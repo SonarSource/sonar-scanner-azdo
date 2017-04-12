@@ -11,3 +11,8 @@ https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube
 
 ## JIRA
 https://jira.sonarsource.com/browse/TBSTFNP
+
+## How to package
+* Install NPM / Node.js
+* npm install -g tfx-cli
+* run pack.ps1

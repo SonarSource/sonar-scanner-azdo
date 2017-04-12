@@ -43,10 +43,10 @@
             "uri": "http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html"
         },
         "support": {
-            "uri": "http://www.sonarqube.org/get-support/"
+            "uri": "https://www.sonarqube.org/community/"
         },
         "repository": {
-            "uri": "https://github.com/SonarSource-VisualStudio/sonar-scanner-msbuild/tree/master/VSTS"
+            "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
         }
     },
     "files": [
