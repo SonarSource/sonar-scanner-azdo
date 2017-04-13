@@ -16,6 +16,9 @@ if ($environment -eq "Test" -and [string]::IsNullOrEmpty($publisherName))
 }
 
 $ErrorActionPreference = "Stop"
+$ScannerMSBuildVersion = "2.3.1.554"
+# It has to be the same version as the one embedded in the Scanner for MSBuild
+$ScannerCliVersion = "3.0.1.733"
 
 $extensionsDirectoryPath = Join-Path $PSScriptRoot "Extensions"
 $buildDirectoryPath = Join-Path $PSScriptRoot "build"
@@ -92,7 +95,7 @@ function CopyScannerFiles
 
     # Copy specific content
     Copy-Item $scannerPath -Destination "$tasksTempPath\ScannerMsBuildBegin\SonarQubeScannerMsBuild" -Recurse
-    Copy-Item "$scannerPath\sonar-scanner-2.8" -Destination "$tasksTempPath\ScannerCli\sonar-scanner" -Recurse
+    Copy-Item "$scannerPath\sonar-scanner-$ScannerCliVersion" -Destination "$tasksTempPath\ScannerCli\sonar-scanner" -Recurse
 }
 
 function UpdateExtensionManifestOverrideFile
@@ -222,6 +225,6 @@ function Pack
 UpdateTfxCli
 PrepareBuildDirectory
 CopyCommonTaskItems
-$scannerPath = DownloadSonarQubeScanner "https://github.com/SonarSource-VisualStudio/sonar-scanner-msbuild/releases/download/2.2/sonar-scanner-msbuild-2.2.0.24.zip" 
+$scannerPath = DownloadSonarQubeScanner "https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/$ScannerMSBuildVersion/sonar-scanner-msbuild-$ScannerMSBuildVersion.zip" 
 CopyScannerFiles $scannerPath
 Pack "SonarQube"
