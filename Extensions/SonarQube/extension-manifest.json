@@ -20,7 +20,9 @@
     "tags": [
         "build",
         "ci",
-        "continuous integration"
+        "continuous integration",
+        "code quality",
+        "static code analysis"
     ],
     "content": {
         "details": {
