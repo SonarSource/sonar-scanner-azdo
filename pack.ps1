@@ -16,9 +16,9 @@ if ($environment -eq "Test" -and [string]::IsNullOrEmpty($publisherName))
 }
 
 $ErrorActionPreference = "Stop"
-$ScannerMSBuildVersion = "2.3.1.554"
+$ScannerMSBuildVersion = "2.3.2.573"
 # It has to be the same version as the one embedded in the Scanner for MSBuild
-$ScannerCliVersion = "3.0.1.733"
+$ScannerCliVersion = "3.0.3.778"
 
 $extensionsDirectoryPath = Join-Path $PSScriptRoot "Extensions"
 $buildDirectoryPath = Join-Path $PSScriptRoot "build"
