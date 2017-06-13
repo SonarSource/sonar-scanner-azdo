@@ -144,7 +144,7 @@
                         ]
                     }
                 ],
-                "helpMarkDown": "Is your project open source? Have a look at <a href=\"https://sonarqube.com\">sonarqube.com</a> to freely consume SonarQube as a service."
+                "helpMarkDown": "Is your project open source? Have a look at <a href=\"https://sonarcloud.io\">sonarcloud.io</a> to freely consume SonarQube as a service."
             }
         }
     ]
