@@ -16,7 +16,7 @@ if ($environment -eq "Test" -and [string]::IsNullOrEmpty($publisherName))
 }
 
 $ErrorActionPreference = "Stop"
-$ScannerMSBuildVersion = "3.0.0.629"
+$ScannerMSBuildVersion = "3.0.1.635"
 # It has to be the same version as the one embedded in the Scanner for MSBuild
 $ScannerCliVersion = "3.0.3.778"
 
@@ -228,3 +228,4 @@ CopyCommonTaskItems
 $scannerPath = DownloadSonarQubeScanner "https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/$ScannerMSBuildVersion/sonar-scanner-msbuild-$ScannerMSBuildVersion.zip" 
 CopyScannerFiles $scannerPath
 Pack "SonarQube"
+
