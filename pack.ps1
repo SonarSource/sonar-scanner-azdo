@@ -16,7 +16,7 @@ if ($environment -eq "Test" -and [string]::IsNullOrEmpty($publisherName))
 }
 
 $ErrorActionPreference = "Stop"
-$ScannerMSBuildVersion = "3.0.1.635"
+$ScannerMSBuildVersion = "3.0.2.656"
 # It has to be the same version as the one embedded in the Scanner for MSBuild
 $ScannerCliVersion = "3.0.3.778"
 
