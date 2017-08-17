@@ -1,6 +1,6 @@
 **[SonarQube][sq]** is an open source, static, source code analysis solution that enables continuous tracking of bugs, code smells and vulnerabilities for more than 20 different languages such as C#, VB .Net, Java, C, C++, COBOL, JavaScript, ... 
 
-SonarQube can be [installed][getstarted] and run locally on a dedicated infrastructure, or consumed as a service through **[SonarQube.com][sqcom]**. This free-of-charge service is currently dedicated to open source projects.
+SonarQube can be [installed][getstarted] and run locally on a dedicated infrastructure, or consumed as a service through **[SonarCloud][sonarcloud]**. This free-of-charge service is currently dedicated to open source projects.
 
 The analysis of the source code doesn't happen on the server side, but must be part of the build chain to make the analysis as accurate as possible. These analysis are performed using SonarQube Scanners.
 
@@ -35,5 +35,5 @@ Example of a failing Quality Gate:
 This [Get Started][getstarted] guide provides all the required documentation for you to setup a build definition.
 
    [sq]: <https://www.sonarsource.com/why-us/products/sonarqube/>
-   [sqcom]: <https://sonarqube.com/>
+   [sonarcloud]: <https://sonarcloud.io/>
    [getstarted]: <http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html>
