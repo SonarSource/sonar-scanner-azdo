@@ -34,6 +34,6 @@ Example of a failing Quality Gate:
 
 This [Get Started][getstarted] guide provides all the required documentation for you to setup a build definition.
 
-   [sq]: <https://www.sonarsource.com/why-us/products/sonarqube/>
+   [sq]: <https://www.sonarsource.com/products/sonarqube/>
    [sonarcloud]: <https://sonarcloud.io/>
    [getstarted]: <http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html>
