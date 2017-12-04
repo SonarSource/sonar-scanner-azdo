@@ -1,7 +1,6 @@
 {
     "id": "sonarqube",
     "name": "[Test] SonarQube",
-    "version": "set-by-pack.ps1",
     "public": false,
     "branding": {
         "color": "#ff0000",
