@@ -13,7 +13,7 @@
             "id": "Microsoft.VisualStudio.Services"
         }
     ],
-    "description": "Use the SonarQube / SonarCloud build tasks in your continuous integration builds to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
+    "description": "Use the SonarQube/SonarCloud build tasks in your build/release definitions to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
     "public": true,
     "categories": [
         "Build and release"
