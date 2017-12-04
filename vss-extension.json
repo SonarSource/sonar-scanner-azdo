@@ -1,16 +1,20 @@
 {
     "manifestVersion": 1,
-    "id": "set-by-extension-manifest.environment.json",
-    "name": "set-by-extension-manifest.environment.json",
-    "version": "set-by-extension-manifest.environment.json",
-    "publisher": "set-by-extension-manifest.environment.json",
+    "id": "sonarqube",
+    "name": "SonarQube",
+    "version": "4.0.0",
+    "branding": {
+        "color": "rgb(67, 157, 210)",
+        "theme": "dark"
+    },
+    "publisher": "sonarsource",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
         }
     ],
     "description": "Use the SonarQube build tasks in your continuous integration builds to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
-    "public": false,
+    "public": true,
     "categories": [
         "Build and release"
     ],
@@ -53,7 +57,7 @@
     },
     "files": [
         {
-            "path": "Tasks"
+            "path": "tasks"
         },
         {
             "path": "img",
@@ -73,7 +77,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "Tasks/ScannerMsBuildBegin"
+                "name": "tasks/scanner-msbuild-begin"
             }
         },
         {
@@ -83,7 +87,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "Tasks/ScannerMsBuildEnd"
+                "name": "tasks/scanner-msbuild-end"
             }
         },
         {
@@ -93,7 +97,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name":  "Tasks/ScannerCli"
+                "name":  "tasks/scanner-cli"
             }
         },
         {
