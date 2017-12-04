@@ -1,17 +1,19 @@
 {
     "manifestVersion": 1,
     "id": "sonarqube",
-    "name": "SonarQube",
+    "name": "SonarQube & SonarCloud",
     "version": "4.0.0",
     "branding": {
         "color": "rgb(67, 157, 210)",
         "theme": "dark"
     },
     "publisher": "sonarsource",
-    "targets": [{
-        "id": "Microsoft.VisualStudio.Services"
-    }],
-    "description": "Use the SonarQube build tasks in your continuous integration builds to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "description": "Use the SonarQube / SonarCloud build tasks in your continuous integration builds to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
     "public": true,
     "categories": [
         "Build and release"
@@ -39,7 +41,7 @@
     }],
     "links": {
         "home": {
-            "uri": "http://www.sonarqube.org/"
+            "uri": "https://www.sonarqube.org/"
         },
         "getstarted": {
             "uri": "http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html"
