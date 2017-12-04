@@ -1,8 +1,8 @@
 {
     "id": "6D01813A-9589-4B15-8491-8164AEB38055",
     "name": "SonarQubeScannerMsBuildEnd",
-    "friendlyName": "SonarQube  Scanner for MSBuild - End Analysis (new)",
-    "description": "Complete the SonarQube analysis of your solution",
+    "friendlyName": "Scanner for MSBuild - End Analysis",
+    "description": "Complete the SonarQube or SonarCloud analysis of your solution",
     "helpMarkDown": "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
     "category": "Build",
     "visibility": [
