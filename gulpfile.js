@@ -119,7 +119,8 @@ gulp.task('extension:copy', () =>
     gulp
       .src(['vss-extension.json', 'extension-icon.png', 'overview.md', 'license-terms.md'])
       .pipe(gulp.dest(paths.build.extension)),
-    gulp.src(pathAllFiles('img')).pipe(gulp.dest(path.join(paths.build.extension, 'img')))
+    gulp.src(pathAllFiles('img')).pipe(gulp.dest(path.join(paths.build.extension, 'img'))),
+    gulp.src(pathAllFiles('icons')).pipe(gulp.dest(path.join(paths.build.extension, 'icons')))
   )
 );
 
