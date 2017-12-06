@@ -24,10 +24,10 @@
     "yargs": "10.0.3"
   },
   "scripts": {
-    "build": "npx gulp build",
-    "format": "npx prettier --write --list-different '**/*.{js,ts}'",
-    "test-build": "npx gulp build:test",
-    "ts-check": "tsc --noEmit"
+    "build": "./node_modules/.bin/gulp build",
+    "format": "./node_modules/.bin/prettier --write --list-different '**/*.{js,ts}'",
+    "test-build": "./node_modules/.bin/gulp build:test",
+    "ts-check": "./node_modules/.bin/tsc --noEmit"
   },
   "engines": {
     "node": ">=6"
