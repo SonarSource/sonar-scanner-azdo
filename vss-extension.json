@@ -88,6 +88,14 @@
             }
         },
         {
+            "id": "364fcf6c-8c46-43b8-8221-dfc34ac97eb4",
+            "type": "ms.vss-distributed-task.task",
+            "targets": ["ms.vss-distributed-task.tasks"],
+            "properties": {
+                "name": "tasks/inject-config"
+            }
+        },
+        {
             "id": "EDC775DD-1A82-4ADD-A073-7B5813E87202",
             "description": "Service Endpoint type for SonarQube Connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
