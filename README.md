@@ -15,4 +15,7 @@ https://jira.sonarsource.com/browse/TBSTFNP
 ## How to package
 * Install NPM / Node.js
 * npm install -g tfx-cli
-* run pack.ps1
+* npm run build -- --releaseVersion 4.0.x
+
+## Package a test version
+* npm run test-build -- --publisher name
