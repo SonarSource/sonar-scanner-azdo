@@ -1,1 +1,21 @@
-build
+# build
+build/
+
+# VS Code
+.vscode/
+
+# nodeJS dependencies
+node_modules/
+
+# npm logs
+npm-debug.log*
+npm.tar.gz
+yarn-error.log
+
+# yarn
+.yarn-meta
+yarn-error.log*
+yarn-debug.log*
+
+# vsts
+*.vsix
