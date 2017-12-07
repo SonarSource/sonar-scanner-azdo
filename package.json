@@ -4,7 +4,7 @@
   "repository": "SonarSource/sonar-scanner-vsts",
   "license": "LGPL-3.0",
   "devDependencies": {
-    "@types/node": "8.0.54",
+    "@types/node": "8.0.19",
     "del": "3.0.0",
     "event-stream": "3.3.4",
     "fs-extra": "4.0.2",
@@ -18,9 +18,9 @@
     "gulp-sequence": "0.4.6",
     "gulp-typescript": "3.2.3",
     "gulp-util": "3.0.8",
-    "prettier": "1.7.4",
+    "prettier": "1.9.1",
     "semver": "5.4.1",
-    "typescript": "2.5.3",
+    "typescript": "2.6.2",
     "yargs": "10.0.3"
   },
   "scripts": {

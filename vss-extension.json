@@ -43,10 +43,15 @@
         },
         "support": {
             "uri": "https://www.sonarqube.org/community/"
-        },
-        "repository": {
-            "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
         }
+    },
+    "CustomerQnASupport": {
+        "enableqna": "true",
+        "url": "https://groups.google.com/d/forum/sonarqube"
+    },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
     },
     "files": [
         {
@@ -85,6 +90,14 @@
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/scanner-cli"
+            }
+        },
+        {
+            "id": "364fcf6c-8c46-43b8-8221-dfc34ac97eb4",
+            "type": "ms.vss-distributed-task.task",
+            "targets": ["ms.vss-distributed-task.tasks"],
+            "properties": {
+                "name": "tasks/inject-config"
             }
         },
         {
