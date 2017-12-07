@@ -43,10 +43,11 @@
         },
         "support": {
             "uri": "https://www.sonarqube.org/community/"
-        },
-        "repository": {
-            "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
         }
+    },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
     },
     "files": [
         {
