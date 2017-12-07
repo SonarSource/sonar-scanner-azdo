@@ -1,6 +1,6 @@
 {
     "id": "sonarqube",
-    "name": "[Test] SonarQube",
+    "name": "[Test] SonarQube & SonarCloud",
     "public": false,
     "branding": {
         "color": "#ff0000",
