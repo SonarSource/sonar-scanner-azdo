@@ -45,6 +45,10 @@
             "uri": "https://www.sonarqube.org/community/"
         }
     },
+    "CustomerQnASupport": {
+        "enableqna": "true",
+        "url": "https://groups.google.com/d/forum/sonarqube"
+    },
     "repository": {
         "type": "git",
         "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
