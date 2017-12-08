@@ -14,6 +14,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const semver = require('semver');
 const ts = require('gulp-typescript').createProject('tsconfig.json');
+const extensionTest = require('./vss-extension.test.json');
+const { pathAllFiles, npmInstallTask, tfxCommand } = require('./package-utils');
 
 const paths = {
   build: {
@@ -30,10 +32,6 @@ const paths = {
 const sqScannerMSBuildVersion = '3.0.2.656';
 const sqScannerCliVersion = '3.0.3.778'; // Has to be the same version as the one embedded in the Scanner for MSBuild
 const sqScannerUrl = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/${sqScannerMSBuildVersion}/sonar-scanner-msbuild-${sqScannerMSBuildVersion}.zip`;
-
-function pathAllFiles(...paths) {
-  return path.join(...paths, '**', '*');
-}
 
 gulp.task('clean', () => del([path.join(paths.build.root, '**'), '*.vsix']));
 
@@ -76,10 +74,33 @@ gulp.task('tasks:logo', () => {
   return taskPipe;
 });
 
-gulp.task('tasks:copy', () =>
+gulp.task('tasks:v3:copy', () =>
   gulp
     .src(pathAllFiles(paths.tasks))
-    .pipe(gulpif(file => path.extname(file.path) === '.ts', ts()))
+    .pipe(
+      gulpif(
+        file => file.path.endsWith('task.json'),
+        jeditor(task => ({
+          ...task,
+          helpMarkDown:
+            `Version: ${task.version.Major}.${task.version.Minor}.${task.version.Patch}. ` +
+            task.helpMarkDown
+        }))
+      )
+    )
+    .pipe(gulp.dest(paths.build.tasks))
+);
+
+gulp.task('tasks:v4:npminstall', () => {
+  gulp
+    .src([path.join(paths.tasks, '**', 'package.json'), '!**/node_modules/**'])
+    .pipe(es.mapSync(file => npmInstallTask(file.path)));
+});
+
+gulp.task('tasks:v4:copy', ['tasks:v4:npminstall'], () =>
+  gulp
+    .src([path.join(paths.tasks, '**', '*.ts'), '!**/node_modules/**'])
+    .pipe(ts())
     .pipe(gulp.dest(paths.build.tasks))
 );
 
@@ -136,35 +157,32 @@ gulp.task(
 );
 
 gulp.task('extension:test', () =>
-  gulp
-    .src('extension-icon.test.png')
-    .pipe(rename('extension-icon.png'))
-    .pipe(gulp.dest(paths.build.extension))
+  es.merge(
+    gulp
+      .src('extension-icon.test.png')
+      .pipe(rename('extension-icon.png'))
+      .pipe(gulp.dest(paths.build.extension)),
+    gulp
+      .src(path.join(paths.build.extension, 'vss-extension.json'))
+      .pipe(jeditor(extensionTest))
+      .pipe(gulp.dest(paths.build.extension))
+  )
 );
 
-function tfxCommand(cb, params = '') {
-  try {
-    execSync(`tfx extension create ${params}`, {
-      cwd: path.join(__dirname, paths.build.extension),
-      stdio: 'inherit'
-    });
-  } catch (err) {
-    var msg = err.output ? err.output.toString() : err.message;
-    console.error(msg);
-    cb(new gutil.PluginError(msg));
-    return false;
-  }
-  return true;
-}
+gulp.task('tfx', () => tfxCommand(paths.build.extension));
 
-gulp.task('tfx', cb => tfxCommand(cb));
+gulp.task('tfx:test', () =>
+  tfxCommand(paths.build.extension, `--publisher ` + (argv.publisher || 'foo'))
+);
 
-gulp.task('tfx:test', cb => {
-  const extensionTest = path.join('..', '..', 'vss-extension.test.json');
-  tfxCommand(cb, `--overridesFile ${extensionTest} --publisher ` + (argv.publisher || 'foo'));
-});
-
-gulp.task('copy', ['extension:copy', 'tasks:copy', 'tasks:common', 'tasks:logo', 'scanner:copy']);
+gulp.task('copy', [
+  'extension:copy',
+  'tasks:v3:copy',
+  'tasks:v4:copy',
+  'tasks:common',
+  'tasks:logo',
+  'scanner:copy'
+]);
 
 gulp.task('version', ['tasks:version', 'extension:version']);
 
