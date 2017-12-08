@@ -12,9 +12,12 @@ https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube
 ## JIRA
 https://jira.sonarsource.com/browse/TBSTFNP
 
-## How to package
+## How to set the environment
 * Install NPM / Node.js
 * npm install -g tfx-cli
+* npm install
+
+## Package build a version
 * npm run build -- --releaseVersion 4.0.x
 
 ## Package a test version
