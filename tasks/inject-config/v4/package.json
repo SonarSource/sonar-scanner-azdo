@@ -1,10 +1,10 @@
 {
-    "name": "inject-config",
-    "version": "4.0.0",
-    "description": "SonarQube Task",
-    "author": "SonarSource",
-    "license": "LGPL-3.0",
-    "dependencies": {
-        "vsts-task-lib": "^2.1.0"
-    }
+  "name": "inject-config",
+  "version": "4.0.0",
+  "description": "SonarQube Task",
+  "author": "SonarSource",
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "vsts-task-lib": "2.1.0"
+  }
 }

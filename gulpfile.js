@@ -4,7 +4,6 @@ const download = require('gulp-download');
 const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const gulpSequence = require('gulp-sequence');
-const gulpTs = require('gulp-typescript').createProject('tsconfig.json');
 const gutil = require('gulp-util');
 const jeditor = require('gulp-json-editor');
 const rename = require('gulp-rename');
@@ -15,7 +14,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const semver = require('semver');
 const extensionTest = require('./vss-extension.test.json');
-const { pathAllFiles, npmInstallTask, tfxCommand } = require('./package-utils');
+const { bundleTsTask, pathAllFiles, npmInstallTask, tfxCommand } = require('./package-utils');
 
 const paths = {
   build: {
@@ -98,15 +97,21 @@ gulp.task('tasks:v4:npminstall', () => {
     .pipe(es.mapSync(file => npmInstallTask(file.path)));
 });
 
-gulp.task('tasks:v4:copy', ['tasks:v4:npminstall'], () =>
-  es.merge(
-    gulp
-      .src([path.join(paths.tasks, '**', '*.ts'), '!**/node_modules/**'])
-      .pipe(gulpTs())
-      .pipe(gulp.dest(paths.build.tasks)),
-    gulp
-      .src([path.join(paths.tasks, '**', 'task.json'), path.join(paths.tasks, '**', '*.png')])
-      .pipe(gulp.dest(paths.build.tasks))
+gulp.task('tasks:v4:copy', () =>
+  gulp
+    .src([path.join(paths.tasks, '**', 'task.json'), path.join(paths.tasks, '**', '*.png')])
+    .pipe(gulp.dest(paths.build.tasks))
+);
+
+gulp.task('tasks:v4:bundle', ['tasks:v4:npminstall'], () =>
+  gulp.src([path.join(paths.tasks, '**', 'v4', '*.ts'), '!**/node_modules/**']).pipe(
+    es.mapSync(file => {
+      const filePath = path.parse(file.path);
+      return bundleTsTask(
+        file.path,
+        path.join(paths.build.extension, filePath.dir.replace(__dirname, ''), filePath.name + '.js')
+      );
+    })
   )
 );
 
@@ -184,8 +189,9 @@ gulp.task('tfx:test', () =>
 gulp.task('copy', [
   'extension:copy',
   'tasks:v3:copy',
-  'tasks:v4:copy',
   'tasks:v3:common',
+  'tasks:v4:copy',
+  'tasks:v4:bundle',
   'scanner:copy'
 ]);
 
