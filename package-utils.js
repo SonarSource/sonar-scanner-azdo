@@ -1,6 +1,12 @@
 var fs = require('fs-extra');
 var path = require('path');
 var execSync = require('child_process').execSync;
+var rollup = require('rollup');
+var commonjs = require('rollup-plugin-commonjs');
+var resolve = require('rollup-plugin-node-resolve');
+var rollupTs = require('rollup-plugin-typescript2');
+var uglify = require('rollup-plugin-uglify');
+var typescript = require('typescript');
 
 const fail = (exports.fail = function(message) {
   console.error('ERROR: ' + message);
@@ -39,11 +45,44 @@ exports.npmInstallTask = function(packagePath) {
 };
 
 exports.tfxCommand = function(extensionPath, params = '') {
-  run(`tfx extension create ${params}`, {
+  run(`tfx extension create --output-path "../" ${params}`, {
     cwd: path.join(__dirname, extensionPath)
   });
 };
 
 exports.pathAllFiles = function(...paths) {
   return path.join(...paths, '**', '*');
+};
+
+exports.bundleTsTask = function(path, destPath) {
+  return rollup
+    .rollup({
+      input: path,
+      plugins: [rollupTs({ typescript }), resolve({ browser: false }), commonjs(), uglify()],
+      external: [
+        'process',
+        'events',
+        'stream',
+        'util',
+        'path',
+        'buffer',
+        'url',
+        'string_decoder',
+        'http',
+        'https',
+        'os',
+        'assert',
+        'constants',
+        'vm',
+        'child_process',
+        'fs',
+        'crypto'
+      ]
+    })
+    .then(bundle =>
+      bundle.write({
+        file: destPath,
+        format: 'cjs'
+      })
+    );
 };
