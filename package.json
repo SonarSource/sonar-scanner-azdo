@@ -6,6 +6,9 @@
   "devDependencies": {
     "@types/node": "8.0.19",
     "del": "3.0.0",
+    "eslint": "4.13.0",
+    "eslint-plugin-import": "2.8.0",
+    "eslint-plugin-promise": "3.6.0",
     "event-stream": "3.3.4",
     "fs-extra": "4.0.2",
     "gulp": "3.9.1",
@@ -26,13 +29,16 @@
     "rollup-plugin-uglify": "2.0.1",
     "semver": "5.4.1",
     "typescript": "2.6.2",
+    "typescript-eslint-parser": "9.0.1",
     "yargs": "10.0.3"
   },
   "scripts": {
     "build": "./node_modules/.bin/gulp build",
     "format": "./node_modules/.bin/prettier --write --list-different '**/*.{js,ts}'",
+    "lint": "eslint --ext js,ts --quiet '**/*.{js,ts}'",
     "test-build": "./node_modules/.bin/gulp build:test",
-    "ts-check": "./node_modules/.bin/tsc --noEmit"
+    "ts-check": "./node_modules/.bin/tsc --noEmit",
+    "validate": "npm run lint && npm run ts-check"
   },
   "engines": {
     "node": ">=6"
