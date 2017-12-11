@@ -1,19 +1,21 @@
-var fs = require('fs-extra');
-var path = require('path');
-var execSync = require('child_process').execSync;
-var rollup = require('rollup');
-var commonjs = require('rollup-plugin-commonjs');
-var resolve = require('rollup-plugin-node-resolve');
-var rollupTs = require('rollup-plugin-typescript2');
-var uglify = require('rollup-plugin-uglify');
-var typescript = require('typescript');
+/* eslint-disable no-console */
+const { execSync } = require('child_process');
+const path = require('path');
+const fs = require('fs-extra');
+const rollup = require('rollup');
+const commonjs = require('rollup-plugin-commonjs');
+const resolve = require('rollup-plugin-node-resolve');
+const rollupTs = require('rollup-plugin-typescript2');
+const uglify = require('rollup-plugin-uglify');
+const typescript = require('typescript');
 
-const fail = (exports.fail = function(message) {
+function fail(message) {
   console.error('ERROR: ' + message);
   process.exit(1);
-});
+}
+exports.fail = fail;
 
-const run = (exports.run = function(cl, options = {}) {
+function run(cl, options = {}) {
   console.log();
   console.log('> ' + cl);
 
@@ -29,7 +31,8 @@ const run = (exports.run = function(cl, options = {}) {
   }
 
   return (output || '').toString().trim();
-});
+}
+exports.run = run;
 
 exports.npmInstallTask = function(packagePath) {
   const packageJson = JSON.parse(fs.readFileSync(packagePath).toString());

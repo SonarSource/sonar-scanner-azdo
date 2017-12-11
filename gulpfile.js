@@ -1,3 +1,4 @@
+const path = require('path');
 const decompress = require('gulp-decompress');
 const del = require('del');
 const download = require('gulp-download');
@@ -7,11 +8,9 @@ const gulpSequence = require('gulp-sequence');
 const gutil = require('gulp-util');
 const jeditor = require('gulp-json-editor');
 const rename = require('gulp-rename');
-const argv = require('yargs').argv;
+const { argv } = require('yargs');
 const es = require('event-stream');
-const execSync = require('child_process').execSync;
 const fs = require('fs-extra');
-const path = require('path');
 const semver = require('semver');
 const extensionTest = require('./vss-extension.test.json');
 const { bundleTsTask, pathAllFiles, npmInstallTask, tfxCommand } = require('./package-utils');
