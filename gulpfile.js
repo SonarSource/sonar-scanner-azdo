@@ -20,11 +20,13 @@ const paths = {
     root: 'build',
     extension: path.join('build', 'sonarqube'),
     tasks: path.join('build', 'sonarqube', 'tasks'),
+    oldTasks: path.join('build', 'sonarqube', 'oldTasks'),
     tmp: path.join('build', 'tmp'),
     scanner: path.join('build', 'tmp', 'scanner-msbuild')
   },
   common: 'common',
-  tasks: 'tasks'
+  tasks: 'tasks',
+  oldTasks: 'oldTasks',
 };
 
 const sqScannerMSBuildVersion = '3.0.2.656';
@@ -45,24 +47,23 @@ gulp.task('scanner:copy', ['scanner:download'], () =>
       .src(pathAllFiles(paths.build.scanner))
       .pipe(
         gulp.dest(
-          path.join(paths.build.tasks, 'scanner-msbuild-begin', 'v3', 'SonarQubeScannerMsBuild')
+          path.join(paths.build.oldTasks, 'scanner-msbuild-begin', 'SonarQubeScannerMsBuild')
         )
       )
       .pipe(
         gulp.dest(
-          path.join(paths.build.tasks, 'scanner-msbuild-begin', 'v4', 'SonarQubeScannerMsBuild')
+          path.join(paths.build.tasks, 'prepare', 'sonar-scanner-msbuild')
         )
       ),
     gulp
       .src(pathAllFiles(paths.build.scanner, `sonar-scanner-${sqScannerCliVersion}`))
-      .pipe(gulp.dest(path.join(paths.build.tasks, 'scanner-cli', 'v3', 'sonar-scanner')))
-      .pipe(gulp.dest(path.join(paths.build.tasks, 'scanner-cli', 'v4', 'sonar-scanner')))
+      .pipe(gulp.dest(path.join(paths.build.oldTasks, 'scanner-cli', 'sonar-scanner')))
   )
 );
 
-gulp.task('tasks:v3:copy', () =>
+gulp.task('tasks:old:copy', () =>
   gulp
-    .src(pathAllFiles(paths.tasks, '**', 'v3'))
+    .src(pathAllFiles(paths.oldTasks, '**'))
     .pipe(
       gulpif(
         file => file.path.endsWith('task.json'),
@@ -74,36 +75,34 @@ gulp.task('tasks:v3:copy', () =>
         }))
       )
     )
-    .pipe(gulp.dest(paths.build.tasks))
+    .pipe(gulp.dest(paths.build.oldTasks))
 );
 
-gulp.task('tasks:v3:common', () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.common, 'v3'));
+gulp.task('tasks:old:common', () => {
+  let commonPipe = gulp.src(pathAllFiles(paths.common, 'powershell'));
   let logoPipe = gulp.src(path.join('logos', 'icon.png'));
-  const dirs = fs
-    .readdirSync(paths.tasks)
-    .filter(folder => fs.pathExistsSync(path.join(paths.tasks, folder, 'v3')));
-  dirs.forEach(dir => {
-    commonPipe = commonPipe.pipe(gulp.dest(path.join(paths.build.tasks, dir, 'v3')));
-    logoPipe = logoPipe.pipe(gulp.dest(path.join(paths.build.tasks, dir, 'v3')));
+  fs.readdirSync(paths.oldTasks)
+    .forEach(dir => {
+      commonPipe = commonPipe.pipe(gulp.dest(path.join(paths.build.oldTasks, dir)));
+      logoPipe = logoPipe.pipe(gulp.dest(path.join(paths.build.oldTasks, dir)));
   });
   return es.merge(commonPipe, logoPipe);
 });
 
-gulp.task('tasks:v4:npminstall', () => {
+gulp.task('tasks:new:npminstall', () => {
   gulp
     .src([path.join(paths.tasks, '**', 'package.json'), '!**/node_modules/**'])
     .pipe(es.mapSync(file => npmInstallTask(file.path)));
 });
 
-gulp.task('tasks:v4:copy', () =>
+gulp.task('tasks:new:copy', () =>
   gulp
     .src([path.join(paths.tasks, '**', 'task.json'), path.join(paths.tasks, '**', '*.png')])
     .pipe(gulp.dest(paths.build.tasks))
 );
 
-gulp.task('tasks:v4:bundle', ['tasks:v4:npminstall'], () =>
-  gulp.src([path.join(paths.tasks, '**', 'v4', '*.ts'), '!**/node_modules/**']).pipe(
+gulp.task('tasks:new:bundle', ['tasks:new:npminstall'], () =>
+  gulp.src([path.join(paths.tasks, '**', '*.ts'), '!**/node_modules/**']).pipe(
     es.mapSync(file => {
       const filePath = path.parse(file.path);
       return bundleTsTask(
@@ -126,7 +125,7 @@ gulp.task('tasks:version', () => {
   };
 
   return gulp
-    .src(path.join(paths.build.tasks, '**', 'v4', 'task.json'))
+    .src(path.join(paths.build.tasks, '**', 'task.json'))
     .pipe(
       jeditor({
         version,
@@ -136,11 +135,20 @@ gulp.task('tasks:version', () => {
     .pipe(gulp.dest(paths.build.tasks));
 });
 
+gulp.task('tasks:old:test', () => {
+  const dirs = fs.readdirSync(paths.oldTasks);
+  let taskPipe = gulp.src(path.join('logos', 'icon.test.png')).pipe(rename('icon.png'));
+  dirs.forEach(dir => {
+    taskPipe = taskPipe.pipe(gulp.dest(path.join(paths.build.oldTasks, dir)));
+  });
+  return taskPipe;
+});
+
 gulp.task('tasks:test', () => {
   const dirs = fs.readdirSync(paths.tasks);
   let taskPipe = gulp.src(path.join('logos', 'icon.test.png')).pipe(rename('icon.png'));
   dirs.forEach(dir => {
-    taskPipe = taskPipe.pipe(gulp.dest(path.join(paths.build.tasks, dir, 'v3')));
+    taskPipe = taskPipe.pipe(gulp.dest(path.join(paths.build.tasks, dir)));
   });
   return taskPipe;
 });
@@ -187,16 +195,16 @@ gulp.task('tfx:test', () =>
 
 gulp.task('copy', [
   'extension:copy',
-  'tasks:v3:copy',
-  'tasks:v3:common',
-  'tasks:v4:copy',
-  'tasks:v4:bundle',
+  'tasks:old:copy',
+  'tasks:old:common',
+  'tasks:new:copy',
+  'tasks:new:bundle',
   'scanner:copy'
 ]);
 
 gulp.task('version', ['tasks:version', 'extension:version']);
 
-gulp.task('test', ['extension:test', 'tasks:test']);
+gulp.task('test', ['extension:test', 'tasks:test', 'tasks:old:test']);
 
 gulp.task('build', gulpSequence('clean', 'copy', 'version', 'tfx'));
 

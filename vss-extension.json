@@ -58,6 +58,9 @@
             "path": "tasks"
         },
         {
+            "path": "oldTasks"
+        },
+        {
             "path": "img",
             "addressable": true
         },
@@ -73,7 +76,7 @@
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
-                "name": "tasks/scanner-msbuild-begin"
+                "name": "oldTasks/scanner-msbuild-begin"
             }
         },
         {
@@ -81,7 +84,7 @@
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
-                "name": "tasks/scanner-msbuild-end"
+                "name": "oldTasks/scanner-msbuild-end"
             }
         },
         {
@@ -89,7 +92,7 @@
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
-                "name": "tasks/scanner-cli"
+                "name": "oldTasks/scanner-cli"
             }
         },
         {
@@ -97,7 +100,7 @@
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
-                "name": "tasks/inject-config"
+                "name": "tasks/prepare"
             }
         },
         {
