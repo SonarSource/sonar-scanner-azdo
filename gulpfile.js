@@ -26,7 +26,7 @@ const paths = {
   },
   common: 'common',
   tasks: 'tasks',
-  oldTasks: 'oldTasks',
+  oldTasks: 'oldTasks'
 };
 
 const sqScannerMSBuildVersion = '3.0.2.656';
@@ -50,11 +50,7 @@ gulp.task('scanner:copy', ['scanner:download'], () =>
           path.join(paths.build.oldTasks, 'scanner-msbuild-begin', 'SonarQubeScannerMsBuild')
         )
       )
-      .pipe(
-        gulp.dest(
-          path.join(paths.build.tasks, 'prepare', 'sonar-scanner-msbuild')
-        )
-      ),
+      .pipe(gulp.dest(path.join(paths.build.tasks, 'prepare', 'sonar-scanner-msbuild'))),
     gulp
       .src(pathAllFiles(paths.build.scanner, `sonar-scanner-${sqScannerCliVersion}`))
       .pipe(gulp.dest(path.join(paths.build.oldTasks, 'scanner-cli', 'sonar-scanner')))
@@ -82,10 +78,9 @@ gulp.task('tasks:old:copy', () =>
 gulp.task('tasks:old:common', () => {
   let commonPipe = gulp.src(pathAllFiles(paths.common, 'powershell'));
   let logoPipe = gulp.src(path.join('logos', 'icon.png'));
-  fs.readdirSync(paths.oldTasks)
-    .forEach(dir => {
-      commonPipe = commonPipe.pipe(gulp.dest(path.join(paths.build.oldTasks, dir)));
-      logoPipe = logoPipe.pipe(gulp.dest(path.join(paths.build.oldTasks, dir)));
+  fs.readdirSync(paths.oldTasks).forEach(dir => {
+    commonPipe = commonPipe.pipe(gulp.dest(path.join(paths.build.oldTasks, dir)));
+    logoPipe = logoPipe.pipe(gulp.dest(path.join(paths.build.oldTasks, dir)));
   });
   return es.merge(commonPipe, logoPipe);
 });
@@ -114,23 +109,36 @@ gulp.task('tasks:new:bundle', ['tasks:new:npminstall'], () =>
   )
 );
 
-gulp.task('tasks:version', () => {
-  if (!argv.releaseVersion) {
-    return Promise.resolve();
+function fullVersion() {
+  var buildNumber = process.env.TRAVIS_BUILD_NUMBER;
+  var packageJSON = JSON.parse(fs.readFileSync('package.json'));
+  var version = packageJSON.version;
+  if (version.endsWith('-SNAPSHOT') && buildNumber) {
+    return version.replace('-SNAPSHOT', '.' + buildNumber);
   }
+  return version;
+}
 
-  const version = {
-    Major: semver.major(argv.releaseVersion),
-    Minor: semver.minor(argv.releaseVersion),
-    Patch: semver.patch(argv.releaseVersion)
+function semVer() {
+  var packageJSON = JSON.parse(fs.readFileSync('package.json'));
+  return packageJSON.version.replace('-SNAPSHOT', '');
+}
+
+gulp.task('tasks:version', () => {
+  // Task version can only be made of numbers (up to 3)
+  const semVersion = semVer();
+  const taskVersion = {
+    Major: semver.major(semVersion),
+    Minor: semver.minor(semVersion),
+    Patch: semver.patch(semVersion)
   };
 
   return gulp
     .src(path.join(paths.build.tasks, '**', 'task.json'))
     .pipe(
       jeditor({
-        version,
-        helpMarkDown: `Version: ${version}. [More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)`
+        version: taskVersion,
+        helpMarkDown: `Version: ${fullVersion()}. [More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)`
       })
     )
     .pipe(gulp.dest(paths.build.tasks));
@@ -164,16 +172,17 @@ gulp.task('extension:copy', () =>
   )
 );
 
-gulp.task(
-  'extension:version',
-  () =>
-    argv.releaseVersion
-      ? gulp
-          .src(path.join(paths.build.extension, 'vss-extension.json'))
-          .pipe(jeditor({ version: argv.releaseVersion }))
-          .pipe(gulp.dest(paths.build.extension))
-      : Promise.resolve()
-);
+gulp.task('extension:version', () => {
+  let vsixVersion = fullVersion();
+  // Extension version can only be made of numbers (up to 4)
+  if (vsixVersion.endsWith('-SNAPSHOT')) {
+    vsixVersion = vsixVersion.replace('-SNAPSHOT', '');
+  }
+  gulp
+    .src(path.join(paths.build.extension, 'vss-extension.json'))
+    .pipe(jeditor({ version: `${vsixVersion}` }))
+    .pipe(gulp.dest(paths.build.extension));
+});
 
 gulp.task('extension:test', () =>
   es.merge(
@@ -209,6 +218,6 @@ gulp.task('test', ['extension:test', 'tasks:test', 'tasks:old:test']);
 
 gulp.task('build', gulpSequence('clean', 'copy', 'version', 'tfx'));
 
-gulp.task('build:test', gulpSequence('clean', 'copy', 'test', 'tfx:test'));
+gulp.task('build:test', gulpSequence('clean', 'copy', 'version', 'test', 'tfx:test'));
 
 gulp.task('default', ['build']);

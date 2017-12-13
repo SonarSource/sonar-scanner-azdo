@@ -7,18 +7,23 @@ Copyright 2017-2017 SonarSource.
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
 
 ## Marketplace
+
 https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube
 
 ## JIRA
-https://jira.sonarsource.com/browse/TBSTFNP
+
+https://jira.sonarsource.com/browse/VSTS
 
 ## How to set the environment
+
 * Install NPM / Node.js
 * npm install -g tfx-cli
 * npm install
 
-## Package build a version
-* npm run build -- --releaseVersion 4.0.x
+## Package a production build
 
-## Package a test version
+* npm run build
+
+## Package a test build
+
 * npm run test-build -- --publisher name
