@@ -3,6 +3,19 @@ import * as trm from 'vsts-task-lib/toolrunner';
 import { EndpointType } from '../../common/ts/types';
 import { PROP_NAMES, toCleanJSON } from '../../common/ts/utils';
 
+function runMsBuildBegin(projectKey) {
+  const scannerExe = tl.resolve(
+    __dirname,
+    'sonar-scanner-msbuild',
+    'SonarQube.Scanner.MSBuild.exe'
+  );
+  tl.setVariable('SONARQUBE_SCANNER_MSBUILD_EXE', scannerExe);
+  const msBuildScannerRunner = tl.tool(scannerExe);
+  msBuildScannerRunner.arg('begin');
+  msBuildScannerRunner.arg('/k:' + projectKey);
+  return msBuildScannerRunner.exec();
+}
+
 async function run() {
   try {
     const props: { [key: string]: string } = {};
@@ -25,9 +38,23 @@ async function run() {
         throw new Error('Unknown endpoint type: ' + endpointType);
     }
     props[PROP_NAMES.HOST_URL] = tl.getEndpointUrl(endpoint, false);
-    props[PROP_NAMES.PROJECTKEY] = tl.getInput('projectKey');
-    props[PROP_NAMES.PROJECTNAME] = tl.getInput('projectName');
-    props[PROP_NAMES.PROJECTVERSION] = tl.getInput('projectVersion');
+    const scannerMode = tl.getInput('scannerMode');
+    // So that "run scanner" task knows the choice that user made made
+    tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
+
+    const isMSBuild = scannerMode == 'MSBuild';
+    let projectKey;
+    if (isMSBuild) {
+      projectKey = tl.getInput('msBuildProjectKey', true);
+      props[PROP_NAMES.PROJECTNAME] = tl.getInput('msBuildProjectName');
+      props[PROP_NAMES.PROJECTVERSION] = tl.getInput('msBuildProjectVersion');
+    } else if (scannerMode == 'CLI') {
+      projectKey = tl.getInput('cliProjectKey', true);
+      props[PROP_NAMES.PROJECTNAME] = tl.getInput('cliProjectName');
+      props[PROP_NAMES.PROJECTVERSION] = tl.getInput('cliProjectVersion');
+      props[PROP_NAMES.PROJECTSOURCES] = tl.getInput('cliSources');
+    }
+    props[PROP_NAMES.PROJECTKEY] = projectKey;
 
     tl
       .getDelimitedInput('extraProperties', '\n')
@@ -35,6 +62,10 @@ async function run() {
       .forEach(([k, v]) => (props[k] = v));
 
     tl.setVariable('SONARQUBE_SCANNER_PARAMS', toCleanJSON(props));
+
+    if (isMSBuild) {
+      await runMsBuildBegin(projectKey);
+    }
   } catch (err) {
     tl.setResult(tl.TaskResult.Failed, err.message);
   }

@@ -1,215 +1,223 @@
 {
-    "manifestVersion": 1,
-    "id": "sonarqube",
-    "name": "SonarQube & SonarCloud",
-    "version": "4.0.0",
-    "branding": {
-        "color": "rgb(67, 157, 210)",
-        "theme": "dark"
+  "manifestVersion": 1,
+  "id": "sonarqube",
+  "name": "SonarQube & SonarCloud",
+  "version": "4.0.0",
+  "branding": {
+    "color": "rgb(67, 157, 210)",
+    "theme": "dark"
+  },
+  "publisher": "sonarsource",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description":
+    "Use the SonarQube/SonarCloud build tasks in your build/release definitions to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
+  "public": true,
+  "categories": ["Build and release"],
+  "icons": {
+    "default": "extension-icon.png"
+  },
+  "tags": ["build", "ci", "continuous integration", "code quality", "static code analysis"],
+  "content": {
+    "details": {
+      "path": "overview.md"
     },
-    "publisher": "sonarsource",
-    "targets": [
-        {
-            "id": "Microsoft.VisualStudio.Services"
-        }
-    ],
-    "description":
-        "Use the SonarQube/SonarCloud build tasks in your build/release definitions to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
-    "public": true,
-    "categories": ["Build and release"],
-    "icons": {
-        "default": "extension-icon.png"
+    "license": {
+      "path": "license-terms.md"
+    }
+  },
+  "screenshots": [
+    {
+      "path": "img/tasks.png"
+    }
+  ],
+  "links": {
+    "home": {
+      "uri": "https://www.sonarqube.org/"
     },
-    "tags": ["build", "ci", "continuous integration", "code quality", "static code analysis"],
-    "content": {
-        "details": {
-            "path": "overview.md"
-        },
-        "license": {
-            "path": "license-terms.md"
-        }
+    "getstarted": {
+      "uri": "http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html"
     },
-    "screenshots": [
-        {
-            "path": "img/tasks.png"
-        }
-    ],
-    "links": {
-        "home": {
-            "uri": "https://www.sonarqube.org/"
-        },
-        "getstarted": {
-            "uri": "http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html"
-        },
-        "support": {
-            "uri": "https://www.sonarqube.org/community/"
-        }
+    "support": {
+      "uri": "https://www.sonarqube.org/community/"
+    }
+  },
+  "CustomerQnASupport": {
+    "enableqna": "true",
+    "url": "https://groups.google.com/d/forum/sonarqube"
+  },
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
+  },
+  "files": [
+    {
+      "path": "tasks"
     },
-    "CustomerQnASupport": {
-        "enableqna": "true",
-        "url": "https://groups.google.com/d/forum/sonarqube"
+    {
+      "path": "oldTasks"
     },
-    "repository": {
-        "type": "git",
-        "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
+    {
+      "path": "img",
+      "addressable": true
     },
-    "files": [
-        {
-            "path": "tasks"
+    {
+      "path": "icons",
+      "addressable": true
+    }
+  ],
+  "scopes": ["vso.build", "vso.code", "vso.test"],
+  "contributions": [
+    {
+      "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "oldTasks/scanner-msbuild-begin"
+      }
+    },
+    {
+      "id": "6D01813A-9589-4B15-8491-8164AEB38055",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "oldTasks/scanner-msbuild-end"
+      }
+    },
+    {
+      "id": "9F57024B-31F9-4E58-9E39-A47CCC098F03",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "oldTasks/scanner-cli"
+      }
+    },
+    {
+      "id": "364fcf6c-8c46-43b8-8221-dfc34ac97eb4",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "tasks/prepare"
+      }
+    },
+    {
+      "id": "28b2db3e-9fbc-46c4-97b8-eba3be9e3f47",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "tasks/analyze"
+      }
+    },
+    {
+      "id": "EDC775DD-1A82-4ADD-A073-7B5813E87202",
+      "description": "Service Endpoint type for SonarQube Connections",
+      "type": "ms.vss-endpoint.service-endpoint-type",
+      "targets": ["ms.vss-endpoint.endpoint-types"],
+      "properties": {
+        "name": "sonarqube",
+        "displayName": "SonarQube",
+        "icon": "icons/SonarQube_icon100px.png",
+        "url": {
+          "displayName": "Server Url",
+          "helpText": "Url for the SonarQube Server to connect to."
         },
-        {
-            "path": "oldTasks"
-        },
-        {
-            "path": "img",
-            "addressable": true
-        },
-        {
-            "path": "icons",
-            "addressable": true
-        }
-    ],
-    "scopes": ["vso.build", "vso.code", "vso.test"],
-    "contributions": [
-        {
-            "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
-            "type": "ms.vss-distributed-task.task",
-            "targets": ["ms.vss-distributed-task.tasks"],
-            "properties": {
-                "name": "oldTasks/scanner-msbuild-begin"
-            }
-        },
-        {
-            "id": "6D01813A-9589-4B15-8491-8164AEB38055",
-            "type": "ms.vss-distributed-task.task",
-            "targets": ["ms.vss-distributed-task.tasks"],
-            "properties": {
-                "name": "oldTasks/scanner-msbuild-end"
-            }
-        },
-        {
-            "id": "9F57024B-31F9-4E58-9E39-A47CCC098F03",
-            "type": "ms.vss-distributed-task.task",
-            "targets": ["ms.vss-distributed-task.tasks"],
-            "properties": {
-                "name": "oldTasks/scanner-cli"
-            }
-        },
-        {
-            "id": "364fcf6c-8c46-43b8-8221-dfc34ac97eb4",
-            "type": "ms.vss-distributed-task.task",
-            "targets": ["ms.vss-distributed-task.tasks"],
-            "properties": {
-                "name": "tasks/prepare"
-            }
-        },
-        {
-            "id": "EDC775DD-1A82-4ADD-A073-7B5813E87202",
-            "description": "Service Endpoint type for SonarQube Connections",
-            "type": "ms.vss-endpoint.service-endpoint-type",
-            "targets": ["ms.vss-endpoint.endpoint-types"],
-            "properties": {
-                "name": "sonarqube",
-                "displayName": "SonarQube",
-                "icon": "icons/SonarQube_icon100px.png",
-                "url": {
-                    "displayName": "Server Url",
-                    "helpText": "Url for the SonarQube Server to connect to."
+        "authenticationSchemes": [
+          {
+            "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
+            "inputDescriptors": [
+              {
+                "id": "username",
+                "name": "Token",
+                "description":
+                  "Authentication Token generated through SonarQube (go to My Account > Security > Generate Tokens)",
+                "inputMode": "passwordbox",
+                "isConfidential": true,
+                "validation": {
+                  "isRequired": true,
+                  "dataType": "string"
+                }
+              },
+              {
+                "id": "password",
+                "name": "Password",
+                "description": "Password",
+                "inputMode": "passwordbox",
+                "isConfidential": true,
+                "validation": {
+                  "isRequired": false,
+                  "dataType": "string"
                 },
-                "authenticationSchemes": [
-                    {
-                        "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
-                        "inputDescriptors": [
-                            {
-                                "id": "username",
-                                "name": "Token",
-                                "description":
-                                    "Authentication Token generated through SonarQube (go to My Account > Security > Generate Tokens)",
-                                "inputMode": "passwordbox",
-                                "isConfidential": true,
-                                "validation": {
-                                    "isRequired": true,
-                                    "dataType": "string"
-                                }
-                            },
-                            {
-                                "id": "password",
-                                "name": "Password",
-                                "description": "Password",
-                                "inputMode": "passwordbox",
-                                "isConfidential": true,
-                                "validation": {
-                                    "isRequired": false,
-                                    "dataType": "string"
-                                },
-                                "values": {
-                                    "inputId": "passwordInput",
-                                    "defaultValue": "",
-                                    "isDisabled": true
-                                }
-                            }
-                        ]
-                    }
-                ],
+                "values": {
+                  "inputId": "passwordInput",
+                  "defaultValue": "",
+                  "isDisabled": true
+                }
+              }
+            ]
+          }
+        ],
 
-                "helpMarkDown":
-                    "Is your project open source? Have a look at <a href=\"https://sonarcloud.io\">sonarcloud.io</a> to freely consume SonarQube as a service."
-            }
+        "helpMarkDown":
+          "Is your project open source? Have a look at <a href=\"https://sonarcloud.io\">sonarcloud.io</a> to freely consume SonarQube as a service."
+      }
+    },
+    {
+      "id": "343c5f6a-e4d5-4480-a764-506e1daa05df",
+      "description": "Service endpoint type for SonarCloud Connections",
+      "type": "ms.vss-endpoint.service-endpoint-type",
+      "targets": ["ms.vss-endpoint.endpoint-types"],
+      "properties": {
+        "name": "sonarcloud",
+        "displayName": "SonarCloud",
+        "icon": "icons/SonarCloud_icon100px.png",
+        "url": {
+          "displayName": "Server Url",
+          "value": "https://sonarcloud.io",
+          "isVisible": false
         },
-        {
-            "id": "343c5f6a-e4d5-4480-a764-506e1daa05df",
-            "description": "Service endpoint type for SonarCloud Connections",
-            "type": "ms.vss-endpoint.service-endpoint-type",
-            "targets": ["ms.vss-endpoint.endpoint-types"],
-            "properties": {
-                "name": "sonarcloud",
-                "displayName": "SonarCloud",
-                "icon": "icons/SonarCloud_icon100px.png",
-                "url": {
-                    "displayName": "Server Url",
-                    "value": "https://sonarcloud.io",
-                    "isVisible": false
-                },
-                "dataSources": [
-                    {
-                        "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/api/organizations/search_my_organizations",
-                        "resultSelector": "jsonpath:$.organizations[*]"
-                    },
-                    {
-                        "name": "MyOrganizations",
-                        "endpointUrl": "{{endpoint.url}}/api/organizations/search_my_organizations",
-                        "resultSelector": "jsonpath:$.organizations[0]"
-                    }
-                ],
-                "authenticationSchemes": [
-                    {
-                        "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
-                        "headers": [
-                            {
-                                "name": "Authorization",
-                                "value": "Basic {{ #base64 endpoint.apitoken \":\" }}"
-                            }
-                        ],
-                        "inputDescriptors": [
-                            {
-                                "id": "apitoken",
-                                "name": "SonarCloud Token",
-                                "description":
-                                    "Authentication Token generated through SonarCloud (go to My Account > Security > Generate Tokens)",
-                                "inputMode": "passwordbox",
-                                "isConfidential": true,
-                                "validation": {
-                                    "isRequired": true,
-                                    "dataType": "string"
-                                }
-                            }
-                        ]
-                    }
-                ],
-                "helpMarkDown":
-                    "Go to <a href=\"https://sonarcloud.io/account/security/\">your account security page</a> to generate a token."
-            }
-        }
-    ]
+        "dataSources": [
+          {
+            "name": "TestConnection",
+            "endpointUrl": "{{endpoint.url}}/api/organizations/search_my_organizations",
+            "resultSelector": "jsonpath:$.organizations[*]"
+          },
+          {
+            "name": "MyOrganizations",
+            "endpointUrl": "{{endpoint.url}}/api/organizations/search_my_organizations",
+            "resultSelector": "jsonpath:$.organizations[0]"
+          }
+        ],
+        "authenticationSchemes": [
+          {
+            "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": "Basic {{ #base64 endpoint.apitoken \":\" }}"
+              }
+            ],
+            "inputDescriptors": [
+              {
+                "id": "apitoken",
+                "name": "SonarCloud Token",
+                "description":
+                  "Authentication Token generated through SonarCloud (go to My Account > Security > Generate Tokens)",
+                "inputMode": "passwordbox",
+                "isConfidential": true,
+                "validation": {
+                  "isRequired": true,
+                  "dataType": "string"
+                }
+              }
+            ]
+          }
+        ],
+        "helpMarkDown":
+          "Go to <a href=\"https://sonarcloud.io/account/security/\">your account security page</a> to generate a token."
+      }
+    }
+  ]
 }

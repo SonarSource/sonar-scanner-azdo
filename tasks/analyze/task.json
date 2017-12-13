@@ -1,0 +1,32 @@
+{
+  "id": "28b2db3e-9fbc-46c4-97b8-eba3be9e3f47",
+  "name": "SonarQubeAnalyze",
+  "friendlyName": "Run Code Analysis",
+  "description":
+    "Run scanner and upload results to the SonarQube or SonarCloud server. This task is not needed for Maven and Gradle projects since the scanner should run as part of the build.",
+  "helpMarkDown":
+    "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+  "category": "Build",
+  "visibility": ["Build"],
+  "author": "sonarsource",
+  "version": {
+    "Major": 4,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "2.119.1",
+  "demands": ["java"],
+  "inputs": [],
+  "execution": {
+    "Node": {
+      "target": "analyze.js"
+    }
+  },
+  "outputVariables": [
+    {
+      "name": "SONARQUBE_TASK_ID",
+      "description":
+        "The ID of the task queued on SonarCloud/the SonarQube server. Use this variable in the Upload Analysis Report task to wait for task completion and display quality gate status in VSTS build dashboard."
+    }
+  ]
+}
