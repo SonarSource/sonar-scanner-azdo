@@ -48,9 +48,15 @@ exports.npmInstallTask = function(packagePath) {
 };
 
 exports.tfxCommand = function(extensionPath, params = '') {
-  run(`tfx extension create --output-path "../" ${params}`, {
-    cwd: path.join(__dirname, extensionPath)
-  });
+  run(
+    `${path.join(
+      __dirname,
+      'node_modules/.bin/tfx'
+    )} extension create --output-path "../" ${params}`,
+    {
+      cwd: path.join(__dirname, extensionPath)
+    }
+  );
 };
 
 exports.pathAllFiles = function(...paths) {
