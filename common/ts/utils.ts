@@ -5,7 +5,8 @@ export const PROP_NAMES = {
   ORG: 'sonar.organization',
   PROJECTKEY: 'sonar.projectKey',
   PROJECTNAME: 'sonar.projectName',
-  PROJECTVERSION: 'sonar.projectVersion'
+  PROJECTVERSION: 'sonar.projectVersion',
+  PROJECTSOURCES: 'sonar.sources'
 };
 
 export function toCleanJSON(props: { [key: string]: string }) {
