@@ -30,6 +30,7 @@
     "rollup-plugin-typescript2": "0.8.4",
     "rollup-plugin-uglify": "2.0.1",
     "semver": "5.4.1",
+    "sonarqube-scanner": "^2.0.2",
     "tfx-cli": "0.4.11",
     "through2": "2.0.3",
     "typescript": "2.6.2",
@@ -39,6 +40,7 @@
   "scripts": {
     "build": "./node_modules/.bin/gulp build",
     "deploy": "./node_modules/.bin/gulp deploy",
+    "sonarqube": "./node_modules/.bin/gulp sonarqube",
     "format": "./node_modules/.bin/prettier --write --list-different '**/*.{js,ts}'",
     "lint": "eslint --ext js,ts --quiet '**/*.{js,ts}'",
     "test-build": "./node_modules/.bin/gulp build:test",
