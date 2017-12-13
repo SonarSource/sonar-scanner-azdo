@@ -58,6 +58,7 @@ gulp.task('scanner:copy', ['scanner:download'], () =>
     gulp
       .src(pathAllFiles(paths.build.scanner, `sonar-scanner-${sqScannerCliVersion}`))
       .pipe(gulp.dest(path.join(paths.build.oldTasks, 'scanner-cli', 'sonar-scanner')))
+      .pipe(gulp.dest(path.join(paths.build.tasks, 'analyze', 'sonar-scanner')))
   )
 );
 
