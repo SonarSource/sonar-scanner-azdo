@@ -17,6 +17,7 @@ const crypto = require('crypto');
 const through = require('through2');
 const request = require('request');
 const dateformat = require('dateformat');
+const sonarqubeScanner = require('sonarqube-scanner');
 const extensionTest = require('./vss-extension.test.json');
 const { bundleTsTask, pathAllFiles, npmInstallTask, tfxCommand } = require('./package-utils');
 
@@ -345,6 +346,44 @@ function hashsum() {
 
   return through.obj(processFile);
 }
+
+gulp.task('sonarqube', function(callback) {
+  if (process.env.TRAVIS_BRANCH == 'master' && process.env.TRAVIS_PULL_REQUEST == 'false') {
+    sonarqubeScanner(
+      {
+        serverUrl: process.env.SONAR_HOST_URL,
+        token: process.env.SONAR_TOKEN,
+        options: {
+          'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
+          'sonar.projectName': 'SonarQube Scanner for TFS/VSTS',
+          'sonar.exclusions': 'build/**',
+          'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,
+          'sonar.analysis.pipeline': process.env.TRAVIS_BUILD_NUMBER,
+          'sonar.analysis.sha1': process.env.TRAVIS_COMMIT,
+          'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG
+        }
+      },
+      callback
+    );
+  } else if (process.env.TRAVIS_PULL_REQUEST != 'false') {
+    sonarqubeScanner(
+      {
+        serverUrl: process.env.SONAR_HOST_URL,
+        token: process.env.SONAR_TOKEN,
+        options: {
+          'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
+          'sonar.projectName': 'SonarQube Scanner for TFS/VSTS',
+          'sonar.exclusions': 'build/**',
+          'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,
+          'sonar.analysis.pipeline': process.env.TRAVIS_BUILD_NUMBER,
+          'sonar.analysis.sha1': process.env.TRAVIS_COMMIT,
+          'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG
+        }
+      },
+      callback
+    );
+  }
+});
 
 gulp.task('copy', [
   'extension:copy',
