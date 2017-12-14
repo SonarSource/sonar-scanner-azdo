@@ -42,13 +42,13 @@ async function run() {
     // So that "run scanner" task knows the choice that user made made
     tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
 
-    const isMSBuild = scannerMode == 'MSBuild';
+    const isMSBuild = scannerMode === 'MSBuild';
     let projectKey;
     if (isMSBuild) {
       projectKey = tl.getInput('msBuildProjectKey', true);
       props[PROP_NAMES.PROJECTNAME] = tl.getInput('msBuildProjectName');
       props[PROP_NAMES.PROJECTVERSION] = tl.getInput('msBuildProjectVersion');
-    } else if (scannerMode == 'CLI') {
+    } else if (scannerMode === 'CLI') {
       projectKey = tl.getInput('cliProjectKey', true);
       props[PROP_NAMES.PROJECTNAME] = tl.getInput('cliProjectName');
       props[PROP_NAMES.PROJECTVERSION] = tl.getInput('cliProjectVersion');
