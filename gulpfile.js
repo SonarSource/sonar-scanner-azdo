@@ -244,7 +244,7 @@ gulp.task('deploy-vsix', ['build', 'compute-hashes'], function() {
   const version = fullVersion();
   const name = packageJSON.name;
   return gulp
-    .src('*.vsix')
+    .src(path.join(paths.build.root, '*.vsix'))
     .pipe(
       artifactoryUpload({
         url:
