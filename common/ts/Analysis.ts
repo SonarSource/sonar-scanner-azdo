@@ -1,0 +1,141 @@
+import * as tl from 'vsts-task-lib/task';
+import Endpoint, { EndpointType } from './Endpoint';
+import Metrics from './Metrics';
+import Task from './Task';
+import { formatMeasure } from './measures';
+
+interface IAnalysis {
+  status: string;
+  conditions: Condition[];
+}
+
+interface Condition {
+  status: string;
+  metricKey: string;
+  actualValue?: string;
+  comparator?: string;
+  periodIndex?: number;
+  errorThreshold?: string;
+  warningThreshold?: string;
+}
+
+export default class Analysis {
+  constructor(
+    private analysis: IAnalysis,
+    private metrics: Metrics,
+    private endpointType: EndpointType,
+    private dashboardUrl: string | undefined
+  ) {}
+
+  public get status() {
+    return this.analysis.status.toUpperCase();
+  }
+
+  public get conditions() {
+    return this.analysis.conditions;
+  }
+
+  public getFailedConditions() {
+    return this.conditions.filter(condition =>
+      ['WARN', 'ERROR'].includes(condition.status.toUpperCase())
+    );
+  }
+
+  public getHtmlAnalysisReport() {
+    tl.debug(`[SQ] Generate analysis report.'`);
+    return [
+      this.getQualityGateSection(),
+      this.getQualityGateDetailSection(),
+      this.getDashboardLink()
+    ]
+      .join(' \r\n')
+      .trim();
+  }
+
+  private getQualityGateSection() {
+    const qgStyle = `background-color: ${this.getQualityGateColor()};
+      padding: 4px 12px;
+      color: #fff;
+      letter-spacing: 0.02em;
+      line-height: 24px;
+      font-weight: 600;
+      font-size: 12px;
+      margin-left: 15px;`;
+    return `<div style="padding-top: 8px;">
+      <span>Quality Gate</span>
+      <span style="${qgStyle}">
+        ${formatMeasure(this.status, 'LEVEL')}
+      </span>
+    </div>`;
+  }
+
+  private getQualityGateDetailSection() {
+    const failedConditions = this.getFailedConditions();
+    if (!['WARN', 'ERROR'].includes(this.status) || failedConditions.length <= 0) {
+      return '';
+    }
+
+    const rows = failedConditions.map(condition => {
+      const metric = this.metrics.getMetricByKey(condition.metricKey);
+      const threshold =
+        condition.status === 'WARN' ? condition.warningThreshold : condition.errorThreshold;
+      return `<tr>
+        <td><span style="padding-right:4px;">${metric.name}</span></td>
+        <td style="text-align: center; background-color:${this.getQualityGateColor()}; color:#fff;">
+          <span style="padding:0px 2px">${formatMeasure(condition.actualValue, metric.type)}</span>
+        </td>
+        <td>
+          &nbsp;${formatMeasure(condition.comparator, 'COMPARATOR')}
+          &nbsp;${formatMeasure(threshold, metric.type)}
+        </td>
+      </tr>`;
+    });
+    return `<table border="0" style="padding-top: 4px; border-top: 1px solid #eee; border-collapse: separate; border-spacing: 0 2px;">
+      <tbody>
+        ${rows.join(' \r\n').trim()}
+      </tbody>
+    </table>\r\n\r\n`; // 2 carriage returns to prevent any malformed summary results
+  }
+
+  private getDashboardLink() {
+    if (!this.dashboardUrl) {
+      return '';
+    }
+    const linkText = `Detailed ${this.endpointType} report`;
+    return `[${linkText}](${this.dashboardUrl})`;
+  }
+
+  private getQualityGateColor() {
+    switch (this.status) {
+      case 'OK':
+        return '#00aa00';
+      case 'WARN':
+        return '#ed7d20';
+      case 'ERROR':
+        return '#d4333f';
+      case 'NONE':
+        return '#b4b4b4';
+      default:
+        return '#b4b4b4';
+    }
+  }
+
+  public static getAnalysis(
+    analysisId: string,
+    endpoint: Endpoint,
+    metrics: Metrics,
+    dashboardUrl?: string
+  ): Promise<Analysis> {
+    tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
+    return endpoint.apiGetJSON('/api/qualitygates/project_status', { analysisId }).then(
+      ({ projectStatus }: { projectStatus: IAnalysis }) =>
+        new Analysis(projectStatus, metrics, endpoint.type, dashboardUrl),
+      err => {
+        if (err && err.message) {
+          tl.debug(`[SQ] Error retrieving analysis: ${err.message}`);
+        }
+        throw new Error(`[SQ] Could not fetch analysis for ID '${analysisId}'`);
+      }
+    );
+  }
+}
