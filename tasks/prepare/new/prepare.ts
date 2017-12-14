@@ -1,7 +1,7 @@
 import * as tl from 'vsts-task-lib/task';
 import * as trm from 'vsts-task-lib/toolrunner';
-import { EndpointType } from '../../common/ts/types';
-import { PROP_NAMES, toCleanJSON } from '../../common/ts/utils';
+import { EndpointType } from '../../../common/ts/types';
+import { PROP_NAMES, toCleanJSON } from '../../../common/ts/utils';
 
 function runMsBuildBegin(projectKey) {
   const scannerExe = tl.resolve(
