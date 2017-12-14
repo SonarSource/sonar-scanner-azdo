@@ -1,0 +1,26 @@
+{
+  "id": "291ed61f-1ee4-45d3-b1b0-bf822d9095ef",
+  "name": "SonarQubeResultPublish",
+  "friendlyName": "Publish Analysis Result",
+  "description":
+    "Publish SonarQube or SonarCloud analysis result, to be used after the actual analysis.",
+  "helpMarkDown":
+    "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+  "category": "Build",
+  "visibility": ["Build"],
+  "author": "sonarsource",
+  "version": {
+    "Major": 4,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "1.95.1",
+  "groups": [],
+  "inputs": [],
+  "dataSourceBindings": [],
+  "execution": {
+    "Node": {
+      "target": "publish.js"
+    }
+  }
+}

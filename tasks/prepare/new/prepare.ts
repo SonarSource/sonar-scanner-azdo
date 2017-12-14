@@ -1,6 +1,6 @@
 import * as tl from 'vsts-task-lib/task';
 import * as trm from 'vsts-task-lib/toolrunner';
-import { EndpointType } from '../../../common/ts/types';
+import Endpoint, { EndpointType } from '../../../common/ts/Endpoint';
 import { PROP_NAMES, toCleanJSON } from '../../../common/ts/utils';
 
 function runMsBuildBegin(projectKey) {
@@ -18,30 +18,13 @@ function runMsBuildBegin(projectKey) {
 
 async function run() {
   try {
-    const props: { [key: string]: string } = {};
     const endpointType: EndpointType = EndpointType[tl.getInput('endpointType', true)];
-    const endpoint = tl.getInput(endpointType, true);
-    switch (endpointType) {
-      case EndpointType.SonarCloud:
-        props[PROP_NAMES.LOGIN] = tl.getEndpointAuthorizationParameter(endpoint, 'apitoken', false);
-        props[PROP_NAMES.ORG] = tl.getInput('organization', true);
-        break;
-      case EndpointType.SonarQube:
-        props[PROP_NAMES.LOGIN] = tl.getEndpointAuthorizationParameter(endpoint, 'username', true);
-        props[PROP_NAMES.PASSSWORD] = tl.getEndpointAuthorizationParameter(
-          endpoint,
-          'password',
-          true
-        );
-        break;
-      default:
-        throw new Error('Unknown endpoint type: ' + endpointType);
-    }
-    props[PROP_NAMES.HOST_URL] = tl.getEndpointUrl(endpoint, false);
-    const scannerMode = tl.getInput('scannerMode');
-    // So that "run scanner" task knows the choice that user made made
-    tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
+    const endpointId = tl.getInput(endpointType, true);
+    const endpoint = Endpoint.getEndpoint(endpointId, endpointType);
 
+    const scannerMode = tl.getInput('scannerMode');
+
+    const props: { [key: string]: string } = {};
     const isMSBuild = scannerMode === 'MSBuild';
     let projectKey;
     if (isMSBuild) {
@@ -61,7 +44,16 @@ async function run() {
       .map(keyValue => keyValue.split(/=(.+)/))
       .forEach(([k, v]) => (props[k] = v));
 
-    tl.setVariable('SONARQUBE_SCANNER_PARAMS', toCleanJSON(props));
+    // So that "run scanner" task knows the choice that user made
+    tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
+    tl.setVariable('SONARQUBE_ENDPOINT', endpoint.toJson(), true);
+    tl.setVariable(
+      'SONARQUBE_SCANNER_PARAMS',
+      toCleanJSON({
+        ...endpoint.toSonarProps(),
+        ...props
+      })
+    );
 
     if (isMSBuild) {
       await runMsBuildBegin(projectKey);
