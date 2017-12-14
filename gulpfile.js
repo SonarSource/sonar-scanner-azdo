@@ -120,9 +120,9 @@ function getPackageJSON() {
 }
 
 function fullVersion() {
-  var buildNumber = process.env.TRAVIS_BUILD_NUMBER;
-  var packageJSON = getPackageJSON();
-  var version = packageJSON.version;
+  const buildNumber = process.env.TRAVIS_BUILD_NUMBER;
+  const packageJSON = getPackageJSON();
+  let version = packageJSON.version;
   if (version.endsWith('-SNAPSHOT') && buildNumber) {
     return version.replace('-SNAPSHOT', '.' + buildNumber);
   }
@@ -130,7 +130,7 @@ function fullVersion() {
 }
 
 function semVer() {
-  var packageJSON = getPackageJSON();
+  const packageJSON = getPackageJSON();
   return packageJSON.version.replace('-SNAPSHOT', '');
 }
 
@@ -213,7 +213,7 @@ gulp.task('tfx:test', () =>
   tfxCommand(paths.build.extension, `--publisher ` + (argv.publisher || 'foo'))
 );
 
-var hashes = {
+let hashes = {
   sha1: '',
   md5: ''
 };
@@ -223,14 +223,13 @@ gulp.task('compute-hashes', ['build'], function() {
 });
 
 gulp.task('deploy-vsix', ['build', 'compute-hashes'], function() {
-  if (process.env.TRAVIS_BRANCH != 'master' && process.env.TRAVIS_PULL_REQUEST == 'false') {
+  if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy-buildinfo');
-    return;
+    return gutil.noop;
   }
-  var packageJSON = getPackageJSON();
-  var version = fullVersion();
-  var name = packageJSON.name;
-  var buildNumber = process.env.TRAVIS_BUILD_NUMBER;
+  const packageJSON = getPackageJSON();
+  const version = fullVersion();
+  const name = packageJSON.name;
   return gulp
     .src('*.vsix')
     .pipe(
@@ -263,14 +262,14 @@ gulp.task('deploy-vsix', ['build', 'compute-hashes'], function() {
 });
 
 gulp.task('deploy-buildinfo', ['compute-hashes'], function() {
-  if (process.env.TRAVIS_BRANCH != 'master' && process.env.TRAVIS_PULL_REQUEST == 'false') {
+  if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy-buildinfo');
-    return;
+    return gutil.noop;
   }
-  var packageJSON = getPackageJSON();
-  var version = fullVersion();
-  var name = packageJSON.name;
-  var buildNumber = process.env.TRAVIS_BUILD_NUMBER;
+  const packageJSON = getPackageJSON();
+  const version = fullVersion();
+  const name = packageJSON.name;
+  const buildNumber = process.env.TRAVIS_BUILD_NUMBER;
   return request
     .put(
       {
@@ -291,24 +290,24 @@ gulp.task('deploy', ['deploy-buildinfo', 'deploy-vsix'], function() {});
 function buildInfo(name, version, buildNumber, hashes) {
   return {
     version: '1.0.1',
-    name: name,
+    name,
     number: buildNumber,
     started: dateformat(new Date(), "yyyy-mm-dd'T'HH:MM:ss.lo"),
     url: process.env.CI_BUILD_URL,
     vcsRevision: process.env.TRAVIS_COMMIT,
-    vcsUrl: 'https://github.com/' + process.env.TRAVIS_REPO_SLUG + '.git',
+    vcsUrl: `https://github.com/${process.env.TRAVIS_REPO_SLUG}.git`,
     modules: [
       {
-        id: 'org.sonarsource.scanner.vsts:' + name + ':' + version,
+        id: `org.sonarsource.scanner.vsts:${name}:${version}`,
         properties: {
-          artifactsToPublish: 'org.sonarsource.scanner.vsts:' + name + ':vsix'
+          artifactsToPublish: `org.sonarsource.scanner.vsts:${name}:vsix`
         },
         artifacts: [
           {
             type: 'vsix',
             sha1: hashes.sha1,
             md5: hashes.md5,
-            name: name + '-' + version + '.vsix'
+            name: `${name}-${version}.vsix`
           }
         ]
       }
@@ -330,13 +329,13 @@ function hashsum() {
       gutil.log('Streams not supported');
       return;
     }
-    for (var algo in hashes) {
+    for (let algo in hashes) {
       if (hashes.hasOwnProperty(algo)) {
         hashes[algo] = crypto
           .createHash(algo)
           .update(file.contents, 'binary')
           .digest('hex');
-        gutil.log('Computed ' + algo + ': ' + hashes[algo]);
+        gutil.log(`Computed ${algo}: ${hashes[algo]}`);
       }
     }
 
@@ -348,7 +347,7 @@ function hashsum() {
 }
 
 gulp.task('sonarqube', function(callback) {
-  if (process.env.TRAVIS_BRANCH == 'master' && process.env.TRAVIS_PULL_REQUEST == 'false') {
+  if (process.env.TRAVIS_BRANCH === 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     sonarqubeScanner(
       {
         serverUrl: process.env.SONAR_HOST_URL,
@@ -365,7 +364,7 @@ gulp.task('sonarqube', function(callback) {
       },
       callback
     );
-  } else if (process.env.TRAVIS_PULL_REQUEST != 'false') {
+  } else if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
     sonarqubeScanner(
       {
         serverUrl: process.env.SONAR_HOST_URL,

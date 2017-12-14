@@ -11,7 +11,7 @@ function runMsBuildEnd() {
 }
 
 function runScannerCli() {
-  var isWindows = tl.osType().match(/^Win/);
+  const isWindows = tl.osType().match(/^Win/);
   let scannerExe = tl.resolve(__dirname, 'sonar-scanner', 'bin', 'sonar-scanner');
   const scannerRunner = tl.tool(scannerExe);
   if (isWindows) {
@@ -28,14 +28,14 @@ async function run() {
         "The 'Prepare Analysis Configuration' task was not executed prior to this task"
       );
     }
-    if (scannerMode == 'Other') {
+    if (scannerMode === 'Other') {
       tl.warning(
         "When using Maven or Gradle, don't use this task but instead tick the 'SonarQube' option in the Maven/Gradle task to run the scanner as part of the build"
       );
-    } else if (scannerMode == 'MSBuild') {
+    } else if (scannerMode === 'MSBuild') {
       await runMsBuildEnd();
       // TODO locate task-result.txt and set SONARQUBE_TASK_ID
-    } else if (scannerMode == 'CLI') {
+    } else if (scannerMode === 'CLI') {
       await runScannerCli();
       // TODO locate task-result.txt and set SONARQUBE_TASK_ID
     } else {
