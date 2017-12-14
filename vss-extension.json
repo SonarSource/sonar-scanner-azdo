@@ -58,9 +58,6 @@
       "path": "tasks"
     },
     {
-      "path": "oldTasks"
-    },
-    {
       "path": "img",
       "addressable": true
     },
@@ -72,31 +69,15 @@
   "scopes": ["vso.build", "vso.code", "vso.test"],
   "contributions": [
     {
-      "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
-      "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
-      "properties": {
-        "name": "oldTasks/scanner-msbuild-begin"
-      }
-    },
-    {
-      "id": "6D01813A-9589-4B15-8491-8164AEB38055",
-      "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
-      "properties": {
-        "name": "oldTasks/scanner-msbuild-end"
-      }
-    },
-    {
       "id": "9F57024B-31F9-4E58-9E39-A47CCC098F03",
       "type": "ms.vss-distributed-task.task",
       "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
-        "name": "oldTasks/scanner-cli"
+        "name": "tasks/scanner-cli"
       }
     },
     {
-      "id": "364fcf6c-8c46-43b8-8221-dfc34ac97eb4",
+      "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
       "type": "ms.vss-distributed-task.task",
       "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
@@ -104,7 +85,7 @@
       }
     },
     {
-      "id": "28b2db3e-9fbc-46c4-97b8-eba3be9e3f47",
+      "id": "6D01813A-9589-4B15-8491-8164AEB38055",
       "type": "ms.vss-distributed-task.task",
       "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
@@ -119,7 +100,7 @@
       "properties": {
         "name": "sonarqube",
         "displayName": "SonarQube",
-        "icon": "icons/SonarQube_icon100px.png",
+        "icon": "icons/SonarQube_endpoint.png",
         "url": {
           "displayName": "Server Url",
           "helpText": "Url for the SonarQube Server to connect to."
@@ -172,7 +153,7 @@
       "properties": {
         "name": "sonarcloud",
         "displayName": "SonarCloud",
-        "icon": "icons/SonarCloud_icon100px.png",
+        "icon": "icons/SonarCloud_endpoint.png",
         "url": {
           "displayName": "Server Url",
           "value": "https://sonarcloud.io",
