@@ -58,6 +58,7 @@
     },
     {
       "name": "SonarQube",
+      "aliases": ["connectedServiceName"],
       "type": "connectedService:sonarqube",
       "label": "SonarQube Server Endpoint",
       "required": true,
@@ -112,6 +113,7 @@
     },
     {
       "name": "msbuildProjectKey",
+      "aliases": ["projectKey"],
       "type": "string",
       "label": "Project Key",
       "required": true,
@@ -128,6 +130,7 @@
     },
     {
       "name": "msbuildProjectName",
+      "aliases": ["projectName"],
       "type": "string",
       "label": "Project Name",
       "required": false,
@@ -145,6 +148,7 @@
     },
     {
       "name": "msbuildProjectVersion",
+      "aliases": ["projectVersion"],
       "type": "string",
       "label": "Project Version",
       "defaultValue": "1.0",
