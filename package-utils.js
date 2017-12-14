@@ -7,6 +7,7 @@ const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 const rollupTs = require('rollup-plugin-typescript2');
 const uglify = require('rollup-plugin-uglify');
+const { minify } = require('uglify-es');
 const typescript = require('typescript');
 
 function fail(message) {
@@ -34,6 +35,11 @@ function run(cl, options = {}) {
 }
 exports.run = run;
 
+function npmIntall(packagePath) {
+  run(`cd ${path.dirname(packagePath)} && npm install && cd ${__dirname}`);
+}
+exports.npmInstall = npmIntall;
+
 exports.npmInstallTask = function(packagePath) {
   const packageJson = JSON.parse(fs.readFileSync(packagePath).toString());
   if (packageJson) {
@@ -43,7 +49,7 @@ exports.npmInstallTask = function(packagePath) {
           packagePath
       );
     }
-    run(`cd ${path.dirname(packagePath)} && npm install && cd ${__dirname}`);
+    npmInstall(packagePath);
   }
 };
 
@@ -67,7 +73,18 @@ exports.bundleTsTask = function(path, destPath) {
   return rollup
     .rollup({
       input: path,
-      plugins: [rollupTs({ typescript }), resolve({ browser: false }), commonjs(), uglify()],
+      plugins: [
+        rollupTs({ typescript }),
+        resolve({ jsnext: true, browser: false }),
+        commonjs({
+          sourceMap: false,
+          namedExports: {
+            'node_modules/request/index.js': ['get'],
+            'node_modules/fs-extra/lib/index.js': ['ensureDirSync', 'writeFileSync']
+          }
+        }),
+        uglify({}, minify)
+      ],
       external: [
         'process',
         'events',
@@ -75,23 +92,43 @@ exports.bundleTsTask = function(path, destPath) {
         'util',
         'path',
         'buffer',
+        'querystring',
         'url',
         'string_decoder',
+        'punycode',
         'http',
         'https',
         'os',
         'assert',
         'constants',
+        'timers',
+        'console',
         'vm',
+        'zlib',
+        'tty',
+        'domain',
+        'dns',
+        'dgram',
         'child_process',
+        'cluster',
+        'module',
+        'net',
+        'readline',
+        'repl',
+        'tls',
         'fs',
         'crypto'
       ]
     })
-    .then(bundle =>
-      bundle.write({
-        file: destPath,
-        format: 'cjs'
-      })
+    .then(
+      bundle =>
+        bundle.write({
+          file: destPath,
+          format: 'cjs'
+        }),
+      err => {
+        console.error('\nRollup error: ' + err.message);
+        process.exit(1);
+      }
     );
 };

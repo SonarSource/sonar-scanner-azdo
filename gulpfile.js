@@ -19,7 +19,13 @@ const request = require('request');
 const dateformat = require('dateformat');
 const sonarqubeScanner = require('sonarqube-scanner');
 const extensionTest = require('./vss-extension.test.json');
-const { bundleTsTask, pathAllFiles, npmInstallTask, tfxCommand } = require('./package-utils');
+const {
+  bundleTsTask,
+  pathAllFiles,
+  npmInstall,
+  npmInstallTask,
+  tfxCommand
+} = require('./package-utils');
 
 const paths = {
   build: {
@@ -64,6 +70,12 @@ gulp.task('scanner:copy', ['scanner:download'], () =>
   )
 );
 
+gulp.task('npm:install', () => {
+  gulp
+    .src([path.join('.', 'package.json'), '!**/node_modules/**'])
+    .pipe(es.mapSync(file => npmInstall(file.path)));
+});
+
 gulp.task('tasks:old:copy', () =>
   gulp
     .src(pathAllFiles(paths.oldTasks, '**'))
@@ -103,7 +115,7 @@ gulp.task('tasks:new:copy', () =>
     .pipe(gulp.dest(paths.build.tasks))
 );
 
-gulp.task('tasks:new:bundle', ['tasks:new:npminstall'], () =>
+gulp.task('tasks:new:bundle', ['npm:install'], () =>
   gulp.src([path.join(paths.tasks, '**', '*.ts'), '!**/node_modules/**']).pipe(
     es.mapSync(file => {
       const filePath = path.parse(file.path);
