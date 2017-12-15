@@ -1,20 +1,7 @@
 import * as tl from 'vsts-task-lib/task';
-import * as trm from 'vsts-task-lib/toolrunner';
 import Endpoint, { EndpointType } from '../../../common/ts/Endpoint';
 import { PROP_NAMES, toCleanJSON } from '../../../common/ts/utils';
-
-function runMsBuildBegin(projectKey) {
-  const scannerExe = tl.resolve(
-    __dirname,
-    'sonar-scanner-msbuild',
-    'SonarQube.Scanner.MSBuild.exe'
-  );
-  tl.setVariable('SONARQUBE_SCANNER_MSBUILD_EXE', scannerExe);
-  const msBuildScannerRunner = tl.tool(scannerExe);
-  msBuildScannerRunner.arg('begin');
-  msBuildScannerRunner.arg('/k:' + projectKey);
-  return msBuildScannerRunner.exec();
-}
+import { runMsBuildBegin } from '../../../common/ts/vsts-server-utils';
 
 async function run() {
   try {
@@ -23,21 +10,23 @@ async function run() {
     const endpoint = Endpoint.getEndpoint(endpointId, endpointType);
 
     const scannerMode = tl.getInput('scannerMode');
-
-    const props: { [key: string]: string } = {};
     const isMSBuild = scannerMode === 'MSBuild';
-    let projectKey;
+    const props: { [key: string]: string } = {};
     if (isMSBuild) {
-      projectKey = tl.getInput('msBuildProjectKey', true);
+      props[PROP_NAMES.PROJECTKEY] = tl.getInput('msBuildProjectKey', true);
       props[PROP_NAMES.PROJECTNAME] = tl.getInput('msBuildProjectName');
       props[PROP_NAMES.PROJECTVERSION] = tl.getInput('msBuildProjectVersion');
     } else if (scannerMode === 'CLI') {
-      projectKey = tl.getInput('cliProjectKey', true);
-      props[PROP_NAMES.PROJECTNAME] = tl.getInput('cliProjectName');
-      props[PROP_NAMES.PROJECTVERSION] = tl.getInput('cliProjectVersion');
-      props[PROP_NAMES.PROJECTSOURCES] = tl.getInput('cliSources');
+      const cliMode = tl.getInput('configMode');
+      if (cliMode === 'file') {
+        props[PROP_NAMES.PROJECTSETTINGS] = tl.getInput('configFile', true);
+      } else {
+        props[PROP_NAMES.PROJECTKEY] = tl.getInput('cliProjectKey', true);
+        props[PROP_NAMES.PROJECTNAME] = tl.getInput('cliProjectName');
+        props[PROP_NAMES.PROJECTVERSION] = tl.getInput('cliProjectVersion');
+        props[PROP_NAMES.PROJECTSOURCES] = tl.getInput('cliSources');
+      }
     }
-    props[PROP_NAMES.PROJECTKEY] = projectKey;
 
     tl
       .getDelimitedInput('extraProperties', '\n')
@@ -56,7 +45,7 @@ async function run() {
     );
 
     if (isMSBuild) {
-      await runMsBuildBegin(projectKey);
+      await runMsBuildBegin(props[PROP_NAMES.PROJECTKEY]);
     }
   } catch (err) {
     tl.setResult(tl.TaskResult.Failed, err.message);
