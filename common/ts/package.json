@@ -1,10 +1,12 @@
 {
-  "name": "prepare",
+  "name": "common",
   "version": "4.0.0",
-  "description": "SonarQube Task Prepare",
+  "description": "SonarQube Task Common",
   "author": "SonarSource",
   "license": "LGPL-3.0",
   "dependencies": {
+    "fs-extra": "5.0.0",
+    "request": "2.83.0",
     "vsts-task-lib": "2.1.0"
   },
   "engines": {
