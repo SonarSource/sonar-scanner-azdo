@@ -367,7 +367,6 @@ gulp.task('sonarqube', function(callback) {
     'sonar.coverage.exclusions': 'gulpfile.js',
     'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,
     'sonar.analysis.pipeline': process.env.TRAVIS_BUILD_NUMBER,
-    'sonar.analysis.sha1': process.env.TRAVIS_COMMIT,
     'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG
   };
   if (process.env.TRAVIS_BRANCH === 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
@@ -376,7 +375,8 @@ gulp.task('sonarqube', function(callback) {
         serverUrl: process.env.SONAR_HOST_URL,
         token: process.env.SONAR_TOKEN,
         options: {
-          ...commonOptions
+          ...commonOptions,
+          'sonar.analysis.sha1': process.env.TRAVIS_COMMIT
         }
       },
       callback
@@ -390,7 +390,8 @@ gulp.task('sonarqube', function(callback) {
           ...commonOptions,
           'sonar.analysis.prNumber': process.env.TRAVIS_PULL_REQUEST,
           'sonar.branch.name': process.env.TRAVIS_PULL_REQUEST_BRANCH,
-          'sonar.branch.target': process.env.TRAVIS_BRANCH
+          'sonar.branch.target': process.env.TRAVIS_BRANCH,
+          'sonar.analysis.sha1': process.env.TRAVIS_PULL_REQUEST_SHA
         }
       },
       callback
