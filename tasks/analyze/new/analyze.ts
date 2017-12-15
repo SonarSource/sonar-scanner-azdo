@@ -1,24 +1,6 @@
 import * as tl from 'vsts-task-lib/task';
-import * as trm from 'vsts-task-lib/toolrunner';
-import { EndpointType } from '../../../common/ts/types';
 import { PROP_NAMES, toCleanJSON } from '../../../common/ts/utils';
-
-function runMsBuildEnd() {
-  const scannerExe = tl.getVariable('SONARQUBE_SCANNER_MSBUILD_EXE');
-  const msBuildScannerRunner = tl.tool(scannerExe);
-  msBuildScannerRunner.arg('end');
-  return msBuildScannerRunner.exec();
-}
-
-function runScannerCli() {
-  const isWindows = tl.osType().match(/^Win/);
-  let scannerExe = tl.resolve(__dirname, 'sonar-scanner', 'bin', 'sonar-scanner');
-  const scannerRunner = tl.tool(scannerExe);
-  if (isWindows) {
-    scannerExe += '.bat';
-  }
-  return scannerRunner.exec();
-}
+import { runMsBuildEnd, runScannerCli } from '../../../common/ts/vsts-server-utils';
 
 async function run() {
   try {
@@ -37,7 +19,7 @@ async function run() {
     } else if (scannerMode === 'CLI') {
       await runScannerCli();
     } else {
-      throw new Error('Unknwon scanner mode: ' + scannerMode);
+      throw new Error('Unknown scanner mode: ' + scannerMode);
     }
   } catch (err) {
     tl.setResult(tl.TaskResult.Failed, err.message);
