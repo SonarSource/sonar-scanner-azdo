@@ -16,21 +16,6 @@ pipeline {
         MAVEN_TOOL = 'Maven 3.3.x'
     }
     stages {    
-        stage('Notify') {
-            steps {                
-                sendAllNotificationQaStarted()
-            }
-        }
-        stage('QA') {       
-            steps {
-                // NO ITs for now
-            }     
-            post {
-                always {
-                    sendAllNotificationQaResult()
-                }
-            }
-        }
         stage('Promote') {
             steps {
                 repoxPromoteBuild()
