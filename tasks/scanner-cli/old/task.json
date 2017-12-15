@@ -16,6 +16,7 @@
   "demands": ["java"],
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "Perform a SonarQube analysis",
+  "deprecated": true,
   "groups": [
     {
       "name": "serverSettings",
