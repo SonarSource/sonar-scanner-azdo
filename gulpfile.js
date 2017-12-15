@@ -39,7 +39,7 @@ const paths = {
   tasks: 'tasks'
 };
 
-const sqScannerMSBuildVersion = '3.0.2.656';
+const sqScannerMSBuildVersion = '4.0.0.821';
 const sqScannerCliVersion = '3.0.3.778'; // Has to be the same version as the one embedded in the Scanner for MSBuild
 const sqScannerUrl = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/${sqScannerMSBuildVersion}/sonar-scanner-msbuild-${sqScannerMSBuildVersion}.zip`;
 
