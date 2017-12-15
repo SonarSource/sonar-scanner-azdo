@@ -14,6 +14,8 @@
     "Minor": 0,
     "Patch": 0
   },
+  "releaseNotes":
+    "<ul><li><b>SonarCloud:</b> Ability to define a SonarCloud endpoint, and pick an organization.</li><li><b>Support non MSBuild projects:</b> This task can be used to configure analysis also for non MSBuild projects.</li></ul>",
   "minimumAgentVersion": "1.95.1",
   "instanceNameFormat": "Prepare analysis on $(endpointType)",
   "groups": [
