@@ -20,12 +20,5 @@
     "Node": {
       "target": "analyze.js"
     }
-  },
-  "outputVariables": [
-    {
-      "name": "SONARQUBE_TASK_ID",
-      "description":
-        "The ID of the task queued on SonarCloud/the SonarQube server. Use this variable in the Upload Analysis Report task to wait for task completion and display quality gate status in VSTS build dashboard."
-    }
-  ]
+  }
 }
