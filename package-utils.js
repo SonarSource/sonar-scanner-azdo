@@ -2,13 +2,6 @@
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs-extra');
-const rollup = require('rollup');
-const commonjs = require('rollup-plugin-commonjs');
-const resolve = require('rollup-plugin-node-resolve');
-const rollupTs = require('rollup-plugin-typescript2');
-const uglify = require('rollup-plugin-uglify');
-const { minify } = require('uglify-es');
-const typescript = require('typescript');
 
 function fail(message) {
   console.error('ERROR: ' + message);
@@ -35,10 +28,10 @@ function run(cl, options = {}) {
 }
 exports.run = run;
 
-function npmIntall(packagePath) {
+function npmInstall(packagePath) {
   run(`cd ${path.dirname(packagePath)} && npm install && cd ${__dirname}`);
 }
-exports.npmInstall = npmIntall;
+exports.npmInstall = npmInstall;
 
 exports.npmInstallTask = function(packagePath) {
   const packageJson = JSON.parse(fs.readFileSync(packagePath).toString());
@@ -69,66 +62,16 @@ exports.pathAllFiles = function(...paths) {
   return path.join(...paths, '**', '*');
 };
 
-exports.bundleTsTask = function(path, destPath) {
-  return rollup
-    .rollup({
-      input: path,
-      plugins: [
-        rollupTs({ typescript }),
-        resolve({ jsnext: true, browser: false }),
-        commonjs({
-          sourceMap: false,
-          namedExports: {
-            'node_modules/request/index.js': ['get'],
-            'node_modules/fs-extra/lib/index.js': ['ensureDirSync', 'writeFileSync']
-          }
-        }),
-        uglify({}, minify)
-      ],
-      external: [
-        'process',
-        'events',
-        'stream',
-        'util',
-        'path',
-        'buffer',
-        'querystring',
-        'url',
-        'string_decoder',
-        'punycode',
-        'http',
-        'https',
-        'os',
-        'assert',
-        'constants',
-        'timers',
-        'console',
-        'vm',
-        'zlib',
-        'tty',
-        'domain',
-        'dns',
-        'dgram',
-        'child_process',
-        'cluster',
-        'module',
-        'net',
-        'readline',
-        'repl',
-        'tls',
-        'fs',
-        'crypto'
-      ]
-    })
-    .then(
-      bundle =>
-        bundle.write({
-          file: destPath,
-          format: 'cjs'
-        }),
-      err => {
-        console.error('\nRollup error: ' + err.message);
-        process.exit(1);
-      }
-    );
+exports.getAllTasksOfType = function(tasksPath, type) {
+  return fs
+    .readdirSync(tasksPath)
+    .filter(folder => fs.pathExistsSync(path.join(tasksPath, folder, type)));
+};
+
+exports.fullVersion = function(version) {
+  const buildNumber = process.env.TRAVIS_BUILD_NUMBER;
+  if (version.endsWith('-SNAPSHOT') && buildNumber) {
+    return version.replace('-SNAPSHOT', '.' + buildNumber);
+  }
+  return version;
 };
