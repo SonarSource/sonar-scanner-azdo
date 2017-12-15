@@ -34,10 +34,8 @@ async function run() {
       );
     } else if (scannerMode === 'MSBuild') {
       await runMsBuildEnd();
-      // TODO locate task-result.txt and set SONARQUBE_TASK_ID
     } else if (scannerMode === 'CLI') {
       await runScannerCli();
-      // TODO locate task-result.txt and set SONARQUBE_TASK_ID
     } else {
       throw new Error('Unknwon scanner mode: ' + scannerMode);
     }
