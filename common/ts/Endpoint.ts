@@ -1,4 +1,3 @@
-/* eslint-disable import/newline-after-import */
 import * as tl from 'vsts-task-lib/task';
 import { PROP_NAMES } from './utils';
 
