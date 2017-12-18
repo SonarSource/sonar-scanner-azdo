@@ -31,12 +31,8 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
   );
 }
 
-export function runMsBuildBegin(projectKey: string) {
-  const scannerExe = tl.resolve(
-    __dirname,
-    'sonar-scanner-msbuild',
-    'SonarQube.Scanner.MSBuild.exe'
-  );
+export function runMsBuildBegin(rootPath: string, projectKey: string) {
+  const scannerExe = tl.resolve(rootPath, 'sonar-scanner-msbuild', 'SonarQube.Scanner.MSBuild.exe');
   tl.setVariable('SONARQUBE_SCANNER_MSBUILD_EXE', scannerExe);
   const msBuildScannerRunner = tl.tool(scannerExe);
   msBuildScannerRunner.arg('begin');
@@ -51,9 +47,9 @@ export function runMsBuildEnd() {
   return msBuildScannerRunner.exec();
 }
 
-export function runScannerCli() {
+export function runScannerCli(rootPath: string) {
   const isWindows = tl.osType().match(/^Win/);
-  let scannerExe = tl.resolve(__dirname, 'sonar-scanner', 'bin', 'sonar-scanner');
+  let scannerExe = tl.resolve(rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
   const scannerRunner = tl.tool(scannerExe);
   if (isWindows) {
     scannerExe += '.bat';

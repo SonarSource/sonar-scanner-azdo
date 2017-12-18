@@ -45,7 +45,7 @@ async function run() {
     );
 
     if (isMSBuild) {
-      await runMsBuildBegin(props[PROP_NAMES.PROJECTKEY]);
+      await runMsBuildBegin(__dirname, props[PROP_NAMES.PROJECTKEY]);
     }
   } catch (err) {
     tl.setResult(tl.TaskResult.Failed, err.message);

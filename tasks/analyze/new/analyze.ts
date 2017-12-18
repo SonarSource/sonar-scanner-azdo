@@ -17,7 +17,7 @@ async function run() {
     } else if (scannerMode === 'MSBuild') {
       await runMsBuildEnd();
     } else if (scannerMode === 'CLI') {
-      await runScannerCli();
+      await runScannerCli(__dirname);
     } else {
       throw new Error('Unknown scanner mode: ' + scannerMode);
     }
