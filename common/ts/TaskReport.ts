@@ -40,7 +40,7 @@ export default class TaskReport {
   public static findTaskFileReport(): string | undefined {
     const taskReportGlob = path.join('**', REPORT_TASK_NAME);
     const taskReportGlobResult = tl.findMatch(
-      tl.getVariable('System.DefaultWorkingDirectory'),
+      tl.getVariable('Agent.BuildDirectory'),
       taskReportGlob
     );
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
