@@ -3,6 +3,7 @@ import Endpoint, { EndpointType } from './Endpoint';
 import Metrics from './Metrics';
 import Task from './Task';
 import { formatMeasure } from './measures';
+import { getJSON } from './request';
 
 interface IAnalysis {
   status: string;
@@ -136,7 +137,7 @@ export default class Analysis {
     dashboardUrl?: string
   ): Promise<Analysis> {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
-    return endpoint.apiGetJSON('/api/qualitygates/project_status', { analysisId }).then(
+    return getJSON(endpoint, '/api/qualitygates/project_status', { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
         new Analysis(projectStatus, metrics, endpoint.type, dashboardUrl),
       err => {
