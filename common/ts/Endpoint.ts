@@ -1,6 +1,5 @@
 /* eslint-disable import/newline-after-import */
 import * as tl from 'vsts-task-lib/task';
-import * as request from 'request';
 import { PROP_NAMES } from './utils';
 
 export enum EndpointType {
@@ -16,12 +15,23 @@ export interface EndpointData {
   organization?: string;
 }
 
-export interface RequestData {
-  [x: string]: any;
-}
-
 export default class Endpoint {
-  constructor(public type: EndpointType, public data: EndpointData) {}
+  constructor(public type: EndpointType, private data: EndpointData) {}
+
+  public get auth() {
+    if (this.data.token) {
+      return { user: this.data.token };
+    }
+    return { user: this.data.username, pass: this.data.password };
+  }
+
+  public get organization() {
+    return this.data.organization;
+  }
+
+  public get url() {
+    return this.data.url;
+  }
 
   public toJson() {
     return JSON.stringify({ type: this.type, data: this.data });
@@ -34,44 +44,6 @@ export default class Endpoint {
       [PROP_NAMES.PASSSWORD]: this.data.password,
       [PROP_NAMES.ORG]: this.data.organization
     };
-  }
-
-  public apiGetJSON(path: string, query?: RequestData): Promise<any> {
-    tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
-    return new Promise((resolve, reject) => {
-      const options: request.CoreOptions = {};
-      if (this.data.token) {
-        options.auth = { user: this.data.token };
-      } else {
-        options.auth = { user: this.data.username, pass: this.data.password };
-      }
-      if (query) {
-        options.qs = query;
-        options.useQuerystring = true;
-      }
-      request.get(
-        {
-          method: 'GET',
-          baseUrl: this.data.url,
-          uri: path,
-          json: true,
-          ...options
-        },
-        (error, response, body) => {
-          if (error) {
-            return reject(`[SQ] API GET '${path}' failed, error was: ${error}`);
-          }
-
-          if (response.statusCode < 200 || response.statusCode >= 300) {
-            return reject(
-              new Error(`[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`)
-            );
-          }
-
-          return resolve(body || {});
-        }
-      );
-    });
   }
 
   public static getEndpoint(id: string, type: EndpointType): Endpoint {
