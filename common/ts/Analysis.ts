@@ -81,16 +81,25 @@ export default class Analysis {
         condition.status === 'WARN' ? condition.warningThreshold : condition.errorThreshold;
       return `<tr>
         <td><span style="padding-right:4px;">${metric.name}</span></td>
-        <td style="text-align: center; background-color:${this.getQualityGateColor()}; color:#fff;">
-          <span style="padding:0px 2px">${formatMeasure(condition.actualValue, metric.type)}</span>
+        <td style="text-align:center; color:#fff; background-color:${this.getQualityGateColor()};">
+          <span style="padding:0px 4px; line-height:20px;">${formatMeasure(
+            condition.actualValue,
+            metric.type
+          )}</span>
         </td>
         <td>
-          &nbsp;${formatMeasure(condition.comparator, 'COMPARATOR')}
-          &nbsp;${formatMeasure(threshold, metric.type)}
+          <span style="padding-left:4px">${formatMeasure(condition.comparator, 'COMPARATOR')}</span>
+          <span style="padding-left:4px">${formatMeasure(threshold, metric.type)}</span>
         </td>
       </tr>`;
     });
-    return `<table border="0" style="padding-top: 4px; border-top: 1px solid #eee; border-collapse: separate; border-spacing: 0 2px;">
+    const tableStyle = `
+      margin-top: 8px;
+      border-top: 1px solid #eee;
+      border-collapse: separate;
+      border-spacing: 0 4px;
+    `;
+    return `<table border="0" style="${tableStyle}">
       <tbody>
         ${rows.join(' \r\n').trim()}
       </tbody>
@@ -101,7 +110,7 @@ export default class Analysis {
     if (!this.dashboardUrl) {
       return '';
     }
-    const linkText = `Detailed ${this.endpointType} report`;
+    const linkText = `Detailed ${this.endpointType} report &gt;`;
     return `[${linkText}](${this.dashboardUrl})`;
   }
 
