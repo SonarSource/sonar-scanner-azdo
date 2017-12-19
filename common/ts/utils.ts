@@ -1,3 +1,5 @@
+import * as tl from 'vsts-task-lib/task';
+
 export const PROP_NAMES = {
   HOST_URL: 'sonar.host.url',
   LOGIN: 'sonar.login',
@@ -18,4 +20,8 @@ export function setIfNotEmpty(props: { [key: string]: string }, key: string, val
   if (value) {
     props[key] = value;
   }
+}
+
+export function isWindows() {
+  return tl.osType().match(/^Win/);
 }
