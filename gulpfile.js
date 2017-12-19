@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs-extra');
 const request = require('request');
@@ -15,50 +14,26 @@ const gulpSequence = require('gulp-sequence');
 const gulpTs = require('gulp-typescript');
 const gutil = require('gulp-util');
 const jeditor = require('gulp-json-editor');
-const dateformat = require('dateformat');
 const es = require('event-stream');
 const through = require('through2');
 const typescript = require('typescript');
-const sonarqubeScanner = require('sonarqube-scanner');
+const { paths, getAllTasksOfType, pathAllFiles } = require('./config/paths');
 const {
+  fileHashsum,
   fullVersion,
-  getAllTasksOfType,
-  pathAllFiles,
+  getBuildInfo,
   npmInstallTask,
-  semVer,
+  runSonnarQubeScanner,
   tfxCommand
-} = require('./package-utils');
+} = require('./config/utils');
+const { scanner } = require('./config/config');
 const extensionTest = require('./vss-extension.test.json');
 const packageJSON = require('./package.json');
-
-const paths = {
-  build: {
-    root: 'build',
-    extension: path.join('build', 'sonarqube'),
-    tasks: path.join('build', 'sonarqube', 'tasks'),
-    tmp: path.join('build', 'tmp'),
-    scanner: path.join('build', 'tmp', 'scanner-msbuild')
-  },
-  common: {
-    old: path.join('common', 'powershell'),
-    new: path.join('common', 'ts'),
-    icons: path.join('common', 'icons')
-  },
-  tasks: {
-    root: 'tasks',
-    old: path.join('tasks', '**', 'old'),
-    new: path.join('tasks', '**', 'new')
-  }
-};
-
-const sqScannerMSBuildVersion = '4.0.1.883';
-const sqScannerCliVersion = '3.0.3.778'; // Has to be the same version as the one embedded in the Scanner for MSBuild
-const sqScannerUrl = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/${sqScannerMSBuildVersion}/sonar-scanner-msbuild-${sqScannerMSBuildVersion}.zip`;
 
 gulp.task('clean', () => gulpDel([path.join(paths.build.root, '**'), '*.vsix']));
 
 gulp.task('scanner:download', () =>
-  download(sqScannerUrl)
+  download(scanner.url)
     .pipe(decompress())
     .pipe(gulp.dest(paths.build.scanner))
 );
@@ -70,7 +45,7 @@ gulp.task('scanner:copy', ['scanner:download'], () =>
       .pipe(gulp.dest(path.join(paths.build.tasks, 'prepare', 'old', 'SonarQubeScannerMsBuild')))
       .pipe(gulp.dest(path.join(paths.build.tasks, 'prepare', 'new', 'sonar-scanner-msbuild'))),
     gulp
-      .src(pathAllFiles(paths.build.scanner, `sonar-scanner-${sqScannerCliVersion}`))
+      .src(pathAllFiles(paths.build.scanner, `sonar-scanner-${scanner.cliVersion}`))
       .pipe(gulp.dest(path.join(paths.build.tasks, 'scanner-cli', 'old', 'sonar-scanner')))
       .pipe(gulp.dest(path.join(paths.build.tasks, 'analyze', 'new', 'sonar-scanner')))
   )
@@ -122,7 +97,7 @@ gulp.task('tasks:new:ts', ['tasks:new:npminstall'], () =>
   gulp
     .src([path.join(paths.tasks.new, '**', '*.ts'), '!**/node_modules/**'])
     .pipe(gulpTs.createProject('./tsconfig.json', { typescript })())
-    .once('error', function() {
+    .once('error', () => {
       this.once('finish', () => process.exit(1));
     })
     .pipe(gulpReplace('../../../common/ts/', './common/'))
@@ -133,7 +108,7 @@ gulp.task('tasks:new:common:ts', ['tasks:new:npminstall'], () => {
   let commonPipe = gulp
     .src([path.join(paths.common.new, '**', '*.ts'), '!**/node_modules/**'])
     .pipe(gulpTs.createProject('./tsconfig.json', { typescript })())
-    .once('error', function() {
+    .once('error', () => {
       this.once('finish', () => process.exit(1));
     });
 
@@ -231,169 +206,89 @@ gulp.task('tfx:test', () =>
   tfxCommand(paths.build.extension, `--publisher ` + (yargs.argv.publisher || 'foo'))
 );
 
-const hashes = {
-  sha1: '',
-  md5: ''
-};
-
-function hashsum() {
-  function processFile(file, encoding, callback) {
-    if (file.isNull()) {
-      return;
-    }
-    if (file.isStream()) {
-      gutil.log('Streams not supported');
-      return;
-    }
-    for (const algo in hashes) {
-      if (Object.hasOwnProperty.call(hashes, algo)) {
-        hashes[algo] = crypto
-          .createHash(algo)
-          .update(file.contents, 'binary')
-          .digest('hex');
-        gutil.log(`Computed ${algo}: ${hashes[algo]}`);
-      }
-    }
-    this.push(file);
-    callback();
-  }
-  return through.obj(processFile);
-}
-
-function buildInfo(name, version, buildNumber, hashes) {
-  return {
-    version: '1.0.1',
-    name,
-    number: buildNumber,
-    started: dateformat(new Date(), "yyyy-mm-dd'T'HH:MM:ss.lo"),
-    url: process.env.CI_BUILD_URL,
-    vcsRevision: process.env.TRAVIS_COMMIT,
-    vcsUrl: `https://github.com/${process.env.TRAVIS_REPO_SLUG}.git`,
-    modules: [
-      {
-        id: `org.sonarsource.scanner.vsts:${name}:${version}`,
-        properties: {
-          artifactsToPublish: `org.sonarsource.scanner.vsts:${name}:vsix`
-        },
-        artifacts: [
-          {
-            type: 'vsix',
-            sha1: hashes.sha1,
-            md5: hashes.md5,
-            name: `${name}-${version}.vsix`
-          }
-        ]
-      }
-    ],
-    properties: {
-      'buildInfo.env.PROJECT_VERSION': version,
-      'buildInfo.env.ARTIFACTORY_DEPLOY_REPO': 'sonarsource-public-qa',
-      'buildInfo.env.TRAVIS_COMMIT': process.env.TRAVIS_COMMIT
-    }
-  };
-}
-
-gulp.task('compute-hashes', ['build'], () =>
-  gulp.src(path.join(paths.build.root, '*.vsix')).pipe(hashsum())
-);
-
-gulp.task('deploy-vsix', ['build', 'compute-hashes'], () => {
+gulp.task('deploy:vsix', ['build'], () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
-    gutil.log('Not on master nor PR, skip deploy-buildinfo');
+    gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
   }
   const { name } = packageJSON;
   const version = fullVersion(packageJSON.version);
-  return gulp
-    .src(path.join(paths.build.root, '*.vsix'))
-    .pipe(
-      artifactoryUpload({
-        url:
-          process.env.ARTIFACTORY_URL +
-          '/' +
-          process.env.ARTIFACTORY_DEPLOY_REPO +
-          '/org/sonarsource/scanner/vsts/' +
-          name +
-          '/' +
-          version,
-        username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
-        password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
-        properties: {
-          'vcs.revision': process.env.TRAVIS_COMMIT,
-          'vcs.branch': process.env.TRAVIS_BRANCH,
-          'build.name': name,
-          'build.number': process.env.TRAVIS_BUILD_NUMBER
-        },
-        request: {
-          headers: {
-            'X-Checksum-MD5': hashes.md5,
-            'X-Checksum-Sha1': hashes.sha1
-          }
-        }
-      })
-    )
-    .on('error', gutil.log);
+  return gulp.src(path.join(paths.build.root, '*.vsix')).pipe(
+    through.obj((file, enc, cb) => {
+      const [sha1, md5] = fileHashsum(file);
+      gulp
+        .src(file.path)
+        .pipe(
+          artifactoryUpload({
+            url:
+              process.env.ARTIFACTORY_URL +
+              '/' +
+              process.env.ARTIFACTORY_DEPLOY_REPO +
+              '/org/sonarsource/scanner/vsts/' +
+              name +
+              '/' +
+              version,
+            username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
+            password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
+            properties: {
+              'vcs.revision': process.env.TRAVIS_COMMIT,
+              'vcs.branch': process.env.TRAVIS_BRANCH,
+              'build.name': name,
+              'build.number': process.env.TRAVIS_BUILD_NUMBER
+            },
+            request: {
+              headers: {
+                'X-Checksum-MD5': md5,
+                'X-Checksum-Sha1': sha1
+              }
+            }
+          })
+        )
+        .on('error', gutil.log)
+        .on('end', cb);
+    })
+  );
 });
 
-gulp.task('deploy-buildinfo', ['compute-hashes'], () => {
+gulp.task('deploy:buildinfo', ['build'], () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
-    gutil.log('Not on master nor PR, skip deploy-buildinfo');
+    gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
   }
-  const version = fullVersion(packageJSON.version);
-  const buildNumber = process.env.TRAVIS_BUILD_NUMBER;
-  return request
-    .put(
-      {
-        url: process.env.ARTIFACTORY_URL + '/api/build',
-        json: buildInfo(packageJSON.name, version, buildNumber, hashes)
-      },
-      (error, response, body) => {
-        if (error) {
-          gutil.log('error:', error);
-        }
-      }
+  return gulp.src(path.join(paths.build.root, '*.vsix')).pipe(
+    through.obj((file, enc, cb) =>
+      request
+        .put(
+          {
+            url: process.env.ARTIFACTORY_URL + '/api/build',
+            json: getBuildInfo(packageJSON, fileHashsum(file))
+          },
+          (error, response, body) => {
+            if (error) {
+              gutil.log('error:', error);
+            }
+            cb();
+          }
+        )
+        .auth(
+          process.env.ARTIFACTORY_DEPLOY_USERNAME,
+          process.env.ARTIFACTORY_DEPLOY_PASSWORD,
+          true
+        )
     )
-    .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
+  );
 });
 
 gulp.task('sonarqube', callback => {
-  const commonOptions = {
-    'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
-    'sonar.projectName': 'SonarQube Scanner for TFS/VSTS',
-    'sonar.exclusions': 'build/**',
-    'sonar.coverage.exclusions': 'gulpfile.js',
-    'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,
-    'sonar.analysis.pipeline': process.env.TRAVIS_BUILD_NUMBER,
-    'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG
-  };
   if (process.env.TRAVIS_BRANCH === 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
-    sonarqubeScanner(
-      {
-        serverUrl: process.env.SONAR_HOST_URL,
-        token: process.env.SONAR_TOKEN,
-        options: {
-          ...commonOptions,
-          'sonar.analysis.sha1': process.env.TRAVIS_COMMIT
-        }
-      },
-      callback
-    );
+    runSonnarQubeScanner(callback, { 'sonar.analysis.sha1': process.env.TRAVIS_COMMIT });
   } else if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
-    sonarqubeScanner(
-      {
-        serverUrl: process.env.SONAR_HOST_URL,
-        token: process.env.SONAR_TOKEN,
-        options: {
-          ...commonOptions,
-          'sonar.analysis.prNumber': process.env.TRAVIS_PULL_REQUEST,
-          'sonar.branch.name': process.env.TRAVIS_PULL_REQUEST_BRANCH,
-          'sonar.branch.target': process.env.TRAVIS_BRANCH,
-          'sonar.analysis.sha1': process.env.TRAVIS_PULL_REQUEST_SHA
-        }
-      },
-      callback
-    );
+    runSonnarQubeScanner(callback, {
+      'sonar.analysis.prNumber': process.env.TRAVIS_PULL_REQUEST,
+      'sonar.branch.name': process.env.TRAVIS_PULL_REQUEST_BRANCH,
+      'sonar.branch.target': process.env.TRAVIS_BRANCH,
+      'sonar.analysis.sha1': process.env.TRAVIS_PULL_REQUEST_SHA
+    });
   }
 });
 
@@ -406,7 +301,7 @@ gulp.task('copy', [
   'scanner:copy'
 ]);
 
-gulp.task('deploy', ['deploy-buildinfo', 'deploy-vsix']);
+gulp.task('deploy', ['deploy:buildinfo', 'deploy:vsix']);
 
 gulp.task('version', ['tasks:version', 'extension:version']);
 

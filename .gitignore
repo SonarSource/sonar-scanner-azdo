@@ -20,5 +20,8 @@ yarn-debug.log*
 # vsts
 *.vsix
 
-#rollup
+# rollup
 .rpt2_cache/
+
+# sonarqube
+.scannerwork/
