@@ -95,7 +95,11 @@ gulp.task('tasks:new:npminstall', () =>
 
 gulp.task('tasks:new:ts', ['tasks:new:npminstall'], () =>
   gulp
-    .src([path.join(paths.tasks.new, '**', '*.ts'), '!**/node_modules/**'])
+    .src([
+      path.join(paths.tasks.new, '**', '*.ts'),
+      '!' + path.join('**', 'node_modules', '**'),
+      '!' + path.join('**', '__tests__', '**')
+    ])
     .pipe(gulpTs.createProject('./tsconfig.json', { typescript })())
     .once('error', () => {
       this.once('finish', () => process.exit(1));
@@ -106,7 +110,11 @@ gulp.task('tasks:new:ts', ['tasks:new:npminstall'], () =>
 
 gulp.task('tasks:new:common:ts', ['tasks:new:npminstall'], () => {
   let commonPipe = gulp
-    .src([path.join(paths.common.new, '**', '*.ts'), '!**/node_modules/**'])
+    .src([
+      path.join(paths.common.new, '**', '*.ts'),
+      '!' + path.join('**', 'node_modules', '**'),
+      '!' + path.join('**', '__tests__', '**')
+    ])
     .pipe(gulpTs.createProject('./tsconfig.json', { typescript })())
     .once('error', () => {
       this.once('finish', () => process.exit(1));

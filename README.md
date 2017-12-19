@@ -27,3 +27,7 @@ https://jira.sonarsource.com/browse/VSTS
 ## Package a test build
 
 * npm run test-build -- --publisher name
+
+## Run tests
+
+* npm test

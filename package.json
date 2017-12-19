@@ -5,6 +5,7 @@
   "license": "LGPL-3.0",
   "devDependencies": {
     "@types/fs-extra": "5.0.0",
+    "@types/jest": "21.1.8",
     "@types/node": "8.0.19",
     "@types/request": "2.0.9",
     "dateformat": "3.0.2",
@@ -26,12 +27,14 @@
     "gulp-sequence": "0.4.6",
     "gulp-typescript": "3.2.3",
     "gulp-util": "3.0.8",
+    "jest": "22.0.2",
     "prettier": "1.9.1",
     "request": "2.83.0",
     "semver": "5.4.1",
     "sonarqube-scanner": "2.0.2",
     "tfx-cli": "0.4.11",
     "through2": "2.0.3",
+    "ts-jest": "22.0.0",
     "typescript": "2.6.2",
     "typescript-eslint-parser": "9.0.1",
     "yargs": "10.0.3"
@@ -43,11 +46,34 @@
     "format": "./node_modules/.bin/prettier --write --list-different '**/*.{js,ts}'",
     "lint": "eslint --ext js,ts --quiet '**/*.{js,ts}'",
     "test-build": "./node_modules/.bin/gulp build:test",
+    "test": "node ./scripts/test.js",
     "ts-check": "./node_modules/.bin/tsc --noEmit",
     "validate": "npm run lint && npm run ts-check"
   },
   "engines": {
     "node": ">=6"
+  },
+  "jest": {
+    "clearMocks": true,
+    "coverageDirectory": "<rootDir>/build/coverage",
+    "coveragePathIgnorePatterns": [
+      "/node_modules",
+      "/tests"
+    ],
+    "mapCoverage": true,
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules",
+      "<rootDir>/config",
+      "<rootDir>/build"
+    ],
+    "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
+    "transform": {
+      ".(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    }
   },
   "prettier": {
     "printWidth": 100,
