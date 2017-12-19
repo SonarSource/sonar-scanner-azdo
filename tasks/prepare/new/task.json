@@ -114,7 +114,7 @@
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {
-      "name": "msbuildProjectKey",
+      "name": "msBuildProjectKey",
       "aliases": ["projectKey"],
       "type": "string",
       "label": "Project Key",
@@ -131,7 +131,7 @@
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {
-      "name": "msbuildProjectName",
+      "name": "msBuildProjectName",
       "aliases": ["projectName"],
       "type": "string",
       "label": "Project Name",
@@ -149,7 +149,7 @@
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {
-      "name": "msbuildProjectVersion",
+      "name": "msBuildProjectVersion",
       "aliases": ["projectVersion"],
       "type": "string",
       "label": "Project Version",
