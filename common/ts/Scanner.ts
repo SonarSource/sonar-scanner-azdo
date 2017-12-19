@@ -1,5 +1,7 @@
+import * as path from 'path';
+import * as fs from 'fs-extra';
 import * as tl from 'vsts-task-lib/task';
-import { PROP_NAMES } from './utils';
+import { PROP_NAMES, isWindows } from './utils';
 
 export enum ScannerMode {
   MSBuild = 'MSBuild',
@@ -79,12 +81,13 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    const isWindows = tl.osType().match(/^Win/);
     let scannerExe = tl.resolve(this.rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
-    const scannerRunner = tl.tool(scannerExe);
-    if (isWindows) {
+    if (isWindows()) {
       scannerExe += '.bat';
+    } else {
+      await fs.chmod(scannerExe, '777');
     }
+    const scannerRunner = tl.tool(scannerExe);
     await scannerRunner.exec();
   }
 
@@ -128,17 +131,37 @@ export class ScannerMSBuild extends Scanner {
       'SonarQube.Scanner.MSBuild.exe'
     );
     tl.setVariable('SONARQUBE_SCANNER_MSBUILD_EXE', scannerExe);
-    const msBuildScannerRunner = tl.tool(scannerExe);
-    msBuildScannerRunner.arg('begin');
-    msBuildScannerRunner.arg('/k:' + this.data.projectKey);
-    await msBuildScannerRunner.exec();
+    let scannerRunner;
+    if (isWindows()) {
+      scannerRunner = tl.tool(scannerExe);
+    } else {
+      // Need to set executable flag on the embedded scanner CLI
+      const scannerCliExe = tl.findMatch(
+        this.rootPath,
+        path.join('sonar-scanner-msbuild', 'sonar-scanner-*', 'bin', 'sonar-scanner')
+      )[0];
+      await fs.chmod(scannerCliExe, '777');
+      const monoPath = tl.which('mono', true);
+      scannerRunner = tl.tool(monoPath);
+      scannerRunner.arg(scannerExe);
+    }
+    scannerRunner.arg('begin');
+    scannerRunner.arg('/k:' + this.data.projectKey);
+    await scannerRunner.exec();
   }
 
   public async runAnalysis() {
     const scannerExe = tl.getVariable('SONARQUBE_SCANNER_MSBUILD_EXE');
-    const msBuildScannerRunner = tl.tool(scannerExe);
-    msBuildScannerRunner.arg('end');
-    await msBuildScannerRunner.exec();
+    let scannerRunner;
+    if (isWindows()) {
+      scannerRunner = tl.tool(scannerExe);
+    } else {
+      const monoPath = tl.which('mono', true);
+      scannerRunner = tl.tool(monoPath);
+      scannerRunner.arg(scannerExe);
+    }
+    scannerRunner.arg('end');
+    await scannerRunner.exec();
   }
 
   public static getScanner(rootPath: string) {
