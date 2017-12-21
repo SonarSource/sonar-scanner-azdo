@@ -50,11 +50,11 @@ export default class Endpoint {
     const token = tl.getEndpointAuthorizationParameter(
       id,
       'apitoken',
-      type === EndpointType.SonarQube
+      type !== EndpointType.SonarCloud
     );
     const username = tl.getEndpointAuthorizationParameter(id, 'username', true);
     const password = tl.getEndpointAuthorizationParameter(id, 'password', true);
-    const organization = tl.getInput('organization', true);
+    const organization = tl.getInput('organization', type === EndpointType.SonarCloud);
     return new Endpoint(type, { url, token, username, password, organization });
   }
 }
