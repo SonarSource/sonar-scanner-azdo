@@ -148,9 +148,7 @@
             ]
           }
         ],
-
-        "helpMarkDown":
-          "Is your project open source? Have a look at <a href=\"https://sonarcloud.io\">sonarcloud.io</a> to freely consume SonarQube as a service."
+        "helpMarkDown": ""
       }
     },
     {
@@ -170,13 +168,8 @@
         "dataSources": [
           {
             "name": "TestConnection",
-            "endpointUrl": "{{endpoint.url}}/api/organizations/search_my_organizations",
+            "endpointUrl": "{{endpoint.url}}/api/organizations/search?member=true",
             "resultSelector": "jsonpath:$.organizations[*]"
-          },
-          {
-            "name": "MyOrganizations",
-            "endpointUrl": "{{endpoint.url}}/api/organizations/search_my_organizations",
-            "resultSelector": "jsonpath:$.organizations[0]"
           }
         ],
         "authenticationSchemes": [
@@ -205,7 +198,7 @@
           }
         ],
         "helpMarkDown":
-          "Go to <a href=\"https://sonarcloud.io/account/security/\">your account security page</a> to generate a token."
+          "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarSource account security page</a> to generate a token."
       }
     }
   ]
