@@ -2,8 +2,7 @@
   "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
   "name": "SonarQubePrepare",
   "friendlyName": "Prepare Analysis Configuration",
-  "description":
-    "Prepare SonarQube or SonarCloud analysis configuration, for MSBuild, Maven or Gradle projects",
+  "description": "Prepare SonarQube or SonarCloud analysis configuration",
   "helpMarkDown":
     "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
@@ -75,11 +74,11 @@
       "defaultValue": "MSBuild",
       "required": true,
       "helpMarkDown":
-        "##MSBuild\n* put this task before your MSBuild task\n* add the 'Run analysis' task after the MSBuild/VSTest tasks\n##Maven/Gradle\n* put this task before the Maven/Gradle task\n*tick the 'SonarQube' checkbox in the Maven/Gradle task configuration.\n##Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run analysis' task",
+        "##MSBuild\n* put this task before your MSBuild task\n* add the 'Run analysis' task after the MSBuild/VSTest tasks\n##Maven/Gradle\n* put this task before the Maven/Gradle task\n* tick the 'SonarQube' checkbox in the Maven/Gradle task configuration.\n##Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run analysis' task",
       "options": {
         "MSBuild": "Integrate with MSBuild",
-        "Other": "Run as part of the build (Maven, Gradle...)",
-        "CLI": "Use standalone sonar-scanner"
+        "Other": "Integrate with Maven or Gradle",
+        "CLI": "Use standalone scanner"
       }
     },
     {
@@ -187,7 +186,10 @@
     {
       "target": "organization",
       "endpointId": "$(SonarCloud)",
-      "dataSourceName": "MyOrganizations"
+      "endpointUrl": "{{endpoint.url}}/api/organizations/search?member=true",
+      "resultSelector": "jsonpath:$.organizations[*]",
+      "resultTemplate":
+        "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{name}}} ({{{key}}})\" }"
     }
   ],
   "execution": {
