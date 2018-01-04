@@ -1,6 +1,6 @@
 import * as tl from 'vsts-task-lib/task';
-import Scanner, { ScannerMode } from '../../../common/ts/Scanner';
-import { PROP_NAMES, toCleanJSON } from '../../../common/ts/utils';
+import Scanner, { ScannerMode } from '../../../../../common/ts/Scanner';
+import { PROP_NAMES, toCleanJSON } from '../../../../../common/ts/utils';
 
 async function run() {
   try {

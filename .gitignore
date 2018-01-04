@@ -19,6 +19,7 @@ yarn-debug.log*
 
 # vsts
 *.vsix
+.taskkey
 
 # rollup
 .rpt2_cache/

@@ -1,0 +1,13 @@
+{
+  "name": "publish",
+  "version": "4.0.0",
+  "description": "SonarQube Task Publish",
+  "author": "SonarSource",
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "vsts-task-lib": "2.1.0"
+  },
+  "engines": {
+    "node": ">=6"
+  }
+}
