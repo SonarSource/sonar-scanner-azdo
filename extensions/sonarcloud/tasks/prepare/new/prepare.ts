@@ -1,7 +1,7 @@
 import * as tl from 'vsts-task-lib/task';
-import Endpoint, { EndpointType } from '../../../common/ts/Endpoint';
-import Scanner, { ScannerMode } from '../../../common/ts/Scanner';
-import { PROP_NAMES, toCleanJSON } from '../../../common/ts/utils';
+import Endpoint, { EndpointType } from '../../../../../common/ts/Endpoint';
+import Scanner, { ScannerMode } from '../../../../../common/ts/Scanner';
+import { PROP_NAMES, toCleanJSON } from '../../../../../common/ts/utils';
 
 async function run() {
   try {

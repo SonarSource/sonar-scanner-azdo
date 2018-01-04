@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "sonarqube",
-  "name": "SonarQube & SonarCloud",
+  "name": "SonarQube",
   "version": "SET.BY.BUILD",
   "branding": {
     "color": "rgb(67, 157, 210)",
@@ -14,7 +14,7 @@
     }
   ],
   "description":
-    "Use the SonarQube/SonarCloud build tasks in your build/release definitions to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
+    "Use the SonarQube build tasks in your build/release definitions to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
   "public": true,
   "categories": ["Build and release"],
   "icons": {
@@ -149,56 +149,6 @@
           }
         ],
         "helpMarkDown": ""
-      }
-    },
-    {
-      "id": "343c5f6a-e4d5-4480-a764-506e1daa05df",
-      "description": "Service endpoint type for SonarCloud Connections",
-      "type": "ms.vss-endpoint.service-endpoint-type",
-      "targets": ["ms.vss-endpoint.endpoint-types"],
-      "properties": {
-        "name": "sonarcloud",
-        "displayName": "SonarCloud",
-        "icon": "icons/SonarCloud_endpoint.png",
-        "url": {
-          "displayName": "Server Url",
-          "value": "https://sonarcloud.io",
-          "isVisible": false
-        },
-        "dataSources": [
-          {
-            "name": "TestConnection",
-            "endpointUrl": "{{endpoint.url}}/api/organizations/search?member=true",
-            "resultSelector": "jsonpath:$.organizations[*]"
-          }
-        ],
-        "authenticationSchemes": [
-          {
-            "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
-            "headers": [
-              {
-                "name": "Authorization",
-                "value": "Basic {{ #base64 endpoint.apitoken \":\" }}"
-              }
-            ],
-            "inputDescriptors": [
-              {
-                "id": "apitoken",
-                "name": "SonarCloud Token",
-                "description":
-                  "Authentication Token generated through SonarCloud (go to My Account > Security > Generate Tokens)",
-                "inputMode": "passwordbox",
-                "isConfidential": true,
-                "validation": {
-                  "isRequired": true,
-                  "dataType": "string"
-                }
-              }
-            ]
-          }
-        ],
-        "helpMarkDown":
-          "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarSource account security page</a> to generate a token."
       }
     }
   ]
