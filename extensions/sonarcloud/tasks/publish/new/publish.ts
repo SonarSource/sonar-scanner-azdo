@@ -1,10 +1,10 @@
 import * as tl from 'vsts-task-lib/task';
-import Analysis from '../../../common/ts/Analysis';
-import Endpoint, { EndpointType, EndpointData } from '../../../common/ts/Endpoint';
-import Metrics from '../../../common/ts/Metrics';
-import Task from '../../../common/ts/Task';
-import TaskReport from '../../../common/ts/TaskReport';
-import { publishBuildSummary } from '../../../common/ts/vsts-server-utils';
+import Analysis from '../../../../../common/ts/Analysis';
+import Endpoint, { EndpointType, EndpointData } from '../../../../../common/ts/Endpoint';
+import Metrics from '../../../../../common/ts/Metrics';
+import Task from '../../../../../common/ts/Task';
+import TaskReport from '../../../../../common/ts/TaskReport';
+import { publishBuildSummary } from '../../../../../common/ts/vsts-server-utils';
 
 async function run() {
   tl.debug('[SQ] Start publish task');

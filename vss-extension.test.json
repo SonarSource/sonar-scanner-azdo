@@ -1,9 +1,0 @@
-{
-    "id": "sonarqube",
-    "name": "[Test] SonarQube & SonarCloud",
-    "public": false,
-    "branding": {
-        "color": "#ff0000",
-        "theme": "dark"
-    }
-}

@@ -1,0 +1,8 @@
+{
+  "name": "[Test] SonarCloud",
+  "public": false,
+  "branding": {
+    "color": "#ff0000",
+    "theme": "dark"
+  }
+}

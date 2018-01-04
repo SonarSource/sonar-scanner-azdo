@@ -14,33 +14,32 @@ exports.pathAllFiles = function(...paths) {
   return path.join(...paths, '**', '*');
 };
 
-exports.getAllTasksOfType = function(tasksPath, type) {
-  return fs
-    .readdirSync(tasksPath)
-    .filter(folder => fs.pathExistsSync(path.join(tasksPath, folder, type)));
-};
-
 const buildPath = resolveApp('build');
 const commonPath = resolveApp('common');
-const tasksPath = resolveApp('tasks');
+const extensionsPath = resolveApp('extensions');
 
 exports.paths = {
   root: appDirectory,
   build: {
     root: buildPath,
-    extension: path.join(buildPath, 'sonarqube'),
-    tasks: path.join(buildPath, 'sonarqube', 'tasks'),
-    tmp: path.join(buildPath, 'tmp'),
+    extensions: {
+      root: path.join(buildPath, 'extensions'),
+      tasks: path.join(buildPath, 'extensions', '**', 'tasks'),
+      sonarqubeTasks: path.join(buildPath, 'extensions', 'sonarqube', 'tasks'),
+      sonarcloudTasks: path.join(buildPath, 'extensions', 'sonarcloud', 'tasks')
+    },
     scanner: path.join(buildPath, 'tmp', 'scanner-msbuild')
   },
   common: {
     old: path.join(commonPath, 'powershell'),
-    new: path.join(commonPath, 'ts'),
-    icons: path.join(commonPath, 'icons')
+    new: path.join(commonPath, 'ts')
   },
-  tasks: {
-    root: tasksPath,
-    old: path.join(tasksPath, '**', 'old'),
-    new: path.join(tasksPath, '**', 'new')
+  extensions: {
+    root: extensionsPath,
+    tasks: {
+      root: path.join(extensionsPath, '**', 'tasks'),
+      old: path.join(extensionsPath, '**', 'tasks', '**', 'old'),
+      new: path.join(extensionsPath, '**', 'tasks', '**', 'new')
+    }
   }
 };

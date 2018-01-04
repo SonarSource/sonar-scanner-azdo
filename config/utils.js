@@ -54,7 +54,7 @@ exports.tfxCommand = function(extensionPath, params = '') {
   run(
     `${resolveApp(
       path.join('node_modules', '.bin', 'tfx')
-    )} extension create --output-path "../" ${params}`,
+    )} extension create --output-path "../../" ${params}`,
     {
       cwd: resolveApp(extensionPath)
     }

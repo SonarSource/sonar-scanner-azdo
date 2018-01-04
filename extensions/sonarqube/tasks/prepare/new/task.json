@@ -1,0 +1,200 @@
+{
+  "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
+  "name": "SonarQubePrepare",
+  "friendlyName": "Prepare Analysis Configuration",
+  "description": "Prepare SonarQube or SonarCloud analysis configuration",
+  "helpMarkDown":
+    "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+  "category": "Build",
+  "visibility": ["Build"],
+  "author": "sonarsource",
+  "version": {
+    "Major": 4,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "releaseNotes":
+    "<ul><li><b>SonarCloud:</b> Ability to define a SonarCloud endpoint, and pick an organization.</li><li><b>Support non MSBuild projects:</b> This task can be used to configure analysis also for non MSBuild projects.</li></ul>",
+  "minimumAgentVersion": "1.95.1",
+  "instanceNameFormat": "Prepare analysis on $(endpointType)",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "inputs": [
+    {
+      "name": "endpointType",
+      "type": "radio",
+      "label": "Server Type",
+      "defaultValue": "SonarCloud",
+      "required": true,
+      "helpMarkDown": "Use SonarCloud or SonarQube endpoint connection.",
+      "options": {
+        "SonarCloud": "SonarCloud",
+        "SonarQube": "SonarQube"
+      }
+    },
+    {
+      "name": "SonarCloud",
+      "type": "connectedService:sonarcloud",
+      "label": "SonarCloud Service Endpoint",
+      "required": true,
+      "helpMarkDown":
+        "Select the SonarCloud endpoint for your project. To create one, click the Manage link and create a new SonarCloud Service Endpoint, enter your organization and token.",
+      "visibleRule": "endpointType = SonarCloud"
+    },
+    {
+      "name": "organization",
+      "type": "pickList",
+      "label": "Organization",
+      "required": true,
+      "helpMarkDown": "Select the name of your Organization",
+      "properties": {
+        "EditableOptions": "True"
+      },
+      "visibleRule": "endpointType = SonarCloud"
+    },
+    {
+      "name": "SonarQube",
+      "aliases": ["connectedServiceName"],
+      "type": "connectedService:sonarqube",
+      "label": "SonarQube Server Endpoint",
+      "required": true,
+      "helpMarkDown":
+        "The SonarQube Server Endpoint. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token.",
+      "visibleRule": "endpointType = SonarQube"
+    },
+    {
+      "name": "scannerMode",
+      "type": "radio",
+      "label": "Choose the way to run the analysis",
+      "defaultValue": "MSBuild",
+      "required": true,
+      "helpMarkDown":
+        "##MSBuild\n* put this task before your MSBuild task\n* add the 'Run analysis' task after the MSBuild/VSTest tasks\n##Maven/Gradle\n* put this task before the Maven/Gradle task\n* tick the 'SonarQube' checkbox in the Maven/Gradle task configuration.\n##Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run analysis' task",
+      "options": {
+        "MSBuild": "Integrate with MSBuild",
+        "Other": "Integrate with Maven or Gradle",
+        "CLI": "Use standalone scanner"
+      }
+    },
+    {
+      "name": "configMode",
+      "type": "radio",
+      "label": "Mode",
+      "defaultValue": "file",
+      "required": true,
+      "helpMarkDown": "Choose your preferred configuration method",
+      "options": {
+        "file": "Store configuration with my source code (sonar-project.properties)",
+        "manual": "Manually provide configuration"
+      },
+      "visibleRule": "scannerMode = CLI"
+    },
+    {
+      "name": "configFile",
+      "type": "filePath",
+      "defaultValue": "sonar-project.properties",
+      "label": "Settings File",
+      "required": false,
+      "helpMarkDown":
+        "More information is available [here](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+      "visibleRule": "scannerMode = CLI && configMode = file"
+    },
+    {
+      "name": "cliProjectKey",
+      "type": "string",
+      "label": "Project Key",
+      "required": true,
+      "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
+      "visibleRule": "scannerMode = CLI && configMode = manual"
+    },
+    {
+      "name": "msBuildProjectKey",
+      "aliases": ["projectKey"],
+      "type": "string",
+      "label": "Project Key",
+      "required": true,
+      "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
+      "visibleRule": "scannerMode = MSBuild"
+    },
+    {
+      "name": "cliProjectName",
+      "type": "string",
+      "label": "Project Name",
+      "required": false,
+      "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
+      "visibleRule": "scannerMode = CLI && configMode = manual"
+    },
+    {
+      "name": "msBuildProjectName",
+      "aliases": ["projectName"],
+      "type": "string",
+      "label": "Project Name",
+      "required": false,
+      "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
+      "visibleRule": "scannerMode = MSBuild"
+    },
+    {
+      "name": "cliProjectVersion",
+      "type": "string",
+      "label": "Project Version",
+      "defaultValue": "1.0",
+      "required": false,
+      "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
+      "visibleRule": "scannerMode = CLI && configMode = manual"
+    },
+    {
+      "name": "msBuildProjectVersion",
+      "aliases": ["projectVersion"],
+      "type": "string",
+      "label": "Project Version",
+      "defaultValue": "1.0",
+      "required": false,
+      "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
+      "visibleRule": "scannerMode = MSBuild"
+    },
+    {
+      "name": "cliSources",
+      "type": "filePath",
+      "label": "Sources directory root",
+      "defaultValue": ".",
+      "required": true,
+      "helpMarkDown":
+        "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarQube property",
+      "visibleRule": "scannerMode = CLI && configMode = manual"
+    },
+    {
+      "name": "extraProperties",
+      "type": "multiLine",
+      "label": "Additional Properties",
+      "defaultValue": "",
+      "required": false,
+      "properties": {
+        "resizable": "true",
+        "rows": "2"
+      },
+      "helpMarkDown":
+        "Additional properties to be passed to the scanner. Specify each key=value pair on a new line.",
+      "groupName": "advanced"
+    }
+  ],
+  "dataSourceBindings": [
+    {
+      "target": "organization",
+      "endpointId": "$(SonarCloud)",
+      "endpointUrl": "{{endpoint.url}}/api/organizations/search?member=true",
+      "resultSelector": "jsonpath:$.organizations[*]",
+      "resultTemplate":
+        "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{name}}} ({{{key}}})\" }"
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "prepare.js"
+    }
+  }
+}
