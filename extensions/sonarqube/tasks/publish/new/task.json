@@ -3,7 +3,7 @@
   "name": "SonarQubePublish",
   "friendlyName": "Publish Analysis Result",
   "description":
-    "Publish SonarQube or SonarCloud analysis on the build result, to be used after the actual analysis.",
+    "Publish SonarQube analysis on the build result, to be used after the actual analysis.",
   "helpMarkDown":
     "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
