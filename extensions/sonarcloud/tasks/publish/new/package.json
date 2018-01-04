@@ -1,7 +1,7 @@
 {
   "name": "publish",
   "version": "4.0.0",
-  "description": "SonarQube Task Publish",
+  "description": "SonarCloud Task Publish",
   "author": "SonarSource",
   "license": "LGPL-3.0",
   "dependencies": {

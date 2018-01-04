@@ -12,7 +12,7 @@ async function run() {
   if (!params) {
     tl.setResult(
       tl.TaskResult.Failed,
-      'The SonarQube Prepare Analysis Configuration must be added.'
+      'The SonarCloud Prepare Analysis Configuration must be added.'
     );
     return;
   }
