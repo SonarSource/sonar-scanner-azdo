@@ -2,7 +2,7 @@
   "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
   "name": "SonarQubePrepare",
   "friendlyName": "Prepare Analysis Configuration",
-  "description": "Prepare SonarQube or SonarCloud analysis configuration",
+  "description": "Prepare SonarQube analysis configuration",
   "helpMarkDown":
     "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
@@ -14,9 +14,9 @@
     "Patch": 0
   },
   "releaseNotes":
-    "<ul><li><b>SonarCloud:</b> Ability to define a SonarCloud endpoint, and pick an organization.</li><li><b>Support non MSBuild projects:</b> This task can be used to configure analysis also for non MSBuild projects.</li></ul>",
+    "<ul><li><b>Support non MSBuild projects:</b> This task can be used to configure analysis also for non MSBuild projects.</li></ul>",
   "minimumAgentVersion": "1.95.1",
-  "instanceNameFormat": "Prepare analysis on $(endpointType)",
+  "instanceNameFormat": "Prepare analysis on SonarQube",
   "groups": [
     {
       "name": "advanced",
@@ -26,46 +26,13 @@
   ],
   "inputs": [
     {
-      "name": "endpointType",
-      "type": "radio",
-      "label": "Server Type",
-      "defaultValue": "SonarCloud",
-      "required": true,
-      "helpMarkDown": "Use SonarCloud or SonarQube endpoint connection.",
-      "options": {
-        "SonarCloud": "SonarCloud",
-        "SonarQube": "SonarQube"
-      }
-    },
-    {
-      "name": "SonarCloud",
-      "type": "connectedService:sonarcloud",
-      "label": "SonarCloud Service Endpoint",
-      "required": true,
-      "helpMarkDown":
-        "Select the SonarCloud endpoint for your project. To create one, click the Manage link and create a new SonarCloud Service Endpoint, enter your organization and token.",
-      "visibleRule": "endpointType = SonarCloud"
-    },
-    {
-      "name": "organization",
-      "type": "pickList",
-      "label": "Organization",
-      "required": true,
-      "helpMarkDown": "Select the name of your Organization",
-      "properties": {
-        "EditableOptions": "True"
-      },
-      "visibleRule": "endpointType = SonarCloud"
-    },
-    {
       "name": "SonarQube",
       "aliases": ["connectedServiceName"],
       "type": "connectedService:sonarqube",
       "label": "SonarQube Server Endpoint",
       "required": true,
       "helpMarkDown":
-        "The SonarQube Server Endpoint. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token.",
-      "visibleRule": "endpointType = SonarQube"
+        "The SonarQube Server Endpoint. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token."
     },
     {
       "name": "scannerMode",
@@ -180,16 +147,6 @@
       "helpMarkDown":
         "Additional properties to be passed to the scanner. Specify each key=value pair on a new line.",
       "groupName": "advanced"
-    }
-  ],
-  "dataSourceBindings": [
-    {
-      "target": "organization",
-      "endpointId": "$(SonarCloud)",
-      "endpointUrl": "{{endpoint.url}}/api/organizations/search?member=true",
-      "resultSelector": "jsonpath:$.organizations[*]",
-      "resultTemplate":
-        "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{name}}} ({{{key}}})\" }"
     }
   ],
   "execution": {
