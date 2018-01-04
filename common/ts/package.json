@@ -1,7 +1,7 @@
 {
   "name": "common",
   "version": "4.0.0",
-  "description": "SonarQube Task Common",
+  "description": "SonarQube/SonarCloud Extension Tasks Common",
   "author": "SonarSource",
   "license": "LGPL-3.0",
   "dependencies": {

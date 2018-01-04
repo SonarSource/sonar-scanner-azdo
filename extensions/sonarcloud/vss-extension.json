@@ -36,7 +36,7 @@
   ],
   "links": {
     "home": {
-      "uri": "https://www.sonarqube.org/"
+      "uri": "https://about.sonarcloud.io/"
     },
     "getstarted": {
       "uri": "http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html"
@@ -69,15 +69,7 @@
   "scopes": ["vso.build", "vso.code", "vso.test"],
   "contributions": [
     {
-      "id": "9F57024B-31F9-4E58-9E39-A47CCC098F03",
-      "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
-      "properties": {
-        "name": "tasks/scanner-cli"
-      }
-    },
-    {
-      "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
+      "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
       "type": "ms.vss-distributed-task.task",
       "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
@@ -85,7 +77,7 @@
       }
     },
     {
-      "id": "6D01813A-9589-4B15-8491-8164AEB38055",
+      "id": "ce096e50-6155-4de8-8800-4221aaeed4a1",
       "type": "ms.vss-distributed-task.task",
       "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
@@ -93,7 +85,7 @@
       }
     },
     {
-      "id": "291ed61f-1ee4-45d3-b1b0-bf822d9095ef",
+      "id": "38b27399-a642-40af-bb7d-9971f69712e8",
       "type": "ms.vss-distributed-task.task",
       "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
