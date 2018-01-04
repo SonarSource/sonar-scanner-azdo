@@ -47,7 +47,7 @@ export default class Task {
       },
       err => {
         if (err && err.message) {
-          tl.debug(err.message);
+          tl.error(err.message);
         }
         throw new Error(`[SQ] Could not fetch task for ID '${taskId}'`);
       }

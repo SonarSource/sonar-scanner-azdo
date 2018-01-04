@@ -23,9 +23,9 @@ interface Condition {
 export default class Analysis {
   constructor(
     private analysis: IAnalysis,
-    private metrics: Metrics,
     private endpointType: EndpointType,
-    private dashboardUrl: string | undefined
+    private metrics?: Metrics,
+    private dashboardUrl?: string
   ) {}
 
   public get status() {
@@ -72,7 +72,7 @@ export default class Analysis {
 
   private getQualityGateDetailSection() {
     const failedConditions = this.getFailedConditions();
-    if (!['WARN', 'ERROR'].includes(this.status) || failedConditions.length <= 0) {
+    if (!this.metrics || !['WARN', 'ERROR'].includes(this.status) || failedConditions.length <= 0) {
       return '';
     }
 
@@ -133,16 +133,16 @@ export default class Analysis {
   public static getAnalysis(
     analysisId: string,
     endpoint: Endpoint,
-    metrics: Metrics,
+    metrics?: Metrics,
     dashboardUrl?: string
   ): Promise<Analysis> {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
     return getJSON(endpoint, '/api/qualitygates/project_status', { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
-        new Analysis(projectStatus, metrics, endpoint.type, dashboardUrl),
+        new Analysis(projectStatus, endpoint.type, metrics, dashboardUrl),
       err => {
         if (err && err.message) {
-          tl.debug(`[SQ] Error retrieving analysis: ${err.message}`);
+          tl.error(`[SQ] Error retrieving analysis: ${err.message}`);
         }
         throw new Error(`[SQ] Could not fetch analysis for ID '${analysisId}'`);
       }

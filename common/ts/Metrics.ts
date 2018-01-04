@@ -29,12 +29,13 @@ export default class Metrics {
     return this.metrics.find(metric => metric.key === key);
   }
 
-  public static getAllMetrics(endpoint: Endpoint): Promise<Metrics> {
+  public static getAllMetrics(endpoint: Endpoint): Promise<Metrics | undefined> {
     return inner().catch(err => {
+      tl.error(`[SQ] Could not fetch metrics`);
       if (err && err.message) {
-        tl.debug(err.message);
+        tl.error(err.message);
       }
-      throw new Error(`[SQ] Could not fetch metrics`);
+      return undefined;
     });
 
     function inner(
