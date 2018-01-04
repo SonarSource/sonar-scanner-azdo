@@ -5,9 +5,11 @@ import { PROP_NAMES, toCleanJSON } from '../../../../../common/ts/utils';
 
 async function run() {
   try {
-    const endpointType: EndpointType = EndpointType[tl.getInput('endpointType', true)];
     const scannerMode: ScannerMode = ScannerMode[tl.getInput('scannerMode')];
-    const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
+    const endpoint = Endpoint.getEndpoint(
+      tl.getInput(EndpointType.SonarCloud, true),
+      EndpointType.SonarCloud
+    );
     const scanner = Scanner.getPrepareScanner(__dirname, scannerMode);
 
     const props: { [key: string]: string } = {};

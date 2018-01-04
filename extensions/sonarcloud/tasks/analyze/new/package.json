@@ -1,7 +1,7 @@
 {
   "name": "analyze",
   "version": "4.0.0",
-  "description": "SonarQube Task Analyze",
+  "description": "SonarCloud Task Analyze",
   "author": "SonarSource",
   "license": "LGPL-3.0",
   "dependencies": {

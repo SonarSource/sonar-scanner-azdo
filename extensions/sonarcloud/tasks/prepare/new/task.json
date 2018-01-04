@@ -1,8 +1,8 @@
 {
-  "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
-  "name": "SonarQubePrepare",
+  "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
+  "name": "SonarCloudPrepare",
   "friendlyName": "Prepare Analysis Configuration",
-  "description": "Prepare SonarQube or SonarCloud analysis configuration",
+  "description": "Prepare SonarCloud analysis configuration",
   "helpMarkDown":
     "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
@@ -16,7 +16,7 @@
   "releaseNotes":
     "<ul><li><b>SonarCloud:</b> Ability to define a SonarCloud endpoint, and pick an organization.</li><li><b>Support non MSBuild projects:</b> This task can be used to configure analysis also for non MSBuild projects.</li></ul>",
   "minimumAgentVersion": "1.95.1",
-  "instanceNameFormat": "Prepare analysis on $(endpointType)",
+  "instanceNameFormat": "Prepare analysis on SonarCloud",
   "groups": [
     {
       "name": "advanced",
@@ -26,25 +26,12 @@
   ],
   "inputs": [
     {
-      "name": "endpointType",
-      "type": "radio",
-      "label": "Server Type",
-      "defaultValue": "SonarCloud",
-      "required": true,
-      "helpMarkDown": "Use SonarCloud or SonarQube endpoint connection.",
-      "options": {
-        "SonarCloud": "SonarCloud",
-        "SonarQube": "SonarQube"
-      }
-    },
-    {
       "name": "SonarCloud",
       "type": "connectedService:sonarcloud",
       "label": "SonarCloud Service Endpoint",
       "required": true,
       "helpMarkDown":
-        "Select the SonarCloud endpoint for your project. To create one, click the Manage link and create a new SonarCloud Service Endpoint, enter your organization and token.",
-      "visibleRule": "endpointType = SonarCloud"
+        "Select the SonarCloud endpoint for your project. To create one, click the Manage link and create a new SonarCloud Service Endpoint, enter your organization and token."
     },
     {
       "name": "organization",
@@ -54,18 +41,7 @@
       "helpMarkDown": "Select the name of your Organization",
       "properties": {
         "EditableOptions": "True"
-      },
-      "visibleRule": "endpointType = SonarCloud"
-    },
-    {
-      "name": "SonarQube",
-      "aliases": ["connectedServiceName"],
-      "type": "connectedService:sonarqube",
-      "label": "SonarQube Server Endpoint",
-      "required": true,
-      "helpMarkDown":
-        "The SonarQube Server Endpoint. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token.",
-      "visibleRule": "endpointType = SonarQube"
+      }
     },
     {
       "name": "scannerMode",
@@ -74,7 +50,7 @@
       "defaultValue": "MSBuild",
       "required": true,
       "helpMarkDown":
-        "##MSBuild\n* put this task before your MSBuild task\n* add the 'Run analysis' task after the MSBuild/VSTest tasks\n##Maven/Gradle\n* put this task before the Maven/Gradle task\n* tick the 'SonarQube' checkbox in the Maven/Gradle task configuration.\n##Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run analysis' task",
+        "##MSBuild\n* put this task before your MSBuild task\n* add the 'Run analysis' task after the MSBuild/VSTest tasks\n##Maven/Gradle\n* put this task before the Maven/Gradle task\n* tick the 'SonarCloud' checkbox in the Maven/Gradle task configuration.\n##Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run analysis' task",
       "options": {
         "MSBuild": "Integrate with MSBuild",
         "Other": "Integrate with Maven or Gradle",
@@ -109,7 +85,7 @@
       "type": "string",
       "label": "Project Key",
       "required": true,
-      "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
+      "helpMarkDown": "The SonarCloud project unique key, i.e. `sonar.projectKey`",
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {
@@ -118,7 +94,7 @@
       "type": "string",
       "label": "Project Key",
       "required": true,
-      "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
+      "helpMarkDown": "The SonarCloud project unique key, i.e. `sonar.projectKey`",
       "visibleRule": "scannerMode = MSBuild"
     },
     {
@@ -126,7 +102,7 @@
       "type": "string",
       "label": "Project Name",
       "required": false,
-      "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
+      "helpMarkDown": "The SonarCloud project name, i.e. `sonar.projectName`",
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {
@@ -135,7 +111,7 @@
       "type": "string",
       "label": "Project Name",
       "required": false,
-      "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
+      "helpMarkDown": "The SonarCloud project name, i.e. `sonar.projectName`",
       "visibleRule": "scannerMode = MSBuild"
     },
     {
@@ -144,7 +120,7 @@
       "label": "Project Version",
       "defaultValue": "1.0",
       "required": false,
-      "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
+      "helpMarkDown": "The SonarCloud project version, i.e. `sonar.projectVersion`",
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {
@@ -154,7 +130,7 @@
       "label": "Project Version",
       "defaultValue": "1.0",
       "required": false,
-      "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
+      "helpMarkDown": "The SonarCloud project version, i.e. `sonar.projectVersion`",
       "visibleRule": "scannerMode = MSBuild"
     },
     {
@@ -164,7 +140,7 @@
       "defaultValue": ".",
       "required": true,
       "helpMarkDown":
-        "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarQube property",
+        "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarCloud property",
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {

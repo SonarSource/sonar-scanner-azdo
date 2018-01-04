@@ -49,7 +49,7 @@ export default class TaskReport {
       tl.warning(
         `[SQ] Multiple '${REPORT_TASK_NAME}' files found. Choosing the first one. ` +
           `The build summary may not be accurate. ` +
-          `Possible cause: multiple SonarQube analysis during the same build, which is not supported.`
+          `Possible cause: multiple analyses during the same build, which is not supported.`
       );
     }
 
@@ -64,7 +64,7 @@ export default class TaskReport {
         reject(
           TaskReport.throwInvalidReport(
             `[SQ] Could not find '${REPORT_TASK_NAME}'.` +
-              ` Possible cause: the SonarQube analysis did not complete successfully.`
+              ` Possible cause: the analysis did not complete successfully.`
           )
         );
       }
@@ -117,6 +117,8 @@ export default class TaskReport {
 
   private static throwInvalidReport(debugMsg: string): Error {
     tl.error(debugMsg);
-    return new Error('Invalid or missing task report. Check that SonarQube finished successfully.');
+    return new Error(
+      'Invalid or missing task report. Check that the analysis finished successfully.'
+    );
   }
 }
