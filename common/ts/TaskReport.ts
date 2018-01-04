@@ -91,7 +91,7 @@ export default class TaskReport {
             });
             return resolve(taskReport);
           } catch (err) {
-            tl.debug(`[SQ] Parse Task report error: ${err.message}`);
+            tl.error(`[SQ] Parse Task report error: ${err.message}`);
             return reject(err);
           }
         });
@@ -116,7 +116,7 @@ export default class TaskReport {
   }
 
   private static throwInvalidReport(debugMsg: string): Error {
-    tl.debug(debugMsg);
-    return new Error('Invalid or missing task report. Check SonarQube finished successfully.');
+    tl.error(debugMsg);
+    return new Error('Invalid or missing task report. Check that SonarQube finished successfully.');
   }
 }
