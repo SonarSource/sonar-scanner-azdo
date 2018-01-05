@@ -261,11 +261,11 @@ gulp.task('deploy:vsix', ['build'], () => {
   }
   const { name } = packageJSON;
   const version = fullVersion(packageJSON.version);
-  return gulp.src(path.join(paths.build.root, '*.vsix')).pipe(
-    through.obj((file, enc, cb) => {
-      const [sha1, md5] = fileHashsum(file);
-      gulp
-        .src(file.path)
+  return es.merge(
+    globby.sync(path.join(paths.build.root, '*.vsix')).map(filePath => {
+      const [sha1, md5] = fileHashsum(filePath);
+      return gulp
+        .src(filePath)
         .pipe(
           artifactoryUpload({
             url:
@@ -292,8 +292,7 @@ gulp.task('deploy:vsix', ['build'], () => {
             }
           })
         )
-        .on('error', gutil.log)
-        .on('end', cb);
+        .on('error', gutil.log);
     })
   );
 });
@@ -303,28 +302,19 @@ gulp.task('deploy:buildinfo', ['build'], () => {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
   }
-  return gulp.src(path.join(paths.build.root, '*.vsix')).pipe(
-    through.obj((file, enc, cb) =>
-      request
-        .put(
-          {
-            url: process.env.ARTIFACTORY_URL + '/api/build',
-            json: getBuildInfo(packageJSON, fileHashsum(file))
-          },
-          (error, response, body) => {
-            if (error) {
-              gutil.log('error:', error);
-            }
-            cb();
-          }
-        )
-        .auth(
-          process.env.ARTIFACTORY_DEPLOY_USERNAME,
-          process.env.ARTIFACTORY_DEPLOY_PASSWORD,
-          true
-        )
+  return request
+    .put(
+      {
+        url: process.env.ARTIFACTORY_URL + '/api/build',
+        json: getBuildInfo(packageJSON)
+      },
+      (error, response, body) => {
+        if (error) {
+          gutil.log('error:', error);
+        }
+      }
     )
-  );
+    .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
 });
 
 gulp.task('sonarqube', callback => {
