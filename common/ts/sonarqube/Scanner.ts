@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tl from 'vsts-task-lib/task';
-import { PROP_NAMES, isWindows } from './utils';
+import { PROP_NAMES, isWindows } from '../helpers/utils';
 
 export enum ScannerMode {
   MSBuild = 'MSBuild',
