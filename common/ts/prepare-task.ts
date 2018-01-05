@@ -10,6 +10,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   const props: { [key: string]: string } = {};
   tl
     .getDelimitedInput('extraProperties', '\n')
+    .filter(keyValue => !keyValue.startsWith('#'))
     .map(keyValue => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 
