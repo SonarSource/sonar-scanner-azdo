@@ -14,7 +14,7 @@
     "Patch": 0
   },
   "releaseNotes":
-    "<ul><li><b>SonarCloud:</b> Ability to define a SonarCloud endpoint, and pick an organization.</li><li><b>Support non MSBuild projects:</b> This task can be used to configure analysis also for non MSBuild projects.</li></ul>",
+    "* __SonarCloud:__ Ability to define a SonarCloud endpoint, and pick an organization.\n* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
   "minimumAgentVersion": "1.95.1",
   "instanceNameFormat": "Prepare analysis on SonarCloud",
   "groups": [
@@ -31,7 +31,7 @@
       "label": "SonarCloud Service Endpoint",
       "required": true,
       "helpMarkDown":
-        "Select the SonarCloud endpoint for your project. To create one, click the Manage link and create a new SonarCloud Service Endpoint, enter your organization and token."
+        "Select the SonarCloud endpoint for your project. To create one, click the Manage link and create a new SonarCloud Service Endpoint, then enter your SonarCloud account token."
     },
     {
       "name": "organization",
@@ -50,7 +50,7 @@
       "defaultValue": "MSBuild",
       "required": true,
       "helpMarkDown":
-        "##MSBuild\n* put this task before your MSBuild task\n* add the 'Run analysis' task after the MSBuild/VSTest tasks\n##Maven/Gradle\n* put this task before the Maven/Gradle task\n* tick the 'SonarCloud' checkbox in the Maven/Gradle task configuration.\n##Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run analysis' task",
+        "####MSBuild\n* Put this task before your MSBuild task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarCloud Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
       "options": {
         "MSBuild": "Integrate with MSBuild",
         "Other": "Integrate with Maven or Gradle",
@@ -147,14 +147,15 @@
       "name": "extraProperties",
       "type": "multiLine",
       "label": "Additional Properties",
-      "defaultValue": "",
+      "defaultValue":
+        "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin",
       "required": false,
       "properties": {
         "resizable": "true",
-        "rows": "2"
+        "rows": "5"
       },
       "helpMarkDown":
-        "Additional properties to be passed to the scanner. Specify each key=value pair on a new line.",
+        "[Additional properties](https://redirect.sonarsource.com/doc/analysis-parameters.html) to be passed to the scanner. Specify each key=value pair on a new line.",
       "groupName": "advanced"
     }
   ],
