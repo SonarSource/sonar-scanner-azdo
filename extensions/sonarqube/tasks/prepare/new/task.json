@@ -14,7 +14,7 @@
     "Patch": 0
   },
   "releaseNotes":
-    "<ul><li><b>Support non MSBuild projects:</b> This task can be used to configure analysis also for non MSBuild projects.</li></ul>",
+    "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
   "minimumAgentVersion": "1.95.1",
   "instanceNameFormat": "Prepare analysis on SonarQube",
   "groups": [
@@ -32,7 +32,7 @@
       "label": "SonarQube Server Endpoint",
       "required": true,
       "helpMarkDown":
-        "The SonarQube Server Endpoint. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token."
+        "Select the SonarQube server endpoint for your project. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token."
     },
     {
       "name": "scannerMode",
@@ -41,7 +41,7 @@
       "defaultValue": "MSBuild",
       "required": true,
       "helpMarkDown":
-        "##MSBuild\n* put this task before your MSBuild task\n* add the 'Run analysis' task after the MSBuild/VSTest tasks\n##Maven/Gradle\n* put this task before the Maven/Gradle task\n* tick the 'SonarQube' checkbox in the Maven/Gradle task configuration.\n##Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run analysis' task",
+        "####MSBuild\n* Put this task before your MSBuild task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
       "options": {
         "MSBuild": "Integrate with MSBuild",
         "Other": "Integrate with Maven or Gradle",
@@ -138,14 +138,15 @@
       "name": "extraProperties",
       "type": "multiLine",
       "label": "Additional Properties",
-      "defaultValue": "",
+      "defaultValue":
+        "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin",
       "required": false,
       "properties": {
         "resizable": "true",
-        "rows": "2"
+        "rows": "5"
       },
       "helpMarkDown":
-        "Additional properties to be passed to the scanner. Specify each key=value pair on a new line.",
+        "[Additional properties](https://redirect.sonarsource.com/doc/analysis-parameters.html) to be passed to the scanner. Specify each key=value pair on a new line.",
       "groupName": "advanced"
     }
   ],
