@@ -1,5 +1,5 @@
 import * as tl from 'vsts-task-lib/task';
-import { PROP_NAMES } from './utils';
+import { PROP_NAMES } from '../helpers/utils';
 
 export enum EndpointType {
   SonarCloud = 'SonarCloud',

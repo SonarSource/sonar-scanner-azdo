@@ -1,35 +1,14 @@
 import * as tl from 'vsts-task-lib/task';
-import Endpoint, { EndpointType } from '../../../../../common/ts/Endpoint';
-import Scanner, { ScannerMode } from '../../../../../common/ts/Scanner';
-import { PROP_NAMES, toCleanJSON } from '../../../../../common/ts/utils';
+import Endpoint, { EndpointType } from '../../../../../common/ts/sonarqube/Endpoint';
+import prepareTask from '../../../../../common/ts/prepare-task';
 
 async function run() {
   try {
-    const scannerMode: ScannerMode = ScannerMode[tl.getInput('scannerMode')];
     const endpoint = Endpoint.getEndpoint(
       tl.getInput(EndpointType.SonarCloud, true),
       EndpointType.SonarCloud
     );
-    const scanner = Scanner.getPrepareScanner(__dirname, scannerMode);
-
-    const props: { [key: string]: string } = {};
-    tl
-      .getDelimitedInput('extraProperties', '\n')
-      .map(keyValue => keyValue.split(/=(.+)/))
-      .forEach(([k, v]) => (props[k] = v));
-
-    tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
-    tl.setVariable('SONARQUBE_ENDPOINT', endpoint.toJson(), true);
-    tl.setVariable(
-      'SONARQUBE_SCANNER_PARAMS',
-      toCleanJSON({
-        ...endpoint.toSonarProps(),
-        ...scanner.toSonarProps(),
-        ...props
-      })
-    );
-
-    await scanner.runPrepare();
+    await prepareTask(endpoint, __dirname);
   } catch (err) {
     tl.setResult(tl.TaskResult.Failed, err.message);
   }

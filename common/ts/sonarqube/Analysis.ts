@@ -2,8 +2,8 @@ import * as tl from 'vsts-task-lib/task';
 import Endpoint, { EndpointType } from './Endpoint';
 import Metrics from './Metrics';
 import Task from './Task';
-import { formatMeasure } from './measures';
-import { getJSON } from './request';
+import { formatMeasure } from '../helpers/measures';
+import { getJSON } from '../helpers/request';
 
 interface IAnalysis {
   status: string;

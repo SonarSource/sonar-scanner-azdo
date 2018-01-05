@@ -1,6 +1,6 @@
 import * as tl from 'vsts-task-lib/task';
 import Endpoint from './Endpoint';
-import { getJSON } from './request';
+import { getJSON } from '../helpers/request';
 
 interface ITask {
   analysisId: string;
