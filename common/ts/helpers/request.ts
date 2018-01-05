@@ -1,6 +1,6 @@
 import * as request from 'request';
 import * as tl from 'vsts-task-lib/task';
-import Endpoint from './Endpoint';
+import Endpoint from '../sonarqube/Endpoint';
 
 interface RequestData {
   [x: string]: any;

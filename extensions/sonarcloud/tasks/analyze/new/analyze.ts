@@ -1,17 +1,9 @@
 import * as tl from 'vsts-task-lib/task';
-import Scanner, { ScannerMode } from '../../../../../common/ts/Scanner';
-import { PROP_NAMES, toCleanJSON } from '../../../../../common/ts/utils';
+import analyzeTask from '../../../../../common/ts/analyze-task';
 
 async function run() {
   try {
-    const scannerMode: ScannerMode = ScannerMode[tl.getVariable('SONARQUBE_SCANNER_MODE')];
-    if (!scannerMode) {
-      throw new Error(
-        "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task"
-      );
-    }
-    const scanner = Scanner.getAnalyzeScanner(__dirname, scannerMode);
-    await scanner.runAnalysis();
+    await analyzeTask(__dirname);
   } catch (err) {
     tl.setResult(tl.TaskResult.Failed, err.message);
   }
