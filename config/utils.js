@@ -4,6 +4,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const fs = require('fs-extra');
 const dateformat = require('dateformat');
+const globby = require('globby');
 const sonarqubeScanner = require('sonarqube-scanner');
 const { paths, resolveApp } = require('./paths');
 
@@ -70,26 +71,22 @@ function fullVersion(version) {
 }
 exports.fullVersion = fullVersion;
 
-exports.fileHashsum = function(file) {
-  if (file.isNull()) {
-    return [];
-  }
-  if (file.isStream()) {
-    console.warn('Streams not supported');
-    return [];
-  }
+function fileHashsum(filePath) {
+  const fileContent = fs.readFileSync(filePath);
   return ['sha1', 'md5'].map(algo => {
     const hash = crypto
       .createHash(algo)
-      .update(file.contents, 'binary')
+      .update(fileContent, 'binary')
       .digest('hex');
-    console.log(`Computed "${path.basename(file.path)}" ${algo}: ${hash}`);
+    console.log(`Computed "${path.basename(filePath)}" ${algo}: ${hash}`);
     return hash;
   });
-};
+}
+exports.fileHashsum = fileHashsum;
 
-exports.getBuildInfo = function(packageJson, [sha1, md5]) {
+exports.getBuildInfo = function(packageJson, filePath) {
   const version = fullVersion(packageJson.version);
+  const vsixPaths = globby.sync(path.join(paths.build.root, '*.vsix'));
   return {
     version: '1.0.1',
     name: packageJson.name,
@@ -102,16 +99,19 @@ exports.getBuildInfo = function(packageJson, [sha1, md5]) {
       {
         id: `org.sonarsource.scanner.vsts:${packageJson.name}:${version}`,
         properties: {
-          artifactsToPublish: `org.sonarsource.scanner.vsts:${packageJson.name}:vsix`
+          artifactsToPublish: vsixPaths
+            .map(filePath => `org.sonarsource.scanner.vsts:${path.basename(filePath)}:vsix`)
+            .join(',')
         },
-        artifacts: [
-          {
+        artifacts: vsixPaths.map(filePath => {
+          const [sha1, md5] = fileHashsum(filePath);
+          return {
             type: 'vsix',
             sha1,
             md5,
-            name: `${packageJson.name}-${version}.vsix`
-          }
-        ]
+            name: path.basename(filePath)
+          };
+        })
       }
     ],
     properties: {
