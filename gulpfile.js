@@ -233,13 +233,15 @@ gulp.task('extension:test', () =>
 gulp.task('tfx', () =>
   globby
     .sync(path.join(paths.build.extensions.root, '*'), { nodir: false })
-    .forEach(extension => tfxCommand(extension))
+    .forEach(extension => tfxCommand(extension, packageJSON))
 );
 
 gulp.task('tfx:test', () =>
   globby
     .sync(path.join(paths.build.extensions.root, '*'), { nodir: false })
-    .forEach(extension => tfxCommand(extension, `--publisher ` + (yargs.argv.publisher || 'foo')))
+    .forEach(extension =>
+      tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || 'foo'))
+    )
 );
 
 gulp.task('deploy:vsix', ['build'], () => {
@@ -248,7 +250,7 @@ gulp.task('deploy:vsix', ['build'], () => {
     return gutil.noop;
   }
   const { name } = packageJSON;
-  const version = fullVersion(packageJSON.version);
+  const packageVersion = fullVersion(packageJSON.version);
   return es.merge(
     globby.sync(path.join(paths.build.root, '*.vsix')).map(filePath => {
       const [sha1, md5] = fileHashsum(filePath);
@@ -263,7 +265,7 @@ gulp.task('deploy:vsix', ['build'], () => {
               '/org/sonarsource/scanner/vsts/' +
               name +
               '/' +
-              version,
+              packageVersion,
             username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
             password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
             properties: {
