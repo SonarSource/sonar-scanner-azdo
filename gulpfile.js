@@ -199,18 +199,6 @@ gulp.task('extension:copy', () =>
     .pipe(gulp.dest(paths.build.extensions.root))
 );
 
-gulp.task('extension:version', () => {
-  let vsixVersion = fullVersion(packageJSON.version);
-  // Extension version can only be made of numbers (up to 4)
-  if (vsixVersion.endsWith('-SNAPSHOT')) {
-    vsixVersion = vsixVersion.replace('-SNAPSHOT', '');
-  }
-  gulp
-    .src(path.join(paths.build.extensions.root, '**', 'vss-extension.json'))
-    .pipe(jeditor({ version: `${vsixVersion}` }))
-    .pipe(gulp.dest(paths.build.extensions.root));
-});
-
 gulp.task('extension:test', () =>
   es.merge(
     globby.sync(path.join(paths.extensions.root, '*'), { nodir: false }).map(extension =>
@@ -335,17 +323,16 @@ gulp.task('copy', [
   'tasks:old:bundle',
   'tasks:new:bundle',
   'tasks:icons',
+  'tasks:version',
   'scanner:copy'
 ]);
 
 gulp.task('deploy', ['deploy:buildinfo', 'deploy:vsix']);
 
-gulp.task('version', ['tasks:version', 'extension:version']);
-
 gulp.task('test', ['extension:test', 'tasks:icons:test']);
 
-gulp.task('build', gulpSequence('clean', 'copy', 'version', 'tfx'));
+gulp.task('build', gulpSequence('clean', 'copy', 'tfx'));
 
-gulp.task('build:test', gulpSequence('clean', 'copy', 'version', 'test', 'tfx:test'));
+gulp.task('build:test', gulpSequence('clean', 'copy', 'test', 'tfx:test'));
 
 gulp.task('default', ['build']);
