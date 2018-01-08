@@ -42,7 +42,7 @@ function numberFormatter(
   minimumFractionDigits = 0,
   maximumFractionDigits = minimumFractionDigits
 ) {
-  const { format } = new Intl.NumberFormat(null, {
+  const { format } = new Intl.NumberFormat('en-US', {
     minimumFractionDigits,
     maximumFractionDigits
   });
