@@ -9,7 +9,7 @@
   "visibility": ["Build"],
   "author": "sonarsource",
   "version": {
-    "Major": 4,
+    "Major": 1,
     "Minor": 0,
     "Patch": 0
   },
