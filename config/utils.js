@@ -39,7 +39,7 @@ function npmInstall(packagePath) {
 exports.npmInstall = npmInstall;
 
 exports.npmInstallTask = function(packagePath) {
-  const packageJson = JSON.parse(fs.readFileSync(packagePath).toString());
+  const packageJson = fs.readJsonSync(packagePath);
   if (packageJson) {
     if (packageJson.devDependencies && Object.keys(packageJson.devDependencies).length > 0) {
       fail(
@@ -51,11 +51,14 @@ exports.npmInstallTask = function(packagePath) {
   }
 };
 
-exports.tfxCommand = function(extensionPath, params = '') {
+exports.tfxCommand = function(extensionPath, packageJSON, params = '') {
+  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
   run(
     `${resolveApp(
       path.join('node_modules', '.bin', 'tfx')
-    )} extension create --output-path "../../" ${params}`,
+    )} extension create --output-path "../../${packageJSON.name}-${fullVersion(
+      packageJSON.version
+    )}-${vssExtension.id}.vsix" ${params}`,
     {
       cwd: resolveApp(extensionPath)
     }
@@ -85,8 +88,9 @@ function fileHashsum(filePath) {
 exports.fileHashsum = fileHashsum;
 
 exports.getBuildInfo = function(packageJson, filePath) {
-  const version = fullVersion(packageJson.version);
+  const packageVersion = fullVersion(packageJson.version);
   const vsixPaths = globby.sync(path.join(paths.build.root, '*.vsix'));
+  const qualifierMatch = new RegExp(`${packageVersion}-(.+)\.vsix$`);
   return {
     version: '1.0.1',
     name: packageJson.name,
@@ -97,10 +101,15 @@ exports.getBuildInfo = function(packageJson, filePath) {
     vcsUrl: `https://github.com/${process.env.TRAVIS_REPO_SLUG}.git`,
     modules: [
       {
-        id: `org.sonarsource.scanner.vsts:${packageJson.name}:${version}`,
+        id: `org.sonarsource.scanner.vsts:${packageJson.name}:${packageVersion}`,
         properties: {
           artifactsToPublish: vsixPaths
-            .map(filePath => `org.sonarsource.scanner.vsts:${path.basename(filePath)}:vsix`)
+            .map(
+              filePath =>
+                `org.sonarsource.scanner.vsts:${packageJson.name}:vsix:${
+                  filePath.match(qualifierMatch)[1]
+                }`
+            )
             .join(',')
         },
         artifacts: vsixPaths.map(filePath => {
@@ -115,7 +124,7 @@ exports.getBuildInfo = function(packageJson, filePath) {
       }
     ],
     properties: {
-      'buildInfo.env.PROJECT_VERSION': version,
+      'buildInfo.env.PROJECT_VERSION': packageVersion,
       'buildInfo.env.ARTIFACTORY_DEPLOY_REPO': 'sonarsource-public-qa',
       'buildInfo.env.TRAVIS_COMMIT': process.env.TRAVIS_COMMIT
     }
