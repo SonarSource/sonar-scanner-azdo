@@ -166,9 +166,9 @@ export class ScannerMSBuild extends Scanner {
 
   public static getScanner(rootPath: string) {
     return new ScannerMSBuild(rootPath, {
-      projectKey: tl.getInput('msBuildProjectKey', true),
-      projectName: tl.getInput('msBuildProjectName'),
-      projectVersion: tl.getInput('msBuildProjectVersion')
+      projectKey: tl.getInput('projectKey', true),
+      projectName: tl.getInput('projectName'),
+      projectVersion: tl.getInput('projectVersion')
     });
   }
 }
