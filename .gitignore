@@ -26,3 +26,6 @@ yarn-debug.log*
 
 # sonarqube
 .scannerwork/
+
+# jest
+coverage/

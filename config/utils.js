@@ -140,7 +140,7 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
     'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,
     'sonar.analysis.pipeline': process.env.TRAVIS_BUILD_NUMBER,
     'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG,
-    'sonar.typescript.lcov.reportPaths': 'build/coverage/lcov.info'
+    'sonar.typescript.lcov.reportPaths': 'coverage/lcov.info'
   };
   sonarqubeScanner(
     {

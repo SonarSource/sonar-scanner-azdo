@@ -29,6 +29,7 @@ if (!process.env.CI) {
 } else {
   argv.push('--ci');
   argv.push('--coverage');
+  argv.push('--runInBand');
 }
 
 jest.run(argv);
