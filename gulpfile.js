@@ -30,6 +30,15 @@ const packageJSON = require('./package.json');
 
 gulp.task('clean', () => gulpDel([path.join(paths.build.root, '**'), '*.vsix']));
 
+gulp.task('npminstall', () =>
+  gulp
+    .src([
+      path.join(paths.extensions.tasks.new, 'package.json'),
+      path.join(paths.common.new, 'package.json')
+    ])
+    .pipe(es.mapSync(file => npmInstallTask(file.path)))
+);
+
 gulp.task('scanner:download', () =>
   download(scanner.url)
     .pipe(decompress())
@@ -74,16 +83,7 @@ gulp.task('tasks:old:common', () => {
 
 gulp.task('tasks:old:bundle', ['tasks:old:copy', 'tasks:old:common']);
 
-gulp.task('tasks:new:npminstall', () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.new, 'package.json'),
-      path.join(paths.common.new, 'package.json')
-    ])
-    .pipe(es.mapSync(file => npmInstallTask(file.path)))
-);
-
-gulp.task('tasks:new:ts', ['tasks:new:npminstall'], () =>
+gulp.task('tasks:new:ts', ['npminstall'], () =>
   gulp
     .src([
       path.join(paths.extensions.tasks.new, '**', '*.ts'),
@@ -98,7 +98,7 @@ gulp.task('tasks:new:ts', ['tasks:new:npminstall'], () =>
     .pipe(gulp.dest(paths.build.extensions.root))
 );
 
-gulp.task('tasks:new:common:ts', ['tasks:new:npminstall'], () => {
+gulp.task('tasks:new:common:ts', ['npminstall'], () => {
   let commonPipe = gulp
     .src([
       path.join(paths.common.new, '**', '*.ts'),
@@ -119,7 +119,7 @@ gulp.task('tasks:new:common:ts', ['tasks:new:npminstall'], () => {
   return commonPipe;
 });
 
-gulp.task('tasks:new:copy', ['tasks:new:npminstall'], () =>
+gulp.task('tasks:new:copy', ['npminstall'], () =>
   gulp
     .src([
       path.join(paths.extensions.tasks.new, 'task.json'),
@@ -128,7 +128,7 @@ gulp.task('tasks:new:copy', ['tasks:new:npminstall'], () =>
     .pipe(gulp.dest(paths.build.extensions.root))
 );
 
-gulp.task('tasks:new:common:copy', ['tasks:new:npminstall'], () => {
+gulp.task('tasks:new:common:copy', ['npminstall'], () => {
   let commonPipe = gulp.src(pathAllFiles(paths.common.new, 'node_modules'));
   globby.sync(paths.extensions.tasks.new, { nodir: false }).forEach(dir => {
     commonPipe = commonPipe.pipe(
@@ -244,7 +244,7 @@ gulp.task('tfx:test', () =>
     )
 );
 
-gulp.task('deploy:vsix', ['build'], () => {
+gulp.task('deploy:vsix', () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -287,7 +287,7 @@ gulp.task('deploy:vsix', ['build'], () => {
   );
 });
 
-gulp.task('deploy:buildinfo', ['build'], () => {
+gulp.task('deploy:buildinfo', () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;

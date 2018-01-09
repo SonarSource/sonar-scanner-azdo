@@ -43,11 +43,12 @@
     "deploy": "./node_modules/.bin/gulp deploy",
     "sonarqube": "./node_modules/.bin/gulp sonarqube",
     "format": "./node_modules/.bin/prettier --write --list-different '**/*.{js,ts}'",
+    "install-dep": "./node_modules/.bin/gulp npminstall",
     "lint": "eslint --ext js,ts --quiet '**/*.{js,ts}'",
     "test-build": "./node_modules/.bin/gulp build:test",
     "test": "node ./scripts/test.js",
     "ts-check": "./node_modules/.bin/tsc --noEmit",
-    "validate": "npm run lint && npm run ts-check"
+    "validate": "npm run lint && npm run ts-check && npm test"
   },
   "engines": {
     "node": ">=6"
@@ -55,20 +56,10 @@
   "jest": {
     "clearMocks": true,
     "coverageDirectory": "<rootDir>/build/coverage",
-    "coveragePathIgnorePatterns": [
-      "/node_modules",
-      "/tests"
-    ],
+    "coveragePathIgnorePatterns": ["/node_modules", "/tests"],
     "mapCoverage": true,
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules",
-      "<rootDir>/config",
-      "<rootDir>/build"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
+    "testPathIgnorePatterns": ["/node_modules", "<rootDir>/config", "<rootDir>/build"],
     "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
     "transform": {
       ".(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
