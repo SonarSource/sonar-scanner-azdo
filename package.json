@@ -56,7 +56,14 @@
   "jest": {
     "clearMocks": true,
     "coverageDirectory": "<rootDir>/build/coverage",
-    "coveragePathIgnorePatterns": ["/node_modules", "/tests"],
+    "coveragePathIgnorePatterns": [
+      "gulpfile.js",
+      "/node_modules",
+      "/tests",
+      "/config",
+      "/scripts",
+      "/build"
+    ],
     "mapCoverage": true,
     "moduleFileExtensions": ["ts", "js"],
     "testPathIgnorePatterns": ["/node_modules", "<rootDir>/config", "<rootDir>/build"],

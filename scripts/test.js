@@ -28,6 +28,7 @@ if (!process.env.CI) {
   argv.push('--watch');
 } else {
   argv.push('--ci');
+  argv.push('--coverage');
 }
 
 jest.run(argv);

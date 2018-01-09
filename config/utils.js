@@ -136,10 +136,11 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
     'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
     'sonar.projectName': 'SonarQube Scanner for TFS/VSTS',
     'sonar.exclusions': 'build/**, node_modules/**, **/node_modules/**',
-    'sonar.coverage.exclusions': 'gulpfile.js, config/**',
+    'sonar.coverage.exclusions': 'gulpfile.js, config/**, build/**, scripts/**, **/__tests__/**',
     'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,
     'sonar.analysis.pipeline': process.env.TRAVIS_BUILD_NUMBER,
-    'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG
+    'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG,
+    'sonar.typescript.lcov.reportPaths': 'build/coverage/lcov.info'
   };
   sonarqubeScanner(
     {
