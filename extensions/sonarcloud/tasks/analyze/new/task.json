@@ -13,7 +13,6 @@
     "Minor": 0,
     "Patch": 0
   },
-  "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
   "minimumAgentVersion": "2.119.1",
   "demands": ["java"],
   "inputs": [],

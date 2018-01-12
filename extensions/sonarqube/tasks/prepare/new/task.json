@@ -27,7 +27,6 @@
   "inputs": [
     {
       "name": "SonarQube",
-      "aliases": ["connectedServiceName"],
       "type": "connectedService:sonarqube",
       "label": "SonarQube Server Endpoint",
       "required": true,
