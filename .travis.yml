@@ -9,9 +9,8 @@ cache:
 install:
   - npm install
   - npm run install-dep
-before_script: npm run validate
-script:  npm run build
-after_success: npm run deploy && npm run sonarqube
+before_script: npm run clean && npm run validate
+script:  npm run deploy && npm run sonarqube
 
 notifications:
   email: false

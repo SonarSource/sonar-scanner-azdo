@@ -244,7 +244,7 @@ gulp.task('tfx:test', () =>
     )
 );
 
-gulp.task('deploy:vsix', () => {
+gulp.task('deploy:vsix', ['build'], () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -287,7 +287,7 @@ gulp.task('deploy:vsix', () => {
   );
 });
 
-gulp.task('deploy:buildinfo', () => {
+gulp.task('deploy:buildinfo', ['build'], () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -333,7 +333,7 @@ gulp.task('deploy', ['deploy:buildinfo', 'deploy:vsix']);
 
 gulp.task('test', ['extension:test', 'tasks:icons:test']);
 
-gulp.task('build', gulpSequence('clean', 'copy', 'tfx'));
+gulp.task('build', gulpSequence('copy', 'tfx'));
 
 gulp.task('build:test', gulpSequence('clean', 'copy', 'test', 'tfx:test'));
 
