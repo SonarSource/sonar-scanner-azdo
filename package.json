@@ -40,6 +40,7 @@
   },
   "scripts": {
     "build": "./node_modules/.bin/gulp build",
+    "clean": "./node_modules/.bin/gulp clean",
     "deploy": "./node_modules/.bin/gulp deploy",
     "sonarqube": "./node_modules/.bin/gulp sonarqube",
     "format": "./node_modules/.bin/prettier --write --list-different '**/*.{js,ts}'",
