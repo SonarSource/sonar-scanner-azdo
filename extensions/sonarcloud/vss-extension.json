@@ -139,7 +139,7 @@
           }
         ],
         "helpMarkDown":
-          "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarSource account security page</a> to generate a token."
+          "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarCloud account security page</a> to generate a token."
       }
     }
   ]
