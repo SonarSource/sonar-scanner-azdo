@@ -1,4 +1,4 @@
-@Library('SonarSource@1.2') _
+@Library('SonarSource@1.3') _
 
 pipeline {
     agent { 
@@ -15,14 +15,24 @@ pipeline {
         SONARSOURCE_QA = 'true'
         MAVEN_TOOL = 'Maven 3.3.x'
     }
-    stages {    
+    stages {
+        stage('QA') {
+            steps {                
+                burgrNotifyQaStarted()
+            }
+            post {
+                always {
+                    burgrNotifyQaResult()
+                }
+            }
+        }
         stage('Promote') {
             steps {
                 repoxPromoteBuild()
             }
             post {
                 always {
-                    sendAllNotificationPromote()
+                    burgrNotifyPromote()
                 }
             }
         }
