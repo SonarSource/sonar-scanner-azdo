@@ -103,7 +103,7 @@ exports.getBuildInfo = function(packageJson, filePath) {
       {
         id: `org.sonarsource.scanner.vsts:${packageJson.name}:${packageVersion}`,
         properties: {
-          artifactsToPublish: vsixPaths
+          artifactsToDownload: vsixPaths
             .map(
               filePath =>
                 `org.sonarsource.scanner.vsts:${packageJson.name}:vsix:${
