@@ -124,6 +124,7 @@ exports.getBuildInfo = function(packageJson, filePath) {
       }
     ],
     properties: {
+      'java.specification.version': '1.8', // Workaround for https://jira.sonarsource.com/browse/RA-115
       'buildInfo.env.PROJECT_VERSION': packageVersion,
       'buildInfo.env.ARTIFACTORY_DEPLOY_REPO': 'sonarsource-public-qa',
       'buildInfo.env.TRAVIS_COMMIT': process.env.TRAVIS_COMMIT
