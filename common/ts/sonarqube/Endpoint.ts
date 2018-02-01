@@ -18,10 +18,10 @@ export default class Endpoint {
   constructor(public type: EndpointType, private data: EndpointData) {}
 
   public get auth() {
-    if (this.data.token) {
-      return { user: this.data.token };
+    if (!this.data.token && this.data.password) {
+      return { user: this.data.username, pass: this.data.password };
     }
-    return { user: this.data.username, pass: this.data.password };
+    return { user: this.data.token || this.data.username };
   }
 
   public get organization() {
