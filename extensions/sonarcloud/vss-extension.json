@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarcloud",
   "name": "SonarCloud",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "branding": {
     "color": "rgb(67, 157, 210)",
     "theme": "dark"
