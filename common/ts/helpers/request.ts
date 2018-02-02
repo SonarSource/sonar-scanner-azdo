@@ -28,7 +28,7 @@ export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): 
         if (error) {
           return reject(`[SQ] API GET '${path}' failed, error was: ${error}`);
         }
-        tl.debug(`Response: ${response.statusCode} Body: "${body}"`);
+        tl.debug(`Response: ${response.statusCode} Body: "${JSON.stringify(body)}"`);
         if (response.statusCode < 200 || response.statusCode >= 300) {
           return reject(
             new Error(`[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`)
