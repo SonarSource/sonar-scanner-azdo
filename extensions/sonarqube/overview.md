@@ -4,13 +4,16 @@ SonarQube can be [installed][getstarted] and run on a dedicated infrastructure.
 
 The analysis of the source code doesn't happen on the server side, but must be part of the build chain to make the analysis as accurate as possible. These analyses are performed using scanners.
 
-## About the SonarQube VSTS Marketplace Extension
+## About the SonarQube VSTS/TFS Marketplace Extension
 This extension provides the following features:
 * A dedicated **SonarQube EndPoint** to define the SonarQube server to be used.
 * Three build tasks to get your projects analyzed easily:
   * **Prepare Analysis Configuration** task, to configure all the required settings before executing the build. This task is mandatory. In case of .NET solutions or Java projects, this tasks helps to integrate seamlessly with MSBuild, Maven and Gradle tasks.
   * **Run Code Analysis** task, to actually execute the analysis of the source code. Not required for Maven or Gradle projects.
   * **Publish Analysis Result** task, to display the quality gate status in the build summary. This tasks is optional, as it can increase the overall build time.
+
+**Note for TFS installations older than TFS 2017 Update 2**: to install the extension, please follow instructions
+available on the ["SonarQube Extension 3.0" documentation page](https://docs.sonarqube.org/display/SCAN/SonarQube+Extension+3.0).
 
 ## Highlighted Features
 ### Seamless Integration with .Net solutions
