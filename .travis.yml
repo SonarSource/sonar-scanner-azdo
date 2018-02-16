@@ -10,7 +10,7 @@ install:
   - npm install
   - npm run install-dep
 before_script: npm run clean && npm run validate
-script:  npm run deploy && npm run sonarqube
+script:  npm run deploy && git fetch --unshallow && npm run sonarqube
 
 notifications:
   email: false
