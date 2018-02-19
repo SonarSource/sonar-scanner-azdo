@@ -91,7 +91,11 @@ export default class TaskReport {
             });
             return resolve(taskReport);
           } catch (err) {
-            tl.error(`[SQ] Parse Task report error: ${err.message}`);
+            if (err && err.message) {
+              tl.error(`[SQ] Parse Task report error: ${err.message}`);
+            } else if (err) {
+              tl.error(`[SQ] Parse Task report error: ${JSON.stringify(err)}`);
+            }
             return reject(err);
           }
         });

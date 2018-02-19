@@ -26,13 +26,15 @@ export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): 
       },
       (error, response, body) => {
         if (error) {
-          return reject(`[SQ] API GET '${path}' failed, error was: ${error}`);
+          const errMsg = `[SQ] API GET '${path}' failed, error was: ${JSON.stringify(error)}`;
+          tl.debug(errMsg);
+          return reject(new Error(errMsg));
         }
         tl.debug(`Response: ${response.statusCode} Body: "${JSON.stringify(body)}"`);
         if (response.statusCode < 200 || response.statusCode >= 300) {
-          return reject(
-            new Error(`[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`)
-          );
+          const errMsg = `[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`;
+          tl.debug(errMsg);
+          return reject(new Error(errMsg));
         }
         return resolve(body || {});
       }

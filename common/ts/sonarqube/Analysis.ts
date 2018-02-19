@@ -143,6 +143,8 @@ export default class Analysis {
       err => {
         if (err && err.message) {
           tl.error(`[SQ] Error retrieving analysis: ${err.message}`);
+        } else if (err) {
+          tl.error(`[SQ] Error retrieving analysis: ${JSON.stringify(err)}`);
         }
         throw new Error(`[SQ] Could not fetch analysis for ID '${analysisId}'`);
       }
