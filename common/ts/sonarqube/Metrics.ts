@@ -34,6 +34,8 @@ export default class Metrics {
       tl.error(`[SQ] Could not fetch metrics`);
       if (err && err.message) {
         tl.error(err.message);
+      } else if (err) {
+        tl.error(JSON.stringify(err));
       }
       return undefined;
     });
