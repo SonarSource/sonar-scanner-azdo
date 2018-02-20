@@ -1,5 +1,5 @@
-import * as fs from 'fs';
 import * as path from 'path';
+import * as fs from 'fs-extra';
 import * as tl from 'vsts-task-lib/task';
 
 export const REPORT_TASK_NAME = 'report-task.txt';
@@ -59,48 +59,60 @@ export default class TaskReport {
   public static createTaskReportFromFile(
     filePath = TaskReport.findTaskFileReport()
   ): Promise<TaskReport> {
-    return new Promise((resolve, reject) => {
-      if (!filePath) {
-        reject(
-          TaskReport.throwInvalidReport(
-            `[SQ] Could not find '${REPORT_TASK_NAME}'.` +
-              ` Possible cause: the analysis did not complete successfully.`
-          )
+    if (!filePath) {
+      return Promise.reject(
+        TaskReport.throwInvalidReport(
+          `[SQ] Could not find '${REPORT_TASK_NAME}'.` +
+            ` Possible cause: the analysis did not complete successfully.`
+        )
+      );
+    }
+    tl.debug(`[SQ] Read Task report file: ${filePath}`);
+    return fs.access(filePath, fs.constants.R_OK).then(
+      () => this.parseReportFile(filePath),
+      err => {
+        return Promise.reject(
+          TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`)
         );
       }
-      tl.debug(`[SQ] Read Task report file: ${filePath}`);
-      fs.access(filePath, fs.constants.R_OK, err => {
-        if (err) {
-          return reject(
-            TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`)
+    );
+  }
+
+  private static parseReportFile(filePath: string): Promise<TaskReport> {
+    return fs.readFile(filePath, 'utf-8').then(
+      fileContent => {
+        tl.debug(`[SQ] Parse Task report file: ${fileContent}`);
+        if (!fileContent || fileContent.length <= 0) {
+          return Promise.reject(
+            TaskReport.throwInvalidReport(`[SQ] Error reading file: ${fileContent}`)
           );
         }
-        fs.readFile(filePath, 'utf-8', (err, fileContent) => {
-          tl.debug(`[SQ] Parse Task report file: ${fileContent}`);
-          if (err || !fileContent || fileContent.length <= 0) {
-            return reject(TaskReport.throwInvalidReport(`[SQ] Error reading file: ${fileContent}`));
+        try {
+          const settings = TaskReport.createTaskReportFromString(fileContent);
+          const taskReport = new TaskReport({
+            projectKey: settings.get('projectKey'),
+            serverUrl: settings.get('serverUrl'),
+            dashboardUrl: settings.get('dashboardUrl'),
+            ceTaskId: settings.get('ceTaskId'),
+            ceTaskUrl: settings.get('ceTaskUrl')
+          });
+          return Promise.resolve(taskReport);
+        } catch (err) {
+          if (err && err.message) {
+            tl.error(`[SQ] Parse Task report error: ${err.message}`);
+          } else if (err) {
+            tl.error(`[SQ] Parse Task report error: ${JSON.stringify(err)}`);
           }
-          try {
-            const settings = TaskReport.createTaskReportFromString(fileContent);
-            const taskReport = new TaskReport({
-              projectKey: settings.get('projectKey'),
-              serverUrl: settings.get('serverUrl'),
-              dashboardUrl: settings.get('dashboardUrl'),
-              ceTaskId: settings.get('ceTaskId'),
-              ceTaskUrl: settings.get('ceTaskUrl')
-            });
-            return resolve(taskReport);
-          } catch (err) {
-            if (err && err.message) {
-              tl.error(`[SQ] Parse Task report error: ${err.message}`);
-            } else if (err) {
-              tl.error(`[SQ] Parse Task report error: ${JSON.stringify(err)}`);
-            }
-            return reject(err);
-          }
-        });
-      });
-    });
+          return Promise.reject(err);
+        }
+      },
+      err =>
+        Promise.reject(
+          TaskReport.throwInvalidReport(
+            `[SQ] Error reading file: ${err.message || JSON.stringify(err)}`
+          )
+        )
+    );
   }
 
   private static createTaskReportFromString(fileContent: string): Map<string, string> {
