@@ -1,7 +1,7 @@
 import * as tl from 'vsts-task-lib/task';
-import Endpoint, { EndpointType } from './sonarqube/Endpoint';
+import Endpoint from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
-import { PROP_NAMES, toCleanJSON } from './helpers/utils';
+import { toCleanJSON } from './helpers/utils';
 
 export default async function prepareTask(endpoint: Endpoint, rootPath: string) {
   const scannerMode: ScannerMode = ScannerMode[tl.getInput('scannerMode')];

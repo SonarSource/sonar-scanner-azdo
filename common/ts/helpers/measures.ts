@@ -53,10 +53,6 @@ function noFormatter(value: string | number): string {
   return value.toString();
 }
 
-function emptyFormatter(): string {
-  return '';
-}
-
 function intFormatter(value: number): string {
   return numberFormatter(value);
 }
