@@ -1,6 +1,6 @@
 {
   "name": "analyze",
-  "version": "4.0.0",
+  "version": "1.0.0",
   "description": "SonarCloud Task Analyze",
   "author": "SonarSource",
   "license": "LGPL-3.0",
