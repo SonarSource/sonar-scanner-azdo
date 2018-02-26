@@ -23,7 +23,7 @@ export default async function publishTask(endpointType: EndpointType) {
   const metrics = await Metrics.getAllMetrics(endpoint);
 
   const taskReport = await TaskReport.createTaskReportFromFile();
-  const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId);
+  const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutInSeconds());
   const analysis = await Analysis.getAnalysis(
     task.analysisId,
     endpoint,
@@ -31,4 +31,7 @@ export default async function publishTask(endpointType: EndpointType) {
     taskReport.dashboardUrl
   );
   publishBuildSummary(analysis.getHtmlAnalysisReport(), endpoint.type);
+}
+function timeoutInSeconds(): number {
+  return Number.parseInt(tl.getInput('pollingTimeoutSec', true), 10);
 }

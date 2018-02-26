@@ -15,7 +15,17 @@
     "Patch": 0
   },
   "minimumAgentVersion": "1.95.1",
-  "inputs": [],
+  "inputs": [
+    {
+      "name": "pollingTimeoutSec",
+      "type": "string",
+      "label": "Timeout (s)",
+      "defaultValue": "300",
+      "required": true,
+      "helpMarkDown":
+        "This task will poll SonarCloud until the analysis is completed, or until the timeout is reached"
+    }
+  ],
   "dataSourceBindings": [],
   "execution": {
     "Node": {
