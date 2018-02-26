@@ -230,13 +230,20 @@ function IsPrBuild
 {    
     $sourceBranch = $env:Build_SourceBranch
     $scProvider = $env:Build_Repository_Provider
+    $buildReason = $env:BUILD_REASON
 
     return   $scProvider -and `
              ($scProvider -eq "TfsGit") -and `
              $sourceBranch -and `
-             $sourceBranch.StartsWith("refs/pull/", [StringComparison]::OrdinalIgnoreCase)        
+             $sourceBranch.StartsWith("refs/pull/", [StringComparison]::OrdinalIgnoreCase) -or `
+             ($buildReason -eq "PullRequest")
 }
 
+function IsTfsBuild
+{
+    $scProvider = $env:Build_Repository_Provider
+    return $scProvider -and ($scProvider -eq "TfsGit")
+}
 
 function GetSonarQubeBuildDirectory
 {
