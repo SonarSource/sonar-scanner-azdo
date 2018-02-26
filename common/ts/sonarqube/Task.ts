@@ -28,7 +28,7 @@ export default class Task {
       ({ task }: { task: ITask }) => {
         tl.debug(`[SQ] Task status:` + task.status);
         if (tries <= 0) {
-          throw new Error(`[SQ] Timeout, task '${taskId}' took too long to complete.`);
+          throw new TimeOutReachedError();
         }
         switch (task.status.toUpperCase()) {
           case 'CANCEL':
@@ -54,5 +54,13 @@ export default class Task {
         throw new Error(`[SQ] Could not fetch task for ID '${taskId}'`);
       }
     );
+  }
+}
+
+export class TimeOutReachedError extends Error {
+  constructor() {
+    super();
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, TimeOutReachedError.prototype);
   }
 }
