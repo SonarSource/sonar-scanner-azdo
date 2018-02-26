@@ -20,8 +20,8 @@ export default class Task {
   public static waitForTaskCompletion(
     endpoint: Endpoint,
     taskId: string,
-    delay = 1000,
-    tries = 300
+    tries,
+    delay = 1000
   ): Promise<Task> {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
     return getJSON(endpoint, `/api/ce/task`, { id: taskId }).then(
@@ -40,7 +40,7 @@ export default class Task {
           default:
             return new Promise<Task>((resolve, reject) =>
               setTimeout(() => {
-                Task.waitForTaskCompletion(endpoint, taskId, delay, tries--).then(resolve, reject);
+                Task.waitForTaskCompletion(endpoint, taskId, tries--, delay).then(resolve, reject);
               }, delay)
             );
         }
