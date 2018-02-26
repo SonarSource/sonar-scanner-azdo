@@ -1,9 +1,9 @@
 {
   "id": "291ed61f-1ee4-45d3-b1b0-bf822d9095ef",
   "name": "SonarQubePublish",
-  "friendlyName": "Publish Analysis Result",
+  "friendlyName": "Publish Quality Gate Result",
   "description":
-    "Publish SonarQube analysis on the build result, to be used after the actual analysis.",
+    "Publish SonarQube's Quality Gate result on the VSTS/TFS build result, to be used after the actual analysis.",
   "helpMarkDown":
     "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
@@ -12,7 +12,7 @@
   "version": {
     "Major": 4,
     "Minor": 0,
-    "Patch": 1
+    "Patch": 2
   },
   "minimumAgentVersion": "1.95.1",
   "inputs": [],
