@@ -2,7 +2,7 @@ import * as tl from 'vsts-task-lib/task';
 import Analysis from './sonarqube/Analysis';
 import Endpoint, { EndpointType, EndpointData } from './sonarqube/Endpoint';
 import Metrics from './sonarqube/Metrics';
-import Task from './sonarqube/Task';
+import Task, { TimeOutReachedError } from './sonarqube/Task';
 import TaskReport from './sonarqube/TaskReport';
 import { publishBuildSummary } from './helpers/vsts-server-utils';
 
@@ -23,15 +23,29 @@ export default async function publishTask(endpointType: EndpointType) {
   const metrics = await Metrics.getAllMetrics(endpoint);
 
   const taskReport = await TaskReport.createTaskReportFromFile();
-  const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutInSeconds());
-  const analysis = await Analysis.getAnalysis(
-    task.analysisId,
-    endpoint,
-    metrics,
-    taskReport.dashboardUrl
-  );
-  publishBuildSummary(analysis.getHtmlAnalysisReport(), endpoint.type);
+  const timeoutSec = timeoutInSeconds();
+  try {
+    const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
+    const analysis = await Analysis.getAnalysis(
+      task.analysisId,
+      endpoint,
+      metrics,
+      taskReport.dashboardUrl
+    );
+    publishBuildSummary(analysis.getHtmlAnalysisReport(), endpoint.type);
+  } catch (e) {
+    if (e instanceof TimeOutReachedError) {
+      tl.warning(
+        `Task '${
+          taskReport.ceTaskId
+        }' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
+      );
+    } else {
+      throw e;
+    }
+  }
 }
+
 function timeoutInSeconds(): number {
   return Number.parseInt(tl.getInput('pollingTimeoutSec', true), 10);
 }
