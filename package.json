@@ -56,9 +56,7 @@
   },
   "jest": {
     "clearMocks": true,
-    "collectCoverageFrom": [
-      "**/*.ts"
-    ],
+    "collectCoverageFrom": ["**/*.ts"],
     "coveragePathIgnorePatterns": [
       "gulpfile.js",
       "__tests__/",
@@ -68,15 +66,8 @@
       "/build"
     ],
     "mapCoverage": true,
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules",
-      "<rootDir>/config",
-      "<rootDir>/build"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
+    "testPathIgnorePatterns": ["/node_modules", "<rootDir>/config", "<rootDir>/build"],
     "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
     "transform": {
       ".(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
