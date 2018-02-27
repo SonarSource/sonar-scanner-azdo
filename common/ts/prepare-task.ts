@@ -51,7 +51,7 @@ async function populateBranchAndPrProps(endpoint: Endpoint, props: { [key: strin
       props['sonar.pullrequest.provider'] = 'vsts';
       props['sonar.pullrequest.vsts.instanceUrl'] = collectionUrl;
       props['sonar.pullrequest.vsts.project'] = tl.getVariable('System.TeamProject');
-      props['sonar.pullrequest.vsts.gitRepo'] = tl.getVariable(REPO_NAME_VAR);
+      props['sonar.pullrequest.vsts.repository'] = tl.getVariable(REPO_NAME_VAR);
     } else if (provider === 'GitHub') {
       props['sonar.pullrequest.provider'] = 'github';
       props['sonar.pullrequest.github.repository'] = tl.getVariable(REPO_NAME_VAR);
