@@ -42,7 +42,7 @@ async function populateBranchAndPrProps(endpoint: Endpoint, props: { [key: strin
   const prId = tl.getVariable('System.PullRequest.PullRequestId');
   const provider = tl.getVariable('Build.Repository.Provider');
   if (prId) {
-    props['sonar.pullrequest.id'] = prId;
+    props['sonar.pullrequest.key'] = prId;
     props['sonar.pullrequest.base'] = branchName(tl.getVariable('System.PullRequest.TargetBranch'));
     props['sonar.pullrequest.branch'] = branchName(
       tl.getVariable('System.PullRequest.SourceBranch')
@@ -58,11 +58,12 @@ async function populateBranchAndPrProps(endpoint: Endpoint, props: { [key: strin
       const sourceBranch = tl.getVariable('Build.SourceBranch');
       const match = branchPattern.exec(sourceBranch);
       if (match) {
-        props['sonar.pullrequest.id'] = match[1];
+        props['sonar.pullrequest.key'] = match[1];
         props['sonar.pullrequest.provider'] = 'github';
         props['sonar.pullrequest.github.repository'] = tl.getVariable(REPO_NAME_VAR);
       } else {
         tl.warning(`Unable to extract GitHub PR number from '${sourceBranch}'`);
+        props['sonar.scanner.skip'] = 'true';
       }
     } else {
       tl.warning(`Unkwnow provider '${provider}'`);
