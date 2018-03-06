@@ -11,10 +11,6 @@
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services.Cloud"
-    },
-    {
-      "id": "Microsoft.TeamFoundation.Server",
-      "version": "[15.2,)"
     }
   ],
   "description":
