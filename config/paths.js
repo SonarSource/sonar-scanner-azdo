@@ -28,7 +28,8 @@ exports.paths = {
       sonarqubeTasks: path.join(buildPath, 'extensions', 'sonarqube', 'tasks'),
       sonarcloudTasks: path.join(buildPath, 'extensions', 'sonarcloud', 'tasks')
     },
-    scanner: path.join(buildPath, 'tmp', 'scanner-msbuild')
+    classicScanner: path.join(buildPath, 'tmp', 'classic-sonar-scanner-msbuild'),
+    dotnetScanner:  path.join(buildPath, 'tmp', 'dotnet-sonar-scanner-msbuild')
   },
   common: {
     old: path.join(commonPath, 'powershell'),
