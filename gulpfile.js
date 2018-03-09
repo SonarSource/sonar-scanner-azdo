@@ -40,13 +40,15 @@ gulp.task('npminstall', () =>
 );
 
 gulp.task('scanner:download', () => {
-    download(scanner.classicUrl)
+    const classicDownload = download(scanner.classicUrl)
       .pipe(decompress())
       .pipe(gulp.dest(paths.build.classicScanner))
 
-    download(scanner.dotnetUrl)
+    const dotnetDownload = download(scanner.dotnetUrl)
       .pipe(decompress())
       .pipe(gulp.dest(paths.build.dotnetScanner))
+
+    return es.merge(classicDownload, dotnetDownload);
   }
 );
 
@@ -64,6 +66,7 @@ gulp.task('scanner:copy', ['scanner:download'], () => {
 
   const cliFolders = [
     path.join(paths.build.extensions.sonarqubeTasks,  'scanner-cli', 'old', 'sonar-scanner'),
+    path.join(paths.build.extensions.sonarqubeTasks,  'analyze',     'new', 'sonar-scanner'),   
     path.join(paths.build.extensions.sonarcloudTasks, 'analyze',     'new', 'sonar-scanner')
   ];
   let scannerPipe = gulp.src(pathAllFiles(paths.build.classicScanner));
@@ -80,6 +83,7 @@ gulp.task('scanner:copy', ['scanner:download'], () => {
   cliFolders.forEach(dir => {
     cliPipe = cliPipe.pipe(gulp.dest(dir));
   });
+
   return es.merge(scannerPipe, dotnetScannerPipe, cliPipe);
 });
 

@@ -81,13 +81,14 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    let scannerExe = tl.resolve(this.rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
+    let scannerCliScripts = tl.resolve(this.rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
+    
     if (isWindows()) {
-      scannerExe += '.bat';
+      scannerCliScripts += '.bat';
     } else {
-      await fs.chmod(scannerExe, '777');
+      await fs.chmod(scannerCliScripts, '777');
     }
-    const scannerRunner = tl.tool(scannerExe);
+    const scannerRunner = tl.tool(scannerCliScripts);
     await scannerRunner.exec();
   }
 
@@ -128,11 +129,13 @@ export class ScannerMSBuild extends Scanner {
     let scannerRunner;
     
     if (isWindows()) {
-      const scannerExePath = this.findFrameworkScannerPath()
+      const scannerExePath = this.findFrameworkScannerPath();
+      tl.debug(`Using classic scanner at ${scannerExePath}`);
       tl.setVariable('SONARQUBE_SCANNER_MSBUILD_EXE', scannerExePath);
-      scannerRunner = this.getScannerRunner(scannerExePath, true)
+      scannerRunner = this.getScannerRunner(scannerExePath, true);
     } else {
       const scannerDllPath = this.findDotnetScannerPath()
+      tl.debug(`Using dotnet scanner at ${scannerDllPath}`);
       tl.setVariable('SONARQUBE_SCANNER_MSBUILD_DLL', scannerDllPath);
       scannerRunner = this.getScannerRunner(scannerDllPath, false);
 
@@ -144,10 +147,10 @@ export class ScannerMSBuild extends Scanner {
     await scannerRunner.exec();
   }
 
-  private async makeShellScriptExecutable(scannerPath : string) {
+  private async makeShellScriptExecutable(scannerExecutablePath : string) {
     const scannerCliShellScripts = tl.findMatch(
-      scannerPath,
-      path.join('sonar-scanner-*', 'bin', 'sonar-scanner')
+      scannerExecutablePath,
+      path.join(path.dirname(scannerExecutablePath), 'sonar-scanner-*', 'bin', 'sonar-scanner')
     )[0];
     await fs.chmod(scannerCliShellScripts, '777');
   }
@@ -158,7 +161,7 @@ export class ScannerMSBuild extends Scanner {
     }
 
     const dotnetToolPath = tl.which('dotnet', true);
-    let scannerRunner = tl.tool(dotnetToolPath);
+    const scannerRunner = tl.tool(dotnetToolPath);
     scannerRunner.arg(scannerPath);
     return scannerRunner;
   }
