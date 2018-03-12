@@ -53,18 +53,9 @@ async function populateBranchAndPrProps(endpoint: Endpoint, props: { [key: strin
       props['sonar.pullrequest.vsts.project'] = tl.getVariable('System.TeamProject');
       props['sonar.pullrequest.vsts.repository'] = tl.getVariable(REPO_NAME_VAR);
     } else if (provider === 'GitHub') {
-      // Hack for GitHub, SonarCloud decoration need the PR number, not the id see https://github.com/Microsoft/vsts-tasks/issues/6564
-      const branchPattern = /^refs\/pull\/(\d+)\/merge$/g;
-      const sourceBranch = tl.getVariable('Build.SourceBranch');
-      const match = branchPattern.exec(sourceBranch);
-      if (match) {
-        props['sonar.pullrequest.key'] = match[1];
-        props['sonar.pullrequest.provider'] = 'github';
-        props['sonar.pullrequest.github.repository'] = tl.getVariable(REPO_NAME_VAR);
-      } else {
-        tl.warning(`Unable to extract GitHub PR number from '${sourceBranch}'`);
-        props['sonar.scanner.skip'] = 'true';
-      }
+      props['sonar.pullrequest.key'] = tl.getVariable('System.PullRequest.PullRequestNumber');
+      props['sonar.pullrequest.provider'] = 'github';
+      props['sonar.pullrequest.github.repository'] = tl.getVariable(REPO_NAME_VAR);
     } else {
       tl.warning(`Unkwnow provider '${provider}'`);
       props['sonar.scanner.skip'] = 'true';
