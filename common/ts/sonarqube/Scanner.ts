@@ -170,7 +170,7 @@ export class ScannerMSBuild extends Scanner {
     return tl.resolve(
       this.rootPath,
       'classic-sonar-scanner-msbuild',
-      'SonarQube.Scanner.MSBuild.exe'
+      'SonarScanner.MSBuild.exe'
     );
   }
 
@@ -178,7 +178,7 @@ export class ScannerMSBuild extends Scanner {
     return tl.resolve(
       this.rootPath,
       'dotnet-sonar-scanner-msbuild',
-      'SonarQube.Scanner.MSBuild.dll'
+      'SonarScanner.MSBuild.dll'
     );
   }
 
