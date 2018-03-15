@@ -81,14 +81,14 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    let scannerCliScripts = tl.resolve(this.rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
+    let scannerCliScript = tl.resolve(this.rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
     
     if (isWindows()) {
-      scannerCliScripts += '.bat';
+      scannerCliScript += '.bat';
     } else {
-      await fs.chmod(scannerCliScripts, '777');
+      await fs.chmod(scannerCliScript, '777');
     }
-    const scannerRunner = tl.tool(scannerCliScripts);
+    const scannerRunner = tl.tool(scannerCliScript);
     await scannerRunner.exec();
   }
 
@@ -183,7 +183,7 @@ export class ScannerMSBuild extends Scanner {
   }
 
   public async runAnalysis() {
-    let scannerRunner = isWindows()
+    const scannerRunner = isWindows()
       ? this.getScannerRunner(tl.getVariable('SONARQUBE_SCANNER_MSBUILD_EXE'), true)
       : this.getScannerRunner(tl.getVariable('SONARQUBE_SCANNER_MSBUILD_DLL'), false);
 
