@@ -3,8 +3,10 @@
 #
 function HandleCodeAnalysisReporting
 {	
-    
-    if (IsPrBuild)
+    $tfsBuild = IsTfsBuild
+    $prBuild = IsPrBuild
+
+    if ($prBuild -and $tfsBuild)
     {   
         Write-Host "Fetching code analysis issues and posting them to the PR..."
            
