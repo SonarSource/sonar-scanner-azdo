@@ -1,6 +1,6 @@
 {
   "name": "sonar-scanner-vsts",
-  "version": "4.0.3-SNAPSHOT",
+  "version": "0.0.1-SNAPSHOT",
   "repository": "SonarSource/sonar-scanner-vsts",
   "license": "LGPL-3.0",
   "devDependencies": {
@@ -56,9 +56,7 @@
   },
   "jest": {
     "clearMocks": true,
-    "collectCoverageFrom": [
-      "**/*.ts"
-    ],
+    "collectCoverageFrom": ["**/*.ts"],
     "coveragePathIgnorePatterns": [
       "gulpfile.js",
       "__tests__/",
@@ -68,15 +66,8 @@
       "/build"
     ],
     "mapCoverage": true,
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules",
-      "<rootDir>/config",
-      "<rootDir>/build"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
+    "testPathIgnorePatterns": ["/node_modules", "<rootDir>/config", "<rootDir>/build"],
     "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
     "transform": {
       ".(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
