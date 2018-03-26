@@ -53,6 +53,7 @@
     "type": "git",
     "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
   },
+  "baseUri": "https://sonarcloud.io",
   "files": [
     {
       "path": "tasks"
@@ -90,6 +91,37 @@
       "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
         "name": "tasks/publish"
+      }
+    },
+    {
+      "id": "3c598f25-01c1-4c09-97c6-926476882688",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"],
+      "properties": {
+        "name": "Code Quality",
+        "description": "Shows the current quality status of your project based on SonarCloud.",
+        "catalogIconUrl:": "/integration/vsts/images/sonarcloud-icon.png",
+        "previewImageUrl": "/integration/vsts/images/sonarcloud-icon.png",
+        "uri":
+          "/integration/vsts/index.html?type=widget&contribution=3c598f25-01c1-4c09-97c6-926476882688",
+        "supportedSizes": [
+          {
+            "rowSpan": 1,
+            "columnSpan": 1
+          }
+        ],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd",
+      "type": "ms.vss-dashboards-web.widget-configuration",
+      "targets": ["ms.vss-dashboards-web.widget-configuration"],
+      "properties": {
+        "name": "Code Quality Configuration",
+        "description": "Configures Code Quality Widget",
+        "uri":
+          "/integration/vsts/index.html?type=configuration&contribution=e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"
       }
     },
     {

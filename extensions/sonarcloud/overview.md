@@ -18,13 +18,23 @@ The analysis of C# and VB. Net solution is really straightforward since it only 
 If you're doing Java, analyzing your source code is also very easy. It only requires adding the **Prepare Analysis Configuration** task, and check the **Run SonarCloud Analysis** option in the "Code Analysis" panel of the Maven or Gradle task.
 
 ### Quality Gate Status
+
+#### In a dashboard widget
+You can monintor the quality gate status of your projects in your favorite dashboard:
+
+![Quality Gate Widget](img/widget.png)
+
+#### In the build summary
 The **Publish Quality Gate Result** task waits for the analysis report to be consumed by the SonarCloud in order to flag the build job with the Quality Gate status. The Quality Gate is a major, out-of-the-box, feature of SonarCloud. It provides the ability to know at each analysis whether an application passes or fails the release criteria. In other words it tells you at every analysis whether an application is ready for production "quality-wise".
 
 Example of a passing Quality Gate:
+
 ![Passed Qualiy Gate](img/sq-analysis-report-passed.png)
 
 Example of a failing Quality Gate:
+
 ![Failed Qualiy Gate](img/sq-analysis-report-failed.png)
+
 
 
 This [Get Started][getstarted] guide provides all the required documentation for you to setup a build definition.

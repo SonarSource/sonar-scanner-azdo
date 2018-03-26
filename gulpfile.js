@@ -353,7 +353,7 @@ gulp.task('deploy', ['deploy:buildinfo', 'deploy:vsix']);
 
 gulp.task('test', ['extension:test', 'tasks:icons:test']);
 
-gulp.task('build', gulpSequence('copy', 'tfx'));
+gulp.task('build', gulpSequence('clean', 'copy', 'tfx'));
 
 gulp.task('build:test', gulpSequence('clean', 'copy', 'test', 'tfx:test'));
 
