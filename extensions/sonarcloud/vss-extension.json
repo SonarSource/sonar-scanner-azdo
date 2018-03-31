@@ -65,6 +65,9 @@
     {
       "path": "icons",
       "addressable": true
+    },
+    {
+      "path": "templates"
     }
   ],
   "scopes": ["vso.build", "vso.code", "vso.test"],
@@ -172,6 +175,46 @@
         ],
         "helpMarkDown":
           "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarCloud account security page</a> to generate a token."
+      }
+    },
+    {
+      "id": "7ae27005-05c8-46d3-a5f2-06b3b15d608b",
+      "type": "ms.vss-build.template",
+      "targets": [
+        "ms.vss-build.templates"
+      ],
+      "properties": {
+        "name": "templates/maven"
+      }
+    },
+    {
+      "id": "b17d1503-2143-4e01-aada-5f8e29759a32",
+      "type": "ms.vss-build.template",
+      "targets": [
+        "ms.vss-build.templates"
+      ],
+      "properties": {
+        "name": "templates/gradle"
+      }
+    },
+    {
+      "id": "5f882e5A-b102-4fe4-b0b2-de4c812d1e18",
+      "type": "ms.vss-build.template",
+      "targets": [
+        "ms.vss-build.templates"
+      ],
+      "properties": {
+        "name": "templates/netcore"
+      }
+    },
+    {
+      "id": "05fc4e32-1887-480d-93bf-337f6072348e",
+      "type": "ms.vss-build.template",
+      "targets": [
+        "ms.vss-build.templates"
+      ],
+      "properties": {
+        "name": "templates/netdesktop"
       }
     }
   ]
