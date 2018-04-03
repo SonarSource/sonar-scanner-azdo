@@ -1,0 +1,97 @@
+{
+  "id": "sonarcloud_gradle_template",
+  "name": "Gradle with SonarCloud",
+  "category": "Build",
+  "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
+  "defaultHostedQueue": null,
+  "description": "Build your Java projects and run tests with Gradle using a Gradle wrapper script, and analyze with SonarCloud.",
+  "template": {
+    "build": [
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {
+          "scannerMode": "Other"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "8d8eebd8-2b94-4c97-85af-839254cc6da4",
+          "versionSpec": "2.*",
+          "definitionType": null
+        },
+        "inputs": {
+          "wrapperScript": "$(Parameters.wrapperScript)",
+          "tasks": "$(Parameters.tasks)",
+          "codeCoverageTool": "JaCoCo",
+          "sqAnalysisEnabled": "true",
+          "sqGradlePluginVersionChoice": "specify",
+          "sqGradlePluginVersion": "2.6.2"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": false,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "38b27399-a642-40af-bb7d-9971f69712e8",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {}
+      }
+    ],
+    "options": [
+      {
+        "enabled": true,
+        "definition": { "id": "5d58cc01-7c75-450c-be18-a388ddb129ec" },
+        "inputs": {}
+      }
+    ],
+    "variables": {
+      "system.debug": {
+        "value": "false",
+        "allowOverride": true
+      }
+    },
+    "processParameters": {
+      "inputs": [
+        {
+          "name": "wrapperScript",
+          "label": "Gradle wrapper",
+          "defaultValue": "gradlew",
+          "required": true,
+          "type": "filePath",
+          "helpMarkDown": "Relative path from the repository root to the Gradle Wrapper script.",
+          "visibleRule": "",
+          "groupName": ""
+        },
+        {
+          "name": "tasks",
+          "label": "Tasks",
+          "defaultValue": "build",
+          "required": true,
+          "type": "string",
+          "helpMarkDown": "",
+          "visibleRule": "",
+          "groupName": ""
+        }
+      ]
+    }
+  }
+}

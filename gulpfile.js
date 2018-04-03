@@ -214,7 +214,8 @@ gulp.task('extension:copy', () =>
         path.join(paths.extensions.root, '**', '@(vss-extension.json|extension-icon.png|*.md)')
       ),
       gulp.src(pathAllFiles(paths.extensions.root, '**', 'img')),
-      gulp.src(pathAllFiles(paths.extensions.root, '**', 'icons'))
+      gulp.src(pathAllFiles(paths.extensions.root, '**', 'icons')),
+      gulp.src(pathAllFiles(paths.extensions.root, '**', 'templates'))
     )
     .pipe(gulp.dest(paths.build.extensions.root))
 );

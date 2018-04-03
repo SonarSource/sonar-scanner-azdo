@@ -1,0 +1,89 @@
+{
+  "id": "sonarcloud_maven_template",
+  "name": "Maven with SonarCloud",
+  "category": "Build",
+  "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
+  "defaultHostedQueue": null,
+  "description": "Build your Java projects and run tests with Apache Maven, and analyze with SonarCloud. This template requires Maven to be installed on the build agent.",
+  "template": {
+    "build": [
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {
+          "scannerMode": "Other"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "ac4ee482-65da-4485-a532-7b085873e532",
+          "versionSpec": "2.*",
+          "definitionType": null
+        },
+        "inputs": {
+          "mavenPOMFile": "$(Parameters.mavenPOMFile)",
+          "options": "-Dmaven.test.failure.ignore=true",
+          "codeCoverageTool": "JaCoCo",
+          "sqAnalysisEnabled": "true",
+          "checkstyleAnalysisEnabled": "false",
+          "pmdAnalysisEnabled": "false",
+          "findbugsAnalysisEnabled": "false",
+          "sqMavenPluginVersionChoice": "latest"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": false,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "38b27399-a642-40af-bb7d-9971f69712e8",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {}
+      }
+    ],
+    "options": [
+      {
+        "enabled": true,
+        "definition": { "id": "5d58cc01-7c75-450c-be18-a388ddb129ec" },
+        "inputs": {}
+      }
+    ],
+    "variables": {
+      "system.debug": {
+        "value": "false",
+        "allowOverride": true
+      }
+    },
+    "buildNumberFormat": "$(date:yyyyMMdd)$(rev:.r)",
+    "jobAuthorizationScope": "projectCollection",
+    "processParameters": {
+      "inputs": [
+        {
+          "name": "mavenPOMFile",
+          "label": "Maven POM file",
+          "defaultValue": "pom.xml",
+          "required": true,
+          "type": "filePath",
+          "helpMarkDown": ""
+        }
+      ]
+    }
+  }
+}

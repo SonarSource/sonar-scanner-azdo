@@ -1,0 +1,158 @@
+{
+  "id": "sonarcloud_netcore_template",
+  "name": ".NET Core with SonarCloud",
+  "canDelete": false,
+  "category": "Build",
+  "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
+  "defaultHostedQueue": null,
+  "description": "Build .NET Core and ASP.Net Core applications, and analyze with SonarCloud.",
+  "template": {
+    "build": [
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "displayName": "Restore",
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "5541a522-603c-47ad-91fc-a4b1d163081b",
+          "versionSpec": "2.*",
+          "definitionType": "task"
+        },
+        "inputs": {
+          "command": "restore",
+          "projects": "$(Parameters.RestoreBuildProjects)"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {
+          "scannerMode": "MSBuild"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "displayName": "Build",
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "5541a522-603c-47ad-91fc-a4b1d163081b",
+          "versionSpec": "2.*",
+          "definitionType": "task"
+        },
+        "inputs": {
+          "command": "build",
+          "projects": "$(Parameters.RestoreBuildProjects)",
+          "arguments": "--configuration $(BuildConfiguration)"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "displayName": "Test",
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "5541a522-603c-47ad-91fc-a4b1d163081b",
+          "versionSpec": "2.*",
+          "definitionType": "task"
+        },
+        "inputs": {
+          "command": "test",
+          "projects": "$(Parameters.TestProjects)",
+          "arguments": "--configuration $(BuildConfiguration)"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "condition": "succeeded()",
+        "task": {
+          "id": "ce096e50-6155-4de8-8800-4221aaeed4a1",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {}
+      },
+      {
+        "environment": {},
+        "enabled": false,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "condition": "succeeded()",
+        "task": {
+          "id": "38b27399-a642-40af-bb7d-9971f69712e8",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {}
+      }
+    ],
+    "options": [
+      {
+        "enabled": true,
+        "definition": { "id": "5d58cc01-7c75-450c-be18-a388ddb129ec" },
+        "inputs": {}
+      }
+    ],
+    "variables": {
+      "system.debug": {
+        "value": "false",
+        "allowOverride": true
+      },
+      "BuildConfiguration": {
+        "value": "release",
+        "allowOverride": true
+      },
+      "BuildPlatform": {
+        "value": "any cpu",
+        "allowOverride": true
+      }
+    },
+    "buildNumberFormat": "$(date:yyyyMMdd)$(rev:.r)",
+    "jobAuthorizationScope": "projectCollection",
+    "processParameters": {
+      "inputs": [
+        {
+          "options": {},
+          "properties": {},
+          "name": "RestoreBuildProjects",
+          "label": "Project(s) to restore and build",
+          "defaultValue": "**/*.csproj",
+          "type": "multiline",
+          "helpMarkDown": "Relative path of the .csproj file(s) from repo root. Wildcards can be used. For example, **/*.csproj for all .csproj files in all the subfolders.",
+          "visibleRule": "",
+          "groupName": ""
+        },
+        {
+          "options": {},
+          "properties": {},
+          "name": "TestProjects",
+          "label": "Project(s) to test",
+          "defaultValue": "**/*Tests/*.csproj",
+          "type": "multiline",
+          "helpMarkDown": "Relative path of the .csproj file(s) from repo root. Wildcards can be used. For example, **/*.csproj for all .csproj files in all the subfolders.",
+          "visibleRule": "",
+          "groupName": ""
+        }
+      ]
+    }
+  }
+}
