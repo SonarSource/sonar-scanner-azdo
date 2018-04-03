@@ -20,17 +20,7 @@
           "definitionType": "task"
         },
         "inputs": {
-          "scannerMode": "Other",
-          "configMode": "file",
-          "configFile": "sonar-project.properties",
-          "cliProjectKey": "",
-          "projectKey": "",
-          "cliProjectName": "",
-          "projectName": "",
-          "cliProjectVersion": "1.0",
-          "projectVersion": "1.0",
-          "cliSources": ".",
-          "extraProperties": "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin"
+          "scannerMode": "Other"
         }
       },
       {
@@ -50,7 +40,7 @@
           "codeCoverageTool": "JaCoCo",
           "sqAnalysisEnabled": "true",
           "sqGradlePluginVersionChoice": "specify",
-          "sqGradlePluginVersion": "2.6.1"
+          "sqGradlePluginVersion": "2.6.2"
         }
       },
       {
