@@ -48,7 +48,6 @@
         "enabled": true,
         "continueOnError": false,
         "alwaysRun": false,
-        "displayName": "Prepare analysis on SonarCloud",
         "timeoutInMinutes": 0,
         "task": {
           "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
@@ -100,7 +99,6 @@
         "enabled": true,
         "continueOnError": false,
         "alwaysRun": false,
-        "displayName": "Run Code Analysis",
         "timeoutInMinutes": 0,
         "condition": "succeeded()",
         "task": {
@@ -115,7 +113,6 @@
         "enabled": false,
         "continueOnError": false,
         "alwaysRun": false,
-        "displayName": "Publish Quality Gate Result",
         "timeoutInMinutes": 0,
         "condition": "succeeded()",
         "task": {
@@ -123,9 +120,7 @@
           "versionSpec": "1.*",
           "definitionType": "task"
         },
-        "inputs": {
-          "pollingTimeoutSec": "300"
-        }
+        "inputs": {}
       }
     ],
     "options": [
