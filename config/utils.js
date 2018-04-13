@@ -149,8 +149,8 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
   };
   sonarqubeScanner(
     {
-      serverUrl: process.env.SONAR_HOST_URL,
-      token: process.env.SONAR_TOKEN,
+      serverUrl: process.env.SONAR_HOST_URL || process.env.SONAR_HOST_URL_EXTERNAL_PR,
+      token: process.env.SONAR_TOKEN || process.env.SONAR_TOKEN_EXTERNAL_PR,
       options: {
         ...commonOptions,
         ...options
