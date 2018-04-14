@@ -22,28 +22,35 @@ export default async function publishTask(endpointType: EndpointType) {
   const endpoint = new Endpoint(endpointData.type, endpointData.data);
   const metrics = await Metrics.getAllMetrics(endpoint);
 
-  const taskReport = await TaskReport.createTaskReportFromFile();
   const timeoutSec = timeoutInSeconds();
-  try {
-    const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
-    const analysis = await Analysis.getAnalysis(
-      task.analysisId,
-      endpoint,
-      metrics,
-      taskReport.dashboardUrl
-    );
-    publishBuildSummary(analysis.getHtmlAnalysisReport(), endpoint.type);
-  } catch (e) {
-    if (e instanceof TimeOutReachedError) {
-      tl.warning(
-        `Task '${
-          taskReport.ceTaskId
-        }' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
-      );
-    } else {
-      throw e;
-    }
-  }
+  const taskReports = await TaskReport.createTaskReportsFromFiles();
+  const analyses = await Promise.all(
+    taskReports.map(async taskReport => {
+      try {
+        const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
+        const analysis = await Analysis.getAnalysis(
+          task.analysisId,
+          task.componentName,
+          endpoint,
+          metrics,
+          taskReport.dashboardUrl
+        );
+        return analysis.getHtmlAnalysisReport(taskReports.length > 1);
+      } catch (e) {
+        if (e instanceof TimeOutReachedError) {
+          tl.warning(
+            `Task '${
+              taskReport.ceTaskId
+            }' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
+          );
+        } else {
+          throw e;
+        }
+      }
+    })
+  );
+
+  publishBuildSummary(analyses.join('\r\n'), endpoint.type);
 }
 
 function timeoutInSeconds(): number {

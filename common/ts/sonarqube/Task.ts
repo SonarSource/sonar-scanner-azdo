@@ -8,6 +8,7 @@ interface ITask {
   organization?: string;
   status: string;
   type: string;
+  componentName: string;
 }
 
 export default class Task {
@@ -15,6 +16,10 @@ export default class Task {
 
   public get analysisId() {
     return this.task.analysisId;
+  }
+
+  public get componentName() {
+    return this.task.componentName;
   }
 
   public static waitForTaskCompletion(
