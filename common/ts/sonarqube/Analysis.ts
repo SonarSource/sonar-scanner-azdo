@@ -23,6 +23,7 @@ export default class Analysis {
   constructor(
     private analysis: IAnalysis,
     private endpointType: EndpointType,
+    private projectName: string,
     private metrics?: Metrics,
     private dashboardUrl?: string
   ) {}
@@ -41,10 +42,10 @@ export default class Analysis {
     );
   }
 
-  public getHtmlAnalysisReport() {
+  public getHtmlAnalysisReport(includeProjectName = false) {
     tl.debug(`[SQ] Generate analysis report.'`);
     return [
-      this.getQualityGateSection(),
+      this.getQualityGateSection(includeProjectName),
       this.getQualityGateDetailSection(),
       this.getDashboardLink()
     ]
@@ -52,7 +53,7 @@ export default class Analysis {
       .trim();
   }
 
-  private getQualityGateSection() {
+  private getQualityGateSection(includeProjectName = false) {
     const qgStyle = `background-color: ${this.getQualityGateColor()};
       padding: 4px 12px;
       color: #fff;
@@ -62,7 +63,7 @@ export default class Analysis {
       font-size: 12px;
       margin-left: 15px;`;
     return `<div style="padding-top: 8px;">
-      <span>Quality Gate</span>
+      <span>${includeProjectName ? this.projectName + ' ' : ''}Quality Gate</span>
       <span style="${qgStyle}">
         ${formatMeasure(this.status, 'LEVEL')}
       </span>
@@ -131,6 +132,7 @@ export default class Analysis {
 
   public static getAnalysis(
     analysisId: string,
+    projectName: string,
     endpoint: Endpoint,
     metrics?: Metrics,
     dashboardUrl?: string
@@ -138,7 +140,7 @@ export default class Analysis {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
     return getJSON(endpoint, '/api/qualitygates/project_status', { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
-        new Analysis(projectStatus, endpoint.type, metrics, dashboardUrl),
+        new Analysis(projectStatus, endpoint.type, projectName, metrics, dashboardUrl),
       err => {
         if (err && err.message) {
           tl.error(`[SQ] Error retrieving analysis: ${err.message}`);
