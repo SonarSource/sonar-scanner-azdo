@@ -37,44 +37,39 @@ export default class TaskReport {
     return this.report.dashboardUrl;
   }
 
-  public static findTaskFileReport(): string | undefined {
+  public static findTaskFileReport(): string[] | undefined {
     const taskReportGlob = path.join('**', REPORT_TASK_NAME);
     const taskReportGlobResult = tl.findMatch(
       tl.getVariable('Agent.BuildDirectory'),
       taskReportGlob
     );
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
-
-    if (taskReportGlobResult.length > 1) {
-      tl.warning(
-        `[SQ] Multiple '${REPORT_TASK_NAME}' files found. Choosing the first one. ` +
-          `The build summary may not be accurate. ` +
-          `Possible cause: multiple analyses during the same build, which is not supported.`
-      );
-    }
-
-    return taskReportGlobResult[0];
+    return taskReportGlobResult;
   }
 
-  public static createTaskReportFromFile(
-    filePath = TaskReport.findTaskFileReport()
-  ): Promise<TaskReport> {
-    if (!filePath) {
-      return Promise.reject(
-        TaskReport.throwInvalidReport(
-          `[SQ] Could not find '${REPORT_TASK_NAME}'.` +
-            ` Possible cause: the analysis did not complete successfully.`
-        )
-      );
-    }
-    tl.debug(`[SQ] Read Task report file: ${filePath}`);
-    return fs.access(filePath, fs.constants.R_OK).then(
-      () => this.parseReportFile(filePath),
-      err => {
-        return Promise.reject(
-          TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`)
+  public static createTaskReportsFromFiles(
+    filePaths = TaskReport.findTaskFileReport()
+  ): Promise<TaskReport[]> {
+    return Promise.all(
+      filePaths.map(filePath => {
+        if (!filePath) {
+          return Promise.reject(
+            TaskReport.throwInvalidReport(
+              `[SQ] Could not find '${REPORT_TASK_NAME}'.` +
+                ` Possible cause: the analysis did not complete successfully.`
+            )
+          );
+        }
+        tl.debug(`[SQ] Read Task report file: ${filePath}`);
+        return fs.access(filePath, fs.constants.R_OK).then(
+          () => this.parseReportFile(filePath),
+          err => {
+            return Promise.reject(
+              TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`)
+            );
+          }
         );
-      }
+      })
     );
   }
 
