@@ -134,10 +134,10 @@
           "options": {},
           "properties": {},
           "name": "RestoreBuildProjects",
-          "label": "Project(s) to restore and build",
-          "defaultValue": "**/*.csproj",
+          "label": "Solution(s) to restore and build",
+          "defaultValue": "**/*.sln",
           "type": "multiline",
-          "helpMarkDown": "Relative path of the .csproj file(s) from repo root. Wildcards can be used. For example, **/*.csproj for all .csproj files in all the subfolders.",
+          "helpMarkDown": "Relative path of the .sln file(s) from repo root. Wildcards can be used. For example, **/*.sln for all .sln files in all the subfolders.\n\nNOTE: Only solution files or .csproj files containing a <ProjectGuid> can be analyzed.",
           "visibleRule": "",
           "groupName": ""
         },
