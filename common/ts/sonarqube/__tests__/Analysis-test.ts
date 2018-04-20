@@ -37,6 +37,7 @@ beforeEach(() => {
 it('should generate an analysis status with error', async () => {
   const analysis = await Analysis.getAnalysis(
     'analysisId',
+    'projectName',
     ENDPOINT,
     METRICS,
     'https://dashboard.url'
@@ -56,6 +57,7 @@ it('should generate a green analysis status', async () => {
 
   const analysis = await Analysis.getAnalysis(
     'analysisId',
+    'projectName',
     ENDPOINT,
     METRICS,
     'https://dashboard.url'
@@ -69,7 +71,7 @@ it('should generate a green analysis status', async () => {
 });
 
 it('should not fail when metrics are missing', async () => {
-  const analysis = await Analysis.getAnalysis('analysisId', ENDPOINT);
+  const analysis = await Analysis.getAnalysis('analysisId', 'projectName', ENDPOINT);
   expect(getJSON).toHaveBeenCalledWith(ENDPOINT, '/api/qualitygates/project_status', {
     analysisId: 'analysisId'
   });
