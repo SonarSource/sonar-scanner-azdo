@@ -12,11 +12,11 @@ export const PROP_NAMES = {
   PROJECTSETTINGS: 'project.settings'
 };
 
-export function toCleanJSON(props: { [key: string]: string }) {
+export function toCleanJSON(props: { [key: string]: string | undefined }) {
   return JSON.stringify(props, Object.keys(props).filter(key => props[key] != null));
 }
 
-export function setIfNotEmpty(props: { [key: string]: string }, key: string, value: string) {
+export function setIfNotEmpty(props: { [key: string]: string }, key: string, value?: string) {
   if (value) {
     props[key] = value;
   }

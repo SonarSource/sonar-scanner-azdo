@@ -5,20 +5,22 @@ import * as tl from 'vsts-task-lib/task';
 export const REPORT_TASK_NAME = 'report-task.txt';
 
 interface ITaskReport {
-  projectKey: string;
   ceTaskId: string;
-  serverUrl: string;
-  dashboardUrl?: string;
   ceTaskUrl?: string;
+  dashboardUrl?: string;
+  projectKey: string;
+  serverUrl: string;
 }
 
 export default class TaskReport {
-  constructor(private readonly report: ITaskReport) {
+  private readonly report: ITaskReport;
+  constructor(report: Partial<ITaskReport>) {
     for (const field of ['projectKey', 'ceTaskId', 'serverUrl']) {
-      if (!report[field]) {
+      if (!report[field as keyof ITaskReport]) {
         throw TaskReport.throwMissingField(field);
       }
     }
+    this.report = report as ITaskReport;
   }
 
   public get projectKey() {
@@ -37,7 +39,7 @@ export default class TaskReport {
     return this.report.dashboardUrl;
   }
 
-  public static findTaskFileReport(): string[] | undefined {
+  public static findTaskFileReport(): string[] {
     const taskReportGlob = path.join('**', REPORT_TASK_NAME);
     const taskReportGlobResult = tl.findMatch(
       tl.getVariable('Agent.BuildDirectory'),
@@ -63,7 +65,7 @@ export default class TaskReport {
         tl.debug(`[SQ] Read Task report file: ${filePath}`);
         return fs.access(filePath, fs.constants.R_OK).then(
           () => this.parseReportFile(filePath),
-          err => {
+          () => {
             return Promise.reject(
               TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`)
             );
@@ -85,11 +87,11 @@ export default class TaskReport {
         try {
           const settings = TaskReport.createTaskReportFromString(fileContent);
           const taskReport = new TaskReport({
-            projectKey: settings.get('projectKey'),
-            serverUrl: settings.get('serverUrl'),
-            dashboardUrl: settings.get('dashboardUrl'),
             ceTaskId: settings.get('ceTaskId'),
-            ceTaskUrl: settings.get('ceTaskUrl')
+            ceTaskUrl: settings.get('ceTaskUrl'),
+            dashboardUrl: settings.get('dashboardUrl'),
+            projectKey: settings.get('projectKey'),
+            serverUrl: settings.get('serverUrl')
           });
           return Promise.resolve(taskReport);
         } catch (err) {

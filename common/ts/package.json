@@ -6,8 +6,8 @@
   "license": "LGPL-3.0",
   "dependencies": {
     "fs-extra": "5.0.0",
-    "request": "2.83.0",
-    "vsts-task-lib": "2.3.0",
+    "request": "2.85.0",
+    "vsts-task-lib": "2.4.0",
     "vso-node-api": "6.3.2"
   },
   "engines": {

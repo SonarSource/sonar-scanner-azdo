@@ -13,7 +13,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   const props: { [key: string]: string } = {};
 
   if (endpoint.type === EndpointType.SonarCloud) {
-    await populateBranchAndPrProps(endpoint, props);
+    await populateBranchAndPrProps(props);
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
 
@@ -37,7 +37,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   await scanner.runPrepare();
 }
 
-async function populateBranchAndPrProps(endpoint: Endpoint, props: { [key: string]: string }) {
+async function populateBranchAndPrProps(props: { [key: string]: string }) {
   const collectionUrl = tl.getVariable('System.TeamFoundationCollectionUri');
   const prId = tl.getVariable('System.PullRequest.PullRequestId');
   const provider = tl.getVariable('Build.Repository.Provider');
@@ -86,7 +86,7 @@ async function getDefaultBranch(provider: string, collectionUrl: string) {
     return DEFAULT;
   }
   try {
-    const vsts: vm.WebApi = getWebApi(collectionUrl);
+    const vsts = getWebApi(collectionUrl);
     const gitApi = await vsts.getGitApi();
     const repo = await gitApi.getRepository(
       tl.getVariable(REPO_NAME_VAR),
