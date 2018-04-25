@@ -28,14 +28,14 @@ export default async function publishTask(endpointType: EndpointType) {
     taskReports.map(async taskReport => {
       try {
         const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
-        const analysis = await Analysis.getAnalysis(
-          task.analysisId,
-          task.componentName,
+        const analysis = await Analysis.getAnalysis({
+          analysisId: task.analysisId,
+          dashboardUrl: taskReport.dashboardUrl,
           endpoint,
           metrics,
-          taskReport.dashboardUrl
-        );
-        return analysis.getHtmlAnalysisReport(taskReports.length > 1);
+          projectName: taskReports.length > 1 ? task.componentName : undefined
+        });
+        return analysis.getHtmlAnalysisReport();
       } catch (e) {
         if (e instanceof TimeOutReachedError) {
           tl.warning(

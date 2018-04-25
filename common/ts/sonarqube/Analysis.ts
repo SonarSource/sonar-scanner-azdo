@@ -21,11 +21,11 @@ interface Condition {
 
 export default class Analysis {
   constructor(
-    private analysis: IAnalysis,
-    private endpointType: EndpointType,
-    private projectName: string,
-    private metrics?: Metrics,
-    private dashboardUrl?: string
+    private readonly analysis: IAnalysis,
+    private readonly endpointType: EndpointType,
+    private readonly dashboardUrl?: string,
+    private readonly metrics?: Metrics,
+    private readonly projectName?: string
   ) {}
 
   public get status() {
@@ -42,10 +42,10 @@ export default class Analysis {
     );
   }
 
-  public getHtmlAnalysisReport(includeProjectName = false) {
+  public getHtmlAnalysisReport() {
     tl.debug(`[SQ] Generate analysis report.'`);
     return [
-      this.getQualityGateSection(includeProjectName),
+      this.getQualityGateSection(),
       this.getQualityGateDetailSection(),
       this.getDashboardLink()
     ]
@@ -53,7 +53,7 @@ export default class Analysis {
       .trim();
   }
 
-  private getQualityGateSection(includeProjectName = false) {
+  private getQualityGateSection() {
     const qgStyle = `background-color: ${this.getQualityGateColor()};
       padding: 4px 12px;
       color: #fff;
@@ -63,7 +63,7 @@ export default class Analysis {
       font-size: 12px;
       margin-left: 15px;`;
     return `<div style="padding-top: 8px;">
-      <span>${includeProjectName ? this.projectName + ' ' : ''}Quality Gate</span>
+      <span>${this.projectName ? this.projectName + ' ' : ''}Quality Gate</span>
       <span style="${qgStyle}">
         ${formatMeasure(this.status, 'LEVEL')}
       </span>
@@ -130,17 +130,23 @@ export default class Analysis {
     }
   }
 
-  public static getAnalysis(
-    analysisId: string,
-    projectName: string,
-    endpoint: Endpoint,
-    metrics?: Metrics,
-    dashboardUrl?: string
-  ): Promise<Analysis> {
+  public static getAnalysis({
+    analysisId,
+    projectName,
+    endpoint,
+    metrics,
+    dashboardUrl
+  }: {
+    analysisId: string;
+    dashboardUrl?: string;
+    endpoint: Endpoint;
+    projectName?: string;
+    metrics?: Metrics;
+  }): Promise<Analysis> {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
     return getJSON(endpoint, '/api/qualitygates/project_status', { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
-        new Analysis(projectStatus, endpoint.type, projectName, metrics, dashboardUrl),
+        new Analysis(projectStatus, endpoint.type, dashboardUrl, metrics, projectName),
       err => {
         if (err && err.message) {
           tl.error(`[SQ] Error retrieving analysis: ${err.message}`);

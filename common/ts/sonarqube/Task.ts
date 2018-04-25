@@ -12,7 +12,7 @@ interface ITask {
 }
 
 export default class Task {
-  constructor(private task: ITask) {}
+  constructor(private readonly task: ITask) {}
 
   public get analysisId() {
     return this.task.analysisId;
@@ -45,7 +45,8 @@ export default class Task {
           default:
             return new Promise<Task>((resolve, reject) =>
               setTimeout(() => {
-                Task.waitForTaskCompletion(endpoint, taskId, tries--, delay).then(resolve, reject);
+                Task.waitForTaskCompletion(endpoint, taskId, tries, delay).then(resolve, reject);
+                tries--;
               }, delay)
             );
         }
