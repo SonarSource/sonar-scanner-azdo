@@ -77,7 +77,11 @@ export default class Analysis {
     }
 
     const rows = failedConditions.map(condition => {
-      const metric = this.metrics.getMetricByKey(condition.metricKey);
+      const metric = this.metrics && this.metrics.getMetricByKey(condition.metricKey);
+      if (!metric) {
+        return null;
+      }
+
       const threshold =
         condition.status === 'WARN' ? condition.warningThreshold : condition.errorThreshold;
       return `<tr>

@@ -1,4 +1,4 @@
-import { isWindows, setIfNotEmpty, toCleanJSON } from '../utils';
+import { setIfNotEmpty, toCleanJSON } from '../utils';
 
 describe('toCleanJSON', () => {
   it('should jsonify', () => {

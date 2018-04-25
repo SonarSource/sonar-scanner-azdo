@@ -25,7 +25,7 @@ export default class Task {
   public static waitForTaskCompletion(
     endpoint: Endpoint,
     taskId: string,
-    tries,
+    tries: number,
     delay = 1000
   ): Promise<Task> {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);

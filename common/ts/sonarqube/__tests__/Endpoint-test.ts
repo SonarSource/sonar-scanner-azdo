@@ -4,10 +4,10 @@ import Endpoint, { EndpointType } from '../Endpoint';
 it('should not return null password', () => {
   const enpoint = new Endpoint(EndpointType.SonarQube, {
     url: 'http://foo',
-    token: null,
+    token: undefined,
     username: 'token123',
-    password: null,
-    organization: null
+    password: undefined,
+    organization: undefined
   });
   expect(enpoint.auth).toEqual({ user: 'token123' });
 });
