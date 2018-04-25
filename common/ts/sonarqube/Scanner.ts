@@ -64,7 +64,7 @@ interface ScannerCLIData {
 }
 
 export class ScannerCLI extends Scanner {
-  constructor(rootPath: string, private cliMode?: string, private data?: ScannerCLIData) {
+  constructor(rootPath: string, private cliMode?: string, private readonly data?: ScannerCLIData) {
     super(rootPath, ScannerMode.CLI);
   }
 
@@ -113,7 +113,7 @@ interface ScannerMSData {
 }
 
 export class ScannerMSBuild extends Scanner {
-  constructor(rootPath: string, private data?: ScannerMSData) {
+  constructor(rootPath: string, private readonly data?: ScannerMSData) {
     super(rootPath, ScannerMode.MSBuild);
   }
 

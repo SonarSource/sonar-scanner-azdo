@@ -13,7 +13,7 @@ interface ITaskReport {
 }
 
 export default class TaskReport {
-  constructor(private report: ITaskReport) {
+  constructor(private readonly report: ITaskReport) {
     for (const field of ['projectKey', 'ceTaskId', 'serverUrl']) {
       if (!report[field]) {
         throw TaskReport.throwMissingField(field);
