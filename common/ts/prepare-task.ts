@@ -12,7 +12,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   const props: { [key: string]: string } = {};
 
-  if (endpoint.type === EndpointType.SonarCloud) {
+  if (branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
@@ -35,6 +35,14 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   );
 
   await scanner.runPrepare();
+}
+
+function branchFeatureSupported(endpoint) {
+  if (endpoint.type === EndpointType.SonarCloud) {
+    return true;
+  }
+  // TODO check SQ version >= 7.2 and commercial branch feature available
+  return true;
 }
 
 async function populateBranchAndPrProps(props: { [key: string]: string }) {
