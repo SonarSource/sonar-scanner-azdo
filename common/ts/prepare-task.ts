@@ -1,8 +1,10 @@
+import * as semver from 'semver';
 import * as tl from 'vsts-task-lib/task';
 import * as vm from 'vso-node-api';
 import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
 import { toCleanJSON } from './helpers/utils';
+import { getServerVersion } from './helpers/request';
 
 const REPO_NAME_VAR = 'Build.Repository.Name';
 
@@ -12,7 +14,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   const props: { [key: string]: string } = {};
 
-  if (branchFeatureSupported(endpoint)) {
+  if (await branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
@@ -37,12 +39,12 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   await scanner.runPrepare();
 }
 
-function branchFeatureSupported(endpoint) {
+async function branchFeatureSupported(endpoint) {
   if (endpoint.type === EndpointType.SonarCloud) {
     return true;
   }
-  // TODO check SQ version >= 7.2 and commercial branch feature available
-  return true;
+  const serverVersion = await getServerVersion(endpoint);
+  return serverVersion >= semver.parse('7.2.0');
 }
 
 async function populateBranchAndPrProps(props: { [key: string]: string }) {

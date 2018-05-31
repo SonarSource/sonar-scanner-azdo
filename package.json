@@ -8,6 +8,7 @@
     "@types/jest": "22.2.3",
     "@types/node": "8.0.19",
     "@types/request": "2.47.0",
+    "@types/semver": "5.5.0",
     "dateformat": "3.0.3",
     "del": "3.0.0",
     "eslint": "4.19.1",
