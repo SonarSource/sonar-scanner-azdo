@@ -1,5 +1,7 @@
 # SonarQube TFS/VSTS Marketplace Extension
 
+[![Build Status](https://sonarsource.visualstudio.com/_apis/public/build/definitions/399fb241-ecc7-4802-8697-dcdd01fbb832/10/badge)](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_build/index?definitionId=10)
+
 ### License
 
 Copyright 2017-2018 SonarSource.
