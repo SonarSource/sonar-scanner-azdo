@@ -8,7 +8,8 @@
     "fs-extra": "5.0.0",
     "request": "2.85.0",
     "vsts-task-lib": "2.4.0",
-    "vso-node-api": "6.3.2"
+    "vso-node-api": "6.3.2",
+    "semver": "5.5.0"
   },
   "engines": {
     "node": ">=6"
