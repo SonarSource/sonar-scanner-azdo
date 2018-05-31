@@ -118,7 +118,7 @@ export default class TaskReport {
     lines.forEach((line: string) => {
       const splitLine = line.split('=');
       if (splitLine.length > 1) {
-        settings.set(splitLine[0], splitLine.slice(1, splitLine.length).join());
+        settings.set(splitLine[0], splitLine.slice(1, splitLine.length).join('='));
       }
     });
     return settings;
