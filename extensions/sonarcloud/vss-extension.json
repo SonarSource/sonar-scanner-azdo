@@ -14,7 +14,7 @@
     }
   ],
   "description":
-    "Use the SonarCloud build tasks in your build/release definitions to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
+    "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
   "categories": ["Build and release"],
   "icons": {
@@ -39,7 +39,7 @@
       "uri": "https://about.sonarcloud.io/"
     },
     "getstarted": {
-      "uri": "http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html"
+      "uri": "https://aka.ms/sonarcloudlab"
     },
     "support": {
       "uri": "https://www.sonarqube.org/community/"
