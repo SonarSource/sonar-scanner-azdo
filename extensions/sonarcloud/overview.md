@@ -1,6 +1,8 @@
-**[SonarCloud][sc]** is the leading product for Continuous Code Quality online. It is a static source code analysis solution that enables continuous tracking of bugs, code smells and vulnerabilities for 16 different languages such as C#, VB .Net, Java, C, C++, JavaScript, ...
+**[SonarCloud][sc]** is the leading product for Continuous Code Quality online, totally free for open-source projects. It supports all major programming languages, including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. If your code is closed source, SonarCloud also offers a paid plan to run private analyses.
 
-SonarCloud is totally free for open-source projects, and has a paid plan for private ones. Simply sign up and create an organization for your team, and you are ready to configure your build definitions to get your projects analyzed in a couple of minutes.
+This VSTS extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code. A widget is also available to track the health of the overall application.
+
+To get started in a few minutes, you can follow this dedicated [Microsoft Lab][getstarted].
 
 ## About the SonarCloud VSTS Marketplace Extension
 This extension provides the following features:
@@ -51,9 +53,5 @@ Example of a failing Quality Gate:
 
 ![Failed Qualiy Gate](img/sq-analysis-report-failed.png)
 
-
-
-This [Get Started][getstarted] guide provides all the required documentation for you to setup a build definition.
-
    [sc]: <https://sonarcloud.io>
-   [getstarted]: <http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html>
+   [getstarted]: <https://aka.ms/sonarcloudlab>
