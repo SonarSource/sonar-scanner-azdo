@@ -53,6 +53,12 @@ export default class Scanner {
         throw new Error(`[SQ] Unknown scanner mode: ${mode}`);
     }
   }
+
+  logIssueOnBuildSummaryForStdErr(tool) {
+    tool.on('stderr', data => {
+      tl.command('task.logissue', { type: 'error' }, data);
+    });
+  }
 }
 
 interface ScannerCLIData {
@@ -89,6 +95,7 @@ export class ScannerCLI extends Scanner {
       await fs.chmod(scannerCliScript, '777');
     }
     const scannerRunner = tl.tool(scannerCliScript);
+    this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     await scannerRunner.exec();
   }
 
@@ -148,6 +155,7 @@ export class ScannerMSBuild extends Scanner {
     }
     scannerRunner.arg('begin');
     scannerRunner.arg('/k:' + this.data.projectKey);
+    this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     await scannerRunner.exec();
   }
 
@@ -184,6 +192,7 @@ export class ScannerMSBuild extends Scanner {
       : this.getScannerRunner(tl.getVariable('SONARQUBE_SCANNER_MSBUILD_DLL'), false);
 
     scannerRunner.arg('end');
+    this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     await scannerRunner.exec();
   }
 
