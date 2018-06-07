@@ -83,7 +83,7 @@
       "label": "Settings File",
       "required": false,
       "helpMarkDown":
-        "You can also specify settings via a configuration file. A template is available [here](https://github.com/SonarSource-VisualStudio/sonar-scanner-msbuild/blob/master/SonarQube.Bootstrapper/SonarQube.Analysis.xml)",
+        "You can also specify settings via a configuration file. A template is available [here](https://github.com/SonarSource/sonar-scanner-msbuild/blob/master/docs/SonarQube.Analysis.xml)",
       "groupName": "advanced"
     },
     {
