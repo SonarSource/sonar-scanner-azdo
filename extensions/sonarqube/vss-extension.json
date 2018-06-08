@@ -18,7 +18,7 @@
     }
   ],
   "description":
-    "Use the SonarQube build tasks in your build/release definitions to track bugs, code smells and vulnerabilities for 20 different languages such as C#, VB.Net, Java, C, C++, JavaScript...",
+    "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
   "categories": ["Build and release"],
   "icons": {

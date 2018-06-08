@@ -1,8 +1,9 @@
-**[SonarQube][sq]** is the leading product for Continuous Code Quality. It is an open source, static source code analysis solution that enables continuous tracking of bugs, code smells and vulnerabilities for more than 20 different languages such as C#, VB .Net, Java, C, C++, COBOL, JavaScript, ...
+**[SonarQube][sq]** is the leading product for Continuous Code Quality. It supports all major programming languages, including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. Integrate it in your on-premise TFS installation, and continuously track down bugs and vulnerabilities in your codebase.
 
-SonarQube can be [installed][getstarted] and run on a dedicated infrastructure.
+If you are new to SonarQube, using VSTS or looking for cloud-based solutions, then make sure to also check our dedicated [SonarCloud extension for VSTS][sc_vsts] !
 
-The analysis of the source code doesn't happen on the server side, but must be part of the build chain to make the analysis as accurate as possible. These analyses are performed using scanners.
+This TFS extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code.
+
 
 ## About the SonarQube VSTS/TFS Marketplace Extension
 This extension provides the following features:
@@ -35,4 +36,5 @@ Example of a failing Quality Gate:
 This [Get Started][getstarted] guide provides all the required documentation for you to setup a build definition.
 
    [sq]: <https://www.sonarsource.com/products/sonarqube/>
+   [sc_vsts]: <https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud>
    [getstarted]: <http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html>
