@@ -56,6 +56,10 @@ export default class Scanner {
 
   logIssueOnBuildSummaryForStdErr(tool) {
     tool.on('stderr', data => {
+      if (data == null) {
+        return;
+      }
+      data = data.toString().trim();
       tl.command('task.logissue', { type: 'error' }, data);
     });
   }
