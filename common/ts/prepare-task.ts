@@ -81,14 +81,29 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
       props['sonar.scanner.skip'] = 'true';
     }
   } else {
-    const defaultBranch = await getDefaultBranch(provider, collectionUrl);
+    let isDefaultBranch = true;
     const currentBranch = tl.getVariable('Build.SourceBranch');
-    if (defaultBranch !== currentBranch) {
-      props['sonar.branch.name'] = branchName(currentBranch);
+    if (provider === 'TfsGit') {
+      isDefaultBranch = currentBranch === (await getDefaultBranch(collectionUrl));
+    } else if (provider === 'Git' || provider === 'GitHub') {
+      // TODO for GitHub we should get the default branch configured on the repo
+      isDefaultBranch = currentBranch === 'refs/heads/master';
+    } else if (provider === 'Bitbucket') {
+      // TODO for Bitbucket Cloud we should get the main branch configured on the repo
+      // https://github.com/Microsoft/vsts-tasks/issues/7595
+      isDefaultBranch = currentBranch === 'master';
+    } else if (provider === 'Svn') {
+      isDefaultBranch = currentBranch === 'trunk';
+    }
+    if (!isDefaultBranch) {
+      props['sonar.branch.name'] = tl.getVariable('Build.SourceBranchName');
     }
   }
 }
 
+/**
+ * Waiting for https://github.com/Microsoft/vsts-tasks/issues/7591
+ */
 function branchName(fullName: string) {
   if (fullName.startsWith('refs/heads/')) {
     return fullName.substring('refs/heads/'.length);
@@ -97,14 +112,12 @@ function branchName(fullName: string) {
 }
 
 /**
- * Query the repo to get the full name of the default branch.
+ * Waiting for https://github.com/Microsoft/vsts-tasks/issues/7592
+ * query the repo to get the full name of the default branch.
  * @param collectionUrl
  */
-async function getDefaultBranch(provider: string, collectionUrl: string) {
+async function getDefaultBranch(collectionUrl: string) {
   const DEFAULT = 'refs/heads/master';
-  if (provider !== 'TfsGit') {
-    return DEFAULT;
-  }
   try {
     const vsts = getWebApi(collectionUrl);
     const gitApi = await vsts.getGitApi();
