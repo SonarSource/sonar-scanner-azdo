@@ -77,7 +77,7 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
       props['sonar.pullrequest.provider'] = 'github';
       props['sonar.pullrequest.github.repository'] = tl.getVariable(REPO_NAME_VAR);
     } else {
-      tl.warning(`Unkwnow provider '${provider}'`);
+      tl.warning(`Unsupported PR provider '${provider}'`);
       props['sonar.scanner.skip'] = 'true';
     }
   } else {
@@ -96,7 +96,8 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
       isDefaultBranch = currentBranch === 'trunk';
     }
     if (!isDefaultBranch) {
-      props['sonar.branch.name'] = tl.getVariable('Build.SourceBranchName');
+      // VSTS-165 don't use Build.SourceBranchName
+      props['sonar.branch.name'] = branchName(tl.getVariable('Build.SourceBranch'));
     }
   }
 }
