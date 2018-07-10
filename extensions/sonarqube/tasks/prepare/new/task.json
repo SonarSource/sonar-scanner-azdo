@@ -11,7 +11,7 @@
   "version": {
     "Major": 4,
     "Minor": 3,
-    "Patch": 1
+    "Patch": 2
   },
   "releaseNotes":
     "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
