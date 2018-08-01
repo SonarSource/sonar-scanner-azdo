@@ -54,9 +54,9 @@ exports.npmInstallTask = function(packagePath) {
 exports.tfxCommand = function(extensionPath, packageJSON, params = '') {
   const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
   run(
-    `${resolveApp(
+    `"${resolveApp(
       path.join('node_modules', '.bin', 'tfx')
-    )} extension create --output-path "../../${packageJSON.name}-${fullVersion(
+    )}" extension create --output-path "../../${packageJSON.name}-${fullVersion(
       packageJSON.version
     )}-${vssExtension.id}.vsix" ${params}`,
     {
