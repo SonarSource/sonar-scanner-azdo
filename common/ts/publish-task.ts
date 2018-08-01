@@ -35,7 +35,7 @@ export default async function publishTask(endpointType: EndpointType) {
           metrics,
           projectName: taskReports.length > 1 ? task.componentName : undefined
         });
-        return analysis.getHtmlAnalysisReport();
+        return analysis;
       } catch (e) {
         if (e instanceof TimeOutReachedError) {
           tl.warning(
@@ -50,7 +50,19 @@ export default async function publishTask(endpointType: EndpointType) {
     })
   );
 
-  publishBuildSummary(analyses.join('\r\n'), endpoint.type);
+  if (tl.getBoolInput('qualityGateBuildStatus')) {
+    for (const analysis of analyses) {
+      if (analysis.status === 'WARN') {
+        tl.setResult(tl.TaskResult.SucceededWithIssues, 'The SonarQube quality gate associated with this build has passed with warnings.');
+      }
+      if (analysis.status === 'ERROR') {
+        tl.setResult(tl.TaskResult.Failed, 'The SonarQube quality gate associated with this build has failed.');
+      }
+    }
+  }
+
+  const analysisReports = analyses.map(analysis => analysis.getHtmlAnalysisReport());
+  publishBuildSummary(analysisReports.join('\r\n'), endpoint.type);
 }
 
 function timeoutInSeconds(): number {

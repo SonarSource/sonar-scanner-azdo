@@ -15,6 +15,13 @@
     "Patch": 0
   },
   "minimumAgentVersion": "1.95.1",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
   "inputs": [
     {
       "name": "pollingTimeoutSec",
@@ -24,6 +31,16 @@
       "required": true,
       "helpMarkDown":
         "This task will poll SonarQube until the analysis is completed, or until the timeout is reached"
+    },
+    {
+      "name": "qualityGateBuildStatus",
+      "type": "boolean",
+      "defaultValue": "false",
+      "label": "Fail the build on quality gate failure",
+      "required": false,
+      "helpMarkDown":
+        "This option will reflect the quality gate status as the build status.",
+      "groupName": "advanced"
     }
   ],
   "dataSourceBindings": [],
