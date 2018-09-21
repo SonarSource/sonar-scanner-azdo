@@ -1,9 +1,9 @@
 **[SonarQube][sq]** is the leading product for Continuous Code Quality. It supports all major programming languages, including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. Integrate it in your on-premise TFS installation, and continuously track down bugs and vulnerabilities in your codebase.
 
-This TFS extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code.
+This extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code.
 
 
-## About the SonarQube Marketplace Extension
+## About the SonarQube Azure DevOps Marketplace Extension
 This extension provides the following features:
 * A dedicated **SonarQube EndPoint** to define the SonarQube server to be used.
 * Three build tasks to get your projects analyzed easily:
