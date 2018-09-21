@@ -1,10 +1,10 @@
 **[SonarCloud][sc]** is the leading product for Continuous Code Quality online, totally free for open-source projects. It supports all major programming languages, including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. If your code is closed source, SonarCloud also offers a paid plan to run private analyses.
 
-This VSTS extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code. A widget is also available to track the health of the overall application.
+This Azure DevOps extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code. A widget is also available to track the health of the overall application.
 
 To get started in a few minutes, you can follow this dedicated [Microsoft Lab][getstarted].
 
-## About the SonarCloud VSTS Marketplace Extension
+## About the SonarCloud Azure DevOps Marketplace Extension
 This extension provides the following features:
 * A dedicated **SonarCloud EndPoint** to set the user token and validate the connection.
 * Three build tasks (along with build templates) to get your projects analyzed easily:
@@ -12,7 +12,7 @@ This extension provides the following features:
   * **Run Code Analysis** task, to actually execute the analysis of the source code. Not required for Maven or Gradle projects.
   * **Publish Quality Gate Result** task, to display the quality gate status in the build summary. This tasks is optional, as it can increase the overall build time.
 * Analysis of the branches and the **pull requests** of your projects
-* A **widget** to monitor the quality gate for your projects on your favorite VSTS dashboard
+* A **widget** to monitor the quality gate for your projects on your favorite dashboard
 
 ## Highlighted Features
 ### Seamless Integration with .Net solutions
