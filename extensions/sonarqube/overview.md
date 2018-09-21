@@ -1,7 +1,5 @@
 **[SonarQube][sq]** is the leading product for Continuous Code Quality. It supports all major programming languages, including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. Integrate it in your on-premise TFS installation, and continuously track down bugs and vulnerabilities in your codebase.
 
-If you are new to SonarQube, using VSTS or looking for cloud-based solutions, then make sure to also check our dedicated [SonarCloud extension for VSTS][sc_vsts] !
-
 This TFS extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code.
 
 
