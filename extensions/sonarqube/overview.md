@@ -3,7 +3,7 @@
 This TFS extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code.
 
 
-## About the SonarQube VSTS/TFS Marketplace Extension
+## About the SonarQube Marketplace Extension
 This extension provides the following features:
 * A dedicated **SonarQube EndPoint** to define the SonarQube server to be used.
 * Three build tasks to get your projects analyzed easily:
