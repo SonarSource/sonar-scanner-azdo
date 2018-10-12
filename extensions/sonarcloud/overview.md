@@ -22,23 +22,20 @@ The analysis of C# and VB. Net solution is really straightforward since it only 
 If you're doing Java, analyzing your source code is also very easy. It only requires adding the **Prepare Analysis Configuration** task, and check the **Run SonarCloud Analysis** option in the "Code Analysis" panel of the Maven or Gradle task.
 
 ### Branch and Pull Request analysis
-Whatever type of source repository you are analysing, when a build is run on a branch of your project, the extension 
-automatically configures the analysis to be pushed to the relevant project branch on SonarCloud:
+Whatever type of source repository you are analysing, when a build is run on a branch of your project, the extension automatically configures the analysis to be pushed to the relevant project branch on SonarCloud:
 
 ![Branches](img/branches.png)
 
-If you configure your build definition as a build validation for pull requests of that project (this can be done on "Branch policies"), SonarCloud will also
-analyze the code changes and decorate the pull request with comments and overall status so that you can merge with confidence:
+If you configure your build definition as a build validation for pull requests of that project (this can be done on "Branch policies"), SonarCloud will also analyze the code changes and decorate the pull request with comments and overall status so that you can merge with confidence:
 
 ![PR-Decoration](img/pull-request-decoration.png)
 
-**Important note**: to activate pull request decoration, you must specify a user token in the 
-"General Settings > Pull Requests" administration page of your project in SonarCloud.
+**Important note**: to activate pull request decoration, you must specify a user token in the "General Settings > Pull Requests" administration page of your project in SonarCloud.
 
 ### Quality Gate Status
 
 #### In a dashboard widget
-You can monintor the quality gate status of your projects in your favorite dashboard:
+You can monitor the quality gate status of your projects in your favorite dashboard:
 
 ![Quality Gate Widget](img/widget.png)
 
