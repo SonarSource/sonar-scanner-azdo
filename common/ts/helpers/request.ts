@@ -16,6 +16,7 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
     if (query) {
       options.qs = query;
       options.useQuerystring = true;
+      options.rejectUnauthorized = false;
     }
     request.get(
       {
