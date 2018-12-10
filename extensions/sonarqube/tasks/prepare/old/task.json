@@ -11,7 +11,7 @@
   "version": {
     "Major": 3,
     "Minor": 6,
-    "Patch": 0
+    "Patch": 1
   },
   "demands": ["msbuild", "java"],
   "minimumAgentVersion": "1.95.0",
