@@ -4,6 +4,9 @@ build/
 # VS Code
 .vscode/
 
+# IntelliJ IDEA
+.idea/
+
 # nodeJS dependencies
 node_modules/
 

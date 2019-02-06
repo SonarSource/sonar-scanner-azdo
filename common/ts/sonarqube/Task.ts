@@ -7,6 +7,7 @@ interface ITask {
   componentKey: string;
   organization?: string;
   status: string;
+  errorMessage?: string;
   type: string;
   componentName: string;
 }
@@ -35,10 +36,11 @@ export default class Task {
         if (tries <= 0) {
           throw new TimeOutReachedError();
         }
+        const errorMessage = task.errorMessage ? task.errorMessage : 'Not provided by Sonar Server';
         switch (task.status.toUpperCase()) {
           case 'CANCEL':
           case 'FAILED':
-            throw new Error(`[SQ] Task failed with status ${task.status}`);
+            throw new Error(`[SQ] Task failed with status ${task.status}, Error message: ${errorMessage}`);
           case 'SUCCESS':
             tl.debug(`[SQ] Task complete: ${JSON.stringify(task)}`);
             return new Task(task);
