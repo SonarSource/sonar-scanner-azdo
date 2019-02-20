@@ -132,6 +132,7 @@ interface ScannerMSData {
   projectKey?: string;
   projectName?: string;
   projectVersion?: string;
+  organization?: string;
 }
 
 export class ScannerMSBuild extends Scanner {
@@ -166,6 +167,9 @@ export class ScannerMSBuild extends Scanner {
     }
     scannerRunner.arg('begin');
     scannerRunner.arg('/k:' + this.data.projectKey);
+    if (this.data.organization) {
+      scannerRunner.arg('/o:' + this.data.organization);
+    }
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     if (this.isDebug()) {
       scannerRunner.arg('/d:sonar.verbose=true');
@@ -214,7 +218,8 @@ export class ScannerMSBuild extends Scanner {
     return new ScannerMSBuild(rootPath, {
       projectKey: tl.getInput('projectKey', true),
       projectName: tl.getInput('projectName'),
-      projectVersion: tl.getInput('projectVersion')
+      projectVersion: tl.getInput('projectVersion'),
+      organization: tl.getInput('organization')
     });
   }
 }
