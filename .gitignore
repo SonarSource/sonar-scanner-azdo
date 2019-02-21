@@ -33,3 +33,6 @@ yarn-debug.log*
 # jest
 coverage/
 /.vs
+
+# eslint
+eslint-report.json
