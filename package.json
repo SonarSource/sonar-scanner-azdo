@@ -16,7 +16,7 @@
     "eslint-plugin-import": "2.11.0",
     "eslint-plugin-promise": "3.7.0",
     "event-stream": "3.3.4",
-    "fs-extra": "5.0.0",
+    "fs-extra": "7.0.1",
     "globby": "7.1.1",
     "gulp": "3.9.1",
     "gulp-artifactory-upload": "1.3.0",
@@ -46,22 +46,27 @@
     "clean": "./node_modules/.bin/gulp clean",
     "deploy": "./node_modules/.bin/gulp deploy",
     "sonarqube": "./node_modules/.bin/gulp sonarqube",
-    "format": "./node_modules/.bin/prettier --write --list-different '**/*.{js,ts}'",
+    "format":
+      "./node_modules/.bin/prettier --write --list-different '{common,extensions}/**/*.{js,ts}'",
+    "format-check":
+      "./node_modules/.bin/prettier --list-different '{common,extensions}/**/*.{js,ts}'",
     "install-dep": "./node_modules/.bin/gulp npminstall",
-    "lint": "eslint --ext js,ts --quiet '**/*.{js,ts}'",
+    "lint": "eslint --ext js,ts --quiet '{common,extensions}/**/*.{js,ts}'",
+    "lint-report":
+      "eslint --ext js,ts -f json -o eslint-report.json '{common,extensions}/**/*.{js,ts}'",
     "test-build": "./node_modules/.bin/gulp build:test",
-    "test": "node ./scripts/test.js",
+    "test": "./node_modules/.bin/jest",
     "ts-check": "./node_modules/.bin/tsc --noEmit",
-    "validate": "npm run lint && npm run ts-check && npm run test"
+    "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test",
+    "validate-ci":
+      "npm run lint-report && npm run ts-check && npm run format-check && npm run test --ci --coverage --runInBand"
   },
   "engines": {
     "node": ">=6"
   },
   "jest": {
     "clearMocks": true,
-    "collectCoverageFrom": [
-      "**/*.ts"
-    ],
+    "collectCoverageFrom": ["**/*.ts"],
     "coveragePathIgnorePatterns": [
       "gulpfile.js",
       "__tests__/",
@@ -70,16 +75,10 @@
       "/scripts",
       "/build"
     ],
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules",
-      "<rootDir>/config",
-      "<rootDir>/build"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
+    "testPathIgnorePatterns": ["/node_modules", "<rootDir>/config", "<rootDir>/build"],
     "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
+    "testURL": "http://localhost/",
     "transform": {
       ".(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     }

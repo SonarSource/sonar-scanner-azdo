@@ -145,6 +145,7 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
     'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,
     'sonar.analysis.pipeline': process.env.TRAVIS_BUILD_NUMBER,
     'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG,
+    'sonar.eslint.reportPaths': 'eslint-report.json',
     'sonar.typescript.lcov.reportPaths': 'coverage/lcov.info'
   };
   sonarqubeScanner(
