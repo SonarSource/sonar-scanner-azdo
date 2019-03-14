@@ -67,7 +67,7 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
     props['sonar.pullrequest.branch'] = branchName(
       tl.getVariable('System.PullRequest.SourceBranch')
     );
-    if (provider === 'TfsGit') {
+    if (provider.toLowerCase() === 'tfsgit') {
       props['sonar.pullrequest.provider'] = 'vsts';
       props['sonar.pullrequest.vsts.instanceUrl'] = collectionUrl;
       props['sonar.pullrequest.vsts.project'] = tl.getVariable('System.TeamProject');
@@ -83,7 +83,7 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
   } else {
     let isDefaultBranch = true;
     const currentBranch = tl.getVariable('Build.SourceBranch');
-    if (provider === 'TfsGit') {
+    if (provider.toLowerCase() === 'tfsgit') {
       isDefaultBranch = currentBranch === (await getDefaultBranch(collectionUrl));
     } else if (provider === 'Git' || provider === 'GitHub') {
       // TODO for GitHub we should get the default branch configured on the repo
