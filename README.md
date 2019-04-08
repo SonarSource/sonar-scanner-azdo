@@ -1,4 +1,4 @@
-SonarQube TFS/VSTS Marketplace Extension
+SonarQube/SonarCloud Azure Pipelines Extension
 ========================================
 
 [![Build Status](https://sonarsource.visualstudio.com/_apis/public/build/definitions/399fb241-ecc7-4802-8697-dcdd01fbb832/10/badge)](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_build/index?definitionId=10)
@@ -7,6 +7,7 @@ Marketplace
 -----------
 
 https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube
+https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud
 
 Have Question or Feedback?
 --------------------------
