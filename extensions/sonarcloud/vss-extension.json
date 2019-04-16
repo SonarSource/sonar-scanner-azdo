@@ -39,7 +39,7 @@
       "uri": "https://about.sonarcloud.io/"
     },
     "getstarted": {
-      "uri": "https://aka.ms/sonarcloudlab"
+      "uri": "https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud"
     },
     "support": {
       "uri": "https://www.sonarqube.org/community/"
