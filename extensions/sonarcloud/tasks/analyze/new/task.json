@@ -14,7 +14,7 @@
     "Patch": 0
   },
   "minimumAgentVersion": "2.119.1",
-  "demands": ["JAVA_HOME"],
+  "demands": [],
   "inputs": [],
   "execution": {
     "Node": {

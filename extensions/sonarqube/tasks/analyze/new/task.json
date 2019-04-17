@@ -15,7 +15,7 @@
   },
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
   "minimumAgentVersion": "2.119.1",
-  "demands": ["JAVA_HOME"],
+  "demands": [],
   "inputs": [],
   "execution": {
     "Node": {
