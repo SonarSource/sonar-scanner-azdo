@@ -25,7 +25,7 @@ export default async function publishTask(endpointType: EndpointType) {
   const timeoutSec = timeoutInSeconds();
   const taskReports = await TaskReport.createTaskReportsFromFiles();
   const analyses = await Promise.all(
-    taskReports.map(async taskReport => await getReportForTask(taskReport, metrics, endpoint, timeoutSec))
+    taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
   );
 
   publishBuildSummary(analyses.join('\r\n'), endpoint.type);
