@@ -67,7 +67,7 @@ serverUrl=http://sonar`,
 it('should find report files', async () => {
   // using spyOn so we can reset the original behaviour
   jest.spyOn(tl, 'getVariable').mockImplementation(() => 'mock root search path');
-  jest.spyOn(tl, 'findMatch').mockImplementation(() => ['path1', 'path2']);
+  const findMatchMock = jest.spyOn(tl, 'findMatch').mockImplementation(() => ['path1', 'path2']);
 
   const reportFiles = await TaskReport.findTaskFileReport();
 
@@ -79,5 +79,10 @@ it('should find report files', async () => {
   expect(tl.getVariable).toBeCalledWith('Agent.BuildDirectory');
 
   expect(tl.findMatch).toHaveBeenCalledTimes(1);
-  expect(tl.findMatch).toBeCalledWith('mock root search path', '**\\report-task.txt');
+  expect(findMatchMock.mock.calls[0][0]).toBe('mock root search path');
+
+  // Match using a regular expression to take account of the different
+  // path separators used by "join" on Windows/non-Windows
+  const regEx = new RegExp(/^\*\*[\\/]report-task.txt$/);
+  expect(findMatchMock.mock.calls[0][1]).toMatch(regEx);
 });
