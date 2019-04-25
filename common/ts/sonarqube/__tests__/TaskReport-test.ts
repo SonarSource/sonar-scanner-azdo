@@ -1,6 +1,11 @@
 import { writeFileSync } from 'fs';
 import { fileSync } from 'tmp'; // eslint-disable-line import/no-extraneous-dependencies
 import TaskReport from '../TaskReport';
+import * as tl from 'vsts-task-lib/task';
+
+beforeEach(() => {
+  jest.restoreAllMocks();
+});
 
 it('should parse report-task.txt and preserve equals sign in url', async () => {
   const tmpReport = fileSync();
@@ -22,4 +27,58 @@ serverUrl=http://sonar`,
   expect(report.dashboardUrl).toBe('http://sonar/bar?toto=titi&foo=%2Esomething');
 
   tmpReport.removeCallback();
+});
+
+
+it('should parse all reports', async () => {
+  const tmpReport = fileSync();
+  writeFileSync(
+    tmpReport.fd,
+    `dashboardUrl=http://sonar/bar?toto=titi&foo=%2Esomething
+projectKey=projectKey1
+ceTaskId=12345
+serverUrl=http://sonar`,
+    {
+      encoding: 'utf-8'
+    }
+  );
+
+  const tmpReport2 = fileSync();
+  writeFileSync(
+    tmpReport2.fd,
+    `dashboardUrl=http://sonar/bar?toto=titi&foo=%2Esomething
+projectKey=projectKey2
+ceTaskId=12345
+serverUrl=http://sonar`,
+    {
+      encoding: 'utf-8'
+    }
+  );
+
+  const reports = await TaskReport.createTaskReportsFromFiles([tmpReport.name, tmpReport2.name]);
+
+  expect(reports).toHaveLength(2);
+  expect(reports[0].projectKey).toBe('projectKey1');
+  expect(reports[1].projectKey).toBe('projectKey2');
+
+  tmpReport.removeCallback();
+  tmpReport2.removeCallback();
+});
+
+it('should find report files', async () => {
+  // using spyOn so we can reset the original behaviour
+  jest.spyOn(tl, 'getVariable').mockImplementation(() => 'mock root search path');
+  jest.spyOn(tl, 'findMatch').mockImplementation(() => ['path1', 'path2']);
+
+  const reportFiles = await TaskReport.findTaskFileReport();
+
+  expect(reportFiles.length).toBe(2);
+  expect(reportFiles[0]).toBe('path1');
+  expect(reportFiles[1]).toBe('path2');
+
+  expect(tl.getVariable).toHaveBeenCalledTimes(1);
+  expect(tl.getVariable).toBeCalledWith('Agent.BuildDirectory');
+
+  expect(tl.findMatch).toHaveBeenCalledTimes(1);
+  expect(tl.findMatch).toBeCalledWith('mock root search path', '**\\report-task.txt');
 });
