@@ -1,3 +1,5 @@
+import * as tl from 'vsts-task-lib/task';
+import { InvalidApiResourceVersionError } from 'vso-node-api/VsoClient';
 import Analysis from '../sonarqube/Analysis';
 import Endpoint, { EndpointType } from '../sonarqube/Endpoint';
 import Metrics from '../sonarqube/Metrics';
@@ -5,8 +7,6 @@ import Task, { TimeOutReachedError } from '../sonarqube/Task';
 import TaskReport from '../sonarqube/TaskReport';
 import * as publishTask from '../publish-task';
 import * as serverUtils from '../helpers/vsts-server-utils';
-import * as tl from 'vsts-task-lib/task';
-import { InvalidApiResourceVersionError } from 'vso-node-api/VsoClient';
 
 beforeEach(() => {
   jest.restoreAllMocks();

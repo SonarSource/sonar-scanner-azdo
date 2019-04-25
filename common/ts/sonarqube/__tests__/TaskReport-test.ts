@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import { fileSync } from 'tmp'; // eslint-disable-line import/no-extraneous-dependencies
-import TaskReport from '../TaskReport';
 import * as tl from 'vsts-task-lib/task';
+import TaskReport from '../TaskReport';
 
 beforeEach(() => {
   jest.restoreAllMocks();
