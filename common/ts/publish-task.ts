@@ -35,7 +35,12 @@ function timeoutInSeconds(): number {
   return Number.parseInt(tl.getInput('pollingTimeoutSec', true), 10);
 }
 
-export async function getReportForTask(taskReport: TaskReport, metrics: Metrics, endpoint: Endpoint, timeoutSec: number): Promise<string> {
+export async function getReportForTask(
+  taskReport: TaskReport,
+  metrics: Metrics,
+  endpoint: Endpoint,
+  timeoutSec: number
+): Promise<string> {
   try {
     const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
     const analysis = await Analysis.getAnalysis({

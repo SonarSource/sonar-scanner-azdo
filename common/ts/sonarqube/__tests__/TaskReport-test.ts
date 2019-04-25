@@ -29,7 +29,6 @@ serverUrl=http://sonar`,
   tmpReport.removeCallback();
 });
 
-
 it('should parse all reports', async () => {
   const tmpReport = fileSync();
   writeFileSync(
