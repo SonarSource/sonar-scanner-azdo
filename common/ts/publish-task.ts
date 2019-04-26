@@ -25,29 +25,7 @@ export default async function publishTask(endpointType: EndpointType) {
   const timeoutSec = timeoutInSeconds();
   const taskReports = await TaskReport.createTaskReportsFromFiles();
   const analyses = await Promise.all(
-    taskReports.map(async taskReport => {
-      try {
-        const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
-        const analysis = await Analysis.getAnalysis({
-          analysisId: task.analysisId,
-          dashboardUrl: taskReport.dashboardUrl,
-          endpoint,
-          metrics,
-          projectName: taskReports.length > 1 ? task.componentName : undefined
-        });
-        return analysis.getHtmlAnalysisReport();
-      } catch (e) {
-        if (e instanceof TimeOutReachedError) {
-          tl.warning(
-            `Task '${
-              taskReport.ceTaskId
-            }' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
-          );
-        } else {
-          throw e;
-        }
-      }
-    })
+    taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
   );
 
   publishBuildSummary(analyses.join('\r\n'), endpoint.type);
@@ -55,4 +33,33 @@ export default async function publishTask(endpointType: EndpointType) {
 
 function timeoutInSeconds(): number {
   return Number.parseInt(tl.getInput('pollingTimeoutSec', true), 10);
+}
+
+export async function getReportForTask(
+  taskReport: TaskReport,
+  metrics: Metrics,
+  endpoint: Endpoint,
+  timeoutSec: number
+): Promise<string> {
+  try {
+    const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
+    const analysis = await Analysis.getAnalysis({
+      analysisId: task.analysisId,
+      dashboardUrl: taskReport.dashboardUrl,
+      endpoint,
+      metrics,
+      projectName: task.componentName
+    });
+    return analysis.getHtmlAnalysisReport();
+  } catch (e) {
+    if (e instanceof TimeOutReachedError) {
+      tl.warning(
+        `Task '${
+          taskReport.ceTaskId
+        }' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
+      );
+    } else {
+      throw e;
+    }
+  }
 }
