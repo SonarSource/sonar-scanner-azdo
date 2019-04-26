@@ -26,7 +26,7 @@ const METRICS = new Metrics([]);
 
 it('should fail unless SONARQUBE_SCANNER_PARAMS are supplied', async () => {
   jest.spyOn(tl, 'getVariable').mockImplementation(() => null);
-  jest.spyOn(tl, 'setResult');
+  jest.spyOn(tl, 'setResult').mockImplementation(() => null);
 
   await publishTask.default(EndpointType.SonarCloud);
 
