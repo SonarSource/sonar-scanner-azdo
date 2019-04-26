@@ -132,7 +132,9 @@ it('task should not fail the task even if all ceTasks timeout', async () => {
   jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => {
     throw new TimeOutReachedError();
   });
-  const publishSummaryMock = jest.spyOn(serverUtils, 'publishBuildSummary').mockImplementation(() => null);
+  const publishSummaryMock = jest
+    .spyOn(serverUtils, 'publishBuildSummary')
+    .mockImplementation(() => null);
 
   await publishTask.default(EndpointType.SonarCloud);
 
