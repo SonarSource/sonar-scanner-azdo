@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { writeFileSync } from 'fs';
 import { fileSync } from 'tmp'; // eslint-disable-line import/no-extraneous-dependencies
 import * as tl from 'vsts-task-lib/task';
@@ -67,7 +68,7 @@ serverUrl=http://sonar`,
 it('should find report files', async () => {
   // using spyOn so we can reset the original behaviour
   jest.spyOn(tl, 'getVariable').mockImplementation(() => 'mock root search path');
-  const findMatchMock = jest.spyOn(tl, 'findMatch').mockImplementation(() => ['path1', 'path2']);
+  jest.spyOn(tl, 'findMatch').mockImplementation(() => ['path1', 'path2']);
 
   const reportFiles = await TaskReport.findTaskFileReport();
 
@@ -78,11 +79,9 @@ it('should find report files', async () => {
   expect(tl.getVariable).toHaveBeenCalledTimes(1);
   expect(tl.getVariable).toBeCalledWith('Agent.BuildDirectory');
 
+  // Calculate the expected path to take account of different
+  // path separators in Windows/non-Windows
+  const expectedSearchPath = path.join('**', 'report-task.txt');
   expect(tl.findMatch).toHaveBeenCalledTimes(1);
-  expect(findMatchMock.mock.calls[0][0]).toBe('mock root search path');
-
-  // Match using a regular expression to take account of the different
-  // path separators used by "join" on Windows/non-Windows
-  const regEx = new RegExp(/^\*\*[\\/]report-task.txt$/);
-  expect(findMatchMock.mock.calls[0][1]).toMatch(regEx);
+  expect(tl.findMatch).toHaveBeenCalledWith('mock root search path', expectedSearchPath);
 });
