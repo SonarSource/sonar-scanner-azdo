@@ -2,6 +2,7 @@
 
 This extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code.
 
+*Note: this extension is officially supported for use with Azure DevOps Server (formerly TFS). Ongoing interoperability with Azure DevOps Server (cloud-based) is not assured.*
 
 ## About the SonarQube Azure DevOps Marketplace Extension
 This extension provides the following features:
