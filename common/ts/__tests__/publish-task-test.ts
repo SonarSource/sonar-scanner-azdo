@@ -1,5 +1,5 @@
-import * as tl from 'vsts-task-lib/task';
-import { InvalidApiResourceVersionError } from 'vso-node-api/VsoClient';
+import * as tl from 'azure-pipelines-task-lib/task';
+import { InvalidApiResourceVersionError } from 'azure-devops-node-api/VsoClient';
 import Analysis from '../sonarqube/Analysis';
 import Endpoint, { EndpointType } from '../sonarqube/Endpoint';
 import Metrics from '../sonarqube/Metrics';

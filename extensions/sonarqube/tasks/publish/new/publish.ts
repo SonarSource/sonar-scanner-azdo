@@ -1,4 +1,4 @@
-import * as tl from 'vsts-task-lib/task';
+import * as tl from 'azure-pipelines-task-lib/task';
 import publishTask from '../../../../../common/ts/publish-task';
 import { EndpointType } from '../../../../../common/ts/sonarqube/Endpoint';
 

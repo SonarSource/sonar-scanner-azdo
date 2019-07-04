@@ -1,6 +1,6 @@
 import * as semver from 'semver';
-import * as tl from 'vsts-task-lib/task';
-import * as vm from 'vso-node-api';
+import * as tl from 'azure-pipelines-task-lib/task';
+import * as vm from 'azure-devops-node-api';
 import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
 import { toCleanJSON } from './helpers/utils';
