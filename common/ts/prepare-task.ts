@@ -76,7 +76,10 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
       props['sonar.pullrequest.key'] = tl.getVariable('System.PullRequest.PullRequestNumber');
       props['sonar.pullrequest.provider'] = 'github';
       props['sonar.pullrequest.github.repository'] = tl.getVariable(REPO_NAME_VAR);
-    } else {
+    } else if(provider == 'Bitbucket') {
+      props['sonar.pullrequest.provider'] = 'bitbucketcloud';
+
+    }else {
       tl.warning(`Unsupported PR provider '${provider}'`);
       props['sonar.scanner.skip'] = 'true';
     }
@@ -91,7 +94,7 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
     } else if (provider === 'Bitbucket') {
       // TODO for Bitbucket Cloud we should get the main branch configured on the repo
       // https://github.com/Microsoft/vsts-tasks/issues/7595
-      isDefaultBranch = currentBranch === 'master';
+      isDefaultBranch = currentBranch === 'refs/heads/master';
     } else if (provider === 'Svn') {
       isDefaultBranch = currentBranch === 'trunk';
     }
