@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarcloud",
   "name": "SonarCloud",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
@@ -16,7 +16,7 @@
   "description":
     "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
-  "categories": ["Build and release"],
+  "categories": ["Azure Pipelines"],
   "icons": {
     "default": "extension-icon.png"
   },

@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarqube",
   "name": "SonarQube",
-  "version": "4.6.3",
+  "version": "4.6.4",
   "branding": {
     "color": "rgb(67, 157, 210)",
     "theme": "dark"
@@ -20,7 +20,7 @@
   "description":
     "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
-  "categories": ["Build and release"],
+  "categories": ["Azure Pipelines"],
   "icons": {
     "default": "extension-icon.png"
   },
