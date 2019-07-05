@@ -76,10 +76,9 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
       props['sonar.pullrequest.key'] = tl.getVariable('System.PullRequest.PullRequestNumber');
       props['sonar.pullrequest.provider'] = 'github';
       props['sonar.pullrequest.github.repository'] = tl.getVariable(REPO_NAME_VAR);
-    } else if(provider === 'Bitbucket') {
+    } else if (provider === 'Bitbucket') {
       props['sonar.pullrequest.provider'] = 'bitbucketcloud';
-
-    }else {
+    } else {
       tl.warning(`Unsupported PR provider '${provider}'`);
       props['sonar.scanner.skip'] = 'true';
     }
