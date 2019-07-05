@@ -12,7 +12,7 @@ const SQ_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: 'https://sonarqu
 
 it('should display warning for dedicated extension for Sonarcloud', async () => {
 
-let scannerObject =  new ScannerMSBuild(__dirname, {
+const scannerObject =  new ScannerMSBuild(__dirname, {
     projectKey: 'dummyProjectKey',
     projectName: 'dummyProjectName',
     projectVersion: 'dummyProjectVersion',
