@@ -1,8 +1,8 @@
-**[SonarCloud][sc]** is the leading product for Continuous Code Quality online, totally free for open-source projects. It supports all major programming languages, including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. If your code is closed source, SonarCloud also offers a paid plan to run private analyses.
+**[SonarCloud][sc]** is the leading online service for Code Quality & Code Security. It is totally free for open-source projects, and supports all major programming languages including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. If your code is closed source, SonarCloud also offers a paid plan to run private analyses.
 
-This Azure DevOps extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code. A widget is also available to track the health of the overall application.
+This Azure DevOps extension provides build tasks that you can add in your build definition. You'll benefit from automated dectection of bugs and vulnerabilities across all branches and Pull Requests. SonarCloud explains all coding issues in details, giving you chance to fix your code before even merging and deploying, all while learning best practices along the way. At project level, you'll also get a dedicated widget that tracks the overall health of your application.
 
-To get started in a few minutes, you can follow this dedicated [Microsoft Lab][getstarted].
+To get started in a few minutes, you can follow this dedicated [Microsoft Lab][getstarted]. There is also a SonarCloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn] .
 
 ## About the SonarCloud Azure DevOps Marketplace Extension
 This extension provides the following features:
@@ -13,6 +13,8 @@ This extension provides the following features:
   * **Publish Quality Gate Result** task, to display the quality gate status in the build summary. This tasks is optional, as it can increase the overall build time.
 * Analysis of the branches and the **pull requests** of your projects
 * A **widget** to monitor the quality gate for your projects on your favorite dashboard
+
+Note that the above features are **available for all Git repository providers in Azure DevOps**: Azure Repos Git, Bitbucket Cloud or GitHub.
 
 ## Highlighted Features
 ### Seamless Integration with .Net solutions
@@ -52,3 +54,4 @@ Example of a failing Quality Gate:
 
    [sc]: <https://sonarcloud.io>
    [getstarted]: <https://aka.ms/sonarcloudlab>
+   [msft_learn]: https://docs.microsoft.com/en-us/learn/modules/scan-for-vulnerabilities/5-scan-pipeline
