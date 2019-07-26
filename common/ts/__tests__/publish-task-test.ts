@@ -6,7 +6,7 @@ import Metrics from '../sonarqube/Metrics';
 import Task, { TimeOutReachedError } from '../sonarqube/Task';
 import TaskReport from '../sonarqube/TaskReport';
 import * as publishTask from '../publish-task';
-import * as serverUtils from '../helpers/vsts-server-utils';
+import * as serverUtils from '../helpers/azdo-server-utils';
 
 beforeEach(() => {
   jest.restoreAllMocks();
