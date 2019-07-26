@@ -10,6 +10,7 @@
     "fs-extra": "5.0.0",
     "jsonpath": "^1.0.2",
     "request": "2.85.0",
+    "request-promise-native": "^1.0.7",
     "semver": "5.5.0"
   },
   "engines": {

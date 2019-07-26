@@ -4,9 +4,30 @@ import * as vm from 'azure-devops-node-api';
 import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
 import { toCleanJSON } from './helpers/utils';
-import { getServerVersion } from './helpers/request';
+import { getJSON, getServerVersion } from './helpers/request';
+import { getAuthToken } from './helpers/azdo-server-utils';
+import * as azdoApiUtils from './helpers/azdo-api-utils';
 
 const REPO_NAME_VAR = 'Build.Repository.Name';
+
+interface Component {
+  organization: string;
+  id: string;
+  key: string;
+  name: string;
+  qualifier: string;
+  analysisDate: Date;
+  tags: any[];
+  visibility: string;
+  leakPeriodDate: Date;
+  version: string;
+}
+
+interface SonarCloudComponentDetail {
+  component: Component;
+  ancestors: any[];
+}
+
 
 export default async function prepareTask(endpoint: Endpoint, rootPath: string) {
   if (
@@ -23,6 +44,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
 
   const props: { [key: string]: string } = {};
+
+  checkProjectMatrix(endpoint);
 
   if (await branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);
@@ -47,6 +70,41 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   );
 
   await scanner.runPrepare();
+}
+
+export function checkProjectMatrix(endpoint: Endpoint) {
+  if (endpoint.type === EndpointType.SonarCloud) {
+    azdoApiUtils.getProjectDetails().then((projectDetails: azdoApiUtils.ProjectDetail) => {
+      tl.debug('Returned : ' + JSON.stringify(projectDetails));
+      let component = tl.getInput('projectKey', true);
+      getJSON(endpoint, '/api/components/show', { component }).then(
+        ( componentDetail: SonarCloudComponentDetail ) => {
+          tl.debug("SC project visibility : " + componentDetail.component.visibility);
+          if (componentDetail.component.visibility === 'public') {
+            tl.debug("Entered public SC Project");
+            tl.debug("AzDO project visibility : " + projectDetails.visibility);
+            if (projectDetails.visibility === 'private') {
+              tl.debug("Entered private AzDO Project");
+              tl.setResult(
+                tl.TaskResult.Failed,
+                "ERROR : You can't analyze a private repository towards a public SonarCloud organization. Either switch to a public repository, or a private organization."
+              );
+            }
+          }
+        },
+        err => {
+          if (err && err.message) {
+            tl.error(`[SQ] Error retrieving project information: ${err.message}`);
+          } else if (err) {
+            tl.error(`[SQ] Error retrieving project information: ${JSON.stringify(err)}`);
+          }
+          throw new Error(
+            `[SQ] Error retrieving project information for project key '${component}'`
+          );
+        }
+      );
+    });
+  }
 }
 
 async function branchFeatureSupported(endpoint) {
@@ -140,13 +198,4 @@ function getWebApi(collectionUrl: string): vm.WebApi {
   const accessToken = getAuthToken();
   const credentialHandler = vm.getBearerHandler(accessToken);
   return new vm.WebApi(collectionUrl, credentialHandler);
-}
-
-function getAuthToken() {
-  const auth = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false);
-  if (auth.scheme.toLowerCase() === 'oauth') {
-    return auth.parameters['AccessToken'];
-  } else {
-    throw new Error('Unable to get credential to perform rest API calls');
-  }
 }

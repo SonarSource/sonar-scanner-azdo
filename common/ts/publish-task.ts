@@ -4,7 +4,8 @@ import Endpoint, { EndpointType, EndpointData } from './sonarqube/Endpoint';
 import Metrics from './sonarqube/Metrics';
 import Task, { TimeOutReachedError } from './sonarqube/Task';
 import TaskReport from './sonarqube/TaskReport';
-import { publishBuildSummary } from './helpers/vsts-server-utils';
+import { publishBuildSummary } from './helpers/azdo-server-utils';
+import * as azdoApiUtils from './helpers/azdo-api-utils';
 
 export default async function publishTask(endpointType: EndpointType) {
   const params = tl.getVariable('SONARQUBE_SCANNER_PARAMS');
@@ -27,6 +28,18 @@ export default async function publishTask(endpointType: EndpointType) {
   const analyses = await Promise.all(
     taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
   );
+
+  azdoApiUtils.getVariableGroup().then((variableGroup: azdoApiUtils.VariableGroup)=> {
+
+    tl.debug('Returned : ' + JSON.stringify(variableGroup));
+    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let ceTaskId = taskReports[0].ceTaskId;
+    if (variableGroup === null) {
+      azdoApiUtils.createVariableGroup(buildNumber, ceTaskId);
+    } else {
+      azdoApiUtils.updateVariableGroup(variableGroup, buildNumber, ceTaskId);
+    }
+  });
 
   publishBuildSummary(analyses.join('\r\n'), endpoint.type);
 }
