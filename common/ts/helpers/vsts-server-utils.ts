@@ -30,12 +30,3 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
     summaryPath
   );
 }
-
-export function getAuthToken() {
-  const auth = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false);
-  if (auth.scheme.toLowerCase() === 'oauth') {
-    return auth.parameters['AccessToken'];
-  } else {
-    throw new Error('Unable to get credential to perform rest API calls');
-  }
-}
