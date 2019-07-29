@@ -4,29 +4,9 @@ import * as vm from 'azure-devops-node-api';
 import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
 import { toCleanJSON } from './helpers/utils';
-import { getJSON, getServerVersion } from './helpers/request';
-import { getAuthToken } from './helpers/azdo-server-utils';
-import * as azdoApiUtils from './helpers/azdo-api-utils';
+import { getServerVersion } from './helpers/request';
 
 const REPO_NAME_VAR = 'Build.Repository.Name';
-
-interface Component {
-  organization: string;
-  id: string;
-  key: string;
-  name: string;
-  qualifier: string;
-  analysisDate: Date;
-  tags: any[];
-  visibility: string;
-  leakPeriodDate: Date;
-  version: string;
-}
-
-interface SonarCloudComponentDetail {
-  component: Component;
-  ancestors: any[];
-}
 
 export default async function prepareTask(endpoint: Endpoint, rootPath: string) {
   if (
@@ -45,7 +25,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   const props: { [key: string]: string } = {};
 
   if (await branchFeatureSupported(endpoint)) {
-    checkProjectMatrix(endpoint);
     await populateBranchAndPrProps(props);
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
@@ -53,7 +32,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   tl
     .getDelimitedInput('extraProperties', '\n')
     .filter(keyValue => !keyValue.startsWith('#'))
-    .map(keyValue => keyValue.split(/[=](.+)/))
+    .map(keyValue => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 
   tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
@@ -68,41 +47,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   );
 
   await scanner.runPrepare();
-}
-
-export function checkProjectMatrix(endpoint: Endpoint) {
-  let projectDetails: azdoApiUtils.ProjectDetail;
-
-  azdoApiUtils
-    .getProjectDetails()
-    .then((response: azdoApiUtils.ProjectDetail) => {
-      tl.debug(`Returned : ${JSON.stringify(response)}`);
-      projectDetails = response;
-    })
-    .catch(error => {
-      tl.error(
-        `Could not fetch project detail in Azure DevOps API. Error was  : ${JSON.stringify(error)}`
-      );
-    });
-  const component = tl.getInput('projectKey', true);
-  getJSON(endpoint, '/api/components/show', { component }).then(
-    (componentDetail: SonarCloudComponentDetail) => {
-      tl.debug(`SC project visibility : ${componentDetail.component.visibility}`);
-      if (
-        componentDetail.component.visibility === 'public' &&
-        projectDetails.visibility === 'private'
-      ) {
-        tl.setResult(
-          tl.TaskResult.Failed,
-          "ERROR : You can't analyze a private repository towards a public SonarCloud organization. Either switch to a public repository, or a private organization."
-        );
-      }
-    },
-    err => {
-      tl.error(`[SQ] Error retrieving project information: ${JSON.stringify(err)}`);
-      throw new Error(`[SQ] Error retrieving project information for project key "${component}"`);
-    }
-  );
 }
 
 async function branchFeatureSupported(endpoint) {
@@ -135,7 +79,7 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
     } else if (provider === 'Bitbucket') {
       props['sonar.pullrequest.provider'] = 'bitbucketcloud';
     } else {
-      tl.warning(`Unsupported PR provider "${provider}"`);
+      tl.warning(`Unsupported PR provider '${provider}'`);
       props['sonar.scanner.skip'] = 'true';
     }
   } else {
@@ -154,7 +98,7 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
       isDefaultBranch = currentBranch === 'trunk';
     }
     if (!isDefaultBranch) {
-      // VSTS-165 don"t use Build.SourceBranchName
+      // VSTS-165 don't use Build.SourceBranchName
       props['sonar.branch.name'] = branchName(tl.getVariable('Build.SourceBranch'));
     }
   }
@@ -184,7 +128,7 @@ async function getDefaultBranch(collectionUrl: string) {
       tl.getVariable(REPO_NAME_VAR),
       tl.getVariable('System.TeamProject')
     );
-    tl.debug(`Default branch of this repository is "${repo.defaultBranch}"`);
+    tl.debug(`Default branch of this repository is '${repo.defaultBranch}'`);
     return repo.defaultBranch;
   } catch (e) {
     tl.warning("Unable to get default branch, defaulting to 'master': " + e);
@@ -196,4 +140,13 @@ function getWebApi(collectionUrl: string): vm.WebApi {
   const accessToken = getAuthToken();
   const credentialHandler = vm.getBearerHandler(accessToken);
   return new vm.WebApi(collectionUrl, credentialHandler);
+}
+
+function getAuthToken() {
+  const auth = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false);
+  if (auth.scheme.toLowerCase() === 'oauth') {
+    return auth.parameters['AccessToken'];
+  } else {
+    throw new Error('Unable to get credential to perform rest API calls');
+  }
 }

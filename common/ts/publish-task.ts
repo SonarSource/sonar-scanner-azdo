@@ -4,7 +4,7 @@ import Endpoint, { EndpointType, EndpointData } from './sonarqube/Endpoint';
 import Metrics from './sonarqube/Metrics';
 import Task, { TimeOutReachedError } from './sonarqube/Task';
 import TaskReport from './sonarqube/TaskReport';
-import { publishBuildSummary } from './helpers/azdo-server-utils';
+import { publishBuildSummary } from './helpers/vsts-server-utils';
 
 export default async function publishTask(endpointType: EndpointType) {
   const params = tl.getVariable('SONARQUBE_SCANNER_PARAMS');
