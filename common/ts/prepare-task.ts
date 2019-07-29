@@ -4,9 +4,29 @@ import * as vm from 'azure-devops-node-api';
 import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
 import { toCleanJSON } from './helpers/utils';
-import { getServerVersion } from './helpers/request';
+import { getJSON, getServerVersion } from './helpers/request';
+import { getAuthToken } from './helpers/azdo-server-utils';
+import * as azdoApiUtils from './helpers/azdo-api-utils';
 
 const REPO_NAME_VAR = 'Build.Repository.Name';
+
+interface Component {
+  organization: string;
+  id: string;
+  key: string;
+  name: string;
+  qualifier: string;
+  analysisDate: Date;
+  tags: any[];
+  visibility: string;
+  leakPeriodDate: Date;
+  version: string;
+}
+
+interface SonarCloudComponentDetail {
+  component: Component;
+  ancestors: any[];
+}
 
 export default async function prepareTask(endpoint: Endpoint, rootPath: string) {
   if (
@@ -25,6 +45,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   const props: { [key: string]: string } = {};
 
   if (await branchFeatureSupported(endpoint)) {
+    checkProjectMatrix(endpoint, scannerMode);
     await populateBranchAndPrProps(props);
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
@@ -47,6 +68,46 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   );
 
   await scanner.runPrepare();
+}
+
+export function checkProjectMatrix(endpoint: Endpoint, scannerMode: ScannerMode) {
+  let projectDetails: azdoApiUtils.ProjectDetail;
+
+  azdoApiUtils
+    .getProjectDetails()
+    .then((response: azdoApiUtils.ProjectDetail) => {
+      tl.debug(`Returned : ${JSON.stringify(response)}`);
+      projectDetails = response;
+    })
+    .catch(error => {
+      tl.error(
+        `Could not fetch project detail in Azure DevOps API. Error was  : ${JSON.stringify(error)}`
+      );
+    });
+  const component = getProjectKey(scannerMode);
+  if (component !== '') {
+    getJSON(endpoint, '/api/components/show', { component }).then(
+      (componentDetail: SonarCloudComponentDetail) => {
+        tl.debug(`SC project visibility : ${componentDetail.component.visibility}`);
+        if (
+          componentDetail.component.visibility === 'public' &&
+          projectDetails.visibility === 'private'
+        ) {
+          tl.setResult(
+            tl.TaskResult.Failed,
+            "ERROR : You can't analyze a private repository towards a public SonarCloud organization. Either switch to a public repository, or a private organization."
+          );
+        }
+      },
+      err => {
+        tl.error(`[SQ] Error retrieving project information: ${JSON.stringify(err)}`);
+        tl.setResult(
+          tl.TaskResult.Failed,
+          `[SQ] Error retrieving project information for project key "${component}"`
+        );
+      }
+    );
+  }
 }
 
 async function branchFeatureSupported(endpoint) {
@@ -104,6 +165,26 @@ async function populateBranchAndPrProps(props: { [key: string]: string }) {
   }
 }
 
+function getProjectKey(scannerMode: ScannerMode) {
+  let componentKey = '';
+  switch (scannerMode) {
+    case ScannerMode.MSBuild:
+      componentKey = tl.getInput('projectKey', true);
+      break;
+    case ScannerMode.CLI:
+      //Read from properties file.
+      componentKey = tl.getInput('cliProjectKey', true);
+      break;
+    case ScannerMode.Other:
+      tl.warning(
+        'Checking project visibility feature is not yet available for Gradle or other SonarScanner than MSBuild or CLI. Skipping....'
+      );
+      break;
+  }
+
+  return componentKey;
+}
+
 /**
  * Waiting for https://github.com/Microsoft/vsts-tasks/issues/7591
  */
@@ -140,13 +221,4 @@ function getWebApi(collectionUrl: string): vm.WebApi {
   const accessToken = getAuthToken();
   const credentialHandler = vm.getBearerHandler(accessToken);
   return new vm.WebApi(collectionUrl, credentialHandler);
-}
-
-function getAuthToken() {
-  const auth = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false);
-  if (auth.scheme.toLowerCase() === 'oauth') {
-    return auth.parameters['AccessToken'];
-  } else {
-    throw new Error('Unable to get credential to perform rest API calls');
-  }
 }
