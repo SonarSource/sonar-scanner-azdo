@@ -53,9 +53,10 @@
     "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"{common,extensions}/**/*.{js,ts}\"",
     "test-build": "./node_modules/.bin/gulp build:test",
     "test": "./node_modules/.bin/jest",
+	"test-ci": "./node_modules/.bin/jest --collectCoverage --ci --runInBand",
     "ts-check": "./node_modules/.bin/tsc --noEmit",
     "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test",
-    "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test --ci --coverage --runInBand"
+    "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci "
   },
   "engines": {
     "node": ">=6"
