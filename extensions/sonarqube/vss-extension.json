@@ -105,6 +105,14 @@
       }
     },
     {
+      "id": "c8017058-c274-47e7-b9ce-8f1cb6aa444c",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "tasks/qgstatus"
+      }
+    },
+    {
       "id": "EDC775DD-1A82-4ADD-A073-7B5813E87202",
       "description": "Service Endpoint type for SonarQube Connections",
       "type": "ms.vss-endpoint.service-endpoint-type",

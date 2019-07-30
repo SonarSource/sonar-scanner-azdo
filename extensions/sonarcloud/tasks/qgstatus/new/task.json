@@ -1,0 +1,84 @@
+{
+  "id": "6350bfb8-c310-4cdd-af68-722f33cf440a",
+  "name": "SonarCloudQualityGateCheck",
+  "friendlyName": "Check SonarCloud QualityGate status for a build.",
+  "description": "SonarCloud QualityGate status check for a build.",
+  "helpMarkDown": "",
+  "category": "Deploy",
+  "visibility": ["Release"],
+  "runsOn": ["ServerGate"],
+  "author": "sonarsource",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "preview": "true",
+  "inputs": [
+    {
+      "name": "SonarCloud",
+      "type": "connectedService:sonarcloud",
+      "label": "SonarCloud Service Endpoint",
+      "required": true,
+      "helpMarkDown": "Select the SonarCloud endpoint for your project. To create one, click the Manage link and create a new SonarCloud Service Endpoint, then enter your SonarCloud account token."
+    },
+    {
+      "name": "organization",
+      "type": "pickList",
+      "label": "Organization",
+      "required": true,
+      "helpMarkDown": "Select the name of your Organization",
+      "properties": {
+        "EditableOptions": "True"
+      }
+    }
+  ],
+  "dataSourceBindings": [
+    {
+      "target": "organization",
+      "endpointId": "$(SonarCloud)",
+      "endpointUrl": "{{endpoint.url}}/api/organizations/search?member=true",
+      "resultSelector": "jsonpath:$.organizations[*]",
+      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{name}}} ({{{key}}})\" }"
+    }
+  ],
+  "instanceNameFormat": "Check SonarCloud Quality Gate Status",
+  "execution": {
+    "HttpRequestChain": {
+      "Execute": [
+        {
+          "RequestInputs": {
+            "EndpointUrl": "$(system.teamFoundationCollectionUri)$(system.teamProjectId)/_apis/distributedtask/variablegroups?groupName=SonarCloud&api-version=5.0-preview.1",
+            "Method": "GET",
+            "Headers": "{\n\"Content-Type\":\"application/json\", \n\"Authorization\": \"Bearer  $(system.accesstoken)\"\n}"
+          },
+          "ExecutionOptions": {
+            "OutputVariables": {
+              "ceTaskId": "jsonpath('$..[''$(build.buildNumber)''].value')[0]"
+            }
+          }
+        },
+        {
+          "RequestInputs": {
+            "EndpointId": "$(SonarCloud)",
+            "EndpointUrl": "$(endpoint.url)api/ce/task?id=$(ceTaskId)",
+            "Method": "GET"
+          },
+          "ExecutionOptions": {
+            "OutputVariables": {
+              "analysisId": "jsonpath('$.task.analysisId')[0]"
+            }
+          }
+        },
+        {
+          "RequestInputs": {
+            "EndpointId": "$(SonarCloud)",
+            "EndpointUrl": "$(endpoint.url)api/qualitygates/project_status?analysisId=$(analysisId)",
+            "Method": "GET",
+            "Expression": "eq(jsonpath('$.projectStatus.status')[0], 'OK')"
+          }
+        }
+      ]
+    }
+  }
+}

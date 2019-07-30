@@ -132,8 +132,6 @@ export function updateVariableGroup(
     var bodyToPost = new ValueBase();
     bodyToPost.variables = variableGroup.value[0].variables;
 
-    tl.debug('Body to post update : ' + JSON.stringify(bodyToPost));
-
     var options = {
       url:
         collectionUri +
@@ -156,7 +154,6 @@ export function updateVariableGroup(
         return reject();
       }
       tl.debug(`Response: ${response.statusCode} Body: "${JSON.stringify(body)}"`);
-
       return resolve();
     });
   });
