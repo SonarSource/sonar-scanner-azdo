@@ -33,8 +33,8 @@
     "prettier": "1.12.1",
     "request": "2.85.0",
     "semver": "5.5.0",
-    "sonarqube-scanner": "2.1.2",
-    "tfx-cli": "^0.7.6",
+    "sonarqube-scanner": "^2.5.0",
+    "tfx-cli": "^0.7.8",
     "tmp": "0.0.33",
     "ts-jest": "22.4.4",
     "typescript": "2.8.3",
@@ -53,9 +53,10 @@
     "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"{common,extensions}/**/*.{js,ts}\"",
     "test-build": "./node_modules/.bin/gulp build:test",
     "test": "./node_modules/.bin/jest",
+    "test-ci": "./node_modules/.bin/jest --coverage",
     "ts-check": "./node_modules/.bin/tsc --noEmit",
     "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test",
-    "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test --ci --coverage --runInBand"
+    "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci"
   },
   "engines": {
     "node": ">=6"
@@ -63,15 +64,12 @@
   "jest": {
     "clearMocks": true,
     "collectCoverageFrom": [
-      "**/*.ts"
+      "{common}**/*.ts"
     ],
-    "coveragePathIgnorePatterns": [
-      "gulpfile.js",
-      "__tests__/",
-      "/node_modules",
-      "/config",
-      "/scripts",
-      "/build"
+    "coverageDirectory": "<rootDir>/coverage",
+    "coverageReporters": [
+      "lcovonly",
+      "text"
     ],
     "moduleFileExtensions": [
       "ts",
