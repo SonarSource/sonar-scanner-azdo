@@ -139,7 +139,7 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
     'sonar.exclusions':
       'build/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**',
     'sonar.coverage.exclusions':
-      'gulpfile.js, build/**, config/**, coverage/**, scripts/**, **/__tests__/**',
+      'gulpfile.js, build/**, config/**, coverage/**, extensions/**,  scripts/**, **/__tests__/**',
     'sonar.tests': '.',
     'sonar.test.inclusions': '**/__tests__/**',
     'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,

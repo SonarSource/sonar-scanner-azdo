@@ -9,7 +9,7 @@ cache:
 install:
   - npm install
   - npm run install-dep
-before_script: npm run clean && npm run validate
+before_script: npm run clean && npm run validate-ci
 script:  
   - if [ -n "$ARTIFACTORY_URL" ]; then npm run deploy; fi
   - git fetch --unshallow && npm run sonarqube
