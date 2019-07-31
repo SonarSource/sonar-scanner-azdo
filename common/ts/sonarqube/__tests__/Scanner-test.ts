@@ -1,4 +1,4 @@
-import { ScannerCLI } from '../Scanner';
+import Scanner, { ScannerCLI, ScannerMode } from '../Scanner';
 
 jest.mock('azure-pipelines-task-lib/task', () => ({
   debug: jest.fn(),
@@ -21,4 +21,12 @@ it('should return formated argument string for CLI with manual mode', () => {
   expect(actual).toBe(
     '-Dsonar.projectKey=myprojectKey -Dsonar.projectName=undefined -Dsonar.projectVersion=undefined -Dsonar.sources=undefined'
   );
+});
+
+it('should return empty string for default scanner mode', () => {
+  const scanner = new Scanner(__dirname, ScannerMode.CLI);
+
+  const actual = scanner.toCliProps();
+
+  expect(actual).toBe('');
 });
