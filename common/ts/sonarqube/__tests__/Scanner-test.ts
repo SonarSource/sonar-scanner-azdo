@@ -1,24 +1,24 @@
 import { ScannerCLI } from '../Scanner';
-  
-  jest.mock('azure-pipelines-task-lib/task', () => ({
-    debug: jest.fn(),
-    error: jest.fn()
-  }));
 
+jest.mock('azure-pipelines-task-lib/task', () => ({
+  debug: jest.fn(),
+  error: jest.fn()
+}));
 
-  it('should return formated argument string for CLI with file mode', () => {
-    const scanner = new ScannerCLI(__dirname, {projectSettings: "DummyScanner.properties"}, 'file');
+it('should return formated argument string for CLI with file mode', () => {
+  const scanner = new ScannerCLI(__dirname, { projectSettings: 'DummyScanner.properties' }, 'file');
 
-    var actual = scanner.toCliProps();
+  const actual = scanner.toCliProps();
 
-    expect(actual).toBe("-Dproject.settings=DummyScanner.properties");
-  });
+  expect(actual).toBe('-Dproject.settings=DummyScanner.properties');
+});
 
-  
-  it('should return formated argument string for CLI with manual mode', () => {
-    const scanner = new ScannerCLI(__dirname, {projectKey: "myprojectKey"}, 'manual');
+it('should return formated argument string for CLI with manual mode', () => {
+  const scanner = new ScannerCLI(__dirname, { projectKey: 'myprojectKey' }, 'manual');
 
-    var actual = scanner.toCliProps();
+  const actual = scanner.toCliProps();
 
-    expect(actual).toBe("-Dsonar.projectKey=myprojectKey -Dsonar.projectName=undefined -Dsonar.projectVersion=undefined -Dsonar.sources=undefined");
-  });
+  expect(actual).toBe(
+    '-Dsonar.projectKey=myprojectKey -Dsonar.projectName=undefined -Dsonar.projectVersion=undefined -Dsonar.sources=undefined'
+  );
+});

@@ -32,9 +32,13 @@ it('should display warning for dedicated extension for Sonarcloud', async () => 
 });
 
 it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
-  const scannerObject = new ScannerCLI(__dirname, {
-    projectSettings: 'dummyProjectKey.properties'
-  }, 'file');
+  const scannerObject = new ScannerCLI(
+    __dirname,
+    {
+      projectSettings: 'dummyProjectKey.properties'
+    },
+    'file'
+  );
 
   jest.spyOn(tl, 'getInput').mockImplementation(() => 'CLI');
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
@@ -43,7 +47,5 @@ it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
 
   await prept.default(SQ_ENDPOINT, __dirname);
 
-  expect(process.env.SONAR_SCANNER_OPTS).toBe(
-    '-Dproject.settings=dummyProjectKey.properties'
-  );
+  expect(process.env.SONAR_SCANNER_OPTS).toBe('-Dproject.settings=dummyProjectKey.properties');
 });
