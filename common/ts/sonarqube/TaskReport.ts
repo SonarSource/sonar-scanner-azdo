@@ -40,9 +40,9 @@ export default class TaskReport {
   }
 
   public static findTaskFileReport(): string[] {
-    const taskReportGlob = path.join('**', REPORT_TASK_NAME);
+    const taskReportGlob = path.join(tl.getVariable('Build.BuildNumber'), REPORT_TASK_NAME);
     const taskReportGlobResult = tl.findMatch(
-      tl.getVariable('Agent.BuildDirectory'),
+      tl.getVariable('Agent.TempDirectory'),
       taskReportGlob
     );
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);

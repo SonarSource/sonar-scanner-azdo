@@ -30,3 +30,17 @@ it('should display warning for dedicated extension for Sonarcloud', async () => 
     'There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud'
   );
 });
+
+it('should build report task path from variables', () => {
+  const reportDirectory = 'C:\\temp\\dir';
+  const buildNumber = '20250909.1';
+
+  const reportFullPath = `${reportDirectory}\\${buildNumber}\\report-task.txt`;
+
+  jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => reportDirectory);
+  jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => buildNumber);
+
+  const actual = prept.reportPath();
+
+  expect(actual).toBe(reportFullPath);
+});
