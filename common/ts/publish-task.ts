@@ -5,6 +5,9 @@ import Metrics from './sonarqube/Metrics';
 import Task, { TimeOutReachedError } from './sonarqube/Task';
 import TaskReport from './sonarqube/TaskReport';
 import { publishBuildSummary } from './helpers/azdo-server-utils';
+import * as azdoApiUtils from './helpers/azdo-api-utils';
+
+let globalQualityGateStatus = '';
 
 export default async function publishTask(endpointType: EndpointType) {
   const params = tl.getVariable('SONARQUBE_SCANNER_PARAMS');
@@ -28,11 +31,28 @@ export default async function publishTask(endpointType: EndpointType) {
     taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
   );
 
+  if (globalQualityGateStatus === '') {
+    globalQualityGateStatus = 'ok';
+  }
+
+  fillBuildProperty();
+
   publishBuildSummary(analyses.join('\r\n'), endpoint.type);
 }
 
 function timeoutInSeconds(): number {
   return Number.parseInt(tl.getInput('pollingTimeoutSec', true), 10);
+}
+
+function fillBuildProperty() {
+  const properties: azdoApiUtils.IPropertyBag[] = [];
+
+  properties.push({
+    propertyName: 'sonar.globalqualitygate',
+    propertyValue: globalQualityGateStatus
+  });
+
+  azdoApiUtils.addBuildProperty(properties).then(() => {});
 }
 
 export async function getReportForTask(
@@ -50,6 +70,11 @@ export async function getReportForTask(
       metrics,
       projectName: task.componentName
     });
+
+    if (analysis.status === 'ERROR') {
+      globalQualityGateStatus = 'failed';
+    }
+
     return analysis.getHtmlAnalysisReport();
   } catch (e) {
     if (e instanceof TimeOutReachedError) {

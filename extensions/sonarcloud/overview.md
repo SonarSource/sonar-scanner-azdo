@@ -42,6 +42,9 @@ You can monitor the quality gate status of your projects in your favorite dashbo
 
 ![Quality Gate Widget](img/widget.png)
 
+### In Release Pipelines
+You can check the quality gate status of a build as a pre-deployment gate in release pipelines.
+
 #### In the build summary
 The **Publish Quality Gate Result** task waits for the analysis report to be consumed by the SonarCloud in order to flag the build job with the Quality Gate status. The Quality Gate is a major, out-of-the-box, feature of SonarCloud. It provides the ability to know at each analysis whether an application passes or fails the release criteria. In other words it tells you at every analysis whether an application is ready for production "quality-wise".
 
