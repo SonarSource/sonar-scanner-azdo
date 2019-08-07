@@ -52,7 +52,7 @@ Each extension provides three tasks you will use in your build definitions to an
 * **Run Code Analysis** task, to actually execute the analysis of the source code. 
    * This task is not required for Maven or Gradle projects, because scanner will be run as part of the Maven/Gradle build.
 * **Publish Quality Gate Result** task, to display the Quality Gate status in the build summary and give you a sense of whether the application is ready for production "quality-wise". 
-   * This tasks is optional. 
+   * This tasks is mandatory if you are using a release pipeline, with the {instance} quality gate status check pre-deployment gate, otherwise it's optional. 
    * It can significantly increase the overall build time because it will poll {instance} until the analysis is complete. Omitting this task will not affect the analysis results on {instance} - it simply means the Azure DevOps Build Summary page will not show the status of the analysis or a link to the project dashboard on {instance}.
  
 When creating a build definition you can filter the list of available tasks by typing "Sonar" to display only the relevant tasks.
@@ -148,17 +148,30 @@ When a build is run on a branch of your project, the extension automatically con
 If you are working with branches on TFVC projects, you still need to manually specify the branch to be used on {instance}: in the **Prepare Analysis Configuration** task, in the **Additional Properties**, you need to set `sonar.branch.name`.
 
 ### PRs
-{instance} can analyze the code of the new features and annotate your pull requests in TFS with comments to highlight issues that were found.
+{instance} can analyze the code of the new features and annotate your pull requests in Azure DevOps with comments to highlight issues that were found.
 
 Pull request analysis is supported for any type of Git repositories. To activate it:
 
 1. In the **Branch policies** page of your main development branches (e.g. "master"), add a build policy that runs your build definition
 1. Create an Azure DevOps token with "Code (read and write)" scope
-1. <!-- sonarqube -->In SonarQube, in the **[Administration > General Settings > Pull Requests](/#sonarqube-admin#/admin/settings?category=pull_request)** page,<!-- /sonarqube --><!-- sonarcloud -->In SonarCloud,<!-- /sonarcloud --> set this token in the **VSTS/TFS** section
+1. <!-- sonarqube -->In SonarQube, in the **[Administration > General Settings > Pull Requests](/#sonarqube-admin#/admin/settings?category=pull_request)** page,<!-- /sonarqube --><!-- sonarcloud -->In SonarCloud,<!-- /sonarcloud --> set this token in the **Azure DevOps** section
 
 Next time some code is pushed in the branch of a pull request, the build definition will execute a scan on the code and publish the results in {instance} which will decorate the pull request in TFS.
 
+<!-- sonarcloud -->
+## Using Release Pipelines
+You have the possibility to check the SonarCloud quality gate status in your release pipeline. It takes place as a [pre-deployment gate](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/approvals/gates?view=azure-devops).
 
+1. In the **release pipeline**, add a stage, then click on **pre-deployment conditions**.
+2. Enable the **gates**, then click on add. Choose **SonarCloud QualityGate status check**
+3. Save your pipeline.
+
+**This feature is currently in preview, and the following notes are important** :
+* The **publish quality gate result** task has to be enabled in order to get this gate working.
+* If the quality gate is in the failed state, it will not be possible to get the pre-deployment gate passing as this status will remain in its initial state. You will have to execute another build with either the current issues corrected in SonarCloud, or with another commit for fixing them.
+* Please note also that current behavior of the pre-deployment gates in Release Pipelines check every 5 minutes the status, for a duration of 1 day by default. Knowing the fact that if the SonarCloud quality gate is failed and it will remains like this on Azure DevOps, you can down this duraction to 6min at least (so the gate will be evaluated only twice), or just cancel the release itself.
+* Only the primary build artifact related QualityGate of the release will be checked.
+<!-- sonarcloud -->
 
 ## FAQ
 **Is it possible to trigger analyses on Linux or macOS agents?**  
