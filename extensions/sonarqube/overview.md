@@ -12,7 +12,6 @@ This extension provides the following features:
   * **Run Code Analysis** task, to actually execute the analysis of the source code. Not required for Maven or Gradle projects.
   * **Publish Quality Gate Result** task, to display the quality gate status in the build summary. This tasks is optional, as it can increase the overall build time.
   * Analysis of the branches and the **pull requests** of your projects
-* A **deployment gate** allowing you to control your deployment process by checking the status of the Quality Gate of the last build related to the release pipeline executed.
 
 **Note for TFS installations older than TFS 2017 Update 2**: to install the extension, please follow instructions
 available on the ["SonarQube Extension 3.0" documentation page](https://docs.sonarqube.org/display/SCAN/SonarQube+Extension+3.0).
