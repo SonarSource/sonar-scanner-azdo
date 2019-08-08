@@ -120,7 +120,7 @@ function branchName(fullName: string) {
  * query the repo to get the full name of the default branch.
  * @param collectionUrl
  */
-async function getDefaultBranch(collectionUrl: string) {
+export async function getDefaultBranch(collectionUrl: string) {
   const DEFAULT = 'refs/heads/master';
   try {
     const vsts = getWebApi(collectionUrl);

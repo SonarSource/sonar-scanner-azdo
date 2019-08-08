@@ -172,6 +172,7 @@ You have the possibility to check the SonarCloud quality gate status in your rel
 * If the quality gate is in the failed state, it will not be possible to get the pre-deployment gate passing as this status will remain in its initial state. You will have to execute another build with either the current issues corrected in SonarCloud, or with another commit for fixing them.
 * Please note also that current behavior of the pre-deployment gates in Release Pipelines check every 5 minutes the status, for a duration of 1 day by default. Knowing the fact that if the SonarCloud quality gate is failed and it will remains like this on Azure DevOps, you can decrease this duration to a maximum of 6 minutes (so the gate will be evaluated only twice), or just cancel the release itself.
 * Only the primary build artifact related QualityGate of the release will be checked.
+* During a build, if multiple analyses are performed, all of the related QualityGates are checked. If one of them has the status either WARN, ERROR or NONE, then the QualityGate status on the Release Pipeline will be failed.
 <!-- sonarcloud -->
 
 ## FAQ

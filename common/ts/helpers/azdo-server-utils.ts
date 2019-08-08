@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tl from 'azure-pipelines-task-lib/task';
+import * as azdoApiUtils from './../helpers/azdo-api-utils';
 
 export function publishBuildSummary(summary: string, endpointType = 'SonarQube') {
   uploadBuildSummary(saveBuildSummary(summary), `${endpointType} Analysis Report`);
@@ -29,6 +30,17 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
     },
     summaryPath
   );
+}
+
+export function fillBuildProperty(sonarQualityGateStatus: string) {
+  const properties: azdoApiUtils.IPropertyBag[] = [];
+
+  properties.push({
+    propertyName: 'sonarglobalqualitygate',
+    propertyValue: sonarQualityGateStatus
+  });
+
+  azdoApiUtils.addBuildProperty(properties).then(() => {});
 }
 
 export function getAuthToken() {

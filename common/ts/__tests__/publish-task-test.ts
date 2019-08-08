@@ -7,6 +7,7 @@ import Task, { TimeOutReachedError } from '../sonarqube/Task';
 import TaskReport from '../sonarqube/TaskReport';
 import * as publishTask from '../publish-task';
 import * as serverUtils from '../helpers/azdo-server-utils';
+import * as apiUtils from '../helpers/azdo-api-utils';
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -35,6 +36,180 @@ it('should fail unless SONARQUBE_SCANNER_PARAMS are supplied', async () => {
     tl.TaskResult.Failed,
     'The SonarCloud Prepare Analysis Configuration must be added.'
   );
+});
+
+it('check multiple report status and set global quality gate for build properties should be ok', async () => {
+  // Mock waiting for the ceTask to complete and return a Task
+  const returnedTaskOk = new Task({
+    analysisId: '123',
+    componentKey: 'key',
+    status: 'OK',
+    type: EndpointType.SonarCloud,
+    componentName: 'componentName'
+  });
+
+  const taskReportArray: TaskReport[] = [];
+  const taskReport = new TaskReport({
+    ceTaskId: 'string',
+    ceTaskUrl: 'string',
+    dashboardUrl: 'string',
+    projectKey: 'string',
+    serverUrl: 'string'
+  });
+
+  taskReportArray.push(taskReport);
+  taskReportArray.push(taskReport);
+
+  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => returnedTaskOk);
+  jest.spyOn(TaskReport, 'createTaskReportsFromFiles').mockImplementation(() => taskReportArray);
+
+  // Mock converting the Task into an html report
+  const returnedAnalysisOk = new Analysis(
+    { status: 'OK', conditions: [] },
+    EndpointType.SonarCloud,
+    '',
+    null,
+    null
+  );
+
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisOk);
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisOk);
+
+  jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(() => METRICS);
+
+  jest.spyOn(returnedAnalysisOk, 'getHtmlAnalysisReport').mockImplementation(() => 'dummy html');
+
+  jest.spyOn(tl, 'getInput').mockImplementation(() => 100);
+  jest.spyOn(tl, 'debug');
+
+  tl.setVariable('SONARQUBE_SCANNER_PARAMS', 'anything...');
+  tl.setVariable('SONARQUBE_ENDPOINT', SC_ENDPOINT.toJson());
+  tl.setVariable('build.artifactStagingDirectory', '');
+
+  jest.spyOn(apiUtils, 'addBuildProperty').mockImplementation(
+    () =>
+      new Promise(resolve => {
+        return resolve();
+      })
+  );
+  jest.spyOn(serverUtils, 'fillBuildProperty');
+  jest.spyOn(serverUtils, 'getAuthToken').mockImplementation(() => null);
+
+  await publishTask.default(EndpointType.SonarCloud);
+
+  expect(tl.debug).toHaveBeenCalledWith(
+    `Following QualityGate status : 'ok' has been deducted from 2 analysis(es) of this build.`
+  );
+  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith('ok');
+});
+
+it('check multiple report status and set global quality gate for build properties should be failed', async () => {
+  // Mock waiting for the ceTask to complete and return a Task
+  const returnedTaskOk = new Task({
+    analysisId: '123',
+    componentKey: 'key',
+    status: 'OK',
+    type: EndpointType.SonarCloud,
+    componentName: 'componentName'
+  });
+
+  const taskReportArray: TaskReport[] = [];
+  const taskReport = new TaskReport({
+    ceTaskId: 'string',
+    ceTaskUrl: 'string',
+    dashboardUrl: 'string',
+    projectKey: 'string',
+    serverUrl: 'string'
+  });
+
+  taskReportArray.push(taskReport);
+  taskReportArray.push(taskReport);
+  taskReportArray.push(taskReport);
+
+  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => returnedTaskOk);
+  jest.spyOn(TaskReport, 'createTaskReportsFromFiles').mockImplementation(() => taskReportArray);
+
+  // Mock converting the Task into an html report
+  const returnedAnalysisOk = new Analysis(
+    { status: 'OK', conditions: [] },
+    EndpointType.SonarCloud,
+    '',
+    null,
+    null
+  );
+
+  const returnedAnalysisError = new Analysis(
+    { status: 'ERROR', conditions: [] },
+    EndpointType.SonarCloud,
+    '',
+    null,
+    null
+  );
+
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisOk);
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisError);
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisOk);
+
+  jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(() => METRICS);
+
+  jest.spyOn(returnedAnalysisOk, 'getHtmlAnalysisReport').mockImplementation(() => 'dummy html');
+
+  tl.setVariable('SONARQUBE_SCANNER_PARAMS', 'anything...');
+  tl.setVariable('SONARQUBE_ENDPOINT', SC_ENDPOINT.toJson());
+  tl.setVariable('build.artifactStagingDirectory', '');
+
+  jest.spyOn(tl, 'getInput').mockImplementation(() => 100);
+  jest.spyOn(tl, 'debug');
+
+  jest.spyOn(apiUtils, 'addBuildProperty').mockImplementation(
+    () =>
+      new Promise(resolve => {
+        return resolve();
+      })
+  );
+  jest.spyOn(serverUtils, 'fillBuildProperty');
+  jest.spyOn(serverUtils, 'getAuthToken').mockImplementation(() => null);
+
+  await publishTask.default(EndpointType.SonarCloud);
+
+  expect(tl.debug).toHaveBeenCalledWith(
+    `Following QualityGate status : 'failed' has been deducted from 3 analysis(es) of this build.`
+  );
+  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith('failed');
+});
+
+it('get report string should return undefined if ceTask times out', async () => {
+  // Mock the ceTask timing out
+  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => {
+    throw new TimeOutReachedError();
+  });
+  jest.spyOn(Analysis, 'getAnalysis');
+  jest.spyOn(tl, 'warning').mockImplementation(() => null);
+
+  const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
+
+  expect(result).toBeUndefined();
+  expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
+  expect(tl.warning).toBeCalledWith(
+    "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result."
+  );
+  expect(Analysis.getAnalysis).not.toBeCalled();
+});
+
+it('get report string should fail for non-timeout errors', async () => {
+  // Mock the ceTask timing out
+  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => {
+    throw new InvalidApiResourceVersionError('my error');
+  });
+  jest.spyOn(Analysis, 'getAnalysis');
+  jest.spyOn(tl, 'warning').mockImplementation(() => null);
+
+  expect.assertions(1);
+  try {
+    await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
+  } catch (e) {
+    expect(e).toEqual({ message: 'my error', name: 'Invalid resource version' });
+  }
 });
 
 it('get report string for single report', async () => {
@@ -71,24 +246,6 @@ it('get report string for single report', async () => {
   });
 
   expect(result).toBe('dummy html');
-});
-
-it('get report string should return undefined if ceTask times out', async () => {
-  // Mock the ceTask timing out
-  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => {
-    throw new TimeOutReachedError();
-  });
-  jest.spyOn(Analysis, 'getAnalysis');
-  jest.spyOn(tl, 'warning').mockImplementation(() => null);
-
-  const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
-
-  expect(result).toBeUndefined();
-  expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
-  expect(tl.warning).toBeCalledWith(
-    "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result."
-  );
-  expect(Analysis.getAnalysis).not.toBeCalled();
 });
 
 it('get report string should fail for non-timeout errors', async () => {
@@ -137,6 +294,13 @@ it('task should not fail the task even if all ceTasks timeout', async () => {
     .mockImplementation(() => null);
 
   jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(() => METRICS);
+
+  jest.spyOn(apiUtils, 'addBuildProperty').mockImplementation(
+    () =>
+      new Promise(resolve => {
+        return resolve();
+      })
+  );
 
   await publishTask.default(EndpointType.SonarCloud);
 
