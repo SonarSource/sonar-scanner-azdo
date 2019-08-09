@@ -1,10 +1,10 @@
 import * as path from 'path';
 import * as tl from 'azure-pipelines-task-lib/task';
+import { Guid } from 'guid-typescript';
 import Endpoint, { EndpointType } from '../sonarqube/Endpoint';
 import * as prept from '../prepare-task';
 import * as request from '../helpers/request';
 import Scanner, { ScannerMSBuild, ScannerCLI } from '../sonarqube/Scanner';
-import { Guid } from 'guid-typescript';
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -59,7 +59,7 @@ it('should build report task path from variables', () => {
   const sonarSubDirectory = 'sonar';
   const buildNumber = '20250909.1';
 
-  var guid = Guid.create();
+  const guid = Guid.create();
 
   jest.spyOn(Guid, 'create').mockImplementation(() => guid);
 
