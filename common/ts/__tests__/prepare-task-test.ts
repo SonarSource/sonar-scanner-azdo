@@ -32,15 +32,18 @@ it('should display warning for dedicated extension for Sonarcloud', async () => 
 });
 
 it('should build report task path from variables', () => {
-  const reportDirectory = 'C:\\temp\\dir';
+  const reportDirectory = 'C:\\\\temp\\\\dir';
+  const reportDirectoryFunction = 'C:\\temp\\dir';
   const buildNumber = '20250909.1';
 
-  const reportFullPath = `${reportDirectory}\\${buildNumber}\\report-task.txt`;
+  const reportFullPath = `${reportDirectory}\\\\${buildNumber}\\\\([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})\\\\report-task\.txt`;
 
-  jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => reportDirectory);
+  const regex = new RegExp(reportFullPath);
+
+  jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => reportDirectoryFunction);
   jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => buildNumber);
 
   const actual = prept.reportPath();
 
-  expect(actual).toBe(reportFullPath);
+  expect(actual).toMatch(regex);
 });

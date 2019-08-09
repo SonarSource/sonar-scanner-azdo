@@ -1,6 +1,7 @@
 import * as semver from 'semver';
 import * as tl from 'azure-pipelines-task-lib/task';
 import * as vm from 'azure-devops-node-api';
+import { Guid } from 'guid-typescript';
 import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
 import { toCleanJSON } from './helpers/utils';
@@ -120,7 +121,7 @@ function branchName(fullName: string) {
 export function reportPath(): string {
   return `${tl.getVariable('Agent.TempDirectory')}\\${tl.getVariable(
     'Build.BuildNumber'
-  )}\\${REPORT_TASK_NAME}`;
+  )}\\${Guid.create()}\\${REPORT_TASK_NAME}`;
 }
 
 /**

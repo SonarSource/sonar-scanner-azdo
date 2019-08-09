@@ -81,7 +81,11 @@ it('should find report files', async () => {
 
   // Calculate the expected path to take account of different
   // path separators in Windows/non-Windows
-  const expectedSearchPath = path.join(tl.getVariable('Build.BuildNumber'), 'report-task.txt');
+  const expectedSearchPath = path.join(
+    tl.getVariable('Build.BuildNumber'),
+    '**',
+    'report-task.txt'
+  );
   expect(tl.findMatch).toHaveBeenCalledTimes(1);
   expect(tl.findMatch).toHaveBeenCalledWith('mock root search path', expectedSearchPath);
 });
