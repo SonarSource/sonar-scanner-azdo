@@ -82,9 +82,8 @@ it('check multiple report status and set global quality gate for build propertie
   jest.spyOn(tl, 'getInput').mockImplementation(() => 100);
   jest.spyOn(tl, 'debug');
 
-  tl.setVariable('SONARQUBE_SCANNER_PARAMS', 'anything...');
-  tl.setVariable('SONARQUBE_ENDPOINT', SC_ENDPOINT.toJson());
-  tl.setVariable('build.artifactStagingDirectory', '');
+  jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => 'anything...');
+  jest.spyOn(tl, 'getVariable').mockImplementation(() => SC_ENDPOINT.toJson());
 
   jest.spyOn(apiUtils, 'addBuildProperty').mockImplementation(
     () =>
@@ -156,9 +155,8 @@ it('check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(returnedAnalysisOk, 'getHtmlAnalysisReport').mockImplementation(() => 'dummy html');
 
-  tl.setVariable('SONARQUBE_SCANNER_PARAMS', 'anything...');
-  tl.setVariable('SONARQUBE_ENDPOINT', SC_ENDPOINT.toJson());
-  tl.setVariable('build.artifactStagingDirectory', '');
+  jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => 'anything...');
+  jest.spyOn(tl, 'getVariable').mockImplementation(() => SC_ENDPOINT.toJson());
 
   jest.spyOn(tl, 'getInput').mockImplementation(() => 100);
   jest.spyOn(tl, 'debug');
