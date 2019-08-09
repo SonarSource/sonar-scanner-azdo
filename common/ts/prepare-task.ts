@@ -1,7 +1,7 @@
+import * as path from 'path';
 import * as semver from 'semver';
 import * as tl from 'azure-pipelines-task-lib/task';
 import * as vm from 'azure-devops-node-api';
-import * as path from 'path';
 import { Guid } from 'guid-typescript';
 import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';

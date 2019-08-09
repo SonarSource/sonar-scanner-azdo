@@ -18,7 +18,7 @@ it('should display warning for dedicated extension for Sonarcloud', async () => 
     organization: 'dummyOrganization'
   });
 
-  jest.spyOn(tl, 'getVariable').mockImplementation(() => null);
+  jest.spyOn(tl, 'getVariable').mockImplementation(() => '');
   jest.spyOn(tl, 'warning').mockImplementation(() => null);
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
@@ -45,6 +45,8 @@ it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
   jest.spyOn(request, 'getServerVersion').mockImplementation(() => '7.2.0');
 
+  jest.spyOn(tl, 'getVariable').mockImplementation(() => '');
+
   await prept.default(SQ_ENDPOINT, __dirname);
 
   expect(process.env.SONAR_SCANNER_OPTS).toBe('-Dproject.settings=dummyProjectKey.properties');
@@ -53,9 +55,10 @@ it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
 it('should build report task path from variables', () => {
   const reportDirectory = 'C:\\\\temp\\\\dir';
   const reportDirectoryFunction = 'C:\\temp\\dir';
+  const sonarSubDirectory = 'sonar';
   const buildNumber = '20250909.1';
 
-  const reportFullPath = `${reportDirectory}\\\\${buildNumber}\\\\([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})\\\\report-task\.txt`;
+  const reportFullPath = `${reportDirectory}\\\\${sonarSubDirectory}\\\\${buildNumber}\\\\([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})\\\\report-task\.txt`;
 
   const regex = new RegExp(reportFullPath);
 

@@ -82,6 +82,7 @@ it('should find report files', async () => {
   // Calculate the expected path to take account of different
   // path separators in Windows/non-Windows
   const expectedSearchPath = path.join(
+    'sonar',
     tl.getVariable('Build.BuildNumber'),
     '**',
     'report-task.txt'
