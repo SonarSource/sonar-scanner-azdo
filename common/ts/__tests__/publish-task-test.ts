@@ -92,14 +92,16 @@ it('check multiple report status and set global quality gate for build propertie
         return resolve();
       })
   );
+
   jest.spyOn(serverUtils, 'fillBuildProperty');
   jest.spyOn(serverUtils, 'getAuthToken').mockImplementation(() => null);
 
+  jest.spyOn(serverUtils, 'publishBuildSummary').mockImplementation(() => null);
+
   await publishTask.default(EndpointType.SonarCloud);
 
-  expect(tl.debug).toHaveBeenCalledWith(
-    `Following QualityGate status : 'ok' has been deducted from 2 analysis(es) of this build.`
-  );
+  expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: ok`);
+  expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 2`);
   expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith('ok');
 });
 
@@ -170,11 +172,12 @@ it('check multiple report status and set global quality gate for build propertie
   jest.spyOn(serverUtils, 'fillBuildProperty');
   jest.spyOn(serverUtils, 'getAuthToken').mockImplementation(() => null);
 
+  jest.spyOn(serverUtils, 'publishBuildSummary').mockImplementation(() => null);
+
   await publishTask.default(EndpointType.SonarCloud);
 
-  expect(tl.debug).toHaveBeenCalledWith(
-    `Following QualityGate status : 'failed' has been deducted from 3 analysis(es) of this build.`
-  );
+  expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: failed`);
+  expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 3`);
   expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith('failed');
 });
 

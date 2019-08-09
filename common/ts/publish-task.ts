@@ -35,11 +35,8 @@ export default async function publishTask(endpointType: EndpointType) {
     globalQualityGateStatus = 'ok';
   }
 
-  tl.debug(
-    `Following QualityGate status : '${globalQualityGateStatus}' has been deducted from ${
-      taskReports.length
-    } analysis(es) of this build.`
-  );
+  tl.debug(`Number of analyses in this build: ${taskReports.length}`);
+  tl.debug(`Overall Quality Gate status: ${globalQualityGateStatus}`);
 
   fillBuildProperty(globalQualityGateStatus);
 
