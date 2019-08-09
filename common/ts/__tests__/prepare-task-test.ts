@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as tl from 'azure-pipelines-task-lib/task';
 import Endpoint, { EndpointType } from '../sonarqube/Endpoint';
 import * as prept from '../prepare-task';
@@ -53,16 +54,21 @@ it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
 });
 
 it('should build report task path from variables', () => {
-  const reportDirectory = 'C:\\\\temp\\\\dir';
-  const reportDirectoryFunction = 'C:\\temp\\dir';
+  const reportDirectory = path.join('C:', 'temp', 'dir');
   const sonarSubDirectory = 'sonar';
   const buildNumber = '20250909.1';
 
-  const reportFullPath = `${reportDirectory}\\\\${sonarSubDirectory}\\\\${buildNumber}\\\\([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})\\\\report-task\.txt`;
+  const reportFullPath = path.join(
+    reportDirectory,
+    sonarSubDirectory,
+    buildNumber,
+    '\\([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})',
+    'report-task.txt'
+  );
 
-  const regex = new RegExp(reportFullPath);
+  const regex = new RegExp(reportFullPath.replace(/\\/g, '\\\\'));
 
-  jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => reportDirectoryFunction);
+  jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => reportDirectory);
   jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => buildNumber);
 
   const actual = prept.reportPath();
