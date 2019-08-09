@@ -13,7 +13,7 @@ This extension provides the following features:
   * **Publish Quality Gate Result** task, to display the quality gate status in the build summary. This tasks is optional, as it can increase the overall build time.
 * Analysis of the branches and the **pull requests** of your projects
 * A **widget** to monitor the quality gate for your projects on your favorite dashboard
-* A **deployment gate** allowing you to control your deployment process by checking the status of the Quality Gate of the last build related to the release pipeline executed.
+* A **deployment gate (in preview)** allowing you to control your deployment process by checking the status of the Quality Gate of the last build related to the release pipeline executed.
 
 Note that the above features are **available for all Git repository providers in Azure DevOps**: Azure Repos Git, Bitbucket Cloud or GitHub.
 
@@ -42,7 +42,7 @@ You can monitor the quality gate status of your projects in your favorite dashbo
 
 ![Quality Gate Widget](img/widget.png)
 
-### In Release Pipelines
+### In Release Pipelines (Preview)
 You can check the quality gate status of a build as a pre-deployment gate in release pipelines.
 
 #### In the build summary
