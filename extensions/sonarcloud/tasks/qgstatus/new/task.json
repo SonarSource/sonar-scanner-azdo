@@ -14,21 +14,18 @@
     "Patch": 0
   },
   "preview": "true",
-  "inputs": [
-  ],
+  "inputs": [],
   "instanceNameFormat": "Check SonarCloud Quality Gate Status",
   "execution": {
     "HttpRequest": {
-      "Execute": [
-        {
-          "RequestInputs": {
-            "EndpointUrl": "$(system.teamFoundationCollectionUri)$(system.teamProjectId)/_apis/build/builds/$(build.buildid)/properties?api-version=5.0-preview.1",
-            "Method": "GET",
-            "Headers": "{\n\"Content-Type\":\"application/json\", \n\"Authorization\": \"Bearer  $(system.accesstoken)\"\n}",
-            "Expression": "eq(jsonpath('$..[''sonar.globalqualitygate''].[''$value'']')[0], 'ok')"
-          }
-        }
-      ]
+      "Execute": {
+        "EndpointUrl":
+          "$(system.teamFoundationCollectionUri)$(system.teamProjectId)/_apis/build/builds/$(build.buildId)/properties?api-version=5.0-preview.1",
+        "Method": "GET",
+        "Headers":
+          "{\n\"Content-Type\":\"application/json\", \n\"Authorization\": \"Bearer  $(system.accesstoken)\"\n}",
+        "Expression": "eq(jsonpath('$..sonarglobalqualitygate.[''$value'']')[0], 'ok')"
+      }
     }
   }
 }
