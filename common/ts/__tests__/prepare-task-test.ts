@@ -4,6 +4,7 @@ import Endpoint, { EndpointType } from '../sonarqube/Endpoint';
 import * as prept from '../prepare-task';
 import * as request from '../helpers/request';
 import Scanner, { ScannerMSBuild, ScannerCLI } from '../sonarqube/Scanner';
+import { Guid } from 'guid-typescript';
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -58,20 +59,22 @@ it('should build report task path from variables', () => {
   const sonarSubDirectory = 'sonar';
   const buildNumber = '20250909.1';
 
+  var guid = Guid.create();
+
+  jest.spyOn(Guid, 'create').mockImplementation(() => guid);
+
   const reportFullPath = path.join(
     reportDirectory,
     sonarSubDirectory,
     buildNumber,
-    '\\([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})',
+    guid.toString(),
     'report-task.txt'
   );
-
-  const regex = new RegExp(reportFullPath.replace(/\\/g, '\\\\'));
 
   jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => reportDirectory);
   jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => buildNumber);
 
   const actual = prept.reportPath();
 
-  expect(actual).toMatch(regex);
+  expect(actual).toEqual(reportFullPath);
 });
