@@ -11,7 +11,7 @@ url: /analysis/scan/sonarscanner-for-azure-devops/
 The <!-- sonarqube -->[SonarQube](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube)<!-- /sonarqube --> <!-- sonarcloud -->[SonarCloud](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud)<!-- /sonarcloud --> extension for Azure DevOps <!-- sonarqube -->Server<!-- /sonarqube --> makes it easy to integrate analysis into your build pipeline. The extension allows the analysis of all languages supported by {instance}.
 
 <!-- sonarcloud -->
-Microsoft has published a [dedicated lab](https://aka.ms/sonarcloudlab) describing how to integrate Azure DevOps Pipelines and SonarCloud. The lab includes setting up a Branch Policy in Azure DevOps to block a Pull Request from being submitted if the changed code does not meet the quality bar.
+Microsoft has published a [dedicated lab](https://aka.ms/sonarcloudlab) describing how to integrate Azure DevOps Pipelines and SonarCloud. The lab includes setting up a Branch Policy in Azure DevOps to block a Pull Request from being submitted if the changed code does not meet the quality bar, as well as setting up the newest pre-deployement gate available from 1.8+ version of the extension.
 <!-- /sonarcloud -->
 
 <!-- sonarqube -->
@@ -160,10 +160,10 @@ Next time some code is pushed in the branch of a pull request, the build definit
 
 <!-- sonarcloud -->
 ## Using Release Pipelines
-You have the possibility to check the SonarCloud quality gate status in your release pipeline. It takes place as a [pre-deployment gate](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/approvals/gates?view=azure-devops).
+You have the possibility to check the SonarCloud Quality Gate status in your release pipeline. It takes place as a [pre-deployment gate](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/approvals/gates?view=azure-devops).
 
 1. In the **release pipeline**, add a stage, then click on **pre-deployment conditions**.
-2. Enable the **gates**, then click on add. Choose **SonarCloud QualityGate status check**
+2. Enable the **gates**, then click on add. Choose **SonarCloud Quality Gate status check**
 3. Save your pipeline.
 
 **This feature is currently in preview, and the following notes are important** :
@@ -171,8 +171,8 @@ You have the possibility to check the SonarCloud quality gate status in your rel
 * The **Publish Quality Gate Result** task (in your build pipeline) has to be enabled in order to get this gate working.
 * If the quality gate is in the failed state, it will not be possible to get the pre-deployment gate passing as this status will remain in its initial state. You will have to execute another build with either the current issues corrected in SonarCloud, or with another commit for fixing them.
 * Please note also that current behavior of the pre-deployment gates in Release Pipelines check every 5 minutes the status, for a duration of 1 day by default. Knowing the fact that if the SonarCloud quality gate is failed and it will remains like this on Azure DevOps, you can decrease this duration to a maximum of 6 minutes (so the gate will be evaluated only twice), or just cancel the release itself.
-* Only the primary build artifact related QualityGate of the release will be checked.
-* During a build, if multiple analyses are performed, all of the related QualityGates are checked. If one of them has the status either WARN, ERROR or NONE, then the QualityGate status on the Release Pipeline will be failed.
+* Only the primary build artifact related Quality Gate of the release will be checked.
+* During a build, if multiple analyses are performed, all of the related Quality Gates are checked. If one of them has the status either WARN, ERROR or NONE, then the Quality Gate status on the Release Pipeline will be failed.
 <!-- sonarcloud -->
 
 ## FAQ
