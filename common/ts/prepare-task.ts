@@ -48,7 +48,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   );
 
   if (scannerMode === ScannerMode.CLI) {
-    tl.setVariable('SONAR_SCANNER_OPTS', scanner.toCliProps());
+    const actualSonarOpts = tl.getVariable('SONAR_SCANNER_OPTS') + ' ';
+    tl.setVariable('SONAR_SCANNER_OPTS', actualSonarOpts + scanner.toCliProps());
   }
 
   await scanner.runPrepare();
