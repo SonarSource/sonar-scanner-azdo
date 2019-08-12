@@ -8,7 +8,7 @@
     "azure-devops-node-api": "^9.0.1",
     "azure-pipelines-task-lib": "^2.8.0",
     "fs-extra": "5.0.0",
-    "jsonpath": "^1.0.2",
+    "guid-typescript": "1.0.9",
     "request": "2.85.0",
     "request-promise-native": "^1.0.7",
     "semver": "5.5.0"
