@@ -1,8 +1,8 @@
 {
   "id": "6350bfb8-c310-4cdd-af68-722f33cf440a",
   "name": "SonarCloudQualityGateCheck",
-  "friendlyName": "SonarCloud QualityGate status check",
-  "description": "SonarCloud QualityGate status check for a build.",
+  "friendlyName": "SonarCloud Quality Gate status check",
+  "description": "SonarCloud Quality Gate status check for a build.",
   "helpMarkDown": "",
   "category": "Deploy",
   "visibility": ["Release"],
@@ -15,7 +15,7 @@
   },
   "preview": "true",
   "inputs": [],
-  "instanceNameFormat": "Check SonarCloud Quality Gate Status",
+  "instanceNameFormat": "Check SonarCloud Quality Gate status",
   "execution": {
     "HttpRequest": {
       "Execute": {
