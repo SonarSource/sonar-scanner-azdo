@@ -3,6 +3,7 @@ import * as fs from 'fs-extra';
 import * as tl from 'azure-pipelines-task-lib/task';
 
 export const REPORT_TASK_NAME = 'report-task.txt';
+export const SONAR_TEMP_DIRECTORY_NAME = 'sonar';
 
 interface ITaskReport {
   ceTaskId: string;
@@ -40,9 +41,14 @@ export default class TaskReport {
   }
 
   public static findTaskFileReport(): string[] {
-    const taskReportGlob = path.join('**', REPORT_TASK_NAME);
+    const taskReportGlob = path.join(
+      SONAR_TEMP_DIRECTORY_NAME,
+      tl.getVariable('Build.BuildNumber'),
+      '**',
+      REPORT_TASK_NAME
+    );
     const taskReportGlobResult = tl.findMatch(
-      tl.getVariable('Agent.BuildDirectory'),
+      tl.getVariable('Agent.TempDirectory'),
       taskReportGlob
     );
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);

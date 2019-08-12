@@ -76,12 +76,17 @@ it('should find report files', async () => {
   expect(reportFiles[0]).toBe('path1');
   expect(reportFiles[1]).toBe('path2');
 
-  expect(tl.getVariable).toHaveBeenCalledTimes(1);
-  expect(tl.getVariable).toBeCalledWith('Agent.BuildDirectory');
+  expect(tl.getVariable).toHaveBeenCalledTimes(2);
+  expect(tl.getVariable).toBeCalledWith('Agent.TempDirectory');
 
   // Calculate the expected path to take account of different
   // path separators in Windows/non-Windows
-  const expectedSearchPath = path.join('**', 'report-task.txt');
+  const expectedSearchPath = path.join(
+    'sonar',
+    tl.getVariable('Build.BuildNumber'),
+    '**',
+    'report-task.txt'
+  );
   expect(tl.findMatch).toHaveBeenCalledTimes(1);
   expect(tl.findMatch).toHaveBeenCalledWith('mock root search path', expectedSearchPath);
 });
