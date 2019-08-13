@@ -97,6 +97,14 @@
       }
     },
     {
+      "id": "6350bfb8-c310-4cdd-af68-722f33cf440a",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "tasks/qgstatus"
+      }
+    },
+    {
       "id": "3c598f25-01c1-4c09-97c6-926476882688",
       "type": "ms.vss-dashboards-web.widget",
       "targets": ["ms.vss-dashboards-web.widget-catalog", ".e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"],

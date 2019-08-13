@@ -7,6 +7,7 @@ import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
 import { toCleanJSON } from './helpers/utils';
 import { getServerVersion } from './helpers/request';
+import { getAuthToken } from './helpers/azdo-server-utils';
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from './sonarqube/TaskReport';
 
 const REPO_NAME_VAR = 'Build.Repository.Name';
@@ -52,7 +53,9 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   );
 
   if (scannerMode === ScannerMode.CLI) {
-    tl.setVariable('SONAR_SCANNER_OPTS', scanner.toCliProps());
+    let actualSonarOpts = tl.getVariable('SONAR_SCANNER_OPTS');
+    actualSonarOpts = actualSonarOpts.concat(' ', scanner.toCliProps()).trim();
+    tl.setVariable('SONAR_SCANNER_OPTS', actualSonarOpts);
   }
 
   await scanner.runPrepare();
@@ -138,7 +141,7 @@ export function reportPath(): string {
  * query the repo to get the full name of the default branch.
  * @param collectionUrl
  */
-async function getDefaultBranch(collectionUrl: string) {
+export async function getDefaultBranch(collectionUrl: string) {
   const DEFAULT = 'refs/heads/master';
   try {
     const vsts = getWebApi(collectionUrl);
@@ -159,13 +162,4 @@ function getWebApi(collectionUrl: string): vm.WebApi {
   const accessToken = getAuthToken();
   const credentialHandler = vm.getBearerHandler(accessToken);
   return new vm.WebApi(collectionUrl, credentialHandler);
-}
-
-function getAuthToken() {
-  const auth = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false);
-  if (auth.scheme.toLowerCase() === 'oauth') {
-    return auth.parameters['AccessToken'];
-  } else {
-    throw new Error('Unable to get credential to perform rest API calls');
-  }
 }

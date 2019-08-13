@@ -1,0 +1,31 @@
+{
+  "id": "6350bfb8-c310-4cdd-af68-722f33cf440a",
+  "name": "SonarCloudQualityGateCheck",
+  "friendlyName": "SonarCloud Quality Gate status check",
+  "description": "SonarCloud Quality Gate status check for a build.",
+  "helpMarkDown": "",
+  "category": "Deploy",
+  "visibility": ["Release"],
+  "runsOn": ["ServerGate"],
+  "author": "sonarsource",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "preview": "true",
+  "inputs": [],
+  "instanceNameFormat": "Check SonarCloud Quality Gate status",
+  "execution": {
+    "HttpRequest": {
+      "Execute": {
+        "EndpointUrl":
+          "$(system.teamFoundationCollectionUri)$(system.teamProjectId)/_apis/build/builds/$(build.buildId)/properties?api-version=5.0-preview.1",
+        "Method": "GET",
+        "Headers":
+          "{\n\"Content-Type\":\"application/json\", \n\"Authorization\": \"Bearer  $(system.accesstoken)\"\n}",
+        "Expression": "eq(jsonpath('$..sonarglobalqualitygate.[''$value'']')[0], 'ok')"
+      }
+    }
+  }
+}

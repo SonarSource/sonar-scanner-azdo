@@ -44,7 +44,7 @@
       },
       {
         "environment": {},
-        "enabled": false,
+        "enabled": true,
         "continueOnError": false,
         "alwaysRun": false,
         "timeoutInMinutes": 0,
