@@ -39,7 +39,10 @@
     "ts-jest": "24.0.2",
     "typescript": "3.5.3",
     "typescript-eslint-parser": "22.0.0",
-    "yargs": "11.0.0"
+    "yargs": "11.0.0",
+    "@types/jest-when": "2.4.1",
+    "@types/yargs": "13.0.2",
+    "jest-when": "2.6.0"
   },
   "scripts": {
     "build": "./node_modules/.bin/gulp build",
