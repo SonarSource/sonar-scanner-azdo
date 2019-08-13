@@ -53,7 +53,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   );
 
   if (scannerMode === ScannerMode.CLI) {
-    let actualSonarOpts = tl.getVariable('SONAR_SCANNER_OPTS');
+    let actualSonarOpts = tl.getVariable('SONAR_SCANNER_OPTS') || '';
     actualSonarOpts = actualSonarOpts.concat(' ', scanner.toCliProps()).trim();
     tl.setVariable('SONAR_SCANNER_OPTS', actualSonarOpts);
   }
@@ -69,7 +69,7 @@ async function branchFeatureSupported(endpoint) {
   return serverVersion >= semver.parse('7.2.0');
 }
 
-async function populateBranchAndPrProps(props: { [key: string]: string }) {
+export async function populateBranchAndPrProps(props: { [key: string]: string }) {
   const collectionUrl = tl.getVariable('System.TeamFoundationCollectionUri');
   const prId = tl.getVariable('System.PullRequest.PullRequestId');
   const provider = tl.getVariable('Build.Repository.Provider');

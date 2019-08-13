@@ -5,7 +5,7 @@
   "license": "LGPL-3.0",
   "devDependencies": {
     "@types/fs-extra": "5.0.2",
-    "@types/jest": "22.2.3",
+    "@types/jest": "24.0.17",
     "@types/node": "8.0.19",
     "@types/request": "2.47.0",
     "@types/semver": "5.5.0",
@@ -29,16 +29,16 @@
     "gulp-sequence": "1.0.0",
     "gulp-typescript": "4.0.2",
     "gulp-util": "3.0.8",
-    "jest": "22.4.3",
+    "jest": "^24.8.0",
     "prettier": "1.12.1",
     "request": "2.85.0",
     "semver": "5.5.0",
     "sonarqube-scanner": "2.5.0",
     "tfx-cli": "0.7.8",
     "tmp": "0.0.33",
-    "ts-jest": "22.4.4",
-    "typescript": "2.8.3",
-    "typescript-eslint-parser": "15.0.0",
+    "ts-jest": "24.0.2",
+    "typescript": "3.5.3",
+    "typescript-eslint-parser": "22.0.0",
     "yargs": "11.0.0"
   },
   "scripts": {
@@ -64,9 +64,9 @@
   "jest": {
     "clearMocks": true,
     "collectCoverageFrom": [
-      "{common}**/*.ts"
+      "common/**/*.ts"
     ],
-    "coverageDirectory": "<rootDir>/coverage",
+    "coverageDirectory": "/coverage",
     "coverageReporters": [
       "lcovonly",
       "text"
@@ -76,14 +76,14 @@
       "js"
     ],
     "testPathIgnorePatterns": [
-      "/node_modules",
+      "<rootDir>/node_modules",
       "<rootDir>/config",
       "<rootDir>/build"
     ],
     "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
     "testURL": "http://localhost/",
     "transform": {
-      ".(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".(ts)$": "ts-jest"
     }
   },
   "prettier": {
