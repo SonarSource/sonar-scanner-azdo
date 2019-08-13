@@ -91,7 +91,6 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@types/jest-when": "2.4.1",
     "azure-pipelines-task-lib": "^2.8.0"
   }
 }

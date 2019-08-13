@@ -26,18 +26,9 @@ it('should display warning for dedicated extension for Sonarcloud', async () => 
   jest.spyOn(tl, 'warning').mockImplementation(() => null);
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
-  jest.spyOn(request, 'getServerVersion').mockImplementation(
-    () =>
-      new Promise<SemVer>(resolve => {
-        return resolve(new SemVer('7.2.0'));
-      })
-  );
-  jest.spyOn(prept, 'getDefaultBranch').mockImplementation(
-    () =>
-      new Promise<string>(resolve => {
-        return resolve('refs/heads/master');
-      })
-  );
+  jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
+
+  jest.spyOn(prept, 'getDefaultBranch').mockResolvedValue('refs/heads/master');
 
   await prept.default(SQ_ENDPOINT, __dirname);
 
@@ -58,12 +49,7 @@ it('should concat SONAR_SCANNER_OPTS with existing value', async () => {
   jest.spyOn(tl, 'getInput').mockImplementation(() => 'CLI');
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
-  jest.spyOn(request, 'getServerVersion').mockImplementation(
-    () =>
-      new Promise<SemVer>(resolve => {
-        return resolve(new SemVer('7.2.0'));
-      })
-  );
+  jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
 
   const getVariable = jest.spyOn(tl, 'getVariable');
   when(getVariable)
@@ -95,12 +81,7 @@ it('should concat SONAR_SCANNER_OPTS with non existing value', async () => {
   jest.spyOn(tl, 'getInput').mockImplementation(() => 'CLI');
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
-  jest.spyOn(request, 'getServerVersion').mockImplementation(
-    () =>
-      new Promise<SemVer>(resolve => {
-        return resolve(new SemVer('7.2.0'));
-      })
-  );
+  jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
 
   const getVariable = jest.spyOn(tl, 'getVariable');
   when(getVariable)
@@ -130,12 +111,7 @@ it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
   jest.spyOn(tl, 'getInput').mockImplementation(() => 'CLI');
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
-  jest.spyOn(request, 'getServerVersion').mockImplementation(
-    () =>
-      new Promise<SemVer>(resolve => {
-        return resolve(new SemVer('7.2.0'));
-      })
-  );
+  jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
 
   jest.spyOn(tl, 'getVariable').mockImplementation(() => '');
 
