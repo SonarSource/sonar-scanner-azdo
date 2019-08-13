@@ -60,8 +60,18 @@ it('check multiple report status and set global quality gate for build propertie
   taskReportArray.push(taskReport);
   taskReportArray.push(taskReport);
 
-  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => returnedTaskOk);
-  jest.spyOn(TaskReport, 'createTaskReportsFromFiles').mockImplementation(() => taskReportArray);
+  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(
+    () =>
+      new Promise<Task>(resolve => {
+        return resolve(returnedTaskOk);
+      })
+  );
+  jest.spyOn(TaskReport, 'createTaskReportsFromFiles').mockImplementation(
+    () =>
+      new Promise<TaskReport[]>(resolve => {
+        return resolve(taskReportArray);
+      })
+  );
 
   // Mock converting the Task into an html report
   const returnedAnalysisOk = new Analysis(
@@ -72,14 +82,29 @@ it('check multiple report status and set global quality gate for build propertie
     null
   );
 
-  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisOk);
-  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisOk);
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(
+    () =>
+      new Promise<Analysis>(resolve => {
+        return resolve(returnedAnalysisOk);
+      })
+  );
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(
+    () =>
+      new Promise<Analysis>(resolve => {
+        return resolve(returnedAnalysisOk);
+      })
+  );
 
-  jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(() => METRICS);
+  jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(
+    () =>
+      new Promise<Metrics>(resolve => {
+        return resolve(METRICS);
+      })
+  );
 
   jest.spyOn(returnedAnalysisOk, 'getHtmlAnalysisReport').mockImplementation(() => 'dummy html');
 
-  jest.spyOn(tl, 'getInput').mockImplementation(() => 100);
+  jest.spyOn(tl, 'getInput').mockImplementation(() => '100');
   jest.spyOn(tl, 'debug');
 
   jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => 'anything...');
@@ -127,8 +152,19 @@ it('check multiple report status and set global quality gate for build propertie
   taskReportArray.push(taskReport);
   taskReportArray.push(taskReport);
 
-  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => returnedTaskOk);
-  jest.spyOn(TaskReport, 'createTaskReportsFromFiles').mockImplementation(() => taskReportArray);
+  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(
+    () =>
+      new Promise<Task>(resolve => {
+        return resolve(returnedTaskOk);
+      })
+  );
+
+  jest.spyOn(TaskReport, 'createTaskReportsFromFiles').mockImplementation(
+    () =>
+      new Promise<TaskReport[]>(resolve => {
+        return resolve(taskReportArray);
+      })
+  );
 
   // Mock converting the Task into an html report
   const returnedAnalysisOk = new Analysis(
@@ -147,18 +183,38 @@ it('check multiple report status and set global quality gate for build propertie
     null
   );
 
-  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisOk);
-  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisError);
-  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(() => returnedAnalysisOk);
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(
+    () =>
+      new Promise<Analysis>(resolve => {
+        return resolve(returnedAnalysisOk);
+      })
+  );
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(
+    () =>
+      new Promise<Analysis>(resolve => {
+        return resolve(returnedAnalysisError);
+      })
+  );
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementationOnce(
+    () =>
+      new Promise<Analysis>(resolve => {
+        return resolve(returnedAnalysisOk);
+      })
+  );
 
-  jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(() => METRICS);
+  jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(
+    () =>
+      new Promise<Metrics>(resolve => {
+        return resolve(METRICS);
+      })
+  );
 
   jest.spyOn(returnedAnalysisOk, 'getHtmlAnalysisReport').mockImplementation(() => 'dummy html');
 
   jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => 'anything...');
   jest.spyOn(tl, 'getVariable').mockImplementation(() => SC_ENDPOINT.toJson());
 
-  jest.spyOn(tl, 'getInput').mockImplementation(() => 100);
+  jest.spyOn(tl, 'getInput').mockImplementation(() => '100');
   jest.spyOn(tl, 'debug');
 
   jest.spyOn(apiUtils, 'addBuildProperty').mockImplementation(
@@ -222,8 +278,12 @@ it('get report string for single report', async () => {
     type: EndpointType.SonarQube,
     componentName: 'componentName'
   });
-  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => returnedTask);
-
+  jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(
+    () =>
+      new Promise<Task>(resolve => {
+        return resolve(returnedTask);
+      })
+  );
   // Mock converting the Task into an html report
   const returnedAnalysis = new Analysis(
     { status: '', conditions: [] },
@@ -232,7 +292,12 @@ it('get report string for single report', async () => {
     null,
     null
   );
-  jest.spyOn(Analysis, 'getAnalysis').mockImplementation(() => returnedAnalysis);
+  jest.spyOn(Analysis, 'getAnalysis').mockImplementation(
+    () =>
+      new Promise<Analysis>(resolve => {
+        return resolve(returnedAnalysis);
+      })
+  );
   jest.spyOn(returnedAnalysis, 'getHtmlAnalysisReport').mockImplementation(() => 'dummy html');
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
@@ -283,9 +348,12 @@ it('task should not fail the task even if all ceTasks timeout', async () => {
   tl.setVariable('SONARQUBE_ENDPOINT', SC_ENDPOINT.toJson());
 
   // Mock finding two report files to process
-  jest
-    .spyOn(TaskReport, 'createTaskReportsFromFiles')
-    .mockImplementation(() => [TASK_REPORT, taskReport2]);
+  jest.spyOn(TaskReport, 'createTaskReportsFromFiles').mockImplementation(
+    () =>
+      new Promise<TaskReport[]>(resolve => {
+        return resolve([TASK_REPORT, taskReport2]);
+      })
+  );
 
   jest.spyOn(Task, 'waitForTaskCompletion').mockImplementation(() => {
     throw new TimeOutReachedError();
@@ -294,7 +362,12 @@ it('task should not fail the task even if all ceTasks timeout', async () => {
     .spyOn(serverUtils, 'publishBuildSummary')
     .mockImplementation(() => null);
 
-  jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(() => METRICS);
+  jest.spyOn(Metrics, 'getAllMetrics').mockImplementation(
+    () =>
+      new Promise<Metrics>(resolve => {
+        return resolve(METRICS);
+      })
+  );
 
   jest.spyOn(apiUtils, 'addBuildProperty').mockImplementation(
     () =>
