@@ -57,7 +57,9 @@ Each extension provides three tasks you will use in your build pipeline to analy
 * **Run Code Analysis** task, to actually execute the analysis of the source code. 
    * This task is not required for Maven or Gradle projects, because scanner will be run as part of the Maven/Gradle build.
 * **Publish Quality Gate Result** task, to display the Quality Gate status in the build summary and give you a sense of whether the application is ready for production "quality-wise". 
-   * This task is required if you are using the {instance} quality gate status pre-deployment gate in a release pipeline, otherwise it is optional.
+  
+   <!-- sonarcloud -->* This task is required if you are using the SonarCloud quality gate status pre-deployment gate in a release pipeline, otherwise it is optional.<!-- /sonarcloud -->
+   <!-- sonarqube -->* This task is optional <!-- sonarqube -->
    * It can significantly increase the overall build time because it will poll {instance} until the analysis is complete. Omitting this task will not affect the analysis results on {instance} - it simply means the Azure DevOps Build Summary page will not show the status of the analysis or a link to the project dashboard on {instance}.
  
 When creating a build pipeline you can filter the list of available tasks by typing "Sonar" to display only the relevant tasks.
@@ -65,12 +67,12 @@ When creating a build pipeline you can filter the list of available tasks by typ
 ## Analyzing a .NET solution
 1. In your build definition, add:
    * At least **Prepare analysis Configuration** task and **Run Code Analysis** task
-   * Optionally **Publish Quality Gate Result** task
-1. Reorder the tasks to respect the following order:
-   * **Prepare analysis Configuration** task before any **MSBuild** or **Visual Studio Build** tasks.
+   * Optionally **Publish Quality Gate Result** task <!-- sonarcloud --> (required if you want to check the Quality Gate in a release pipeline). <!-- sonarcloud -->
+2. Reorder the tasks to respect the following order:
+   * **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** task before any **MSBuild** or **Visual Studio Build** tasks.
    * **Run Code Analysis** task after the **Visual Studio Test task**.
    * **Publish Quality Gate Result** task after the **Run Code Analysis** task
-1. Click on the **Prepare analysis Configuration** build step to configure it:
+3. Click on the **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** build step to configure it:
    * You must specify the service connection (i.e. {instance}) to use. You can:
       * select an existing endpoint from the drop down list
       * add a new endpoint
@@ -80,18 +82,18 @@ When creating a build pipeline you can filter the list of available tasks by typ
       * **Project Key** - the unique project key in {instance}
       * **Project Name** - the name of the project in {instance}
       * **Project Version** - the version of the project in {instance}
-1. Click the **Visual Studio Test** task and check the **Code Coverage Enabled** checkbox to process the code coverage and have it imported into {instance}. (Optional but recommended)
+4. Click the **Visual Studio Test** task and check the **Code Coverage Enabled** checkbox to process the code coverage and have it imported into {instance}. (Optional but recommended)
 
 Once all this is done, you can trigger a build.
 
 ## Analyzing a Java project with Maven or Gradle
 1. In your build definition, add:
    * At least **Prepare analysis Configuration** task
-   * Optionally **Publish Quality Gate Result** task
+   * Optionally **Publish Quality Gate Result** task <!-- sonarcloud --> (required if you want to check the Quality Gate in a release pipeline). <!-- sonarcloud -->
 1. Reorder the tasks to respect the following order:
-   * **Prepare analysis Configuration** task before the **Maven** or **Gradle** task.
+   * **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** task before the **Maven** or **Gradle** task.
    * **Publish Quality Gate Result** task after the **Maven** or **Gradle** task.
-1. Click on the **Prepare analysis Configuration** task to configure it:
+1. Click on the **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** task to configure it:
    * You must specify the service connection (i.e. {instance}) to use. You can:
       * select an existing endpoint from the drop down list
       * add a new endpoint
@@ -111,9 +113,9 @@ Once all this is done, you can trigger a build.
    ```
 2. In your build pipeline, add:
    * At least **Prepare analysis Configuration** task, **Run Code Analysis** task and the **Command Line** task
-   * Optionally **Publish Quality Gate Result** task
+   * Optionally **Publish Quality Gate Result** task <!-- sonarcloud --> (required if you want to check the Quality Gate in a release pipeline). <!-- sonarcloud -->
 3. Reorder the tasks to respect the following order:
-   * **Prepare analysis Configuration** task before **Command Line** task.
+   * **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** task before **Command Line** task.
    * **Run Code Analysis** task after the **Command Line** task.
    * **Publish Quality Gate Result** task after the **Run Code Analysis** task
 4. On the **Command Line** task
@@ -121,7 +123,7 @@ Once all this is done, you can trigger a build.
    ```
    path/to/build-wrapper-win-x86-64.exe --out-dir <output directory> MSBuild.exe /t:Rebuild
    ```
-5. Click on the **Prepare analysis Configuration** task to configure it:
+5. Click on the **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** task to configure it:
    * Select the <!-- sonarcloud -->**SonarCloud Service Endpoint**<!-- /sonarcloud --><!-- sonarqube -->**SonarQube Server**<!-- /sonarqube -->
    <!-- sonarcloud -->* Select your SonarCloud organization<!-- /sonarcloud -->
    * In *Additional Properties* in the *Advanced* section, add the property `sonar.cfamily.build-wrapper-output` with the value of the directory you specified: `sonar.cfamily.build-wrapper-output=<output directory>`
@@ -135,10 +137,10 @@ If you are not developing a .NET application or a Java project, here is the stan
    * At least **Prepare analysis Configuration** task and **Run Code Analysis** task
    * Optionally **Publish Quality Gate Result** task (required if you want to check the Quality Gate in a release pipeline).
 2. Reorder the tasks to respect the following order:
-   1. **Prepare analysis Configuration**
+   1. **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->**
    2. **Run Code Analysis**
    3. **Publish Quality Gate Result**
-3. Click on the **Prepare analysis Configuration** task to configure it:
+3. Click on the **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** task to configure it:
    * Select the <!-- sonarcloud -->**SonarCloud Service Endpoint**<!-- /sonarcloud --><!-- sonarqube -->**SonarQube Server**<!-- /sonarqube -->
    <!-- sonarcloud -->* Select your SonarCloud organization<!-- /sonarcloud -->
    * Select **Use standalone scanner**
