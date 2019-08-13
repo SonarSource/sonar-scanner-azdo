@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { Guid } from 'guid-typescript';
-import { when } from 'jest-when';
 import { SemVer } from 'semver';
+import { when } from 'jest-when';
 import Endpoint, { EndpointType } from '../sonarqube/Endpoint';
 import * as prept from '../prepare-task';
 import * as request from '../helpers/request';
