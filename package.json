@@ -64,9 +64,9 @@
   "jest": {
     "clearMocks": true,
     "collectCoverageFrom": [
-      "{common}**/*.ts"
+      "common/**/*.ts"
     ],
-    "coverageDirectory": "<rootDir>/coverage",
+    "coverageDirectory": "/coverage",
     "coverageReporters": [
       "lcovonly",
       "text"
@@ -83,7 +83,7 @@
     "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
     "testURL": "http://localhost/",
     "transform": {
-      ".(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".(ts)$": "ts-jest"
     }
   },
   "prettier": {
