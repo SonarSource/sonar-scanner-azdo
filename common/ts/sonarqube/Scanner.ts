@@ -16,10 +16,6 @@ export default class Scanner {
     return {};
   }
 
-  public toCliProps() {
-    return '';
-  }
-
   public async runPrepare() {}
 
   public async runAnalysis() {}
@@ -96,12 +92,6 @@ export class ScannerCLI extends Scanner {
       [PROP_NAMES.PROJECTVERSION]: this.data.projectVersion,
       [PROP_NAMES.PROJECTSOURCES]: this.data.projectSources
     };
-  }
-
-  public toCliProps() {
-    if (this.cliMode === 'file') {
-      return `-D${[PROP_NAMES.PROJECTSETTINGS]}=\"${this.data.projectSettings}\"`;
-    }
   }
 
   public async runAnalysis() {

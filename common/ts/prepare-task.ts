@@ -52,12 +52,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     })
   );
 
-  if (scannerMode === ScannerMode.CLI && tl.getInput('configMode') === 'file') {
-    let actualSonarOpts = tl.getVariable('SONAR_SCANNER_OPTS') || '';
-    actualSonarOpts = actualSonarOpts.concat(' ', scanner.toCliProps()).trim();
-    tl.setVariable('SONAR_SCANNER_OPTS', '"' + actualSonarOpts + '"');
-  }
-
   await scanner.runPrepare();
 }
 
