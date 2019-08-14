@@ -46,7 +46,14 @@ it('should concat SONAR_SCANNER_OPTS with existing value', async () => {
     'file'
   );
 
-  jest.spyOn(tl, 'getInput').mockImplementation(() => 'CLI');
+  const getInput = jest.spyOn(tl, 'getInput');
+  when(getInput)
+    .calledWith('configMode')
+    .mockReturnValue('file');
+  when(getInput)
+    .calledWith('scannerMode')
+    .mockReturnValue('CLI');
+
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
   jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
@@ -65,7 +72,7 @@ it('should concat SONAR_SCANNER_OPTS with existing value', async () => {
   await prept.default(SQ_ENDPOINT, __dirname);
 
   expect(process.env.SONAR_SCANNER_OPTS).toBe(
-    '-Xmx512m -Dproject.settings=dummyProjectKey.properties'
+    '"-Xmx512m -Dproject.settings="dummyProjectKey.properties""'
   );
 });
 
@@ -78,7 +85,14 @@ it('should concat SONAR_SCANNER_OPTS with non existing value', async () => {
     'file'
   );
 
-  jest.spyOn(tl, 'getInput').mockImplementation(() => 'CLI');
+  const getInput = jest.spyOn(tl, 'getInput');
+  when(getInput)
+    .calledWith('configMode')
+    .mockReturnValue('file');
+  when(getInput)
+    .calledWith('scannerMode')
+    .mockReturnValue('CLI');
+
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
   jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
@@ -96,7 +110,7 @@ it('should concat SONAR_SCANNER_OPTS with non existing value', async () => {
 
   await prept.default(SQ_ENDPOINT, __dirname);
 
-  expect(process.env.SONAR_SCANNER_OPTS).toBe('-Dproject.settings=dummyProjectKey.properties');
+  expect(process.env.SONAR_SCANNER_OPTS).toBe('"-Dproject.settings="dummyProjectKey.properties""');
 });
 
 it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
@@ -108,7 +122,14 @@ it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
     'file'
   );
 
-  jest.spyOn(tl, 'getInput').mockImplementation(() => 'CLI');
+  const getInput = jest.spyOn(tl, 'getInput');
+  when(getInput)
+    .calledWith('configMode')
+    .mockReturnValue('file');
+  when(getInput)
+    .calledWith('scannerMode')
+    .mockReturnValue('CLI');
+
   jest.spyOn(Scanner, 'getPrepareScanner').mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, 'runPrepare').mockImplementation(() => null);
   jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
@@ -117,7 +138,7 @@ it('should fill SONAR_SCANNER_OPTS environment variable', async () => {
 
   await prept.default(SQ_ENDPOINT, __dirname);
 
-  expect(process.env.SONAR_SCANNER_OPTS).toBe('-Dproject.settings=dummyProjectKey.properties');
+  expect(process.env.SONAR_SCANNER_OPTS).toBe('"-Dproject.settings="dummyProjectKey.properties""');
 });
 
 it('should build report task path from variables', () => {

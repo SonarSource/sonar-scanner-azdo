@@ -100,13 +100,8 @@ export class ScannerCLI extends Scanner {
 
   public toCliProps() {
     if (this.cliMode === 'file') {
-      return `-D${[PROP_NAMES.PROJECTSETTINGS]}=${this.data.projectSettings}`;
+      return `-D${[PROP_NAMES.PROJECTSETTINGS]}=\"${this.data.projectSettings}\"`;
     }
-    return `-D${[PROP_NAMES.PROJECTKEY]}=${this.data.projectKey} -D${[PROP_NAMES.PROJECTNAME]}=${
-      this.data.projectName
-    } -D${[PROP_NAMES.PROJECTVERSION]}=${this.data.projectVersion} -D${[
-      PROP_NAMES.PROJECTSOURCES
-    ]}=${this.data.projectSources}`;
   }
 
   public async runAnalysis() {
