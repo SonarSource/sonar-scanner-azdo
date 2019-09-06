@@ -3,7 +3,6 @@ import * as fs from 'fs-extra';
 import * as tl from 'azure-pipelines-task-lib/task';
 import * as semver from 'semver';
 import Endpoint, { EndpointType } from './Endpoint';
-import { findMatch } from '../helpers/temp-find-method';
 
 export const REPORT_TASK_NAME = 'report-task.txt';
 export const SONAR_TEMP_DIRECTORY_NAME = 'sonar';
@@ -52,7 +51,7 @@ export default class TaskReport {
         'SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file.'
       );
       taskReportGlob = path.join('**', REPORT_TASK_NAME);
-      taskReportGlobResult = findMatch(tl.getVariable('Agent.BuildDirectory'), taskReportGlob);
+      taskReportGlobResult = tl.findMatch(tl.getVariable('Agent.BuildDirectory'), taskReportGlob);
     } else {
       taskReportGlob = path.join(
         SONAR_TEMP_DIRECTORY_NAME,
@@ -60,7 +59,7 @@ export default class TaskReport {
         '**',
         REPORT_TASK_NAME
       );
-      taskReportGlobResult = findMatch(tl.getVariable('Agent.TempDirectory'), taskReportGlob);
+      taskReportGlobResult = tl.findMatch(tl.getVariable('Agent.TempDirectory'), taskReportGlob);
     }
 
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
