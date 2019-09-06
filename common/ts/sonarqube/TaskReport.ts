@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tl from 'azure-pipelines-task-lib/task';
+import { findMatch } from '../helpers/temp-find-method';
 
 export const REPORT_TASK_NAME = 'report-task.txt';
 export const SONAR_TEMP_DIRECTORY_NAME = 'sonar';
@@ -47,7 +48,7 @@ export default class TaskReport {
       '**',
       REPORT_TASK_NAME
     );
-    const taskReportGlobResult = tl.findMatch(
+    const taskReportGlobResult = findMatch(
       tl.getVariable('Agent.TempDirectory'),
       taskReportGlob
     );
