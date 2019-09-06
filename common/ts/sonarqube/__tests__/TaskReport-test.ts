@@ -3,6 +3,7 @@ import { writeFileSync } from 'fs';
 import { fileSync } from 'tmp'; // eslint-disable-line import/no-extraneous-dependencies
 import * as tl from 'azure-pipelines-task-lib/task';
 import TaskReport from '../TaskReport';
+import * as tempFindMethods from '../../helpers/temp-find-method';
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -68,7 +69,7 @@ serverUrl=http://sonar`,
 it('should find report files', async () => {
   // using spyOn so we can reset the original behaviour
   jest.spyOn(tl, 'getVariable').mockImplementation(() => 'mock root search path');
-  jest.spyOn(tl, 'findMatch').mockImplementation(() => ['path1', 'path2']);
+  jest.spyOn(tempFindMethods, 'findMatch').mockImplementation(() => ['path1', 'path2']);
 
   const reportFiles = await TaskReport.findTaskFileReport();
 
@@ -87,6 +88,9 @@ it('should find report files', async () => {
     '**',
     'report-task.txt'
   );
-  expect(tl.findMatch).toHaveBeenCalledTimes(1);
-  expect(tl.findMatch).toHaveBeenCalledWith('mock root search path', expectedSearchPath);
+  expect(tempFindMethods.findMatch).toHaveBeenCalledTimes(1);
+  expect(tempFindMethods.findMatch).toHaveBeenCalledWith(
+    'mock root search path',
+    expectedSearchPath
+  );
 });

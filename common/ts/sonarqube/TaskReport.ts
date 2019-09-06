@@ -48,10 +48,7 @@ export default class TaskReport {
       '**',
       REPORT_TASK_NAME
     );
-    const taskReportGlobResult = findMatch(
-      tl.getVariable('Agent.TempDirectory'),
-      taskReportGlob
-    );
+    const taskReportGlobResult = findMatch(tl.getVariable('Agent.TempDirectory'), taskReportGlob);
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
     return taskReportGlobResult;
   }
