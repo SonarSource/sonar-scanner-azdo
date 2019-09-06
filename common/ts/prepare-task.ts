@@ -30,6 +30,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   if (await branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);
+    props['sonar.scanner.metadataFilePath'] = reportPath();
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
 
@@ -38,8 +39,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     .filter(keyValue => !keyValue.startsWith('#'))
     .map(keyValue => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
-
-  props['sonar.scanner.metadataFilePath'] = reportPath();
 
   tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
   tl.setVariable('SONARQUBE_ENDPOINT', endpoint.toJson(), true);

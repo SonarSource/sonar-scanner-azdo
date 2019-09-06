@@ -42,7 +42,7 @@ You can monitor the quality gate status of your projects in your favorite dashbo
 
 ![Quality Gate Widget](img/widget.png)
 
-### In Release Pipelines (Preview)
+#### In Release Pipelines (Preview)
 You can check the quality gate status of a build as a pre-deployment gate in release pipelines.
 
 #### In the build summary
