@@ -216,6 +216,22 @@
       "properties": {
         "name": "templates/netdesktop"
       }
+    },
+    {
+      "id": "f2dcb989-20d1-4a5c-b138-0dd8f53bcf97",
+      "type": "ms.vss-build.template",
+      "targets": ["ms.vss-build.templates"],
+      "properties": {
+        "name": "templates/otherfile"
+      }
+    },
+    {
+      "id": "1d772a94-aac4-4395-baf6-7d2d0cb17e5d",
+      "type": "ms.vss-build.template",
+      "targets": ["ms.vss-build.templates"],
+      "properties": {
+        "name": "templates/othermanual"
+      }
     }
   ]
 }
