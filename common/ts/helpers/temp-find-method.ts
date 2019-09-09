@@ -1,4 +1,5 @@
 /* istanbul ignore file */
+/*Can be deleted once https://www.npmjs.com/package/azure-pipelines-task-lib v3.1.0 will be release */
 import * as tl from 'azure-pipelines-task-lib/task';
 import path = require('path');
 import fs = require('fs');
