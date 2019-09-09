@@ -32,7 +32,7 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
   );
 }
 
-export function fillBuildProperty(sonarQualityGateStatus: string) {
+export async function fillBuildProperty(sonarQualityGateStatus: string) {
   const properties: azdoApiUtils.IPropertyBag[] = [];
 
   properties.push({
@@ -40,14 +40,5 @@ export function fillBuildProperty(sonarQualityGateStatus: string) {
     propertyValue: sonarQualityGateStatus
   });
 
-  azdoApiUtils.addBuildProperty(properties).then(() => {});
-}
-
-export function getAuthToken() {
-  const auth = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false);
-  if (auth.scheme.toLowerCase() === 'oauth') {
-    return auth.parameters['AccessToken'];
-  } else {
-    throw new Error('Unable to get credential to perform rest API calls');
-  }
+  await azdoApiUtils.addBuildProperty(properties);
 }

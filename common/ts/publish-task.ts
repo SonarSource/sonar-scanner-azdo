@@ -40,7 +40,7 @@ export default async function publishTask(endpointType: EndpointType) {
   tl.debug(`Number of analyses in this build: ${taskReports.length}`);
   tl.debug(`Overall Quality Gate status: ${globalQualityGateStatus}`);
 
-  fillBuildProperty(globalQualityGateStatus);
+  await fillBuildProperty(globalQualityGateStatus);
 
   publishBuildSummary(analyses.join('\r\n'), endpoint.type);
 }
