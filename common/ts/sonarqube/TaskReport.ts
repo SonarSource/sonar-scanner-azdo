@@ -1,6 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tl from 'azure-pipelines-task-lib/task';
+import * as semver from 'semver';
+import { findMatch } from '../helpers/temp-find-method';
+import Endpoint, { EndpointType } from './Endpoint';
 
 export const REPORT_TASK_NAME = 'report-task.txt';
 export const SONAR_TEMP_DIRECTORY_NAME = 'sonar';
@@ -40,23 +43,34 @@ export default class TaskReport {
     return this.report.dashboardUrl;
   }
 
-  public static findTaskFileReport(): string[] {
-    const taskReportGlob = path.join(
-      SONAR_TEMP_DIRECTORY_NAME,
-      tl.getVariable('Build.BuildNumber'),
-      '**',
-      REPORT_TASK_NAME
-    );
-    const taskReportGlobResult = tl.findMatch(
-      tl.getVariable('Agent.TempDirectory'),
-      taskReportGlob
-    );
+  public static findTaskFileReport(endpoint: Endpoint, serverVersion: semver.SemVer): string[] {
+    let taskReportGlob: string;
+    let taskReportGlobResult: string[];
+
+    if (endpoint.type === EndpointType.SonarQube && serverVersion < semver.parse('7.2.0')) {
+      tl.debug(
+        'SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file.'
+      );
+      taskReportGlob = path.join('**', REPORT_TASK_NAME);
+      taskReportGlobResult = findMatch(tl.getVariable('Agent.BuildDirectory'), taskReportGlob);
+    } else {
+      taskReportGlob = path.join(
+        SONAR_TEMP_DIRECTORY_NAME,
+        tl.getVariable('Build.BuildNumber'),
+        '**',
+        REPORT_TASK_NAME
+      );
+      taskReportGlobResult = findMatch(tl.getVariable('Agent.TempDirectory'), taskReportGlob);
+    }
+
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
     return taskReportGlobResult;
   }
 
   public static createTaskReportsFromFiles(
-    filePaths = TaskReport.findTaskFileReport()
+    endpoint: Endpoint,
+    serverVersion: semver.SemVer,
+    filePaths = TaskReport.findTaskFileReport(endpoint, serverVersion)
   ): Promise<TaskReport[]> {
     return Promise.all(
       filePaths.map(filePath => {

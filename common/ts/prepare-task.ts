@@ -30,6 +30,12 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   if (await branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);
+    /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
+    so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
+    tl.debug(
+      'SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location.'
+    );
+    props['sonar.scanner.metadataFilePath'] = reportPath();
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
 
@@ -38,8 +44,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     .filter(keyValue => !keyValue.startsWith('#'))
     .map(keyValue => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
-
-  props['sonar.scanner.metadataFilePath'] = reportPath();
 
   tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
   tl.setVariable('SONARQUBE_ENDPOINT', endpoint.toJson(), true);
