@@ -5,6 +5,7 @@ import Metrics from './sonarqube/Metrics';
 import Task, { TimeOutReachedError } from './sonarqube/Task';
 import TaskReport from './sonarqube/TaskReport';
 import { publishBuildSummary, fillBuildProperty } from './helpers/azdo-server-utils';
+import { getServerVersion } from './helpers/request';
 
 let globalQualityGateStatus = '';
 
@@ -25,7 +26,8 @@ export default async function publishTask(endpointType: EndpointType) {
   const metrics = await Metrics.getAllMetrics(endpoint);
 
   const timeoutSec = timeoutInSeconds();
-  const taskReports = await TaskReport.createTaskReportsFromFiles();
+  const serverVersion = await getServerVersion(endpoint);
+  const taskReports = await TaskReport.createTaskReportsFromFiles(endpoint, serverVersion);
 
   const analyses = await Promise.all(
     taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
