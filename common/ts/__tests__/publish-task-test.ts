@@ -89,15 +89,10 @@ it('check multiple report status and set global quality gate for build propertie
   jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => 'anything...');
   jest.spyOn(tl, 'getVariable').mockImplementation(() => SC_ENDPOINT.toJson());
 
-  jest.spyOn(apiUtils, 'addBuildProperty').mockResolvedValue(
-    () =>
-      new Promise(resolve => {
-        return resolve();
-      })
-  );
+  jest.spyOn(apiUtils, 'addBuildProperty').mockResolvedValue(null);
+  jest.spyOn(apiUtils, 'getAuthToken').mockImplementation(() => null);
 
   jest.spyOn(serverUtils, 'fillBuildProperty');
-  jest.spyOn(serverUtils, 'getAuthToken').mockImplementation(() => null);
 
   jest.spyOn(serverUtils, 'publishBuildSummary').mockImplementation(() => null);
 
@@ -167,14 +162,10 @@ it('check multiple report status and set global quality gate for build propertie
   jest.spyOn(tl, 'getInput').mockImplementation(() => '100');
   jest.spyOn(tl, 'debug');
 
-  jest.spyOn(apiUtils, 'addBuildProperty').mockImplementation(
-    () =>
-      new Promise(resolve => {
-        return resolve();
-      })
-  );
+  jest.spyOn(apiUtils, 'addBuildProperty').mockResolvedValue(null);
+  jest.spyOn(apiUtils, 'getAuthToken').mockImplementation(() => null);
+
   jest.spyOn(serverUtils, 'fillBuildProperty');
-  jest.spyOn(serverUtils, 'getAuthToken').mockImplementation(() => null);
 
   jest.spyOn(serverUtils, 'publishBuildSummary').mockImplementation(() => null);
 
