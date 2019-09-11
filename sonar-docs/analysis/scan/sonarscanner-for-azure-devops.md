@@ -166,7 +166,9 @@ If you are working with branches on TFVC projects, you still need to manually sp
 Pull request analysis is supported for any type of Git repositories. 
 You have 2 possibilities to activate it, depending on where your code is hosted :
 
-# Azure Git Repos : Using branch policies
+* **Using branch policies (for Azure Git Repos)**
+
+_The Microsoft documentation on setting up build validation for Azure Git is [here](https://docs.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops#build-validation)_
 
 1. In the **Branch policies** page of your main development branches (e.g. "master"), add a build policy that runs your build pipeline
 2. Create an Azure DevOps token with "Code (read and write)" scope
@@ -186,13 +188,13 @@ After the first analysis on a pull request (this is important because however, y
 This feature will, after with the build pipeline execution, check the Quality Gate status of the current commit on the Pull Request before being able to merge it.
 
 <!-- sonarcloud -->
-# GitHub, Bitbucket Cloud : Using pull request validation trigger
+* **Using pull request validation trigger (for GitHub and Bitbucket Cloud)**
 <!-- /sonarcloud -->
 <!-- sonarqube -->
-# GitHub Enterprise, Bitbucket : Using pull request validation trigger
+* **Using pull request validation trigger (for GitHub Enterprise and Bitbucket Server)**
 <!-- /sonarqube -->
 
-If you want to activate the Pull Request analysis for <!-- sonarqube -->GitHub Enterprise or Bitbucket<!-- /sonarqube --><!-- sonarcloud -->GitHub or Bitbucket Cloud<!-- /sonarcloud --> :
+If you want to activate the Pull Request analysis for <!-- sonarqube -->GitHub Enterprise or Bitbucket Server<!-- /sonarqube --><!-- sonarcloud -->GitHub or Bitbucket Cloud<!-- /sonarcloud --> :
 
 1. **Edit** your build pipeline
 2. Go to the **Triggers** tab
@@ -201,22 +203,22 @@ If you want to activate the Pull Request analysis for <!-- sonarqube -->GitHub E
 5. Set up the branch filters : please note that this is the **target** branch of the pull request.
 6. Click on Save.
 
-<!-- sonarcloud -->
 ## Using Release Pipelines
-You have the possibility to check the SonarCloud Quality Gate status in your release pipeline. It takes place as a [pre-deployment gate](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/approvals/gates?view=azure-devops).
+
+You have the possibility to check the {instance} Quality Gate status in your release pipeline. It takes place as a [pre-deployment gate](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/approvals/gates?view=azure-devops).
 
 1. In the **release pipeline**, add a stage, then click on **pre-deployment conditions**.
-2. Enable the **gates**, then click on add. Choose **SonarCloud Quality Gate status check**
+2. Enable the **gates**, then click on add. Choose **{instance} Quality Gate status check**
 3. Save your pipeline.
 
 **This feature is currently in preview, and the following notes are important** :
 
 * The **Publish Quality Gate Result** task (in your build pipeline) has to be enabled in order to get this gate working.
-* If the quality gate is in the failed state, it will not be possible to get the pre-deployment gate passing as this status will remain in its initial state. You will have to execute another build with either the current issues corrected in SonarCloud, or with another commit for fixing them.
-* Please note also that current behavior of the pre-deployment gates in Release Pipelines check every 5 minutes the status, for a duration of 1 day by default. Knowing the fact that if the SonarCloud Quality Gate is failed and it will remains like this on Azure DevOps, you can decrease this duration to a maximum of 6 minutes (so the gate will be evaluated only twice), or just cancel the release itself.
+* If the quality gate is in the failed state, it will not be possible to get the pre-deployment gate passing as this status will remain in its initial state. You will have to execute another build with either the current issues corrected in {instance}, or with another commit for fixing them.
+* Please note also that current behavior of the pre-deployment gates in Release Pipelines check every 5 minutes the status, for a duration of 1 day by default. Knowing the fact that if the {instance} Quality Gate is failed and it will remains like this on Azure DevOps, you can decrease this duration to a maximum of 6 minutes (so the gate will be evaluated only twice), or just cancel the release itself.
 * Only the primary build artifact related Quality Gate of the release will be checked.
 * During a build, if multiple analyses are performed, all of the related Quality Gates are checked. If one of them has the status either WARN, ERROR or NONE, then the Quality Gate status on the Release Pipeline will be failed.
-<!-- /sonarcloud -->
+<!-- sonarqube -->* Available since Azure DevOps Server 2019<!-- /sonarqube -->
 
 ## Quality Gate Status widget
 
