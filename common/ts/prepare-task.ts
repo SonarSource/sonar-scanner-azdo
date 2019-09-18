@@ -1,13 +1,12 @@
 import * as path from 'path';
 import * as semver from 'semver';
 import * as tl from 'azure-pipelines-task-lib/task';
-import * as vm from 'azure-devops-node-api';
 import { Guid } from 'guid-typescript';
 import Endpoint, { EndpointType } from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from './sonarqube/Scanner';
 import { toCleanJSON } from './helpers/utils';
 import { getServerVersion } from './helpers/request';
-import { getAuthToken } from './helpers/azdo-server-utils';
+import * as azdoApiUtils from './helpers/azdo-api-utils';
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from './sonarqube/TaskReport';
 
 const REPO_NAME_VAR = 'Build.Repository.Name';
@@ -30,6 +29,12 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   if (await branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);
+    /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
+    so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
+    tl.debug(
+      'SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location.'
+    );
+    props['sonar.scanner.metadataFilePath'] = reportPath();
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
 
@@ -38,8 +43,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     .filter(keyValue => !keyValue.startsWith('#'))
     .map(keyValue => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
-
-  props['sonar.scanner.metadataFilePath'] = reportPath();
 
   tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
   tl.setVariable('SONARQUBE_ENDPOINT', endpoint.toJson(), true);
@@ -138,7 +141,7 @@ export function reportPath(): string {
 export async function getDefaultBranch(collectionUrl: string) {
   const DEFAULT = 'refs/heads/master';
   try {
-    const vsts = getWebApi(collectionUrl);
+    const vsts = azdoApiUtils.getWebApi(collectionUrl);
     const gitApi = await vsts.getGitApi();
     const repo = await gitApi.getRepository(
       tl.getVariable(REPO_NAME_VAR),
@@ -150,10 +153,4 @@ export async function getDefaultBranch(collectionUrl: string) {
     tl.warning("Unable to get default branch, defaulting to 'master': " + e);
     return DEFAULT;
   }
-}
-
-function getWebApi(collectionUrl: string): vm.WebApi {
-  const accessToken = getAuthToken();
-  const credentialHandler = vm.getBearerHandler(accessToken);
-  return new vm.WebApi(collectionUrl, credentialHandler);
 }

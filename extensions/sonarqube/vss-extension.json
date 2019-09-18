@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarqube",
   "name": "SonarQube",
-  "version": "4.7.2",
+  "version": "4.8.0",
   "branding": {
     "color": "rgb(67, 157, 210)",
     "theme": "dark"
@@ -20,7 +20,7 @@
   "description":
     "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
-  "categories": ["Azure Pipelines"],
+  "categories": ["Build and release"],
   "icons": {
     "default": "extension-icon.png"
   },
@@ -51,7 +51,7 @@
   },
   "CustomerQnASupport": {
     "enableqna": "true",
-    "url": "https://groups.google.com/d/forum/sonarqube"
+    "url": "https://community.sonarsource.com/"
   },
   "repository": {
     "type": "git",

@@ -1,57 +1,54 @@
 import * as tl from 'azure-pipelines-task-lib/task';
-import * as request from 'request';
-import { getAuthToken } from './azdo-server-utils';
+import * as vm from 'azure-devops-node-api';
+import {
+  JsonPatchDocument,
+  JsonPatchOperation,
+  Operation
+} from 'azure-devops-node-api/interfaces/common/VSSInterfaces';
 
 export interface IPropertyBag {
   propertyName: string;
   propertyValue: string;
 }
 
-interface IJsonPatchBody {
-  op: string;
-  path: string;
-  value: string;
-}
+export async function addBuildProperty(properties: IPropertyBag[]) {
+  const collectionUri = tl.getVariable('System.TeamFoundationCollectionUri') + '/';
+  const teamProjectId = tl.getVariable('System.TeamProjectId') + '/';
+  const buildId = tl.getVariable('Build.BuildId');
 
-export function addBuildProperty(properties: IPropertyBag[]): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const collectionUri = tl.getVariable('System.TeamFoundationCollectionUri') + '/';
-    const teamProjectId = tl.getVariable('System.TeamProjectId') + '/';
-    const buildId = tl.getVariable('Build.BuildId');
+  const patchBody: JsonPatchOperation[] = [];
 
-    const patchBody: IJsonPatchBody[] = [];
-
-    properties.forEach((property: IPropertyBag) => {
-      patchBody.push({
-        op: 'add',
-        path: `/${property.propertyName}`,
-        value: `${property.propertyValue}`
-      });
-    });
-
-    tl.debug(JSON.stringify(patchBody));
-
-    const options = {
-      url:
-        collectionUri +
-        teamProjectId +
-        `_apis/build/builds/${buildId}/properties?api-version=5.0-preview.1`,
-      headers: {
-        'Content-Type': 'application/json-patch+json'
-      },
-      auth: {
-        bearer: getAuthToken()
-      },
-      body: JSON.stringify(patchBody)
-    };
-
-    request.patch(options, (error, response, body) => {
-      if (error) {
-        tl.error('Failed to update build properties, error was : ' + JSON.stringify(error));
-        return reject();
-      }
-      tl.debug(`Response: ${response.statusCode} Body: "${JSON.stringify(body)}"`);
-      return resolve();
+  properties.forEach((property: IPropertyBag) => {
+    patchBody.push({
+      op: Operation.Add,
+      path: `/${property.propertyName}`,
+      value: `${property.propertyValue}`
     });
   });
+
+  tl.debug(JSON.stringify(patchBody));
+
+  const customHeader = { Authorization: `Bearer ${getAuthToken()}` };
+
+  const azdoWebApi = getWebApi(collectionUri);
+  const buildApi = await azdoWebApi.getBuildApi();
+
+  const jsonPatchBody: JsonPatchDocument[] = patchBody;
+
+  await buildApi.updateBuildProperties(customHeader, jsonPatchBody, teamProjectId, +buildId);
+}
+
+export function getWebApi(collectionUrl: string): vm.WebApi {
+  const accessToken = getAuthToken();
+  const credentialHandler = vm.getBearerHandler(accessToken);
+  return new vm.WebApi(collectionUrl, credentialHandler);
+}
+
+export function getAuthToken() {
+  const auth = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false);
+  if (auth.scheme.toLowerCase() === 'oauth') {
+    return auth.parameters['AccessToken'];
+  } else {
+    throw new Error('Unable to get credential to perform rest API calls');
+  }
 }

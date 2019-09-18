@@ -1,3 +1,4 @@
 node_modules
 build
 coverage
+common/ts/helpers/temp-find-method.ts

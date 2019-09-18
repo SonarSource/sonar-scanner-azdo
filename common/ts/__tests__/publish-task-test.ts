@@ -1,5 +1,6 @@
 import * as tl from 'azure-pipelines-task-lib/task';
 import { InvalidApiResourceVersionError } from 'azure-devops-node-api/VsoClient';
+import { SemVer } from 'semver';
 import Analysis from '../sonarqube/Analysis';
 import Endpoint, { EndpointType } from '../sonarqube/Endpoint';
 import Metrics from '../sonarqube/Metrics';
@@ -8,6 +9,7 @@ import TaskReport from '../sonarqube/TaskReport';
 import * as publishTask from '../publish-task';
 import * as serverUtils from '../helpers/azdo-server-utils';
 import * as apiUtils from '../helpers/azdo-api-utils';
+import * as request from '../helpers/request';
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -72,6 +74,8 @@ it('check multiple report status and set global quality gate for build propertie
     null
   );
 
+  jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
+
   jest.spyOn(Analysis, 'getAnalysis').mockResolvedValue(returnedAnalysisOk);
   jest.spyOn(Analysis, 'getAnalysis').mockResolvedValue(returnedAnalysisOk);
 
@@ -85,15 +89,10 @@ it('check multiple report status and set global quality gate for build propertie
   jest.spyOn(tl, 'getVariable').mockImplementationOnce(() => 'anything...');
   jest.spyOn(tl, 'getVariable').mockImplementation(() => SC_ENDPOINT.toJson());
 
-  jest.spyOn(apiUtils, 'addBuildProperty').mockResolvedValue(
-    () =>
-      new Promise(resolve => {
-        return resolve();
-      })
-  );
+  jest.spyOn(apiUtils, 'addBuildProperty').mockResolvedValue(null);
+  jest.spyOn(apiUtils, 'getAuthToken').mockImplementation(() => null);
 
   jest.spyOn(serverUtils, 'fillBuildProperty');
-  jest.spyOn(serverUtils, 'getAuthToken').mockImplementation(() => null);
 
   jest.spyOn(serverUtils, 'publishBuildSummary').mockImplementation(() => null);
 
@@ -147,6 +146,7 @@ it('check multiple report status and set global quality gate for build propertie
     null,
     null
   );
+  jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
 
   jest.spyOn(Analysis, 'getAnalysis').mockResolvedValueOnce(returnedAnalysisOk);
   jest.spyOn(Analysis, 'getAnalysis').mockResolvedValueOnce(returnedAnalysisError);
@@ -162,14 +162,10 @@ it('check multiple report status and set global quality gate for build propertie
   jest.spyOn(tl, 'getInput').mockImplementation(() => '100');
   jest.spyOn(tl, 'debug');
 
-  jest.spyOn(apiUtils, 'addBuildProperty').mockImplementation(
-    () =>
-      new Promise(resolve => {
-        return resolve();
-      })
-  );
+  jest.spyOn(apiUtils, 'addBuildProperty').mockResolvedValue(null);
+  jest.spyOn(apiUtils, 'getAuthToken').mockImplementation(() => null);
+
   jest.spyOn(serverUtils, 'fillBuildProperty');
-  jest.spyOn(serverUtils, 'getAuthToken').mockImplementation(() => null);
 
   jest.spyOn(serverUtils, 'publishBuildSummary').mockImplementation(() => null);
 
@@ -278,6 +274,8 @@ it('task should not fail the task even if all ceTasks timeout', async () => {
   jest.spyOn(tl, 'setResult');
   jest.spyOn(tl, 'debug').mockImplementation(() => null);
   jest.spyOn(tl, 'warning').mockImplementation(() => null);
+
+  jest.spyOn(request, 'getServerVersion').mockResolvedValue(new SemVer('7.2.0'));
 
   tl.setVariable('SONARQUBE_SCANNER_PARAMS', 'anything...');
   tl.setVariable('SONARQUBE_ENDPOINT', SC_ENDPOINT.toJson());

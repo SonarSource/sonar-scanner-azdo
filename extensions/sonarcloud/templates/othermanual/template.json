@@ -1,0 +1,68 @@
+{
+  "id": "sonarcloud_other_template",
+  "name": "Generic analysis with SonarCloud",
+  "category": "Build",
+  "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
+  "defaultHostedQueue": null,
+  "description": "Analyze your project with SonarCloud using the Scanner CLI when you’re not relying on Maven, Gradle or MSBuild.", 
+  "template": {
+    "build": [
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {
+          "scannerMode": "CLI",
+          "configMode": "manual"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "condition": "succeeded()",
+        "task": {
+          "id": "ce096e50-6155-4de8-8800-4221aaeed4a1",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {}
+      },
+      {
+        "environment": {},
+        "enabled": false,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "38b27399-a642-40af-bb7d-9971f69712e8",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {}
+      }
+    ],
+    "options": [
+      {
+        "enabled": true,
+        "definition": { "id": "5d58cc01-7c75-450c-be18-a388ddb129ec" },
+        "inputs": {}
+      }
+    ],
+    "variables": {
+      "system.debug": {
+        "value": "false",
+        "allowOverride": true
+      }
+    }
+  }
+}
