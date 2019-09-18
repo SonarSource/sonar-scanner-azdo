@@ -37,7 +37,12 @@ export default async function publishTask(endpointType: EndpointType) {
     globalQualityGateStatus = 'ok';
   }
 
-  tl.debug(`Number of analyses in this build: ${taskReports.length}`);
+  if (!taskReports.length) {
+    tl.warning('No analyses found in this build! Please check your build configuration.');
+  } else {
+    tl.debug(`Number of analyses in this build: ${taskReports.length}`);
+  }
+
   tl.debug(`Overall Quality Gate status: ${globalQualityGateStatus}`);
 
   await fillBuildProperty(globalQualityGateStatus);
