@@ -12,7 +12,7 @@ install:
 before_script: npm run clean && npm run validate-ci
 script:  
   - if [ -n "$ARTIFACTORY_URL" ]; then npm run deploy; fi
-  - git fetch --unshallow && npm run sonarqube
+  - if [ -n "$SONAR_TOKEN" ]; then git fetch --unshallow && npm run sonarqube; fi
 
 notifications:
   email: false
