@@ -7,6 +7,7 @@ import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import { toCleanJSON } from "./helpers/utils";
 import { getServerVersion } from "./helpers/request";
 import * as azdoApiUtils from "./helpers/azdo-api-utils";
+import { extractAndPublishTaskVersion } from "./helpers/task-version-utils";
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from "./sonarqube/TaskReport";
 
 const REPO_NAME_VAR = "Build.Repository.Name";
@@ -26,6 +27,12 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
 
   const props: { [key: string]: string } = {};
+
+  if (tl.getVariable("IT_TRIGGER_BUILD")) {
+    tl.debug("IT detected, promoting version...");
+    const taskJsonPath = path.join(__dirname, "..", "task.json");
+    await extractAndPublishTaskVersion("SonarSourcePrepareTaskVersion", taskJsonPath);
+  }
 
   if (await branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);

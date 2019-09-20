@@ -18,6 +18,8 @@ stages:
   jobs:
   - job: npminstall
     displayName: 'NPM Install, CI and Build'
+    variables:
+      publisher: $(SonarSourceITPublisher)
     steps:
     - task: Npm@1
       displayName: 'Update npm'
@@ -41,7 +43,7 @@ stages:
       displayName: 'Create test extension'
       inputs:
         command: 'custom'
-        customCommand: 'run test-build -- --publisher sonar-ci-publish'
+        customCommand: 'run test-build -- --publisher $(publisher)'
 
     - task: CopyFiles@2
       displayName: 'Copy artefacts to build directory'
@@ -79,6 +81,15 @@ stages:
             Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$version"
 
             Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-0.0.2-SNAPSHOT-sonarcloud.vsix" -NewName $extensionNewName
+
+            $version = Get-AzureDevopsTaskVersion "$env:BUILD_SOURCESDIRECTORY/build/extensions" "sonarcloud" "analyze" "v1"
+            Write-Host "##vso[task.setvariable variable=SC_V1_ANALYZE_VERSION;isOutput=true]$version"
+
+            $version = Get-AzureDevopsTaskVersion "$env:BUILD_SOURCESDIRECTORY/build/extensions" "sonarcloud" "prepare" "v1"
+            Write-Host "##vso[task.setvariable variable=SC_V1_PREPARE_VERSION;isOutput=true]$version"
+
+            $version = Get-AzureDevopsTaskVersion "$env:BUILD_SOURCESDIRECTORY/build/extensions" "sonarcloud" "publish" "v1"
+            Write-Host "##vso[task.setvariable variable=SC_V1_PUBLISH_VERSION;isOutput=true]$version"
         pwsh: true
     - task: PublishBuildArtifacts@1
       displayName: 'Publish artifacts on the build'
@@ -86,11 +97,14 @@ stages:
         PathtoPublish: '$(Agent.BuildDirectory)/a'
         ArtifactName: 'extensions'
 - stage: unpublish
+  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
   dependsOn: build
   displayName: 'Unpublish:'
   jobs:
   - job: 'unpublishextensions'
     displayName: 'Unpublish extensions on Marketplace'
+    variables:
+      publisher: $(SonarSourceITPublisher)
     steps: 
     - task: TfxInstaller@3
       displayName: 'Install TFX CLI'
@@ -102,7 +116,7 @@ stages:
         connectTo: 'VsTeam'
         connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
         method: 'id'
-        publisherId: 'sonar-ci-publish'
+        publisherId: '$(publisher)'
         extensionId: 'sonarcloud'
     - task: UnpublishAzureDevOpsExtension@3
       displayName: 'Remove SonarQube extension from CI publisher'
@@ -110,9 +124,10 @@ stages:
         connectTo: 'VsTeam'
         connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
         method: 'id'
-        publisherId: 'sonar-ci-publish'
+        publisherId: '$(publisher)'
         extensionId: 'sonarqube'
 - stage: publish
+  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
   dependsOn: 
     - build
     - unpublish
@@ -123,6 +138,8 @@ stages:
     variables:
       sqExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SQ_VERSION'] ]
       scExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_VERSION'] ]
+      itOrg: $(SonarSourceITOrganization)
+      publisher: $(SonarSourceITPublisher)
     steps: 
       - task: TfxInstaller@3
         displayName: 'Install TFX CLI'
@@ -143,7 +160,54 @@ stages:
           vsixFile: '$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion).$(Build.BuildId)-sonarcloud.vsix'
           extensionName: '[Test] SonarCloud ITs'
           updateTasksVersion: false
-          updateTasksId: true
+          updateTasksId: false
           extensionVisibility: 'private'
-          shareWith: 'sonarsource-integration-tests'
+          shareWith: '$(itOrg)'
           cwd: '$(System.ArtifactsDirectory)'
+      - task: InstallAzureDevOpsExtension@3
+        displayName: 'Install extension in IT org'
+        inputs:
+          connectTo: 'VsTeam'
+          connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
+          method: 'id'
+          publisherId: '$(publisher)'
+          extensionId: 'sonarcloud'
+          accounts: 'https://devops.azure.com/$(itOrg)'
+
+- stage: qa
+  dependsOn: 
+    - build
+    - publish
+  displayName: 'QA:'
+  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - job: 'runqa'
+    displayName: 'Run QA'
+    variables:
+         PrepareVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_V1_PREPARE_VERSION'] ]
+         AnalyzeVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_V1_ANALYZE_VERSION'] ]
+         PublishVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_V1_PUBLISH_VERSION'] ]
+    steps: 
+     - task: DotNetCoreCLI@2
+       displayName: 'Run Integration tests project'
+       env:
+         SC_TOKEN: $(SonarCloudToken)
+         AZURE_TOKEN: $(PAT)
+         PREPARE_TASK_VERSION: $(PrepareVersion)
+         ANALYZE_TASK_VERSION: $(AnalyzeVersion)
+         PUBLISH_TASK_VERSION: $(PublishVersion)
+         AZDO_BASE_URL: $(AzdoBaseUrl)
+         SONARCLOUD_BASE_URL: $(SonarCloudBaseUrl)
+         AZDO_ITS_ORGA: $(AzdoItsOrga)
+         AZDO_ITS_PROJECT_NAME: $(AzdoItsProjectName)
+         AZDO_ITS_DOTNET_PIPELINE_NAME: $(AzdoItsDotnetPipelineName)
+         AZDO_ITS_MAVEN_PIPELINE_NAME: $(AzdoItsMavenPipelineName)
+         AZDO_ITS_GRADLE_PIPELINE_NAME: $(AzdoItsGradlePipelineName)
+         AZDO_ITS_SCANNERCLI_PIPELINE_NAME: $(AzdoItsScannerCliPipelineName)
+         SC_DOTNET_PROJECT_KEY: $(SonarCloudItsDotnetProjectKey)
+         SC_MAVEN_PROJECT_KEY: $(SonarCloudItsMavenProjectKey)
+         SC_GRADLE_PROJECT_KEY: $(SonarCloudItsGradleProjectKey)
+         SC_SCANNERCLI_PROJECT_KEY: $(SonarCloudItsCLIProjectKey)
+       inputs:
+         command: 'test'
+         projects: 'its/IntegrationTests.csproj'

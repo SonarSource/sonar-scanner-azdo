@@ -1,6 +1,8 @@
 # build
 build/
-build_powershell/
+**/bin
+**/obj
+**/.vs
 
 # VS Code
 .vscode/
@@ -37,3 +39,5 @@ coverage/
 
 # eslint
 eslint-report.json
+
+.DS_Store

@@ -1,3 +1,4 @@
+import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import Analysis from "./sonarqube/Analysis";
 import Endpoint, { EndpointType, EndpointData } from "./sonarqube/Endpoint";
@@ -5,11 +6,17 @@ import Metrics from "./sonarqube/Metrics";
 import Task, { TimeOutReachedError } from "./sonarqube/Task";
 import TaskReport from "./sonarqube/TaskReport";
 import { publishBuildSummary, fillBuildProperty } from "./helpers/azdo-server-utils";
+import { extractAndPublishTaskVersion } from "./helpers/task-version-utils";
 import { getServerVersion } from "./helpers/request";
 
 let globalQualityGateStatus = "";
 
 export default async function publishTask(endpointType: EndpointType) {
+  if (tl.getVariable("IT_TRIGGER_BUILD")) {
+    const taskJsonPath = path.join(__dirname, "..", "task.json");
+    await extractAndPublishTaskVersion("SonarSourcePublishTaskVersion", taskJsonPath);
+  }
+
   const params = tl.getVariable("SONARQUBE_SCANNER_PARAMS");
   if (!params) {
     tl.setResult(
@@ -45,7 +52,7 @@ export default async function publishTask(endpointType: EndpointType) {
 
   tl.debug(`Overall Quality Gate status: ${globalQualityGateStatus}`);
 
-  await fillBuildProperty(globalQualityGateStatus);
+  await fillBuildProperty("sonarglobalqualitygate", globalQualityGateStatus);
 
   publishBuildSummary(analyses.join("\r\n"), endpoint.type);
 }

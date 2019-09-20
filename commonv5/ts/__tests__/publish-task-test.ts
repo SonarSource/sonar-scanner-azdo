@@ -10,6 +10,7 @@ import * as publishTask from "../publish-task";
 import * as serverUtils from "../helpers/azdo-server-utils";
 import * as apiUtils from "../helpers/azdo-api-utils";
 import * as request from "../helpers/request";
+import * as taskVersionUtils from "../helpers/task-version-utils";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -30,6 +31,7 @@ const METRICS = new Metrics([]);
 it("should fail unless SONARQUBE_SCANNER_PARAMS are supplied", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => null);
   jest.spyOn(tl, "setResult").mockImplementation(() => null);
+  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
 
   await publishTask.default(EndpointType.SonarCloud);
 
@@ -91,6 +93,8 @@ it("check multiple report status and set global quality gate for build propertie
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => "anything...");
   jest.spyOn(tl, "getVariable").mockImplementation(() => SC_ENDPOINT.toJson());
 
+  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
+
   jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue(null);
   jest.spyOn(apiUtils, "getAuthToken").mockImplementation(() => null);
 
@@ -102,7 +106,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: ok`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 2`);
-  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("ok");
+  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "ok");
 });
 
 it("check multiple report status and set global quality gate for build properties should be failed", async () => {
@@ -132,6 +136,8 @@ it("check multiple report status and set global quality gate for build propertie
   jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTaskOk);
 
   jest.spyOn(TaskReport, "createTaskReportsFromFiles").mockResolvedValue(taskReportArray);
+
+  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
 
   // Mock converting the Task into an html report
   const returnedAnalysisOk = new Analysis(
@@ -178,7 +184,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: failed`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 3`);
-  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("failed");
+  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "failed");
 });
 
 it("get report string should return undefined if ceTask times out", async () => {
@@ -206,6 +212,8 @@ it("get report string should fail for non-timeout errors", async () => {
   });
   jest.spyOn(Analysis, "getAnalysis");
   jest.spyOn(tl, "warning").mockImplementation(() => null);
+
+  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
 
   expect.assertions(1);
   try {
@@ -237,6 +245,7 @@ it("get report string for single report", async () => {
   );
   jest.spyOn(Analysis, "getAnalysis").mockResolvedValue(returnedAnalysis);
   jest.spyOn(returnedAnalysis, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
+  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
@@ -260,7 +269,7 @@ it("get report string should fail for non-timeout errors", async () => {
   });
   jest.spyOn(Analysis, "getAnalysis");
   jest.spyOn(tl, "warning").mockImplementation(() => null);
-
+  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
   expect.assertions(1);
   try {
     await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
@@ -282,6 +291,8 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
   jest.spyOn(tl, "setResult");
   jest.spyOn(tl, "debug").mockImplementation(() => null);
   jest.spyOn(tl, "warning").mockImplementation(() => null);
+
+  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
 
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
