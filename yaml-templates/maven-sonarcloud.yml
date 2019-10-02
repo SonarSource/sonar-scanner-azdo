@@ -1,0 +1,55 @@
+# Maven with SonarCloud analysis
+# Build and run tests for Maven projects
+# and analyse on SonarCloud
+#
+# * If necessary, create an endpoint to connect to SonarCloud
+#
+# * Set the sonarCloudXXX variables below
+# 
+# * Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  sonarCloudEndpointName: 'SC'
+  sonarCloudOrganization: 'my-org'
+  sonarCloudProjectKey: 'my-projectkey1'
+  sonarCloudProjectName: 'My Project'
+
+steps:
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: '$(sonarCloudEndpointName)'
+    organization: '$(sonarCloudOrganization)'
+    projectKey: '$(sonarCloudProjectKey)'
+    projectName: '$(sonarCloudProjectName)'
+    scannerMode: MSBuild # 'Other' # = maven
+    # Additional properties that will be passed to the scanner,
+    # Put one key=value per line, example:
+    # sonar.exclusions=**/*.bin
+    extraProperties: 
+
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    options: '-Dmaven.test.failure.ignore=true'
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
+    codeCoverageToolOption: 'JaCoCo'
+    javaHomeOption: 'JDKVersion'
+    mavenVersionOption: 'Default'
+    mavenAuthenticateFeed: false
+    effectivePomSkip: false
+    sonarQubeRunAnalysis: true
+    sqMavenPluginVersionChoice: 'latest'
+
+# Uncomment the next task to wait until SonarCloud processing has
+# finished and to publish the result on the Pipeline build summary
+#- task: SonarCloudPublish@1
+#  inputs:
+#    pollingTimeoutSec: '300'
