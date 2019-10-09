@@ -101,7 +101,6 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
       isDefaultBranch = currentBranch === 'refs/heads/master';
     } else if (provider === 'Bitbucket') {
       // TODO for Bitbucket Cloud we should get the main branch configured on the repo
-      // https://github.com/Microsoft/vsts-tasks/issues/7595
       isDefaultBranch = currentBranch === 'refs/heads/master';
     } else if (provider === 'Svn') {
       isDefaultBranch = currentBranch === 'trunk';
