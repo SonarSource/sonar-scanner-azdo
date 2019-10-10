@@ -13,8 +13,7 @@ trigger:
 - master
 
 pool:
-  name: Device2
-#  vmImage: 'VS2017-Win2016'
+  vmImage: 'windows-latest'
 
 variables:
   # SonarCloud variables
@@ -55,8 +54,13 @@ steps:
 
 - task: VSTest@2
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    testAssemblyVer2: |
+      **\*Test.dll
+      !**\*TestAdapter.dll
+      !**\obj\**
+    codeCoverageEnabled: true
+    platform: '$(BuildPlatform)'
+    configuration: '$(BuildConfiguration)'
 
 - task: SonarCloudAnalyze@1
 

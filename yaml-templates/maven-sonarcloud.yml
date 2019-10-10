@@ -7,7 +7,7 @@
 # * Set the sonarCloudXXX variables below
 # 
 # * Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+# https://docs.microsoft.com/en-gb/azure/devops/pipelines/customize-pipeline?view=azure-devops
 
 trigger:
 - master
@@ -28,11 +28,15 @@ steps:
     organization: '$(sonarCloudOrganization)'
     projectKey: '$(sonarCloudProjectKey)'
     projectName: '$(sonarCloudProjectName)'
-    scannerMode: MSBuild # 'Other' # = maven
+    scannerMode: Other
     # Additional properties that will be passed to the scanner,
     # Put one key=value per line, example:
     # sonar.exclusions=**/*.bin
     extraProperties: 
+      # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
+      # object model to provide smart defaults for most of the standard analysis parameters.
+      # You can however override this by setting wanted properties in this extraProperties space.
+      # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/#header-4
 
 - task: Maven@3
   inputs:

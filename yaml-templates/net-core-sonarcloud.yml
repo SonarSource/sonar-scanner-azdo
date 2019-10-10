@@ -30,7 +30,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(solution)'
+    projects: '$(solution)' # Comes from variables section defined above.
     feedsToUse: 'select'
 
 - task: SonarCloudPrepare@1
@@ -48,13 +48,13 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(solution)'
+    projects: '$(solution)' # Comes from variables section defined above.
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    projects: '$(testProjects)'
+    projects: '$(testProjects)' # Comes from variables section defined above.
     arguments: '--configuration $(BuildConfiguration) --collect "Code Coverage"'
 
 - task: SonarCloudAnalyze@1

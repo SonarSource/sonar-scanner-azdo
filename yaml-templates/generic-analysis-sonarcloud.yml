@@ -1,11 +1,12 @@
 # Generic Analysis with SonarCloud
+# Specific templates exist for MSBuild, Maven and Gradle. Use this template for other types of build.
 #
 # * If necessary, create an endpoint to connect to SonarCloud
 #
 # * Set the sonarCloudXXX variables below
 # 
 # * Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+# https://docs.microsoft.com/en-gb/azure/devops/pipelines/create-first-pipeline
 
 trigger:
 - master
