@@ -7,7 +7,7 @@ it('should build jsonpath body properly', () => {
   jest.spyOn(tl, 'getEndpointAuthorization').mockImplementation(() => null);
   jest.spyOn(azdoApiUtils, 'getAuthToken').mockImplementation(() => null);
 
-  const webApi = new vm.WebApi('', null);
+  const webApi = new vm.WebApi('http://vsts.net', null);
 
   jest.spyOn(tl, 'debug').mockImplementation(() => null);
   jest.spyOn(azdoApiUtils, 'getWebApi').mockImplementation(() => webApi);

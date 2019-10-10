@@ -31,11 +31,19 @@ export async function addBuildProperty(properties: IPropertyBag[]) {
   const customHeader = { Authorization: `Bearer ${getAuthToken()}` };
 
   const azdoWebApi = getWebApi(collectionUri);
-  const buildApi = await azdoWebApi.getBuildApi();
-
   const jsonPatchBody: JsonPatchDocument[] = patchBody;
 
-  await buildApi.updateBuildProperties(customHeader, jsonPatchBody, teamProjectId, +buildId);
+  try {
+    tl.debug('Acquiring a build API object.');
+    const buildApi = await azdoWebApi.getBuildApi();
+    tl.debug('Creating a new build property with global Quality Gate Status');
+    await buildApi.updateBuildProperties(customHeader, jsonPatchBody, teamProjectId, +buildId);
+  } catch (exception) {
+    tl.warning(
+      'Failed to create a build property. Not blocking unless you are using the Sonar Pre-Deployment gate in Release Pipelines. Exception : ' +
+        exception
+    );
+  }
 }
 
 export function getWebApi(collectionUrl: string): vm.WebApi {
