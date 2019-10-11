@@ -7,7 +7,7 @@ To get started in a few minutes, you can :
 * Follow the SonarCloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn].
 * Benefit from embedded templates for common analyses :
   * **Classic** build pipelines templates integrated while creating a new pipeline
-  * **YAML** build pipeline templates available in our Sourcecode : https://github.com/SonarSource/sonar-scanner-vsts/yaml-templates
+  * **YAML** build pipeline templates available in our Sourcecode : https://github.com/SonarSource/sonar-scanner-vsts/yaml-pipeline-templates
 
 ## About the SonarCloud Azure DevOps Marketplace Extension
 This extension provides the following features:
