@@ -12,7 +12,7 @@
   "version": {
     "Major": 4,
     "Minor": 8,
-    "Patch": 0
+    "Patch": 1
   },
   "minimumAgentVersion": "1.95.1",
   "inputs": [
@@ -23,7 +23,7 @@
       "defaultValue": "300",
       "required": true,
       "helpMarkDown":
-        "This task will poll SonarQube until the analysis is completed, or until the timeout is reached"
+        "This task will poll SonarQube until the analysis is completed, or until the timeout is reached. It also add a build property with the quality gate status of the current build(s) analyses."
     }
   ],
   "dataSourceBindings": [],

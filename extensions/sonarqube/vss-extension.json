@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarqube",
   "name": "SonarQube",
-  "version": "4.8.0",
+  "version": "4.8.1",
   "branding": {
     "color": "rgb(67, 157, 210)",
     "theme": "dark"
