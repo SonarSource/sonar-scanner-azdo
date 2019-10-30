@@ -1,0 +1,69 @@
+# .NET Desktop with Sonarloud analysis
+# Build and run tests for .NET Desktop or Windows classic desktop solutions
+# and analyse on SonarCloud
+#
+# * If necessary, create an endpoint to connect to SonarCloud
+#
+# * Set the sonarCloudXXX variables below
+# 
+# * Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  # SonarCloud variables
+  sonarCloudEndpointName: 'SC'
+  sonarCloudOrganization: 'my-org'
+  sonarCloudProjectKey: 'my-projectkey1'
+  sonarCloudProjectName: 'My Project'
+  
+  # other build variables
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@0
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: '$(sonarCloudEndpointName)'
+    organization: '$(sonarCloudOrganization)'
+    projectKey: '$(sonarCloudProjectKey)'
+    projectName: '$(sonarCloudProjectName)'
+    scannerMode: MSBuild # 'Other' # = maven
+    # Additional properties that will be passed to the scanner,
+    # Put one key=value per line, example:
+    # sonar.exclusions=**/*.bin
+    extraProperties: 
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  inputs:
+    testAssemblyVer2: |
+      **\*Test.dll
+      !**\*TestAdapter.dll
+      !**\obj\**
+    codeCoverageEnabled: true
+    platform: '$(BuildPlatform)'
+    configuration: '$(BuildConfiguration)'
+
+- task: SonarCloudAnalyze@1
+
+# Uncomment the next task to wait until SonarCloud processing has
+# finished and to publish the result on the Pipeline build summary
+# - task: SonarCloudPublish@1

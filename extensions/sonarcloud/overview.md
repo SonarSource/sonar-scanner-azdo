@@ -1,8 +1,13 @@
 **[SonarCloud][sc]** is the leading online service for Code Quality & Code Security. It is totally free for open-source projects, and supports all major programming languages including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. If your code is closed source, SonarCloud also offers a paid plan to run private analyses.
 
-This Azure DevOps extension provides build tasks that you can add in your build definition. You'll benefit from automated dectection of bugs and vulnerabilities across all branches and Pull Requests. SonarCloud explains all coding issues in details, giving you chance to fix your code before even merging and deploying, all while learning best practices along the way. At project level, you'll also get a dedicated widget that tracks the overall health of your application.
+This Azure DevOps extension provides build tasks that you can add in your build definition. You'll benefit from automated detection of bugs and vulnerabilities across all branches and Pull Requests. SonarCloud explains all coding issues in details, giving you chance to fix your code before even merging and deploying, all the while learning best practices along the way. At project level, you'll also get a dedicated widget that tracks the overall health of your application.
 
-To get started in a few minutes, you can follow this dedicated [Microsoft Lab][getstarted]. There is also a SonarCloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn] .
+To get started in a few minutes, you can :
+* Follow this dedicated [Microsoft Lab][getstarted]
+* Follow the SonarCloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn].
+* Benefit from embedded templates for common analyses :
+  * **Classic** build pipelines templates integrated while creating a new pipeline
+  * **YAML** build pipeline templates available in our Sourcecode : https://github.com/SonarSource/sonar-scanner-vsts/yaml-pipeline-templates
 
 ## About the SonarCloud Azure DevOps Marketplace Extension
 This extension provides the following features:

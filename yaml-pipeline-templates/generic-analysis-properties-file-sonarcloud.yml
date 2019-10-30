@@ -1,0 +1,46 @@
+# Generic Analysis with SonarCloud - using an existing properties file
+# Specific templates exist for MSBuild, Maven and Gradle. Use this template for other types of build.
+#
+# * If necessary, create an endpoint to connect to SonarCloud
+#
+# * Set the sonarCloudXXX variables below
+# 
+# * Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/en-gb/azure/devops/pipelines/create-first-pipeline
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  sonarCloudEndpointName: 'SC'
+  sonarCloudOrganization: 'my-org'
+  sonarCloudProjectKey: 'my-projectkey1'
+  sonarCloudProjectName: 'My Project'
+
+steps:
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: '$(sonarCloudEndpointName)'
+    organization: '$(sonarCloudOrganization)'
+    scannerMode: 'CLI'
+    configMode: 'file'
+    # This sonar-project.properties file is usually placed at the root level of the repository. However, you can define your own path. 
+    # Read more about this file and its expected format : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
+    configFile: 'sonar-project.properties' 
+    # Additional properties that will be passed to the scanner,
+    # Put one key=value per line, example:
+    # sonar.exclusions=**/*.bin
+    extraProperties: 
+
+# Add your build task(s) here
+
+- task: SonarCloudAnalyze@1
+
+# Uncomment the next task to wait until SonarCloud processing has
+# finished and to publish the result on the Pipeline build summary
+#- task: SonarCloudPublish@1
+#  inputs:
+#    pollingTimeoutSec: '300'
