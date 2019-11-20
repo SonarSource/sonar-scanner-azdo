@@ -2,7 +2,9 @@
 
 This extension provides build tasks that you incorporate into your build definition(s) to enable additional SonarQube functionality in Azure DevOps environments.
 
-### Quality Gate Status
+## Benefits of the SonarQube Azure DevOps Marketplace Extension
+
+### Quality Gate™ status publishing
 A Quality Gate™ is a Pass/Fail status indicator that clearly lets you know if your code is clean and safe. SonarQube comes with a default Quality Gate called SonarWay™ that's built-in and ready to use. When you see a 'Green' Quality Gate, you know that your application is releasable and your team is hitting the mark! Using this extension, SonarQube publishes Quality Gate status right to your build results.
 
 Example of a passing Quality Gate:
