@@ -2,6 +2,8 @@
 
 This extension provides build tasks that you incorporate into your build definition(s) to enable additional SonarQube functionality in Azure DevOps environments.
 
+_Note: this extension is officially supported for use with Azure DevOps Server (formerly TFS). Ongoing interoperability with Azure DevOps Services (cloud-based) is not assured._
+
 ## Benefits of the SonarQube Azure DevOps Marketplace Extension
 
 ### Quality Gate™ status publishing
