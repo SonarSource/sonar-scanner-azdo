@@ -30,7 +30,14 @@ When a build is run on a branch, the extension automatically configures the anal
 
 **Important note**: to activate pull request decoration, you must specify a user token in the "General Settings > Pull Requests" administration page of your project in SonarQube.
 
-## About the SonarQube Azure DevOps Marketplace Extension
+## Additional Highlights
+### Seamless integration with .NET solutions
+C# and VB.NET analysis is simple and straightforward and only requires adding the **Prepare Analysis Configuration** and **Run Code Analysis** tasks to your build definition.
+
+### Easy setup for Maven and Gradle projects
+For Java, analyzing your source code is also very easy. It only requires adding the **Prepare Analysis Configuration** task and checking the **Run SonarQube Analysis** option in the 'Code Analysis' panel in your Maven or Gradle task.
+
+## SonarQube Azure DevOps Marketplace Extension Details
 This extension provides the following features:
 * A dedicated **SonarQube EndPoint** that defines the SonarQube server to be used.
 * Branch and **Pull Request** analysis in your projects.
@@ -41,13 +48,6 @@ This extension provides the following features:
 
 **Note for TFS installations older than TFS 2017 Update 2**: to install the extension, please follow instructions
 available on the ["SonarQube Extension 3.0" documentation page](https://docs.sonarqube.org/display/SCAN/SonarQube+Extension+3.0).
-
-## Highlights
-### Seamless integration with .NET solutions
-C# and VB.NET analysis is simple and straightforward and only requires adding the **Prepare Analysis Configuration** and **Run Code Analysis** tasks to your build definition.
-
-### Easy setup for Maven and Gradle projects
-For Java, analyzing your source code is also very easy. It only requires adding the **Prepare Analysis Configuration** task and checking the **Run SonarQube Analysis** option in the 'Code Analysis' panel in your Maven or Gradle task.
 
 This [Get Started][getstarted] guide provides all the required documentation to set up your build definition.
 
