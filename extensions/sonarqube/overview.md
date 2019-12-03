@@ -1,6 +1,8 @@
 **[SonarQube™][sq]** is the leading tool for continuously inspecting the Code Quality and Security™ of your codebases, all while empowering development teams. Covering 25+ programming languages including C#, VB.Net, JavaScript, TypeScript and C++; SonarQube easily pairs up with your Azure DevOps environment and tracks down bugs, vulnerabilities and code smells. With over 170,000 deployments helping small development teams as well as global organizations, SonarQube provides the means for all teams and companies around the world to own and impact their Code Quality and Security.
 
-SonarQube Commercial Editions tightly integrate with your Azure DevOps environment and analyzes branches and Pull Requests so your team spots and resolves issues before you merge to mastrer. This extension provides tasks that you incorporate into your build definition(s) to enable additional SonarQube functionality in Azure DevOps environments.
+SonarQube Commercial Editions tightly integrate with your Azure DevOps environment and analyze branches and Pull Requests so your team spots and resolves issues before you merge to master. Analysis results are published right in your build summary! 
+
+This extension provides tasks that you incorporate into your build definition(s) to enable additional SonarQube functionality in Azure DevOps environments.
 
 _Note: this extension is officially supported for use with Azure DevOps Server (formerly TFS). Ongoing interoperability with Azure DevOps Services (cloud-based) is not assured._
 
