@@ -24,7 +24,7 @@ This extension allows automatic analysis of all branches and pull-requests which
 
 ![Branches](img/branches.png)
 
-It's easy to add non-disruptive code quality checks right into your Azure DevOps workflow. Simply add SonarQube to your build pipeline definition and you're on your way to only promoting quality code. SonarQube analyzes the code changes and decorates pull request with comments and overall status -> _merge with confidence!_
+It's easy to add non-disruptive code quality checks right into your Azure DevOps workflow. Simply add SonarQube to your build pipeline definition and you're on your way to only promoting quality code. SonarQube analyzes the code changes and decorates pull requests with comments and overall status -> _merge with confidence!_
 
 ![Build Config](img/Build-pipeline.png)
 
