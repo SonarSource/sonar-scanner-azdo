@@ -4,7 +4,7 @@
   "friendlyName": "Prepare Analysis Configuration",
   "description": "Prepare SonarCloud analysis configuration",
   "helpMarkDown":
-    "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+    "[More Information](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
   "category": "Build",
   "visibility": ["Build"],
   "author": "sonarsource",
@@ -75,7 +75,7 @@
       "label": "Settings File",
       "required": false,
       "helpMarkDown":
-        "More information is available [here](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+        "More information is available [here](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
       "visibleRule": "scannerMode = CLI && configMode = file"
     },
     {
@@ -150,7 +150,7 @@
         "rows": "5"
       },
       "helpMarkDown":
-        "[Additional properties](https://redirect.sonarsource.com/doc/analysis-parameters.html) to be passed to the scanner. Specify each key=value pair on a new line.",
+        "[Additional properties](https://sonarcloud.io/documentation/analysis/analysis-parameters/) to be passed to the scanner. Specify each key=value pair on a new line.",
       "groupName": "advanced"
     }
   ],

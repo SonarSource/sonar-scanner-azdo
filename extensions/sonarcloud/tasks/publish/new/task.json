@@ -5,7 +5,7 @@
   "description":
     "Publish SonarCloud's Quality Gate result on the Azure Pipelines build result. To be used after the actual analysis.",
   "helpMarkDown":
-    "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+    "[More Information](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
   "category": "Build",
   "visibility": ["Build"],
   "author": "sonarsource",
