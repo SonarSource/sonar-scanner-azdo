@@ -8,6 +8,7 @@
     "theme": "dark"
   },
   "publisher": "sonarsource",
+  "homepage": "https://www.sonarqube.org/"
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services.Cloud"
@@ -24,7 +25,7 @@
   "icons": {
     "default": "extension-icon.png"
   },
-  "tags": ["build", "ci", "continuous integration", "code quality", "static code analysis"],
+  "tags": ["build", "ci", "continuous integration", "code quality", "static code analysis", "code analysis", "code quality", "SAST", "security"],
   "content": {
     "details": {
       "path": "overview.md"
