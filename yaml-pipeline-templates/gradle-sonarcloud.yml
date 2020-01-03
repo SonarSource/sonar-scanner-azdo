@@ -1,13 +1,7 @@
-# Gradle with SonarCloud analysis
-# Build and run tests for Gradle projects
-# and analyse on SonarCloud
-#
-# * If necessary, create an endpoint to connect to SonarCloud
-#
-# * Set the sonarCloudXXX variables below
-# 
-# * Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/en-gb/azure/devops/pipelines/customize-pipeline?view=azure-devops
+# Gradle
+# Build your Java project and run tests with Gradle using a Gradle wrapper script.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
 - master
@@ -15,30 +9,22 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  sonarCloudEndpointName: 'SC'
-  sonarCloudOrganization: 'my-org'
-  sonarCloudProjectKey: 'my-projectkey1'
-  sonarCloudProjectName: 'My Project'
-
 steps:
+
 - task: SonarCloudPrepare@1
+  displayName: 'Prepare analysis configuration'
   inputs:
-    SonarCloud: '$(sonarCloudEndpointName)'
-    organization: '$(sonarCloudOrganization)'
-    projectKey: '$(sonarCloudProjectKey)'
-    projectName: '$(sonarCloudProjectName)'
+    SonarCloud: 'SC'
+    organization: 'myorga'
     scannerMode: 'Other'
-    # Additional properties that will be passed to the scanner,
-    # Put one key=value per line, example:
-    # sonar.exclusions=**/*.bin
-    extraProperties:
-      # Initial behavior of Gradle task is that the SonarScanner uses information contained in Gradle's 
-      # object model to provide smart defaults for most of the standard analysis parameters.
-      # You can however override this by setting wanted properties in this extraProperties space.
-      # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-gradle/#header-7
+    extraProperties: |
+      # Additional properties that will be passed to the scanner, 
+      # Put one key=value per line, example:
+      # sonar.exclusions=**/*.bin
+      sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/summary.xml
 
 - task: Gradle@2
+  displayName: 'Execute Gradle build'
   inputs:
     gradleWrapperFile: 'gradlew'
     tasks: 'build'
@@ -46,12 +32,13 @@ steps:
     testResultsFiles: '**/TEST-*.xml'
     codeCoverageToolOption: 'JaCoCo'
     javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.8'
+    gradleOptions: '-Xmx3072m'
     sonarQubeRunAnalysis: true
     sqGradlePluginVersionChoice: 'specify'
-    sonarQubeGradlePluginVersion: '2.7.1'
+    sonarQubeGradlePluginVersion: '2.8'
 
-# Uncomment the next task to wait until SonarCloud processing has
-# finished and to publish the result on the Pipeline build summary
-#- task: SonarCloudPublish@1
-#  inputs:
-#    pollingTimeoutSec: '300'
+- task: SonarCloudPublish@1
+  displayName: 'Publish results on build summary'
+  inputs:
+    pollingTimeoutSec: '300'

@@ -1,13 +1,7 @@
-# .NET Core with SonarCloud analysis
-# Build and run tests for .NET Core solutions
-# and analyse on SonarCloud
-#
-# * If necessary, create an endpoint to connect to SonarCloud
-#
-# * Set the sonarCloudXXX variables below
-# 
-# * Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
 - master
@@ -17,50 +11,43 @@ pool:
 
 variables:
   solution: '**/*.sln'
-  testProjects: '**/*Tests/*.csproj'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-  sonarCloudEndpointName: 'SC'
-  sonarCloudOrganization: 'my-org'
-  sonarCloudProjectKey: 'my-projectkey1'
-  sonarCloudProjectName: 'My Project'
-
 steps:
 - task: DotNetCoreCLI@2
+  displayName: 'Restore solution'
   inputs:
     command: 'restore'
-    projects: '$(solution)' # Comes from variables section defined above.
+    projects: '**/*.sln'
     feedsToUse: 'select'
 
 - task: SonarCloudPrepare@1
+  displayName: 'Prepare analysis configuration'
   inputs:
-    SonarCloud: '$(sonarCloudEndpointName)'
-    organization: '$(sonarCloudOrganization)'
-    projectKey: '$(sonarCloudProjectKey)'
-    projectName: '$(sonarCloudProjectName)'
-    scannerMode: MSBuild # 'Other' # = maven
-    # Additional properties that will be passed to the scanner,
-    # Put one key=value per line, example:
-    # sonar.exclusions=**/*.bin
-    extraProperties: 
+    SonarCloud: 'SC'
+    organization: 'myorga'
+    scannerMode: 'MSBuild'
+    projectKey: 'dotnet-core-on-azdo'
+    projectName: 'Sample .NET Core project with Azure DevOps'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Build solution'
   inputs:
     command: 'build'
-    projects: '$(solution)' # Comes from variables section defined above.
-    arguments: '--configuration $(buildConfiguration)'
+    projects: '**/*.sln'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Execute Unit tests'
   inputs:
     command: 'test'
-    projects: '$(testProjects)' # Comes from variables section defined above.
-    arguments: '--configuration $(BuildConfiguration) --collect "Code Coverage"'
+    projects: '**/*.csproj'
+    arguments: '--collect "Code Coverage"'
 
 - task: SonarCloudAnalyze@1
+  displayName: 'Run SonarCloud analysis'
 
-# Uncomment the next task to wait until SonarCloud processing has
-# finished and to publish the result on the Pipeline build summary
-#- task: SonarCloudPublish@1
-#  inputs:
-#    pollingTimeoutSec: '300'
+- task: SonarCloudPublish@1
+  displayName: 'Publish results on build summary'
+  inputs:
+    pollingTimeoutSec: '300'

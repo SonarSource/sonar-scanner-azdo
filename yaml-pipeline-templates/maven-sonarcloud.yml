@@ -15,45 +15,46 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  sonarCloudEndpointName: 'SC'
-  sonarCloudOrganization: 'my-org'
-  sonarCloudProjectKey: 'my-projectkey1'
-  sonarCloudProjectName: 'My Project'
-
 steps:
 - task: SonarCloudPrepare@1
+  displayName: 'Prepare analysis configuration'
   inputs:
-    SonarCloud: '$(sonarCloudEndpointName)'
-    organization: '$(sonarCloudOrganization)'
-    projectKey: '$(sonarCloudProjectKey)'
-    projectName: '$(sonarCloudProjectName)'
+    SonarCloud: 'SC'
+    organization: 'myorga'
     scannerMode: Other
     # Additional properties that will be passed to the scanner,
     # Put one key=value per line, example:
     # sonar.exclusions=**/*.bin
-    extraProperties: 
+    extraProperties: |
+      sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/jacoco.xml
       # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
       # object model to provide smart defaults for most of the standard analysis parameters.
       # You can however override this by setting wanted properties in this extraProperties space.
       # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/#header-4
 
 - task: Maven@3
+  displayName: 'Execute Maven goal'
   inputs:
     mavenPomFile: 'pom.xml'
     options: '-Dmaven.test.failure.ignore=true'
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
-    codeCoverageToolOption: 'JaCoCo'
-    javaHomeOption: 'JDKVersion'
+    mavenOptions: '-Xmx3072m'
     mavenVersionOption: 'Default'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.8'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
     mavenAuthenticateFeed: false
     effectivePomSkip: false
     sonarQubeRunAnalysis: true
     sqMavenPluginVersionChoice: 'latest'
+    codeCoverageToolOption: 'JaCoCo'
+    testResultsFiles: '**/TEST-*.xml'
+    goals: 'verify'
+
 
 # Uncomment the next task to wait until SonarCloud processing has
 # finished and to publish the result on the Pipeline build summary
-#- task: SonarCloudPublish@1
-#  inputs:
-#    pollingTimeoutSec: '300'
+- task: SonarCloudPublish@1
+  displayName: 'Publish results on build summary'
+  inputs:
+    pollingTimeoutSec: '300'
