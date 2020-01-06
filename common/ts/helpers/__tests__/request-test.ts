@@ -1,6 +1,5 @@
 import * as tl from 'azure-pipelines-task-lib/task';
 import * as request from '../request';
-import Endpoint from 'common/ts/sonarqube/Endpoint';
 
 describe('logAndReject', () => {
   it('should log error message', () => {
@@ -15,12 +14,4 @@ describe('logAndReject', () => {
     expect(tl.debug).toHaveBeenCalledWith(errMessage);
     expect(actual).toBe(errMessage);
   });
-});
-
-describe('getServerVersion', () => {
-    it('should return version', () => {
-
-        request.getServerVersion({ url: 'https://sonarcloud.io' } as Endpoint)
-
-    });
 });
