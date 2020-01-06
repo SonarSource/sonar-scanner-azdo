@@ -47,7 +47,7 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
   });
 }
 
-function isString(x) {
+export function isString(x) {
   return Object.prototype.toString.call(x) === "[object String]";
 }
 
@@ -59,7 +59,7 @@ export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
   return get(endpoint, "/api/server/version", false).then(semver.coerce);
 }
 
-function logAndReject(reject, errMsg) {
+export function logAndReject(reject, errMsg) {
   tl.debug(errMsg);
   return reject(new Error(errMsg));
 }

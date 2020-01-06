@@ -1,5 +1,4 @@
 import * as path from "path";
-import * as semver from "semver";
 import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
@@ -8,8 +7,10 @@ import { toCleanJSON } from "./helpers/utils";
 import { getServerVersion } from "./helpers/request";
 import * as azdoApiUtils from "./helpers/azdo-api-utils";
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from "./sonarqube/TaskReport";
+import FeatureEnabler, { Features } from './sonarqube/FeatureEnabler';
 
 const REPO_NAME_VAR = "Build.Repository.Name";
+let featureEnabler: FeatureEnabler;
 
 export default async function prepareTask(endpoint: Endpoint, rootPath: string) {
   if (
@@ -27,14 +28,17 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   const props: { [key: string]: string } = {};
 
-  if (await branchFeatureSupported(endpoint)) {
+  const serverVersion = await getServerVersion(endpoint);
+  featureEnabler = new FeatureEnabler(serverVersion, endpoint.type);
+
+  if (featureEnabler.isEnabled(Features.FEATURE_NEW_REPORT_TASK_LOCATION)) {
+    props['sonar.scanner.metadataFilePath'] = reportPath();
+  }
+
+  if (featureEnabler.isEnabled(Features.FEATURE_BRANCHES_AND_PULLREQUEST)) {
     await populateBranchAndPrProps(props);
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
-    tl.debug(
-      "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location."
-    );
-    props["sonar.scanner.metadataFilePath"] = reportPath();
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
 
@@ -57,14 +61,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   await scanner.runPrepare();
 }
 
-async function branchFeatureSupported(endpoint) {
-  if (endpoint.type === EndpointType.SonarCloud) {
-    return true;
-  }
-  const serverVersion = await getServerVersion(endpoint);
-  return serverVersion >= semver.parse("7.2.0");
-}
-
 export async function populateBranchAndPrProps(props: { [key: string]: string }) {
   const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri");
   const prId = tl.getVariable("System.PullRequest.PullRequestId");
@@ -76,16 +72,22 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
       tl.getVariable("System.PullRequest.SourceBranch")
     );
     if (provider === "TfsGit") {
-      props["sonar.pullrequest.provider"] = "vsts";
-      props["sonar.pullrequest.vsts.instanceUrl"] = collectionUrl;
-      props["sonar.pullrequest.vsts.project"] = tl.getVariable("System.TeamProject");
+      if (!featureEnabler.isEnabled(Features.FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED)) {
+        props['sonar.pullrequest.provider'] = 'vsts';
+      }
       props["sonar.pullrequest.vsts.repository"] = tl.getVariable(REPO_NAME_VAR);
     } else if (provider === "GitHub" || provider === "GitHubEnterprise") {
       props["sonar.pullrequest.key"] = tl.getVariable("System.PullRequest.PullRequestNumber");
       props["sonar.pullrequest.provider"] = "github";
       props["sonar.pullrequest.github.repository"] = tl.getVariable(REPO_NAME_VAR);
-    } else if (provider === "Bitbucket") {
-      props["sonar.pullrequest.provider"] = "bitbucketcloud";
+
+      if (!featureEnabler.isEnabled(Features.FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED)) {
+        props['sonar.pullrequest.provider'] = 'github';
+      }
+
+      if (!featureEnabler.isEnabled(Features.FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED)) {
+        props['sonar.pullrequest.provider'] = 'bitbucketcloud';
+      }
     } else {
       tl.warning(`Unsupported PR provider '${provider}'`);
       props["sonar.scanner.skip"] = "true";
@@ -106,7 +108,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     }
     if (!isDefaultBranch) {
       // VSTS-165 don't use Build.SourceBranchName
-      props["sonar.branch.name"] = branchName(tl.getVariable("Build.SourceBranch"));
+      props['sonar.branch.name'] = branchName(currentBranch);
     }
   }
 }
@@ -114,7 +116,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
 /**
  * Waiting for https://github.com/Microsoft/vsts-tasks/issues/7591
  */
-function branchName(fullName: string) {
+export function branchName(fullName: string) {
   if (fullName.startsWith("refs/heads/")) {
     return fullName.substring("refs/heads/".length);
   }
