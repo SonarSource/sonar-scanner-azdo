@@ -13,7 +13,7 @@ export function formatMeasure(
   return useFormatter(value, formatter, options);
 }
 
-function useFormatter(
+export function useFormatter(
   value: string | number | undefined,
   formatter: Formatter,
   options?: any
@@ -21,7 +21,7 @@ function useFormatter(
   return value !== undefined && value !== "" ? formatter(value, options) : "";
 }
 
-function getFormatter(type: string): Formatter {
+export function getFormatter(type: string): Formatter {
   const FORMATTERS: { [type: string]: Formatter } = {
     INT: intFormatter,
     SHORT_INT: shortIntFormatter,
@@ -37,7 +37,7 @@ function getFormatter(type: string): Formatter {
   return FORMATTERS[type] || noFormatter;
 }
 
-function numberFormatter(
+export function numberFormatter(
   value: number,
   minimumFractionDigits = 0,
   maximumFractionDigits = minimumFractionDigits
@@ -49,15 +49,15 @@ function numberFormatter(
   return format(value);
 }
 
-function noFormatter(value: string | number): string {
+export function noFormatter(value: string | number): string {
   return value.toString();
 }
 
-function intFormatter(value: number): string {
+export function intFormatter(value: number): string {
   return numberFormatter(value);
 }
 
-function shortIntFormatter(value: number): string {
+export function shortIntFormatter(value: number): string {
   if (value >= 1e9) {
     return numberFormatter(value / 1e9) + "G";
   } else if (value >= 1e6) {
@@ -71,12 +71,15 @@ function shortIntFormatter(value: number): string {
   }
 }
 
-function floatFormatter(value: number): string {
+export function floatFormatter(value: number): string {
   return numberFormatter(value, 1, 5);
 }
 
-function percentFormatter(value: string | number, options: { decimals?: number } = {}): string {
-  if (typeof value === "string") {
+export function percentFormatter(
+  value: string | number,
+  options: { decimals?: number } = {}
+): string {
+  if (typeof value === 'string') {
     value = parseFloat(value);
   }
   if (options.decimals) {
@@ -85,14 +88,14 @@ function percentFormatter(value: string | number, options: { decimals?: number }
   return value === 100 ? "100%" : numberFormatter(value, 1) + "%";
 }
 
-function ratingFormatter(value: string | number): string {
+export function ratingFormatter(value: string | number): string {
   if (typeof value === "string") {
     value = parseInt(value, 10);
   }
   return String.fromCharCode(97 + value - 1).toUpperCase();
 }
 
-function levelFormatter(value: string): string {
+export function levelFormatter(value: string): string {
   const l10nKeys = {
     ERROR: "Failed",
     WARN: "Warning",
@@ -103,7 +106,7 @@ function levelFormatter(value: string): string {
   return result ? result : value;
 }
 
-function comparatorFormatter(value: string): string {
+export function comparatorFormatter(value: string): string {
   const l10nKeys = {
     EQ: "&#61;",
     GT: "&#62;",
@@ -114,7 +117,7 @@ function comparatorFormatter(value: string): string {
   return result ? result : value;
 }
 
-function millisecondsFormatter(value: number): string {
+export function millisecondsFormatter(value: number): string {
   const ONE_SECOND = 1000;
   const ONE_MINUTE = 60 * ONE_SECOND;
   if (value >= ONE_MINUTE) {
@@ -128,32 +131,37 @@ function millisecondsFormatter(value: number): string {
   }
 }
 
-function shouldDisplayDays(days: number): boolean {
+export function shouldDisplayDays(days: number): boolean {
   return days > 0;
 }
 
-function shouldDisplayDaysInShortFormat(days: number): boolean {
+export function shouldDisplayDaysInShortFormat(days: number): boolean {
   return days > 0.9;
 }
 
-function shouldDisplayHours(days: number, hours: number): boolean {
+export function shouldDisplayHours(days: number, hours: number): boolean {
   return hours > 0 && days < 10;
 }
 
-function shouldDisplayHoursInShortFormat(hours: number): boolean {
+export function shouldDisplayHoursInShortFormat(hours: number): boolean {
   return hours > 0.9;
 }
 
-function shouldDisplayMinutes(days: number, hours: number, minutes: number): boolean {
+export function shouldDisplayMinutes(days: number, hours: number, minutes: number): boolean {
   return minutes > 0 && hours < 10 && days === 0;
 }
 
-function addSpaceIfNeeded(value: string): string {
+export function addSpaceIfNeeded(value: string): string {
   return value.length > 0 ? value + " " : value;
 }
 
-function formatDuration(isNegative: boolean, days: number, hours: number, minutes: number): string {
-  let formatted = "";
+export function formatDuration(
+  isNegative: boolean,
+  days: number,
+  hours: number,
+  minutes: number
+): string {
+  let formatted = '';
   if (shouldDisplayDays(days)) {
     formatted += (isNegative ? -1 * days : days) + "d";
   }
@@ -168,7 +176,7 @@ function formatDuration(isNegative: boolean, days: number, hours: number, minute
   return formatted;
 }
 
-function formatDurationShort(
+export function formatDurationShort(
   isNegative: boolean,
   days: number,
   hours: number,
@@ -193,7 +201,7 @@ function formatDurationShort(
   return formattedMinutes + "min";
 }
 
-function durationFormatter(value: string | number): string {
+export function durationFormatter(value: string | number): string {
   if (typeof value === "string") {
     value = parseInt(value, 10);
   }
@@ -210,7 +218,7 @@ function durationFormatter(value: string | number): string {
   return formatDuration(isNegative, days, hours, remainingValue);
 }
 
-function shortDurationFormatter(value: string | number): string {
+export function shortDurationFormatter(value: string | number): string {
   if (typeof value === "string") {
     value = parseInt(value, 10);
   }
