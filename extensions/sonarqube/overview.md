@@ -1,5 +1,7 @@
 **[SonarQube™][SQ]** is the leading tool for continuously inspecting the Code Quality and Security™ of your codebases, all while empowering development teams. Analyze over 25 popular programming languages including C#, VB.Net, JavaScript, TypeScript and C++. SonarQube easily pairs up with your Azure DevOps environment and tracks down bugs, security vulnerabilities and code smells. With over 170,000 deployments helping small development teams as well as global organizations, SonarQube provides the means for all teams and companies around the world to own and impact their Code Quality and Security.
 
+![SonarQube in Your Workflow](img/tasks.png)
+
 This extension provides tasks that you incorporate into your build definition(s) to enable additional SonarQube functionality in Azure DevOps environments. When paired with SonarQube [Community Edition][CE], you can analyze and see the results for scanning your master codebase. SonarQube [Commercial Editions][DE] offer additional functionality with Branch and Pull Request analysis so your team spots and resolves code issues before merging to master. Analysis results are published right in your Pull Requests!
 
 ## Benefits of the SonarQube Azure DevOps Marketplace Extension
@@ -9,11 +11,11 @@ A Quality Gate is a Pass/Fail status indicator that clearly lets you know if you
 
 Example of a passing Quality Gate:
 
-![Passed Qualiy Gate](img/sq-analysis-report-passed.png)
+![Passed Quality Gate](img/sq-analysis-report-passed.png)
 
 Example of a failing Quality Gate:
 
-![Failed Qualiy Gate](img/sq-analysis-report-failed.png)
+![Failed Quality Gate](img/sq-analysis-report-failed.png)
 
 ### Automatically Analyze Branches and Decorate Pull Requests (SonarQube Commercial Editions)
 When partnered with a SonarQube [Commercial Edition][DE], this extension allows automatic analysis of all branches and pull-requests which enables early discovery of bugs and security vulnerabilities prior to a merge. Branches and PRs get their own Quality Gate status and analysis results are pushed to the relevant project branch in SonarQube. 
