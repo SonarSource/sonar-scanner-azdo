@@ -1,10 +1,10 @@
-import * as semver from 'semver';
-import { EndpointType } from './Endpoint';
+import * as semver from "semver";
+import { EndpointType } from "./Endpoint";
 
 export enum Features {
-  FEATURE_BRANCHES_AND_PULLREQUEST = 'sonar.branchesandpullrequest',
-  FEATURE_NEW_REPORT_TASK_LOCATION = 'sonar.newreporttasklocation',
-  FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED = 'sonar.pullrequestprovider.deprecated'
+  FEATURE_BRANCHES_AND_PULLREQUEST = "sonar.branchesandpullrequest",
+  FEATURE_NEW_REPORT_TASK_LOCATION = "sonar.newreporttasklocation",
+  FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED = "sonar.pullrequestprovider.deprecated"
 }
 
 const featureToggleMap = new Map();
@@ -27,19 +27,19 @@ export default class FeatureEnabler {
   }
 
   private enableBranchesAndPullRequest() {
-    if (endpoint === EndpointType.SonarCloud || version >= semver.parse('7.2.0')) {
+    if (endpoint === EndpointType.SonarCloud || version >= semver.parse("7.2.0")) {
       featureToggleMap.set(Features.FEATURE_BRANCHES_AND_PULLREQUEST, true);
     }
   }
 
   private enableNewReportTaskLocation() {
-    if (endpoint === EndpointType.SonarCloud || version >= semver.parse('7.2.0')) {
+    if (endpoint === EndpointType.SonarCloud || version >= semver.parse("7.2.0")) {
       featureToggleMap.set(Features.FEATURE_NEW_REPORT_TASK_LOCATION, true);
     }
   }
 
   private enablePullRequestProviderDeprecatedProperty() {
-    if (endpoint === EndpointType.SonarQube && version >= semver.parse('8.0.0')) {
+    if (endpoint === EndpointType.SonarQube && version >= semver.parse("8.0.0")) {
       featureToggleMap.set(Features.FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED, true);
     }
   }

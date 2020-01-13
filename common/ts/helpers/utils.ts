@@ -9,7 +9,7 @@ export const PROP_NAMES = {
   PROJECTNAME: "sonar.projectName",
   PROJECTVERSION: "sonar.projectVersion",
   PROJECTSOURCES: "sonar.sources",
-  PROJECTSETTINGS: "project.settings",
+  PROJECTSETTINGS: "project.settings"
 };
 
 export function toCleanJSON(props: { [key: string]: string | undefined }) {
@@ -26,5 +26,5 @@ export function setIfNotEmpty(props: { [key: string]: string }, key: string, val
 }
 
 export function isWindows() {
-  return tl.osType().match(/^Win/);
+  return tl.getPlatform() === 0;
 }

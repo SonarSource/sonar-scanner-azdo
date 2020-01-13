@@ -6,7 +6,7 @@ async function run() {
   try {
     await publishTask(EndpointType.SonarCloud);
   } catch (err) {
-    tl.debug("[SQ] Publish task error: " + err.message);
+    tl.debug("[SonarScanner] Publish task error: " + err.message);
     tl.setResult(tl.TaskResult.Failed, err.message);
   }
 }

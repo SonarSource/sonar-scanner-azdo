@@ -1,13 +1,17 @@
 const HOURS_IN_DAY = 8;
 
 interface Formatter {
-  (value: string | number, options?: any): string;
+  (value: string | number, options?: IOptions): string;
+}
+
+interface IOptions {
+  decimals?: number;
 }
 
 export function formatMeasure(
   value: string | number | undefined,
   type: string,
-  options?: any
+  options?: IOptions
 ): string {
   const formatter = getFormatter(type);
   return useFormatter(value, formatter, options);
@@ -16,7 +20,7 @@ export function formatMeasure(
 export function useFormatter(
   value: string | number | undefined,
   formatter: Formatter,
-  options?: any
+  options?: IOptions
 ): string {
   return value !== undefined && value !== "" ? formatter(value, options) : "";
 }
@@ -59,13 +63,13 @@ export function intFormatter(value: number): string {
 
 export function shortIntFormatter(value: number): string {
   if (value >= 1e9) {
-    return numberFormatter(value / 1e9) + "G";
+    return `${numberFormatter(value / 1e9)}G`;
   } else if (value >= 1e6) {
-    return numberFormatter(value / 1e6) + "M";
+    return `${numberFormatter(value / 1e6)}M`;
   } else if (value >= 1e4) {
-    return numberFormatter(value / 1e3) + "k";
+    return `${numberFormatter(value / 1e3)}k`;
   } else if (value >= 1e3) {
-    return numberFormatter(value / 1e3, 0, 1) + "k";
+    return `${numberFormatter(value / 1e3, 0, 1)}k`;
   } else {
     return numberFormatter(value);
   }
@@ -79,11 +83,11 @@ export function percentFormatter(
   value: string | number,
   options: { decimals?: number } = {}
 ): string {
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     value = parseFloat(value);
   }
   if (options.decimals) {
-    return numberFormatter(value, options.decimals) + "%";
+    return `${numberFormatter(value, options.decimals)}%`;
   }
   return value === 100 ? "100%" : numberFormatter(value, 1) + "%";
 }
@@ -100,7 +104,7 @@ export function levelFormatter(value: string): string {
     ERROR: "Failed",
     WARN: "Warning",
     OK: "Passed",
-    NONE: "None",
+    NONE: "None"
   };
   const result = l10nKeys[value.toUpperCase()];
   return result ? result : value;
@@ -111,7 +115,7 @@ export function comparatorFormatter(value: string): string {
     EQ: "&#61;",
     GT: "&#62;",
     LT: "&#60;",
-    NE: "&#8800;",
+    NE: "&#8800;"
   };
   const result = l10nKeys[value.toUpperCase()];
   return result ? result : value;
@@ -152,7 +156,7 @@ export function shouldDisplayMinutes(days: number, hours: number, minutes: numbe
 }
 
 export function addSpaceIfNeeded(value: string): string {
-  return value.length > 0 ? value + " " : value;
+  return value.length > 0 ? `${value} ` : value;
 }
 
 export function formatDuration(
@@ -161,17 +165,17 @@ export function formatDuration(
   hours: number,
   minutes: number
 ): string {
-  let formatted = '';
+  let formatted = "";
   if (shouldDisplayDays(days)) {
-    formatted += (isNegative ? -1 * days : days) + "d";
+    formatted += `${isNegative ? -1 * days : days}d`;
   }
   if (shouldDisplayHours(days, hours)) {
     formatted = addSpaceIfNeeded(formatted);
-    formatted += (isNegative && formatted.length === 0 ? -1 * hours : hours) + "h";
+    formatted += `${isNegative && formatted.length === 0 ? -1 * hours : hours}h`;
   }
   if (shouldDisplayMinutes(days, hours, minutes)) {
     formatted = addSpaceIfNeeded(formatted);
-    formatted += (isNegative && formatted.length === 0 ? -1 * minutes : minutes) + "min";
+    formatted += `${isNegative && formatted.length === 0 ? -1 * minutes : minutes}min`;
   }
   return formatted;
 }
@@ -194,11 +198,11 @@ export function formatDurationShort(
       isNegative ? -1 * roundedHours : roundedHours,
       "SHORT_INT"
     );
-    return formattedHours + "h";
+    return `${formattedHours}h`;
   }
 
   const formattedMinutes = formatMeasure(isNegative ? -1 * minutes : minutes, "SHORT_INT");
-  return formattedMinutes + "min";
+  return `${formattedMinutes}min`;
 }
 
 export function durationFormatter(value: string | number): string {

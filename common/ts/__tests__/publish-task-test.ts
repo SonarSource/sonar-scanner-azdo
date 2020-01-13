@@ -20,7 +20,7 @@ const TASK_REPORT = new TaskReport({
   ceTaskUrl: "http://taskurl1",
   dashboardUrl: "http://dashboardurl1",
   projectKey: "projectKey1",
-  serverUrl: "http:/serverUrl1",
+  serverUrl: "http:/serverUrl1"
 });
 
 const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
@@ -57,7 +57,7 @@ it("check multiple report status and set global quality gate for build propertie
     ceTaskUrl: "string",
     dashboardUrl: "string",
     projectKey: "string",
-    serverUrl: "string",
+    serverUrl: "string"
   });
 
   taskReportArray.push(taskReport);
@@ -191,7 +191,7 @@ it("get report string should return undefined if ceTask times out", async () => 
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
-  expect(result).toBeUndefined();
+  expect(result).toBe("");
   expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
   expect(tl.warning).toBeCalledWith(
     "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result."

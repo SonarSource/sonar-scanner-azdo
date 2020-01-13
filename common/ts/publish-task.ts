@@ -85,4 +85,6 @@ export async function getReportForTask(
       throw e;
     }
   }
+
+  return "";
 }

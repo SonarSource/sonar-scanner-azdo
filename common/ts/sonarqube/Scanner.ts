@@ -6,7 +6,7 @@ import { PROP_NAMES, isWindows } from "../helpers/utils";
 export enum ScannerMode {
   MSBuild = "MSBuild",
   CLI = "CLI",
-  Other = "Other",
+  Other = "Other"
 }
 
 export default class Scanner {
@@ -45,7 +45,7 @@ export default class Scanner {
       case ScannerMode.CLI:
         return ScannerCLI.getScanner(rootPath);
       default:
-        throw new Error(`[SQ] Unknown scanner mode: ${mode}`);
+        throw new Error(`[SonarScanner] Unknown scanner mode: ${mode}`);
     }
   }
 
@@ -53,8 +53,8 @@ export default class Scanner {
     switch (mode) {
       case ScannerMode.Other:
         tl.warning(
-          `[SQ] When using Maven or Gradle, don't use the analyze task but instead tick the ` +
-            `'SonarQube' option in the Maven/Gradle task to run the scanner as part of the build.`
+          `[SonarScanner] When using Maven or Gradle, don't use the analyze task but instead tick the ` +
+            `"SonarQube" option in the Maven/Gradle task to run the scanner as part of the build.`
         );
         return Scanner.getScanner(rootPath);
       case ScannerMode.MSBuild:
@@ -62,17 +62,17 @@ export default class Scanner {
       case ScannerMode.CLI:
         return new ScannerCLI(rootPath, {});
       default:
-        throw new Error(`[SQ] Unknown scanner mode: ${mode}`);
+        throw new Error(`[SonarScanner] Unknown scanner mode: ${mode}`);
     }
   }
 
   logIssueOnBuildSummaryForStdErr(tool) {
-    tool.on("stderr", (data) => {
+    tool.on("stderr", data => {
       if (data == null) {
         return;
       }
       data = data.toString().trim();
-      if (data.indexOf("WARNING: An illegal reflective access operation has occurred") !== -1) {
+      tl.command("task.logissue", { type: "error" }, data);
         //bypass those warning showing as error because they can't be catched for now by Scanner.
         tl.debug(data);
         return;
@@ -153,7 +153,7 @@ export class ScannerCLI extends Scanner {
         projectKey: tl.getInput("cliProjectKey", true),
         projectName: tl.getInput("cliProjectName"),
         projectVersion: tl.getInput("cliProjectVersion"),
-        projectSources: tl.getInput("cliSources"),
+        projectSources: tl.getInput("cliSources")
       },
       mode
     );
@@ -253,7 +253,7 @@ export class ScannerMSBuild extends Scanner {
       projectKey: tl.getInput("projectKey", true),
       projectName: tl.getInput("projectName"),
       projectVersion: tl.getInput("projectVersion"),
-      organization: tl.getInput("organization"),
+      organization: tl.getInput("organization")
     });
   }
 }
