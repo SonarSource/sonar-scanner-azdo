@@ -3,7 +3,7 @@ import { PROP_NAMES } from "../helpers/utils";
 
 export enum EndpointType {
   SonarCloud = "SonarCloud",
-  SonarQube = "SonarQube",
+  SonarQube = "SonarQube"
 }
 
 export interface EndpointData {
