@@ -23,11 +23,7 @@ describe("setIfNotEmpty", () => {
 });
 
 describe("isOsWindows", () => {
-  it("should return 0", () => {
-    expect(isWindows()).toEqual(true);
-  });
-
-  it("should return gt than 0", () => {
+  it("should return 2", () => {
     jest.spyOn(tl, "getPlatform").mockReturnValue(2);
     const actual = isWindows();
     expect(actual).toEqual(false);
