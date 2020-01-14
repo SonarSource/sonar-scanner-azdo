@@ -34,11 +34,6 @@
       "path": "license-terms.md"
     }
   },
-  "screenshots": [
-    {
-      "path": "img/tasks.png"
-    }
-  ],
   "links": {
     "home": {
       "uri": "https://www.sonarqube.org/"

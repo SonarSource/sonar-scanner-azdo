@@ -79,7 +79,7 @@ gulp.task('tasks:old:common', () => {
   return commonPipe;
 });
 
-gulp.task('tasks:old:bundle', gulp.parallel('tasks:old:copy', 'tasks:old:common'));
+gulp.task('tasks:old:bundle', gulp.series('tasks:old:copy', 'tasks:old:common'));
 
 gulp.task('npminstall', () =>
   gulp
@@ -90,7 +90,7 @@ gulp.task('npminstall', () =>
     .pipe(es.mapSync(file => npmInstallTask(file.path)))
 );
 
-gulp.task('tasks:new:ts', gulp.parallel('npminstall'), () =>
+gulp.task('tasks:new:ts', () =>
   gulp
     .src([
       path.join(paths.extensions.tasks.new, '**', '*.ts'),
@@ -105,7 +105,7 @@ gulp.task('tasks:new:ts', gulp.parallel('npminstall'), () =>
     .pipe(gulp.dest(paths.build.extensions.root))
 );
 
-gulp.task('tasks:new:common:ts', gulp.parallel('npminstall'), () => {
+gulp.task('tasks:new:common:ts', () => {
   let commonPipe = gulp
     .src([
       path.join(paths.common.new, '**', '*.ts'),
@@ -126,7 +126,7 @@ gulp.task('tasks:new:common:ts', gulp.parallel('npminstall'), () => {
   return commonPipe;
 });
 
-gulp.task('tasks:new:copy', gulp.parallel('npminstall'), () =>
+gulp.task('tasks:new:copy', () =>
   gulp
     .src([
       path.join(paths.extensions.tasks.new, 'task.json'),
@@ -135,7 +135,7 @@ gulp.task('tasks:new:copy', gulp.parallel('npminstall'), () =>
     .pipe(gulp.dest(paths.build.extensions.root))
 );
 
-gulp.task('tasks:new:common:copy', gulp.parallel('npminstall'), () => {
+gulp.task('tasks:new:common:copy', () => {
   let commonPipe = gulp.src(pathAllFiles(paths.common.new, 'node_modules'));
   globby.sync(paths.extensions.tasks.new, { nodir: false }).forEach(dir => {
     commonPipe = commonPipe.pipe(
@@ -153,7 +153,7 @@ gulp.task('tasks:new:common:copy', gulp.parallel('npminstall'), () => {
 
 gulp.task(
   'tasks:new:bundle',
-  gulp.parallel('tasks:new:ts', 'tasks:new:common:ts', 'tasks:new:copy', 'tasks:new:common:copy')
+  gulp.series('npminstall', 'tasks:new:ts', 'tasks:new:common:ts', 'tasks:new:copy', 'tasks:new:common:copy')
 );
 
 gulp.task('tasks:icons', copyIconsTask());
@@ -184,7 +184,7 @@ gulp.task('scanner:download', () => {
   return mergeStream(classicDownload, dotnetDownload);
 });
 
-gulp.task('scanner:copy', gulp.parallel('scanner:download'), () => {
+gulp.task('scanner:copy', () => {
   const scannerFolders = [
     path.join(paths.build.extensions.sonarqubeTasks, 'prepare', 'old', 'SonarQubeScannerMsBuild'),
     path.join(
@@ -243,12 +243,13 @@ gulp.task('scanner:copy', gulp.parallel('scanner:download'), () => {
 
 gulp.task(
   'copy',
-  gulp.parallel(
+  gulp.series(
     'extension:copy',
     'tasks:old:bundle',
     'tasks:new:bundle',
     'tasks:icons',
     'tasks:version',
+    'scanner:download',
     'scanner:copy'
   )
 );
@@ -309,7 +310,7 @@ gulp.task('extension:test', () =>
 
 gulp.task('tasks:icons:test', copyIconsTask('task_icon.test.png'));
 
-gulp.task('test', gulp.parallel('extension:test', 'tasks:icons:test'));
+gulp.task('test', gulp.series('extension:test', 'tasks:icons:test'));
 
 gulp.task('build:test', gulp.series('clean', 'copy', 'test', 'tfx:test'));
 
