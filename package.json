@@ -36,7 +36,7 @@
     "prettier": "^2.0.5",
     "request": "^2.88.0",
     "semver": "^5.7.1",
-    "sonarqube-scanner": "^2.5.0",
+    "sonarqube-scanner": "2.5.0",
     "tfx-cli": "0.7.11",
     "tmp": "0.0.33",
     "ts-jest": "^24.2.0",
