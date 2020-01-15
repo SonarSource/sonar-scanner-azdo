@@ -1,5 +1,5 @@
-import * as tl from 'azure-pipelines-task-lib/task';
-import analyzeTask from '../../../../../common/ts/analyze-task';
+import * as tl from "azure-pipelines-task-lib/task";
+import analyzeTask from "../../../../../common/ts/analyze-task";
 
 async function run() {
   try {

@@ -1,12 +1,12 @@
-import * as path from 'path';
-import * as fs from 'fs-extra';
-import * as tl from 'azure-pipelines-task-lib/task';
-import * as semver from 'semver';
-import { findMatch } from '../helpers/temp-find-method';
-import Endpoint, { EndpointType } from './Endpoint';
+import * as path from "path";
+import * as fs from "fs-extra";
+import * as tl from "azure-pipelines-task-lib/task";
+import * as semver from "semver";
+import { findMatch } from "../helpers/temp-find-method";
+import Endpoint, { EndpointType } from "./Endpoint";
 
-export const REPORT_TASK_NAME = 'report-task.txt';
-export const SONAR_TEMP_DIRECTORY_NAME = 'sonar';
+export const REPORT_TASK_NAME = "report-task.txt";
+export const SONAR_TEMP_DIRECTORY_NAME = "sonar";
 
 interface ITaskReport {
   ceTaskId: string;
@@ -19,7 +19,7 @@ interface ITaskReport {
 export default class TaskReport {
   private readonly report: ITaskReport;
   constructor(report: Partial<ITaskReport>) {
-    for (const field of ['projectKey', 'ceTaskId', 'serverUrl']) {
+    for (const field of ["projectKey", "ceTaskId", "serverUrl"]) {
       if (!report[field as keyof ITaskReport]) {
         throw TaskReport.throwMissingField(field);
       }
@@ -47,20 +47,20 @@ export default class TaskReport {
     let taskReportGlob: string;
     let taskReportGlobResult: string[];
 
-    if (endpoint.type === EndpointType.SonarQube && serverVersion < semver.parse('7.2.0')) {
+    if (endpoint.type === EndpointType.SonarQube && serverVersion < semver.parse("7.2.0")) {
       tl.debug(
-        'SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file.'
+        "SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file."
       );
-      taskReportGlob = path.join('**', REPORT_TASK_NAME);
-      taskReportGlobResult = findMatch(tl.getVariable('Agent.BuildDirectory'), taskReportGlob);
+      taskReportGlob = path.join("**", REPORT_TASK_NAME);
+      taskReportGlobResult = findMatch(tl.getVariable("Agent.BuildDirectory"), taskReportGlob);
     } else {
       taskReportGlob = path.join(
         SONAR_TEMP_DIRECTORY_NAME,
-        tl.getVariable('Build.BuildNumber'),
-        '**',
+        tl.getVariable("Build.BuildNumber"),
+        "**",
         REPORT_TASK_NAME
       );
-      taskReportGlobResult = findMatch(tl.getVariable('Agent.TempDirectory'), taskReportGlob);
+      taskReportGlobResult = findMatch(tl.getVariable("Agent.TempDirectory"), taskReportGlob);
     }
 
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
@@ -96,7 +96,7 @@ export default class TaskReport {
   }
 
   private static parseReportFile(filePath: string): Promise<TaskReport> {
-    return fs.readFile(filePath, 'utf-8').then(
+    return fs.readFile(filePath, "utf-8").then(
       fileContent => {
         tl.debug(`[SQ] Parse Task report file: ${fileContent}`);
         if (!fileContent || fileContent.length <= 0) {
@@ -107,11 +107,11 @@ export default class TaskReport {
         try {
           const settings = TaskReport.createTaskReportFromString(fileContent);
           const taskReport = new TaskReport({
-            ceTaskId: settings.get('ceTaskId'),
-            ceTaskUrl: settings.get('ceTaskUrl'),
-            dashboardUrl: settings.get('dashboardUrl'),
-            projectKey: settings.get('projectKey'),
-            serverUrl: settings.get('serverUrl')
+            ceTaskId: settings.get("ceTaskId"),
+            ceTaskUrl: settings.get("ceTaskUrl"),
+            dashboardUrl: settings.get("dashboardUrl"),
+            projectKey: settings.get("projectKey"),
+            serverUrl: settings.get("serverUrl")
           });
           return Promise.resolve(taskReport);
         } catch (err) {
@@ -133,12 +133,12 @@ export default class TaskReport {
   }
 
   private static createTaskReportFromString(fileContent: string): Map<string, string> {
-    const lines: string[] = fileContent.replace(/\r\n/g, '\n').split('\n'); // proofs against xplat line-ending issues
+    const lines: string[] = fileContent.replace(/\r\n/g, "\n").split("\n"); // proofs against xplat line-ending issues
     const settings = new Map<string, string>();
     lines.forEach((line: string) => {
-      const splitLine = line.split('=');
+      const splitLine = line.split("=");
       if (splitLine.length > 1) {
-        settings.set(splitLine[0], splitLine.slice(1, splitLine.length).join('='));
+        settings.set(splitLine[0], splitLine.slice(1, splitLine.length).join("="));
       }
     });
     return settings;
@@ -151,7 +151,7 @@ export default class TaskReport {
   private static throwInvalidReport(debugMsg: string): Error {
     tl.error(debugMsg);
     return new Error(
-      'Invalid or missing task report. Check that the analysis finished successfully.'
+      "Invalid or missing task report. Check that the analysis finished successfully."
     );
   }
 }
