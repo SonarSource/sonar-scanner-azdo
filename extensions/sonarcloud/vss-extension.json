@@ -36,18 +36,21 @@
   ],
   "links": {
     "home": {
-      "uri": "https://about.sonarcloud.io/"
+      "uri": "https://sonarcloud.io/"
     },
     "getstarted": {
       "uri": "https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud"
     },
     "support": {
-      "uri": "https://www.sonarqube.org/community/"
+      "uri": "https://community.sonarsource.com/"
+    },
+    "privacypolicy": {
+      "uri": "https://sonarcloud.io/documentation/privacy/"
     }
   },
   "CustomerQnASupport": {
     "enableqna": "true",
-    "url": "https://about.sonarcloud.io/contact/"
+    "url": "https://community.sonarsource.com/"
   },
   "repository": {
     "type": "git",
