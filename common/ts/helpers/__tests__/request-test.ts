@@ -1,6 +1,6 @@
-// import * as tl from "azure-pipelines-task-lib/task";
-// import { SemVer } from "semver";
-// import Endpoint, { EndpointType } from "../../sonarqube/Endpoint";
+import * as tl from "azure-pipelines-task-lib/task";
+import { SemVer } from "semver";
+import Endpoint, { EndpointType } from "../../sonarqube/Endpoint";
 import * as request from "../request";
 
 beforeEach(() => {
@@ -24,85 +24,87 @@ describe("isString", () => {
   });
 });
 
-// describe("getServerVersion", () => {
-//   it("should return server version", () => {
-//     const endpointData = { url: "http://httpbin.org/anything/" };
+describe("getServerVersion", () => {
+  it("should return server version", () => {
+    const endpointData = { url: "https://sonarcloud.io/" };
 
-//     jest.spyOn(request, "callGet").mockReturnValue("8.0.0.3842");
+    const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
 
-//     const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
+    request.getServerVersion(endpoint).then(actual => {
+      expect(actual).toBe(new SemVer("8.0.0"));
+    });
+  });
+});
 
-//     const actual = request.getServerVersion(endpoint);
-//     expect(actual).toBe(new SemVer("8.0.0"));
-//   });
-// });
+describe("getJSON", () => {
+  it("should return json", () => {
+    const endpointData = { url: "http://httpbin.org" };
 
-// describe("getJSON", () => {
-//   it("should return json", () => {
-//     const endpointData = { url: "http://httpbin.org" };
+    const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
 
-//     const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
+    const query: request.RequestData = { username: "mickael", location: "geneva" };
 
-//     const query: request.RequestData = { username: "mickael", location: "geneva" };
+    request.getJSON(endpoint, "/get", query).then(actual => {
+      const actualJson = JSON.parse(actual);
+      expect(actualJson.args.location).toBe("geneva");
+    });
+  });
+});
 
-//     const actual = request.getJSON(endpoint, "/get", query);
-//     const actualJson = JSON.parse(actual);
-//     expect(actualJson.args.location).toBe("geneva");
-//   });
-// });
+describe("get", () => {
+  it("should return query params", () => {
+    jest.spyOn(tl, "debug");
 
-// describe("get", () => {
-//   it("should return query params", () => {
-//     jest.spyOn(tl, "debug");
+    const endpointData = { url: "http://httpbin.org" };
 
-//     const endpointData = { url: "http://httpbin.org" };
+    const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
 
-//     const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
+    const query: request.RequestData = { username: "mickael", location: "geneva" };
 
-//     const query: request.RequestData = { username: "mickael", location: "geneva" };
+    request.callGet(endpoint, "/get", true, query).then(response => {
+      const actualJson = JSON.parse(response);
+      expect(actualJson.args.location).toBe("geneva");
+    });
 
-//     const actual = request.callGet(endpoint, "/get", true, query);
-//     tl.debug(actual);
-//     const actualJson = JSON.parse(actual);
-//     expect(actualJson.args.location).toBe("geneva");
+    expect(tl.debug).toHaveBeenCalledTimes(1);
+    expect(tl.debug).toHaveBeenNthCalledWith(
+      1,
+      `[SonarScanner] API GET: '/get' with query '{"username":"mickael","location":"geneva"}'`
+    );
+  });
 
-//     expect(tl.debug).toHaveBeenCalledTimes(1);
-//     expect(tl.debug).toHaveBeenNthCalledWith(
-//       1,
-//       `[SonarScanner] API GET: '/get' with query '{"username":"mickael","location":"geneva"}'`
-//     );
-//   });
+  it("should handle > 300 status code", () => {
+    jest.spyOn(tl, "debug");
 
-//   it("should handle > 300 status code", () => {
-//     jest.spyOn(tl, "debug");
+    const endpointData = { url: "http://httpbin.org" };
 
-//     const endpointData = { url: "http://httpbin.org" };
+    const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
 
-//     const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
+    request.callGet(endpoint, "/status/304", true).then(actual => {
+      expect(actual).toContain(
+        "[Error: [SonarScanner] API GET '/status/304' failed, status code was: 304]"
+      );
+    });
 
-//     const actual = request.callGet(endpoint, "/status/304", true);
-//     expect(actual).toContain(
-//       "[Error: [SonarScanner] API GET '/status/304' failed, status code was: 304]"
-//     );
+    expect(tl.debug).toHaveBeenCalledTimes(1);
+    expect(tl.debug).toHaveBeenNthCalledWith(
+      1,
+      `[SonarScanner] API GET: '/status/304' with query 'undefined'`
+    );
+  });
 
-//     expect(tl.debug).toHaveBeenCalledTimes(1);
-//     expect(tl.debug).toHaveBeenNthCalledWith(
-//       1,
-//       `[SonarScanner] API GET: '/status/304' with query 'undefined'`
-//     );
-//   });
+  it("should handle auth", () => {
+    jest.spyOn(tl, "debug");
 
-//   it("should handle auth", () => {
-//     jest.spyOn(tl, "debug");
+    const endpointData = { url: "http://httpbin.org" };
 
-//     const endpointData = { url: "http://httpbin.org" };
+    const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
 
-//     const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
+    endpoint.auth.user = "admin";
 
-//     endpoint.auth.user = "admin";
-
-//     const actual = request.callGet(endpoint, "/headers", true);
-//     const actualJson = JSON.parse(actual);
-//     expect(actualJson.headers.Authorization).toBe("Basic YWRtaW46");
-//   });
-//});
+    request.callGet(endpoint, "/headers", true).then(response => {
+      const actualJson = JSON.parse(response);
+      expect(actualJson.headers.Authorization).toBe("Basic YWRtaW46");
+    });
+  });
+});

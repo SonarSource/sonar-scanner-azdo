@@ -30,19 +30,6 @@ it("should build jsonpath body properly", () => {
 });
 
 describe("getAuthToken", () => {
-  // it("should return auth token", () => {
-  //   const expected = "Bearer 1234";
-  //   const params: { [key: string]: string } = {};
-  //   params["AccessToken"] = expected;
-
-  //   const auth: tl.EndpointAuthorization = { scheme: "oauth", parameters: params };
-
-  //   jest.spyOn(tl, "getEndpointAuthorization").mockReturnValue(auth);
-
-  //   const actual = azdoApiUtils.getAuthToken();
-
-  //   expect(actual).toBe(expected);
-  // });
   it("should throw error", () => {
     const expected = "Bearer 1234";
     const params: { [key: string]: string } = {};
