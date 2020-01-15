@@ -28,7 +28,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   const props: { [key: string]: string } = {};
 
-  const serverVersion = getServerVersion(endpoint);
+  const serverVersion = await getServerVersion(endpoint);
   featureEnabler = new FeatureEnabler(serverVersion, endpoint.type);
 
   if (featureEnabler.isEnabled(Features.FEATURE_NEW_REPORT_TASK_LOCATION)) {
