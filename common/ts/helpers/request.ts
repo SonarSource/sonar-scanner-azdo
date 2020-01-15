@@ -1,7 +1,7 @@
-import * as request from 'request';
-import * as semver from 'semver';
-import * as tl from 'azure-pipelines-task-lib/task';
-import Endpoint from '../sonarqube/Endpoint';
+import * as request from "request";
+import * as semver from "semver";
+import * as tl from "azure-pipelines-task-lib/task";
+import Endpoint from "../sonarqube/Endpoint";
 
 interface RequestData {
   [x: string]: any;
@@ -19,7 +19,7 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
     }
     request.get(
       {
-        method: 'GET',
+        method: "GET",
         baseUrl: endpoint.url,
         uri: path,
         json: isJson,
@@ -41,14 +41,14 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
             `[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`
           );
         }
-        return resolve(body || (isJson ? {} : ''));
+        return resolve(body || (isJson ? {} : ""));
       }
     );
   });
 }
 
 function isString(x) {
-  return Object.prototype.toString.call(x) === '[object String]';
+  return Object.prototype.toString.call(x) === "[object String]";
 }
 
 export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
@@ -56,7 +56,7 @@ export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): 
 }
 
 export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
-  return get(endpoint, '/api/server/version', false).then(semver.coerce);
+  return get(endpoint, "/api/server/version", false).then(semver.coerce);
 }
 
 function logAndReject(reject, errMsg) {

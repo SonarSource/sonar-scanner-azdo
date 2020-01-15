@@ -1,16 +1,16 @@
-import * as tl from 'azure-pipelines-task-lib/task';
-import Analysis from './sonarqube/Analysis';
-import Endpoint, { EndpointType, EndpointData } from './sonarqube/Endpoint';
-import Metrics from './sonarqube/Metrics';
-import Task, { TimeOutReachedError } from './sonarqube/Task';
-import TaskReport from './sonarqube/TaskReport';
-import { publishBuildSummary, fillBuildProperty } from './helpers/azdo-server-utils';
-import { getServerVersion } from './helpers/request';
+import * as tl from "azure-pipelines-task-lib/task";
+import Analysis from "./sonarqube/Analysis";
+import Endpoint, { EndpointType, EndpointData } from "./sonarqube/Endpoint";
+import Metrics from "./sonarqube/Metrics";
+import Task, { TimeOutReachedError } from "./sonarqube/Task";
+import TaskReport from "./sonarqube/TaskReport";
+import { publishBuildSummary, fillBuildProperty } from "./helpers/azdo-server-utils";
+import { getServerVersion } from "./helpers/request";
 
-let globalQualityGateStatus = '';
+let globalQualityGateStatus = "";
 
 export default async function publishTask(endpointType: EndpointType) {
-  const params = tl.getVariable('SONARQUBE_SCANNER_PARAMS');
+  const params = tl.getVariable("SONARQUBE_SCANNER_PARAMS");
   if (!params) {
     tl.setResult(
       tl.TaskResult.Failed,
@@ -20,7 +20,7 @@ export default async function publishTask(endpointType: EndpointType) {
   }
 
   const endpointData: { type: EndpointType; data: EndpointData } = JSON.parse(
-    tl.getVariable('SONARQUBE_ENDPOINT')
+    tl.getVariable("SONARQUBE_ENDPOINT")
   );
   const endpoint = new Endpoint(endpointData.type, endpointData.data);
   const metrics = await Metrics.getAllMetrics(endpoint);
@@ -33,12 +33,12 @@ export default async function publishTask(endpointType: EndpointType) {
     taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
   );
 
-  if (globalQualityGateStatus === '') {
-    globalQualityGateStatus = 'ok';
+  if (globalQualityGateStatus === "") {
+    globalQualityGateStatus = "ok";
   }
 
   if (!taskReports.length) {
-    tl.warning('No analyses found in this build! Please check your build configuration.');
+    tl.warning("No analyses found in this build! Please check your build configuration.");
   } else {
     tl.debug(`Number of analyses in this build: ${taskReports.length}`);
   }
@@ -47,11 +47,11 @@ export default async function publishTask(endpointType: EndpointType) {
 
   await fillBuildProperty(globalQualityGateStatus);
 
-  publishBuildSummary(analyses.join('\r\n'), endpoint.type);
+  publishBuildSummary(analyses.join("\r\n"), endpoint.type);
 }
 
 function timeoutInSeconds(): number {
-  return Number.parseInt(tl.getInput('pollingTimeoutSec', true), 10);
+  return Number.parseInt(tl.getInput("pollingTimeoutSec", true), 10);
 }
 
 export async function getReportForTask(
@@ -70,8 +70,8 @@ export async function getReportForTask(
       projectName: task.componentName
     });
 
-    if (analysis.status === 'ERROR' || analysis.status === 'WARN' || analysis.status === 'NONE') {
-      globalQualityGateStatus = 'failed';
+    if (analysis.status === "ERROR" || analysis.status === "WARN" || analysis.status === "NONE") {
+      globalQualityGateStatus = "failed";
     }
 
     return analysis.getHtmlAnalysisReport();

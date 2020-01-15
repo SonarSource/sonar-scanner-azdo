@@ -1,9 +1,9 @@
-import * as tl from 'azure-pipelines-task-lib/task';
-import * as analyze from '../../ts/analyze-task';
-import Scanner, { ScannerCLI, ScannerMode } from '../sonarqube/Scanner';
+import * as tl from "azure-pipelines-task-lib/task";
+import * as analyze from "../../ts/analyze-task";
+import Scanner, { ScannerCLI, ScannerMode } from "../sonarqube/Scanner";
 
-it('should not have SONARQUBE_SCANNER_MODE property filled', async () => {
-  jest.spyOn(tl, 'getVariable').mockImplementation(() => undefined);
+it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
+  jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
 
   const expectedError = new Error(
     "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task"
@@ -15,14 +15,14 @@ it('should not have SONARQUBE_SCANNER_MODE property filled', async () => {
   }
 });
 
-it('should run scanner', async () => {
-  jest.spyOn(tl, 'getVariable').mockImplementation(() => 'CLI');
+it("should run scanner", async () => {
+  jest.spyOn(tl, "getVariable").mockImplementation(() => "CLI");
 
-  const scanner = new ScannerCLI(__dirname, { projectSettings: 'scanner.properties' });
+  const scanner = new ScannerCLI(__dirname, { projectSettings: "scanner.properties" });
 
-  jest.spyOn(Scanner, 'getAnalyzeScanner').mockImplementation(() => scanner);
+  jest.spyOn(Scanner, "getAnalyzeScanner").mockImplementation(() => scanner);
 
-  jest.spyOn(scanner, 'runAnalysis').mockImplementation(() => null);
+  jest.spyOn(scanner, "runAnalysis").mockImplementation(() => null);
 
   await analyze.default(__dirname);
 

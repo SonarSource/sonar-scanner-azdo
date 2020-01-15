@@ -1,8 +1,8 @@
-import * as tl from 'azure-pipelines-task-lib/task';
-import Endpoint, { EndpointType } from './Endpoint';
-import Metrics from './Metrics';
-import { formatMeasure } from '../helpers/measures';
-import { getJSON } from '../helpers/request';
+import * as tl from "azure-pipelines-task-lib/task";
+import Endpoint, { EndpointType } from "./Endpoint";
+import Metrics from "./Metrics";
+import { formatMeasure } from "../helpers/measures";
+import { getJSON } from "../helpers/request";
 
 interface IAnalysis {
   status: string;
@@ -38,7 +38,7 @@ export default class Analysis {
 
   public getFailedConditions() {
     return this.conditions.filter(condition =>
-      ['WARN', 'ERROR'].includes(condition.status.toUpperCase())
+      ["WARN", "ERROR"].includes(condition.status.toUpperCase())
     );
   }
 
@@ -49,7 +49,7 @@ export default class Analysis {
       this.getQualityGateDetailSection(),
       this.getDashboardLink()
     ]
-      .join(' \r\n')
+      .join(" \r\n")
       .trim();
   }
 
@@ -63,17 +63,17 @@ export default class Analysis {
       font-size: 12px;
       margin-left: 15px;`;
     return `<div style="padding-top: 8px;">
-      <span>${this.projectName ? this.projectName + ' ' : ''}Quality Gate</span>
+      <span>${this.projectName ? this.projectName + " " : ""}Quality Gate</span>
       <span style="${qgStyle}">
-        ${formatMeasure(this.status, 'LEVEL')}
+        ${formatMeasure(this.status, "LEVEL")}
       </span>
     </div>`;
   }
 
   private getQualityGateDetailSection() {
     const failedConditions = this.getFailedConditions();
-    if (!this.metrics || !['WARN', 'ERROR'].includes(this.status) || failedConditions.length <= 0) {
-      return '';
+    if (!this.metrics || !["WARN", "ERROR"].includes(this.status) || failedConditions.length <= 0) {
+      return "";
     }
 
     const rows = failedConditions.map(condition => {
@@ -83,7 +83,7 @@ export default class Analysis {
       }
 
       const threshold =
-        condition.status === 'WARN' ? condition.warningThreshold : condition.errorThreshold;
+        condition.status === "WARN" ? condition.warningThreshold : condition.errorThreshold;
       return `<tr>
         <td><span style="padding-right:4px;">${metric.name}</span></td>
         <td style="text-align:center; color:#fff; background-color:${this.getQualityGateColor()};">
@@ -93,7 +93,7 @@ export default class Analysis {
           )}</span>
         </td>
         <td>
-          <span style="padding-left:4px">${formatMeasure(condition.comparator, 'COMPARATOR')}</span>
+          <span style="padding-left:4px">${formatMeasure(condition.comparator, "COMPARATOR")}</span>
           <span style="padding-left:4px">${formatMeasure(threshold, metric.type)}</span>
         </td>
       </tr>`;
@@ -106,14 +106,14 @@ export default class Analysis {
     `;
     return `<table border="0" style="${tableStyle}">
       <tbody>
-        ${rows.join(' \r\n').trim()}
+        ${rows.join(" \r\n").trim()}
       </tbody>
     </table>\r\n\r\n`; // 2 carriage returns to prevent any malformed summary results
   }
 
   private getDashboardLink() {
     if (!this.dashboardUrl) {
-      return '';
+      return "";
     }
     const linkText = `Detailed ${this.endpointType} report &gt;`;
     return `[${linkText}](${this.dashboardUrl})`;
@@ -121,16 +121,16 @@ export default class Analysis {
 
   private getQualityGateColor() {
     switch (this.status) {
-      case 'OK':
-        return '#00aa00';
-      case 'WARN':
-        return '#ed7d20';
-      case 'ERROR':
-        return '#d4333f';
-      case 'NONE':
-        return '#b4b4b4';
+      case "OK":
+        return "#00aa00";
+      case "WARN":
+        return "#ed7d20";
+      case "ERROR":
+        return "#d4333f";
+      case "NONE":
+        return "#b4b4b4";
       default:
-        return '#b4b4b4';
+        return "#b4b4b4";
     }
   }
 
@@ -148,7 +148,7 @@ export default class Analysis {
     metrics?: Metrics;
   }): Promise<Analysis> {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
-    return getJSON(endpoint, '/api/qualitygates/project_status', { analysisId }).then(
+    return getJSON(endpoint, "/api/qualitygates/project_status", { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
         new Analysis(projectStatus, endpoint.type, dashboardUrl, metrics, projectName),
       err => {

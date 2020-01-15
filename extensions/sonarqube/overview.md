@@ -1,50 +1,55 @@
-**[SonarQube][sq]** is the leading product for Continuous Code Quality. It supports all major programming languages, including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. Integrate it in your on-premise TFS installation, and continuously track down bugs and vulnerabilities in your codebase.
+**[SonarQube™][SQ]** is the leading tool for continuously inspecting the Code Quality and Security™ of your codebases, all while empowering development teams. Analyze over 25 popular programming languages including C#, VB.Net, JavaScript, TypeScript and C++. SonarQube easily pairs up with your Azure DevOps environment and tracks down bugs, security vulnerabilities and code smells. With over 170,000 deployments helping small development teams as well as global organizations, SonarQube provides the means for all teams and companies around the world to own and impact their Code Quality and Security.
 
-This extension provides build tasks that you can add in your build definition. All branches and pull-requests are automatically analyzed, allowing you to discover early any bug or vulnerability in the code.
+![SonarQube in Your Workflow](img/tasks.png)
 
-*Note: this extension is officially supported for use with Azure DevOps Server (formerly TFS). Ongoing interoperability with Azure DevOps Services (cloud-based) is not assured.*
+This extension provides tasks that you incorporate into your build definition(s) to enable additional SonarQube functionality in Azure DevOps environments. When paired with SonarQube [Community Edition][CE], you can analyze and see the results for scanning your master codebase. SonarQube [Commercial Editions][DE] offer additional functionality with Branch and Pull Request analysis so your team spots and resolves code issues before merging to master. Analysis results are published right in your Pull Requests!
 
-## About the SonarQube Azure DevOps Marketplace Extension
-This extension provides the following features:
-* A dedicated **SonarQube EndPoint** to define the SonarQube server to be used.
-* Three build tasks to get your projects analyzed easily:
-  * **Prepare Analysis Configuration** task, to configure all the required settings before executing the build. This task is mandatory. In case of .NET solutions or Java projects, this tasks helps to integrate seamlessly with MSBuild, Maven and Gradle tasks.
-  * **Run Code Analysis** task, to actually execute the analysis of the source code. Not required for Maven or Gradle projects.
-  * **Publish Quality Gate Result** task, to display the quality gate status in the build summary. This tasks is optional, as it can increase the overall build time.
-  * Analysis of the branches and the **pull requests** of your projects
+## Benefits of the SonarQube Azure DevOps Marketplace Extension
 
-**Note for TFS installations older than TFS 2017 Update 2**: to install the extension, please follow instructions
-available on the ["SonarQube Extension 3.0" documentation page](https://docs.sonarqube.org/display/SCAN/SonarQube+Extension+3.0).
+### Quality Gate™ Status Publishing
+A Quality Gate is a Pass/Fail status indicator that clearly lets you know if your code is clean and safe. SonarQube comes with a default Quality Gate called Sonar Way™ that's built-in and ready to use. When you see a 'Green' Quality Gate, you know that your application is releasable and your team is hitting the mark! The Quality Gate provides the ability to know at each analysis whether an application passes or fails the release criteria. In other words, it tells you with every analysis whether your application is ready for production "quality-wise".
 
-## Highlighted Features
-### Seamless Integration with .Net solutions
-The analysis of C# and VB. Net solution is really straightforward since it only requires adding the two **Prepare Analysis Configuration** and **Run Code Analysis** tasks to your build definition.
+Example of a passing Quality Gate:
 
-### Easy setup for Maven and Gradle projects
-If you're doing Java, analyzing your source code is also very easy. It only requires adding the **Prepare Analysis Configuration** task, and check the **Run SonarQube Analysis** option in the "Code Analysis" panel of the Maven or Gradle task.
+![Passed Quality Gate](img/sq-analysis-report-passed.png)
 
-### Branch and Pull Request analysis
-Whatever type of source repository you are analysing, when a build is run on a branch of your project, the extension automatically configures the analysis to be pushed to the relevant project branch on SonarQube:
+Example of a failing Quality Gate:
+
+![Failed Quality Gate](img/sq-analysis-report-failed.png)
+
+### Automatically Analyze Branches and Decorate Pull Requests (SonarQube Commercial Editions)
+When partnered with a SonarQube [Commercial Edition][DE], this extension allows automatic analysis of all branches and pull-requests which enables early discovery of bugs and security vulnerabilities prior to a merge. Branches and PRs get their own Quality Gate status and analysis results are pushed to the relevant project branch in SonarQube. 
 
 ![Branches](img/branches.png)
 
-If you configure your build definition as a build validation for pull requests of that project (this can be done on "Branch policies"), SonarQube will also analyze the code changes and decorate the pull request with comments and overall status so that you can merge with confidence:
+It's easy to add non-disruptive code quality checks right into your Azure DevOps workflow. Simply add SonarQube to your build pipeline definition and you're on your way to only promoting quality code. SonarQube analyzes the code changes and decorates Pull Requests with comments and overall status -> _merge with confidence!_
+
+![Build Config](img/Build-pipeline.png)
+
+When a build is run on a PR, the extension automatically publishes the QG status and configures the analysis to be pushed to the relevant project branch on SonarQube.
 
 ![PR-Decoration](img/pull-request-decoration.png)
 
-**Important note**: to activate pull request decoration, you must specify a user token in the "General Settings > Pull Requests" administration page of your project in SonarQube.
+**Important note**: to activate Pull Request decoration, you must specify a user token in the "General Settings > Pull Requests" administration page of your project in SonarQube.
 
-### Quality Gate Status
-The **Publish Quality Gate Result** task waits for the analysis report to be consumed by the SonarQube in order to flag the build job with the Quality Gate status. The Quality Gate is a major, out-of-the-box, feature of SonarQube. It provides the ability to know at each analysis whether an application passes or fails the release criteria. In other words it tells you at every analysis whether an application is ready for production "quality-wise".
+## Additional Highlights
+### Seamless integration with .NET solutions
+C# and VB.NET analysis is simple and straightforward and only requires adding the **Prepare Analysis Configuration** and **Run Code Analysis** tasks to your build definition.
 
-Example of a passing Quality Gate:
-![Passed Qualiy Gate](img/sq-analysis-report-passed.png)
+### Easy setup for Maven and Gradle projects
+For Java, analyzing your source code is also very easy. It only requires adding the **Prepare Analysis Configuration** task and checking the **Run SonarQube Analysis** option in the 'Code Analysis' panel in your Maven or Gradle task.
 
-Example of a failing Quality Gate:
-![Failed Qualiy Gate](img/sq-analysis-report-failed.png)
+## SonarQube Azure DevOps Marketplace Extension Details
+This extension provides Branch and Pull Request analysis along with:
+* A dedicated **SonarQube EndPoint** that defines the SonarQube server to be used.
+* Three build tasks to get your projects analyzed easily:
+  * **Prepare Analysis Configuration:** Configures all the required settings prior to executing a build. This task is mandatory. For .NET solutions or Java projects, this task helps SonarQube seamlessly integrate with MSBuild, Maven and Gradle tasks.
+  * **Run Code Analysis:** Executes the source code analysis. This task isn't required for Maven or Gradle projects.
+  * **Publish Quality Gate Result:** Displays the Quality Gate status in the build summary. This tasks is optional, as it may increase the overall build time.
 
+This [Get Started][getstarted] guide provides instructions on installing, configuring and using the SonarQube extension for Azure DevOps.
 
-This [Get Started][getstarted] guide provides all the required documentation for you to setup a build definition.
-
-   [sq]: <https://www.sonarsource.com/products/sonarqube/>
+   [SQ]: <https://www.sonarqube.org/>
+   [CE]: <https://www.sonarqube.org/downloads/>
+   [DE]: <https://www.sonarqube.org/downloads/>
    [getstarted]: <http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html>

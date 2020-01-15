@@ -1,9 +1,9 @@
-import * as tl from 'azure-pipelines-task-lib/task';
-import { PROP_NAMES } from '../helpers/utils';
+import * as tl from "azure-pipelines-task-lib/task";
+import { PROP_NAMES } from "../helpers/utils";
 
 export enum EndpointType {
-  SonarCloud = 'SonarCloud',
-  SonarQube = 'SonarQube'
+  SonarCloud = "SonarCloud",
+  SonarQube = "SonarQube"
 }
 
 export interface EndpointData {
@@ -49,12 +49,12 @@ export default class Endpoint {
     const url = tl.getEndpointUrl(id, false);
     const token = tl.getEndpointAuthorizationParameter(
       id,
-      'apitoken',
+      "apitoken",
       type !== EndpointType.SonarCloud
     );
-    const username = tl.getEndpointAuthorizationParameter(id, 'username', true);
-    const password = tl.getEndpointAuthorizationParameter(id, 'password', true);
-    const organization = tl.getInput('organization', type === EndpointType.SonarCloud);
+    const username = tl.getEndpointAuthorizationParameter(id, "username", true);
+    const password = tl.getEndpointAuthorizationParameter(id, "password", true);
+    const organization = tl.getInput("organization", type === EndpointType.SonarCloud);
     return new Endpoint(type, { url, token, username, password, organization });
   }
 }
