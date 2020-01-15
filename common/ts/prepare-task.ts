@@ -44,6 +44,9 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     .map(keyValue => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 
+  // Save BuildId so that the scan can later uniquely be identified in "project_analyses API" or similar
+  props['sonar.buildid'] = tl.getVariable('Build.BuildId');
+  
   tl.setVariable('SONARQUBE_SCANNER_MODE', scannerMode);
   tl.setVariable('SONARQUBE_ENDPOINT', endpoint.toJson(), true);
   tl.setVariable(
