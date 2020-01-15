@@ -42,7 +42,10 @@
       "uri": "http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html"
     },
     "support": {
-      "uri": "https://www.sonarqube.org/community/"
+      "uri": "https://community.sonarsource.com/"
+    },
+    "privacypolicy": {
+      "uri": "https://www.sonarqube.org/privacy/"
     }
   },
   "CustomerQnASupport": {
