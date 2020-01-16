@@ -146,7 +146,7 @@ In your build pipeline, insert the following steps in the order they appear here
       ```
       Example of bash commands on a macos host with a *xcodebuild* build:
       ```
-      build-wrapper-macosx-x86/build-wrapper-macos-x86 --out-dir <output directory> xcodebuild -project myproject.xcodeproj -configuration Release
+      build-wrapper-macosx-x86/build-wrapper-macos-x86 --out-dir <output directory> xcodebuild -project myproject.xcodeproj -configuration Release clean build
       ```
 4. Add a **Run Code Analysis** task to run the code analysis and make the results available to <!-- sonarcloud -->SonarCloud<!-- /sonarcloud --><!-- sonarqube -->SonarQube<!-- /sonarqube -->.\
    Consider running this task right after the previous one as the build environment should not be significantly altered before running the analysis. 
