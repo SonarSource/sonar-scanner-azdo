@@ -130,7 +130,7 @@ In your build pipeline, insert the following steps in the order they appear here
    Click on the **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** task to configure it:
    * Select the <!-- sonarcloud -->**SonarCloud Service Endpoint**<!-- /sonarcloud --><!-- sonarqube -->**SonarQube Server**<!-- /sonarqube -->
    <!-- sonarcloud -->* Select your SonarCloud organization<!-- /sonarcloud -->
-   * In *Choose the way to run the analysis*, select *standalone scanner* even if you build with *Visual Studio*/*MSBuild* 
+   * In *Choose the way to run the analysis*, select *standalone scanner* (even if you build with *Visual Studio*/*MSBuild*) 
    * In *Additional Properties* in the *Advanced* section, add the property `sonar.cfamily.build-wrapper-output` with, as its value, the output directory to which the Build Wrapper should write its results: `sonar.cfamily.build-wrapper-output=<output directory>`
 3. Add a **Command Line** task to run your build.\
    For the analysis to happen, your build has to be run through a command line so that it can be wrapped-up by the build-wrapper.
