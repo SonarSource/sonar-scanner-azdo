@@ -130,7 +130,7 @@ In your build pipeline, insert the following steps in the order they appear here
 3. Add a **Command Line** task to run your build.
    For the analysis to happen, your build has to be run through a command line so that it can be wrapped-up by the build-wrapper.
    To do so, 
-   * Run **Build Wrapper** executable. Pass in as the arguments (1) the output directory to which the Build Wrapper should write its results and (2) the command that runs the compilation of your project.\
+   * Run **Build Wrapper** executable. Pass in as the arguments (1) the output directory to which the Build Wrapper should write its results and (2) the command that runs a clean build of your project (not an incremental build).\
    Example of PowerShell commands on windows:
       ```
       path/to/build-wrapper-win-x86-64.exe --out-dir <output directory> MSBuild.exe /t:Rebuild
