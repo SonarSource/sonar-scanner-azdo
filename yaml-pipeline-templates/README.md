@@ -8,6 +8,6 @@ You can either pick a file, commit it to your repository, and then access it thr
 License
 -------
 
-Copyright 2017-2019 SonarSource.
+Copyright 2017-2020 SonarSource.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt))
