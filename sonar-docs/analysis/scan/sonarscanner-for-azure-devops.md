@@ -125,7 +125,7 @@ In your build pipeline, insert the following steps in the order they appear here
      curl '<sonarqube or sonarcloud url>/static/cpp/build-wrapper-macosx-x86.zip' --output build-wrapper.zip
      unzip build-wrapper.zip
      ```  
-   * For the self-hosted build agent you can do the same either every build or only once (as part of manual setup of build agent).
+   * For the self-hosted build agent you can either download it everytime (using the same scripts) or only once (as part of manual setup of build agent).
 2. Add a **Prepare analysis Configuration** task and configure it as follow:\
    Click on the **Prepare analysis on <!-- sonarcloud -->SonarCloud <!-- /sonarcloud --><!-- sonarqube -->SonarQube <!-- /sonarqube -->** task to configure it:
    * Select the <!-- sonarcloud -->**SonarCloud Service Endpoint**<!-- /sonarcloud --><!-- sonarqube -->**SonarQube Server**<!-- /sonarqube -->
