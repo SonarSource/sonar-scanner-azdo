@@ -105,7 +105,7 @@ Once all this is done, you can trigger a build.
 Once all this is done, you can trigger a build.
 
 ## Analyzing a C++ project
-In your build pipeline, insert the following steps in the order they appear here. These steps can be interleaved with other steps of your build as long as the following order is followed.
+In your build pipeline, insert the following steps in the order they appear here. These steps can be interleaved with other steps of your build as long as the following order is followed. All steps have to be executed on the same agent.
 1. Make **Build Wrapper** available on the build agent
    Download and unzip **Build Wrapper** on the build agent (see *Prerequisites* section of *C/C++/Objective-C* page). This can be done by inserting a **Command Line** task.\
    Example of PowerShell commands:
