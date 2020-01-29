@@ -319,7 +319,7 @@ gulp.task('build:test', gulp.series('clean', 'copy', 'test', 'tfx:test'));
  *  DEPLOY TASKS
  * =========================
  */
-gulp.task('deploy:vsix', gulp.parallel('build'), () => {
+gulp.task('deploy:vsix', gulp.series('build'), () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
