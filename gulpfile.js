@@ -362,7 +362,7 @@ gulp.task('deploy:vsix', gulp.parallel('build'), () => {
   );
 });
 
-gulp.task('deploy:buildinfo', gulp.parallel('build'), () => {
+gulp.task('deploy:buildinfo', gulp.series('build'), () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -382,7 +382,7 @@ gulp.task('deploy:buildinfo', gulp.parallel('build'), () => {
     .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
 });
 
-gulp.task('deploy', gulp.parallel('deploy:buildinfo', 'deploy:vsix'));
+gulp.task('deploy', gulp.series('deploy:buildinfo', 'deploy:vsix'));
 
 /*
  * =========================
@@ -404,4 +404,4 @@ gulp.task('sonarqube', done => {
   }
 });
 
-gulp.task('default', gulp.parallel('build'));
+gulp.task('default', gulp.series('build'));
