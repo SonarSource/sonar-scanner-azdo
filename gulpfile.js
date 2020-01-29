@@ -319,7 +319,7 @@ gulp.task('build:test', gulp.series('clean', 'copy', 'test', 'tfx:test'));
  *  DEPLOY TASKS
  * =========================
  */
-gulp.task('deploy:vsix', gulp.parallel('build'), () => {
+gulp.task('deploy:vsix', () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -362,7 +362,7 @@ gulp.task('deploy:vsix', gulp.parallel('build'), () => {
   );
 });
 
-gulp.task('deploy:buildinfo', gulp.series('build'), () => {
+gulp.task('deploy:buildinfo', () => {
   if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -382,7 +382,7 @@ gulp.task('deploy:buildinfo', gulp.series('build'), () => {
     .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
 });
 
-gulp.task('deploy', gulp.series('deploy:buildinfo', 'deploy:vsix'));
+gulp.task('deploy', gulp.series('build', 'deploy:buildinfo', 'deploy:vsix'));
 
 /*
  * =========================
