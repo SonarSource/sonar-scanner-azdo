@@ -51,5 +51,5 @@ This [Get Started][getstarted] guide provides instructions on installing, config
 
    [SQ]: <https://www.sonarqube.org/>
    [CE]: <https://www.sonarqube.org/downloads/>
-   [DE]: <https://www.sonarqube.org/downloads/>
+   [DE]: <https://www.sonarqube.org/developer-edition/>
    [getstarted]: <http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html>
