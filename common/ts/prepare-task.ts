@@ -105,7 +105,8 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     } else if (provider === "Svn") {
       isDefaultBranch = currentBranch === "trunk";
     }
-    if (!isDefaultBranch) {
+    let useBranchAnalysis: boolean = tl.getBoolInput('useBranchAnalysis', true);
+    if (useBranchAnalysis && !isDefaultBranch) {      
       // VSTS-165 don't use Build.SourceBranchName
       props["sonar.branch.name"] = branchName(tl.getVariable("Build.SourceBranch"));
     }

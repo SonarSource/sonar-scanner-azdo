@@ -144,6 +144,15 @@
       "helpMarkDown":
         "[Additional properties](https://redirect.sonarsource.com/doc/analysis-parameters.html) to be passed to the scanner. Specify each key=value pair on a new line.",
       "groupName": "advanced"
+    },
+    {
+        "name": "useBranchAnalysis",
+        "type": "boolean",
+        "label": "Use Branch Analysis",
+        "defaultValue": "true",
+        "required": false,
+        "helpMarkDown": "Toggle Branch Analysis feature. When enabled, defines `sonar.branch.name` property if target branch is different from default.",
+        "groupName": "advanced"
     }
   ],
   "execution": {
