@@ -12,6 +12,7 @@ beforeEach(() => {
 });
 
 const SQ_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://sonarqube.com" });
+const DUMMY_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://dummysq.com:9000" });
 
 it("should display warning for dedicated extension for Sonarcloud", async () => {
   const scannerObject = new ScannerMSBuild(__dirname, {
@@ -59,4 +60,25 @@ it("should build report task path from variables", () => {
   const actual = prept.reportPath();
 
   expect(actual).toEqual(reportFullPath);
+});
+
+it("should display debug message for Branch Analysis disabled", async () => {
+  const scannerObject = new ScannerMSBuild(__dirname, {
+    projectKey: "dummyProjectKey",
+    projectName: "dummyProjectName",
+    projectVersion: "dummyProjectVersion",
+    organization: "dummyOrganization"
+  });
+
+  jest.spyOn(tl, "getVariable").mockImplementation(() => "");
+  jest.spyOn(tl, "warning").mockImplementation(() => null);
+  jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => scannerObject);
+  jest.spyOn(scannerObject, "runPrepare").mockImplementation(() => null);
+  jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
+
+  jest.spyOn(prept, "getDefaultBranch").mockResolvedValue("refs/heads/master");
+
+  await prept.default(DUMMY_ENDPOINT, __dirname);
+
+  expect(tl.debug).toHaveBeenCalledWith("Branch Analysis is disabled");
 });
