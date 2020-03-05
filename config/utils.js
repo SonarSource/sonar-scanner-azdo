@@ -66,7 +66,7 @@ exports.tfxCommand = function(extensionPath, packageJSON, params = '') {
 };
 
 function fullVersion(version) {
-  const buildNumber = process.env.TRAVIS_BUILD_NUMBER;
+  const buildNumber = process.env.BUILD_NUMBER;
   if (version.endsWith('-SNAPSHOT') && buildNumber) {
     return version.replace('-SNAPSHOT', '.' + buildNumber);
   }
@@ -94,11 +94,11 @@ exports.getBuildInfo = function(packageJson, filePath) {
   return {
     version: '1.0.1',
     name: packageJson.name,
-    number: process.env.TRAVIS_BUILD_NUMBER,
+    number: process.env.BUILD_NUMBER,
     started: dateformat(new Date(), "yyyy-mm-dd'T'HH:MM:ss.lo"),
     url: process.env.CI_BUILD_URL,
-    vcsRevision: process.env.TRAVIS_COMMIT,
-    vcsUrl: `https://github.com/${process.env.TRAVIS_REPO_SLUG}.git`,
+    vcsRevision: process.env.CIRRUS_CHANGE_IN_REPO,
+    vcsUrl: `https://github.com/${process.env.CIRRUS_REPO_FULL_NAME}.git`,
     modules: [
       {
         id: `org.sonarsource.scanner.vsts:${packageJson.name}:${packageVersion}`,
@@ -126,8 +126,8 @@ exports.getBuildInfo = function(packageJson, filePath) {
     properties: {
       'java.specification.version': '1.8', // Workaround for https://jira.sonarsource.com/browse/RA-115
       'buildInfo.env.PROJECT_VERSION': packageVersion,
-      'buildInfo.env.ARTIFACTORY_DEPLOY_REPO': 'sonarsource-public-qa',
-      'buildInfo.env.TRAVIS_COMMIT': process.env.TRAVIS_COMMIT
+      'buildInfo.env.ARTIFACTORY_DEPLOY_REPO': process.env.ARTIFACTORY_DEPLOY_REPO,
+      'buildInfo.env.TRAVIS_COMMIT': process.env.CIRRUS_CHANGE_IN_REPO
     }
   };
 };
@@ -142,9 +142,9 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
       'gulpfile.js, build/**, config/**, coverage/**, extensions/**, scripts/**, **/__tests__/**, **/temp-find-method.ts',
     'sonar.tests': '.',
     'sonar.test.inclusions': '**/__tests__/**',
-    'sonar.analysis.buildNumber': process.env.TRAVIS_BUILD_NUMBER,
-    'sonar.analysis.pipeline': process.env.TRAVIS_BUILD_NUMBER,
-    'sonar.analysis.repository': process.env.TRAVIS_REPO_SLUG,
+    'sonar.analysis.buildNumber': process.env.CIRRUS_BUILD_ID,
+    'sonar.analysis.pipeline': process.env.CIRRUS_BUILD_ID,
+    'sonar.analysis.repository': process.env.CIRRUS_REPO_FULL_NAME,
     'sonar.eslint.reportPaths': 'eslint-report.json',
     'sonar.typescript.lcov.reportPaths': 'coverage/lcov.info'
   };

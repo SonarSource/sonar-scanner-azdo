@@ -320,8 +320,12 @@ gulp.task('build:test', gulp.series('clean', 'copy', 'test', 'tfx:test'));
  * =========================
  */
 gulp.task('deploy:vsix', () => {
-  if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
-    gutil.log('Not on master nor PR, skip deploy:buildinfo');
+  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
+    gutil.log('Not on master nor PR, skip deploy:vsix');
+    return gutil.noop;
+  }
+  if (process.env.CIRRUS_PR === 'true' && process.env.DEPLOY_PULL_REQUEST === 'false') {
+    gutil.log('On PR, but artifacts should not be deployed, skip deploy:vsix');
     return gutil.noop;
   }
   const { name } = packageJSON;
@@ -344,10 +348,10 @@ gulp.task('deploy:vsix', () => {
             username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
             password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
             properties: {
-              'vcs.revision': process.env.TRAVIS_COMMIT,
-              'vcs.branch': process.env.TRAVIS_BRANCH,
+              'vcs.revision': process.env.CIRRUS_CHANGE_IN_REPO,
+              'vcs.branch': process.env.CIRRUS_BRANCH,
               'build.name': name,
-              'build.number': process.env.TRAVIS_BUILD_NUMBER
+              'build.number': process.env.CIRRUS_BUILD_ID
             },
             request: {
               headers: {
@@ -363,10 +367,15 @@ gulp.task('deploy:vsix', () => {
 });
 
 gulp.task('deploy:buildinfo', () => {
-  if (process.env.TRAVIS_BRANCH !== 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
+  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
   }
+  if (process.env.CIRRUS_PR === 'true' && process.env.DEPLOY_PULL_REQUEST === 'false') {
+    gutil.log('On PR, but artifacts should not be deployed, skip deploy:buildinfo');
+    return gutil.noop;
+  }
+  console.log('deploy build info', getBuildInfo(packageJSON))
   return request
     .put(
       {
@@ -390,18 +399,75 @@ gulp.task('deploy', gulp.series('build', 'deploy:buildinfo', 'deploy:vsix'));
  * =========================
  */
 gulp.task('sonarqube', done => {
-  if (process.env.TRAVIS_BRANCH === 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
-    runSonnarQubeScanner(done, { 'sonar.analysis.sha1': process.env.TRAVIS_COMMIT });
-  } else if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
+  if (process.env.CIRRUS_BRANCH === 'master' && process.env.CIRRUS_PR === 'false') {
+    runSonnarQubeScanner(done, { 'sonar.analysis.sha1': process.env.CIRRUS_CHANGE_IN_REPO });
+  } else if (process.env.CIRRUS_PR !== 'false') {
     runSonnarQubeScanner(done, {
-      'sonar.analysis.prNumber': process.env.TRAVIS_PULL_REQUEST,
-      'sonar.branch.name': process.env.TRAVIS_PULL_REQUEST_BRANCH,
-      'sonar.branch.target': process.env.TRAVIS_BRANCH,
-      'sonar.analysis.sha1': process.env.TRAVIS_PULL_REQUEST_SHA
+      'sonar.analysis.prNumber': process.env.CIRRUS_PR,
+      'sonar.branch.name': process.env.CIRRUS_BRANCH,
+      'sonar.branch.target': process.env.CIRRUS_BASE_BRANCH,
+      'sonar.analysis.sha1': process.env.CIRRUS_BASE_SHA
     });
   } else {
     done();
   }
+});
+
+gulp.task('promote', () => {
+  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
+    gutil.log('Not on master nor PR, skip promote');
+    return gutil.noop;
+  }
+  return request
+    .get(
+      {
+        url: [
+          process.env.PROMOTE_URL,
+          process.env.GITHUB_REPO,
+          process.env.GITHUB_BRANCH,
+          process.env.BUILD_NUMBER,
+          process.env.PULL_REQUEST
+        ].join('/')
+      },
+      (error, response, body) => {
+        if (error) {
+          gutil.log('error:', error);
+        }
+      }
+    )
+    .auth(null, null, true, process.env.GCF_ACCESS_TOKEN);
+});
+
+gulp.task('burgr', () => {
+  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
+    gutil.log('Not on master nor PR, skip burgr');
+    return gutil.noop;
+  }
+  const packageVersion = fullVersion(packageJSON.version);
+  const urls = ['sonarqube', 'sonarcloud'].map(variant => `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/${packageVersion}/sonar-scanner-vsts-${packageVersion}-${variant}.vsix`).join(',');
+  return request
+    .post(
+      {
+        url: [
+          process.env.BURGR_URL,
+          'api/promote',
+          process.env.CIRRUS_REPO_OWNER,
+          process.env.CIRRUS_REPO_NAME,
+          process.env.CIRRUS_BUILD_ID
+        ].join('/'),
+        json: {
+          version: packageVersion,
+          url: urls,
+          buildNumber: process.env.BUILD_NUMBER
+        }
+      },
+      (error, response, body) => {
+        if (error) {
+          gutil.log('error:', error);
+        }
+      }
+    )
+    .auth(process.env.BURGR_USERNAME, process.env.BURGR_PASSWORD, true);
 });
 
 gulp.task('default', gulp.series('build'));
