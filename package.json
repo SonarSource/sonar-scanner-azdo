@@ -1,6 +1,6 @@
 {
   "name": "sonar-scanner-vsts",
-  "version": "0.0.1-SNAPSHOT",
+  "version": "0.0.2-SNAPSHOT",
   "repository": "SonarSource/sonar-scanner-vsts",
   "license": "LGPL-3.0",
   "devDependencies": {
@@ -48,6 +48,8 @@
     "build": "./node_modules/.bin/gulp build",
     "clean": "./node_modules/.bin/gulp clean",
     "deploy": "./node_modules/.bin/gulp deploy",
+    "promote": "./node_modules/.bin/gulp promote",
+    "burgr": "./node_modules/.bin/gulp burgr",
     "sonarqube": "./node_modules/.bin/gulp sonarqube",
     "format": "./node_modules/.bin/prettier --write --list-different \"{common,extensions}/**/*.{js,ts}\"",
     "format-check": "./node_modules/.bin/prettier --list-different \"{common,extensions}/**/*.{js,ts}\"",
