@@ -10,8 +10,8 @@
   "author": "sonarsource",
   "version": {
     "Major": 1,
-    "Minor": 10,
-    "Patch": 0
+    "Minor": 11,
+    "Patch": 0   
   },
   "minimumAgentVersion": "2.119.1",
   "demands": ["java"],
