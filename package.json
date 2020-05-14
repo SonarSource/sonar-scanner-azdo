@@ -33,7 +33,7 @@
     "jest": "24.8.0",
     "jest-when": "2.6.0",
     "merge-stream": "2.0.0",
-    "prettier": "1.12.1",
+    "prettier": "^2.0.5",
     "request": "2.85.0",
     "semver": "5.5.0",
     "sonarqube-scanner": "2.5.0",

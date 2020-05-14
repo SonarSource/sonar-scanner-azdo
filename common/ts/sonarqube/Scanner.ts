@@ -83,7 +83,7 @@ export default class Scanner {
         return;
       }
       data = data.toString().trim();
-      if (data.indexOf("Please update to at least Java 11") != -1 && Scanner.getIsSonarCloud()) {
+      if (data.indexOf("Please update to at least Java 11") !== -1 && Scanner.getIsSonarCloud()) {
         tl.command("task.logissue", { type: "warning" }, data);
       }
     });
