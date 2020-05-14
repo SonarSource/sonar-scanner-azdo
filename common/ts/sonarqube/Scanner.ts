@@ -6,7 +6,7 @@ import { PROP_NAMES, isWindows } from "../helpers/utils";
 export enum ScannerMode {
   MSBuild = "MSBuild",
   CLI = "CLI",
-  Other = "Other",
+  Other = "Other"
 }
 
 export default class Scanner {
@@ -22,11 +22,11 @@ export default class Scanner {
   public static getIsSonarCloud(): boolean {
     return this.isSonarCloud;
   }
+  //MMF-2035
 
   public toSonarProps() {
     return {};
   }
-  //MMF-2035
 
   public async runPrepare() {}
 
@@ -116,7 +116,7 @@ export class ScannerCLI extends Scanner {
       [PROP_NAMES.PROJECTKEY]: this.data.projectKey,
       [PROP_NAMES.PROJECTNAME]: this.data.projectName,
       [PROP_NAMES.PROJECTVERSION]: this.data.projectVersion,
-      [PROP_NAMES.PROJECTSOURCES]: this.data.projectSources,
+      [PROP_NAMES.PROJECTSOURCES]: this.data.projectSources
     };
   }
 
@@ -148,7 +148,7 @@ export class ScannerCLI extends Scanner {
         projectKey: tl.getInput("cliProjectKey", true),
         projectName: tl.getInput("cliProjectName"),
         projectVersion: tl.getInput("cliProjectVersion"),
-        projectSources: tl.getInput("cliSources"),
+        projectSources: tl.getInput("cliSources")
       },
       mode
     );
@@ -171,7 +171,7 @@ export class ScannerMSBuild extends Scanner {
     return {
       [PROP_NAMES.PROJECTKEY]: this.data.projectKey,
       [PROP_NAMES.PROJECTNAME]: this.data.projectName,
-      [PROP_NAMES.PROJECTVERSION]: this.data.projectVersion,
+      [PROP_NAMES.PROJECTVERSION]: this.data.projectVersion
     };
   }
 
@@ -248,7 +248,7 @@ export class ScannerMSBuild extends Scanner {
       projectKey: tl.getInput("projectKey", true),
       projectName: tl.getInput("projectName"),
       projectVersion: tl.getInput("projectVersion"),
-      organization: tl.getInput("organization"),
+      organization: tl.getInput("organization")
     });
   }
 }
