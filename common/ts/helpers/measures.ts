@@ -32,7 +32,7 @@ function getFormatter(type: string): Formatter {
     RATING: ratingFormatter,
     LEVEL: levelFormatter,
     MILLISEC: millisecondsFormatter,
-    COMPARATOR: comparatorFormatter
+    COMPARATOR: comparatorFormatter,
   };
   return FORMATTERS[type] || noFormatter;
 }
@@ -44,7 +44,7 @@ function numberFormatter(
 ) {
   const { format } = new Intl.NumberFormat("en-US", {
     minimumFractionDigits,
-    maximumFractionDigits
+    maximumFractionDigits,
   });
   return format(value);
 }
@@ -97,7 +97,7 @@ function levelFormatter(value: string): string {
     ERROR: "Failed",
     WARN: "Warning",
     OK: "Passed",
-    NONE: "None"
+    NONE: "None",
   };
   const result = l10nKeys[value.toUpperCase()];
   return result ? result : value;
@@ -108,7 +108,7 @@ function comparatorFormatter(value: string): string {
     EQ: "&#61;",
     GT: "&#62;",
     LT: "&#60;",
-    NE: "&#8800;"
+    NE: "&#8800;",
   };
   const result = l10nKeys[value.toUpperCase()];
   return result ? result : value;

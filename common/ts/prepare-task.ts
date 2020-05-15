@@ -38,10 +38,9 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
 
-  tl
-    .getDelimitedInput("extraProperties", "\n")
-    .filter(keyValue => !keyValue.startsWith("#"))
-    .map(keyValue => keyValue.split(/=(.+)/))
+  tl.getDelimitedInput("extraProperties", "\n")
+    .filter((keyValue) => !keyValue.startsWith("#"))
+    .map((keyValue) => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 
   tl.setVariable("SONARQUBE_SCANNER_MODE", scannerMode);
@@ -51,7 +50,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     toCleanJSON({
       ...endpoint.toSonarProps(),
       ...scanner.toSonarProps(),
-      ...props
+      ...props,
     })
   );
 

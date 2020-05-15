@@ -20,7 +20,7 @@ projectKey=myProjectKey
 ceTaskId=12345
 serverUrl=http://sonar`,
     {
-      encoding: "utf-8"
+      encoding: "utf-8",
     }
   );
 
@@ -48,7 +48,7 @@ projectKey=projectKey1
 ceTaskId=12345
 serverUrl=http://sonar`,
     {
-      encoding: "utf-8"
+      encoding: "utf-8",
     }
   );
 
@@ -60,7 +60,7 @@ projectKey=projectKey2
 ceTaskId=12345
 serverUrl=http://sonar`,
     {
-      encoding: "utf-8"
+      encoding: "utf-8",
     }
   );
 

@@ -30,7 +30,7 @@ export default async function publishTask(endpointType: EndpointType) {
   const taskReports = await TaskReport.createTaskReportsFromFiles(endpoint, serverVersion);
 
   const analyses = await Promise.all(
-    taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
+    taskReports.map((taskReport) => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
   );
 
   if (globalQualityGateStatus === "") {
@@ -67,7 +67,7 @@ export async function getReportForTask(
       dashboardUrl: taskReport.dashboardUrl,
       endpoint,
       metrics,
-      projectName: task.componentName
+      projectName: task.componentName,
     });
 
     if (analysis.status === "ERROR" || analysis.status === "WARN" || analysis.status === "NONE") {
@@ -78,9 +78,7 @@ export async function getReportForTask(
   } catch (e) {
     if (e instanceof TimeOutReachedError) {
       tl.warning(
-        `Task '${
-          taskReport.ceTaskId
-        }' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
+        `Task '${taskReport.ceTaskId}' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
       );
     } else {
       throw e;

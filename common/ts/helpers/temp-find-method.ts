@@ -32,7 +32,7 @@ function _getDefaultMatchOptions(): tl.MatchOptions {
     matchBase: false,
     nocomment: false,
     nonegate: false,
-    flipNegate: false
+    flipNegate: false,
   };
 }
 
@@ -46,7 +46,7 @@ function _getDefaultFindOptions(): tl.FindOptions {
   return <tl.FindOptions>{
     allowBrokenSymbolicLinks: false,
     followSpecifiedSymbolicLink: true,
-    followSymbolicLinks: true
+    followSymbolicLinks: true,
   };
 }
 

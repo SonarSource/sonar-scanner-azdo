@@ -53,7 +53,7 @@ export default class Task {
             );
         }
       },
-      err => {
+      (err) => {
         if (err && err.message) {
           tl.error(err.message);
         } else if (err) {

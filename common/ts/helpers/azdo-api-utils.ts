@@ -3,7 +3,7 @@ import * as vm from "azure-devops-node-api";
 import {
   JsonPatchDocument,
   JsonPatchOperation,
-  Operation
+  Operation,
 } from "azure-devops-node-api/interfaces/common/VSSInterfaces";
 
 export interface IPropertyBag {
@@ -22,7 +22,7 @@ export async function addBuildProperty(properties: IPropertyBag[]) {
     patchBody.push({
       op: Operation.Add,
       path: `/${property.propertyName}`,
-      value: `${property.propertyValue}`
+      value: `${property.propertyValue}`,
     });
   });
 
