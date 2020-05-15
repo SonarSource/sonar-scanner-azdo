@@ -18,7 +18,7 @@ it("should display warning for dedicated extension for Sonarcloud", async () => 
     projectKey: "dummyProjectKey",
     projectName: "dummyProjectName",
     projectVersion: "dummyProjectVersion",
-    organization: "dummyOrganization"
+    organization: "dummyOrganization",
   });
 
   jest.spyOn(tl, "getVariable").mockImplementation(() => "");

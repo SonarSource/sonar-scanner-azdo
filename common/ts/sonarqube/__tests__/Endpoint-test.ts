@@ -7,7 +7,7 @@ it("should not return null password", () => {
     token: undefined,
     username: "token123",
     password: undefined,
-    organization: undefined
+    organization: undefined,
   });
   expect(enpoint.auth).toEqual({ user: "token123" });
 });

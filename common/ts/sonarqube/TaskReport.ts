@@ -73,7 +73,7 @@ export default class TaskReport {
     filePaths = TaskReport.findTaskFileReport(endpoint, serverVersion)
   ): Promise<TaskReport[]> {
     return Promise.all(
-      filePaths.map(filePath => {
+      filePaths.map((filePath) => {
         if (!filePath) {
           return Promise.reject(
             TaskReport.throwInvalidReport(
@@ -97,7 +97,7 @@ export default class TaskReport {
 
   private static parseReportFile(filePath: string): Promise<TaskReport> {
     return fs.readFile(filePath, "utf-8").then(
-      fileContent => {
+      (fileContent) => {
         tl.debug(`[SQ] Parse Task report file: ${fileContent}`);
         if (!fileContent || fileContent.length <= 0) {
           return Promise.reject(
@@ -111,7 +111,7 @@ export default class TaskReport {
             ceTaskUrl: settings.get("ceTaskUrl"),
             dashboardUrl: settings.get("dashboardUrl"),
             projectKey: settings.get("projectKey"),
-            serverUrl: settings.get("serverUrl")
+            serverUrl: settings.get("serverUrl"),
           });
           return Promise.resolve(taskReport);
         } catch (err) {
@@ -123,7 +123,7 @@ export default class TaskReport {
           return Promise.reject(err);
         }
       },
-      err =>
+      (err) =>
         Promise.reject(
           TaskReport.throwInvalidReport(
             `[SQ] Error reading file: ${err.message || JSON.stringify(err)}`

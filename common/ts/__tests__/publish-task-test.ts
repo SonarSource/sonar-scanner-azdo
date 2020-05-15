@@ -20,7 +20,7 @@ const TASK_REPORT = new TaskReport({
   ceTaskUrl: "http://taskurl1",
   dashboardUrl: "http://dashboardurl1",
   projectKey: "projectKey1",
-  serverUrl: "http:/serverUrl1"
+  serverUrl: "http:/serverUrl1",
 });
 
 const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
@@ -47,7 +47,7 @@ it("check multiple report status and set global quality gate for build propertie
     componentKey: "key",
     status: "OK",
     type: EndpointType.SonarCloud,
-    componentName: "componentName"
+    componentName: "componentName",
   });
 
   const taskReportArray: TaskReport[] = [];
@@ -56,7 +56,7 @@ it("check multiple report status and set global quality gate for build propertie
     ceTaskUrl: "string",
     dashboardUrl: "string",
     projectKey: "string",
-    serverUrl: "string"
+    serverUrl: "string",
   });
 
   taskReportArray.push(taskReport);
@@ -110,7 +110,7 @@ it("check multiple report status and set global quality gate for build propertie
     componentKey: "key",
     status: "OK",
     type: EndpointType.SonarCloud,
-    componentName: "componentName"
+    componentName: "componentName",
   });
 
   const taskReportArray: TaskReport[] = [];
@@ -119,7 +119,7 @@ it("check multiple report status and set global quality gate for build propertie
     ceTaskUrl: "string",
     dashboardUrl: "string",
     projectKey: "string",
-    serverUrl: "string"
+    serverUrl: "string",
   });
 
   taskReportArray.push(taskReport);
@@ -217,7 +217,7 @@ it("get report string for single report", async () => {
     componentKey: "key",
     status: "status",
     type: EndpointType.SonarQube,
-    componentName: "componentName"
+    componentName: "componentName",
   });
   jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
   // Mock converting the Task into an html report
@@ -239,7 +239,7 @@ it("get report string for single report", async () => {
     dashboardUrl: "http://dashboardurl1",
     endpoint: SQ_ENDPOINT,
     metrics: { metrics: [] },
-    projectName: "componentName"
+    projectName: "componentName",
   });
 
   expect(result).toBe("dummy html");
@@ -267,7 +267,7 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
     ceTaskUrl: "http://taskurl2",
     dashboardUrl: "http://dashboardurl2",
     projectKey: "projectKey2",
-    serverUrl: "http:/serverUrl2"
+    serverUrl: "http:/serverUrl2",
   });
 
   jest.spyOn(tl, "getInput").mockImplementation(() => "1"); // set the timeout
@@ -296,7 +296,7 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
 
   jest.spyOn(apiUtils, "addBuildProperty").mockImplementation(
     () =>
-      new Promise(resolve => {
+      new Promise((resolve) => {
         return resolve();
       })
   );

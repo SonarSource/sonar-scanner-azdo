@@ -3,7 +3,7 @@ import { PROP_NAMES } from "../helpers/utils";
 
 export enum EndpointType {
   SonarCloud = "SonarCloud",
-  SonarQube = "SonarQube"
+  SonarQube = "SonarQube",
 }
 
 export interface EndpointData {
@@ -41,7 +41,7 @@ export default class Endpoint {
       [PROP_NAMES.HOST_URL]: this.data.url,
       [PROP_NAMES.LOGIN]: this.data.token || this.data.username,
       [PROP_NAMES.PASSSWORD]: this.data.password,
-      [PROP_NAMES.ORG]: this.data.organization
+      [PROP_NAMES.ORG]: this.data.organization,
     };
   }
 

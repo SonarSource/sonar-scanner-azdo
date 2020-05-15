@@ -37,7 +37,7 @@ export default class Analysis {
   }
 
   public getFailedConditions() {
-    return this.conditions.filter(condition =>
+    return this.conditions.filter((condition) =>
       ["WARN", "ERROR"].includes(condition.status.toUpperCase())
     );
   }
@@ -47,7 +47,7 @@ export default class Analysis {
     return [
       this.getQualityGateSection(),
       this.getQualityGateDetailSection(),
-      this.getDashboardLink()
+      this.getDashboardLink(),
     ]
       .join(" \r\n")
       .trim();
@@ -76,7 +76,7 @@ export default class Analysis {
       return "";
     }
 
-    const rows = failedConditions.map(condition => {
+    const rows = failedConditions.map((condition) => {
       const metric = this.metrics && this.metrics.getMetricByKey(condition.metricKey);
       if (!metric) {
         return null;
@@ -139,7 +139,7 @@ export default class Analysis {
     projectName,
     endpoint,
     metrics,
-    dashboardUrl
+    dashboardUrl,
   }: {
     analysisId: string;
     dashboardUrl?: string;
@@ -151,7 +151,7 @@ export default class Analysis {
     return getJSON(endpoint, "/api/qualitygates/project_status", { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
         new Analysis(projectStatus, endpoint.type, dashboardUrl, metrics, projectName),
-      err => {
+      (err) => {
         if (err && err.message) {
           tl.error(`[SQ] Error retrieving analysis: ${err.message}`);
         } else if (err) {

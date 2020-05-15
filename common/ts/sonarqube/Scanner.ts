@@ -6,11 +6,23 @@ import { PROP_NAMES, isWindows } from "../helpers/utils";
 export enum ScannerMode {
   MSBuild = "MSBuild",
   CLI = "CLI",
-  Other = "Other"
+  Other = "Other",
 }
 
 export default class Scanner {
   constructor(public rootPath: string, public mode: ScannerMode) {}
+
+  //MMF-2035
+  private static isSonarCloud: boolean;
+
+  public static setIsSonarCloud(value: boolean) {
+    this.isSonarCloud = value;
+  }
+
+  public static getIsSonarCloud(): boolean {
+    return this.isSonarCloud;
+  }
+  //MMF-2035
 
   public toSonarProps() {
     return {};
@@ -55,7 +67,7 @@ export default class Scanner {
   }
 
   logIssueOnBuildSummaryForStdErr(tool) {
-    tool.on("stderr", data => {
+    tool.on("stderr", (data) => {
       if (data == null) {
         return;
       }
@@ -63,6 +75,20 @@ export default class Scanner {
       tl.command("task.logissue", { type: "error" }, data);
     });
   }
+
+  //Temporary warning message for Java version (MMF-2035)
+  logIssueAsWarningForStdOut(tool) {
+    tool.on("stdout", (data) => {
+      if (data == null) {
+        return;
+      }
+      data = data.toString().trim();
+      if (data.indexOf("Please update to at least Java 11") !== -1 && Scanner.getIsSonarCloud()) {
+        tl.command("task.logissue", { type: "warning" }, data);
+      }
+    });
+  }
+  //Temporary warning message for Java version (MMF-2035)
 
   isDebug() {
     return tl.getVariable("system.debug") === "true";
@@ -90,7 +116,7 @@ export class ScannerCLI extends Scanner {
       [PROP_NAMES.PROJECTKEY]: this.data.projectKey,
       [PROP_NAMES.PROJECTNAME]: this.data.projectName,
       [PROP_NAMES.PROJECTVERSION]: this.data.projectVersion,
-      [PROP_NAMES.PROJECTSOURCES]: this.data.projectSources
+      [PROP_NAMES.PROJECTSOURCES]: this.data.projectSources,
     };
   }
 
@@ -104,6 +130,7 @@ export class ScannerCLI extends Scanner {
     }
     const scannerRunner = tl.tool(scannerCliScript);
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
+    this.logIssueAsWarningForStdOut(scannerRunner);
     if (this.isDebug()) {
       scannerRunner.arg("-X");
     }
@@ -121,7 +148,7 @@ export class ScannerCLI extends Scanner {
         projectKey: tl.getInput("cliProjectKey", true),
         projectName: tl.getInput("cliProjectName"),
         projectVersion: tl.getInput("cliProjectVersion"),
-        projectSources: tl.getInput("cliSources")
+        projectSources: tl.getInput("cliSources"),
       },
       mode
     );
@@ -144,7 +171,7 @@ export class ScannerMSBuild extends Scanner {
     return {
       [PROP_NAMES.PROJECTKEY]: this.data.projectKey,
       [PROP_NAMES.PROJECTNAME]: this.data.projectName,
-      [PROP_NAMES.PROJECTVERSION]: this.data.projectVersion
+      [PROP_NAMES.PROJECTVERSION]: this.data.projectVersion,
     };
   }
 
@@ -171,6 +198,7 @@ export class ScannerMSBuild extends Scanner {
       scannerRunner.arg("/o:" + this.data.organization);
     }
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
+    this.logIssueAsWarningForStdOut(scannerRunner);
     if (this.isDebug()) {
       scannerRunner.arg("/d:sonar.verbose=true");
     }
@@ -211,6 +239,7 @@ export class ScannerMSBuild extends Scanner {
 
     scannerRunner.arg("end");
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
+    this.logIssueAsWarningForStdOut(scannerRunner);
     await scannerRunner.exec();
   }
 
@@ -219,7 +248,7 @@ export class ScannerMSBuild extends Scanner {
       projectKey: tl.getInput("projectKey", true),
       projectName: tl.getInput("projectName"),
       projectVersion: tl.getInput("projectVersion"),
-      organization: tl.getInput("organization")
+      organization: tl.getInput("organization"),
     });
   }
 }

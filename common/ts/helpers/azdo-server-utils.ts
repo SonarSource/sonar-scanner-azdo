@@ -26,7 +26,7 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
     "task.addattachment",
     {
       type: "Distributedtask.Core.Summary",
-      name: title
+      name: title,
     },
     summaryPath
   );
@@ -37,7 +37,7 @@ export async function fillBuildProperty(sonarQualityGateStatus: string) {
 
   properties.push({
     propertyName: "sonarglobalqualitygate",
-    propertyValue: sonarQualityGateStatus
+    propertyValue: sonarQualityGateStatus,
   });
 
   await azdoApiUtils.addBuildProperty(properties);

@@ -14,17 +14,17 @@ jest.mock("../../helpers/request", () => ({
             metricKey: "bugs",
             comparator: "GT",
             errorThreshold: "0",
-            actualValue: "1"
-          }
-        ]
-      }
+            actualValue: "1",
+          },
+        ],
+      },
     })
-  )
+  ),
 }));
 
 jest.mock("azure-pipelines-task-lib/task", () => ({
   debug: jest.fn(),
-  error: jest.fn()
+  error: jest.fn(),
 }));
 
 const METRICS = new Metrics([{ key: "bugs", name: "Bugs", type: "INT" }]);
@@ -33,7 +33,7 @@ const GET_ANALYSIS_DATA = {
   analysisId: "analysisId",
   dashboardUrl: "https://dashboard.url",
   endpoint: ENDPOINT,
-  metrics: METRICS
+  metrics: METRICS,
 };
 
 beforeEach(() => {
@@ -43,7 +43,7 @@ beforeEach(() => {
 it("should generate an analysis status with error", async () => {
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
   expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
-    analysisId: "analysisId"
+    analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");
   expect(analysis.getFailedConditions()).toHaveLength(1);
@@ -57,7 +57,7 @@ it("should generate a green analysis status", async () => {
 
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
   expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
-    analysisId: "analysisId"
+    analysisId: "analysisId",
   });
   expect(analysis.status).toBe("SUCCESS");
   expect(analysis.getFailedConditions()).toHaveLength(0);
@@ -68,10 +68,10 @@ it("should not fail when metrics are missing", async () => {
   const analysis = await Analysis.getAnalysis({
     ...GET_ANALYSIS_DATA,
     dashboardUrl: undefined,
-    metrics: undefined
+    metrics: undefined,
   });
   expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
-    analysisId: "analysisId"
+    analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");
   expect(analysis.getFailedConditions()).toHaveLength(1);
@@ -81,7 +81,7 @@ it("should not fail when metrics are missing", async () => {
 it("should display the project name", async () => {
   const analysis = await Analysis.getAnalysis({
     ...GET_ANALYSIS_DATA,
-    projectName: "project_name"
+    projectName: "project_name",
   });
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });

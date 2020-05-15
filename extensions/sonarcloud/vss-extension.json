@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarcloud",
   "name": "SonarCloud",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
@@ -13,8 +13,7 @@
       "id": "Microsoft.VisualStudio.Services.Cloud"
     }
   ],
-  "description":
-    "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
+  "description": "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
   "categories": ["Azure Pipelines"],
   "icons": {
@@ -116,8 +115,7 @@
         "description": "Shows the current quality status of your project based on SonarCloud.",
         "catalogIconUrl:": "/integration/vsts/images/sonarcloud-icon.png",
         "previewImageUrl": "/integration/vsts/images/sonarcloud-icon.png",
-        "uri":
-          "/integration/vsts/index.html?type=widget&contribution=3c598f25-01c1-4c09-97c6-926476882688",
+        "uri": "/integration/vsts/index.html?type=widget&contribution=3c598f25-01c1-4c09-97c6-926476882688",
         "supportedSizes": [
           {
             "rowSpan": 1,
@@ -134,8 +132,7 @@
       "properties": {
         "name": "Code Quality Configuration",
         "description": "Configures Code Quality Widget",
-        "uri":
-          "/integration/vsts/index.html?type=configuration&contribution=e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"
+        "uri": "/integration/vsts/index.html?type=configuration&contribution=e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"
       }
     },
     {
@@ -172,8 +169,7 @@
               {
                 "id": "apitoken",
                 "name": "SonarCloud Token",
-                "description":
-                  "Authentication Token generated through SonarCloud (go to My Account > Security > Generate Tokens)",
+                "description": "Authentication Token generated through SonarCloud (go to My Account > Security > Generate Tokens)",
                 "inputMode": "passwordbox",
                 "isConfidential": true,
                 "validation": {
@@ -184,8 +180,7 @@
             ]
           }
         ],
-        "helpMarkDown":
-          "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarCloud account security page</a> to generate a token."
+        "helpMarkDown": "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarCloud account security page</a> to generate a token."
       }
     },
     {

@@ -9,11 +9,14 @@ export const PROP_NAMES = {
   PROJECTNAME: "sonar.projectName",
   PROJECTVERSION: "sonar.projectVersion",
   PROJECTSOURCES: "sonar.sources",
-  PROJECTSETTINGS: "project.settings"
+  PROJECTSETTINGS: "project.settings",
 };
 
 export function toCleanJSON(props: { [key: string]: string | undefined }) {
-  return JSON.stringify(props, Object.keys(props).filter(key => props[key] != null));
+  return JSON.stringify(
+    props,
+    Object.keys(props).filter((key) => props[key] != null)
+  );
 }
 
 export function setIfNotEmpty(props: { [key: string]: string }, key: string, value?: string) {

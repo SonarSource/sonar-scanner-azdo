@@ -3,7 +3,7 @@ import analyzeTask from "../../../../../common/ts/analyze-task";
 
 async function run() {
   try {
-    await analyzeTask(__dirname);
+    await analyzeTask(__dirname, true);
   } catch (err) {
     tl.setResult(tl.TaskResult.Failed, err.message);
   }

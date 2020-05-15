@@ -11,7 +11,7 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
   tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
   return new Promise((resolve, reject) => {
     const options: request.CoreOptions = {
-      auth: endpoint.auth
+      auth: endpoint.auth,
     };
     if (query) {
       options.qs = query;
@@ -23,7 +23,7 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
         baseUrl: endpoint.url,
         uri: path,
         json: isJson,
-        ...options
+        ...options,
       },
       (error, response, body) => {
         if (error) {
