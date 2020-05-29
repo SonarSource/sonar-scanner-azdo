@@ -72,6 +72,11 @@ export default class Scanner {
         return;
       }
       data = data.toString().trim();
+      if (data.indexOf("WARNING: An illegal reflective access operation has occurred") !== -1) {
+        //bypass those warning showing as error because they can't be catched for now by Scanner.
+        tl.debug(data);
+        return;
+      }
       tl.command("task.logissue", { type: "error" }, data);
     });
   }
