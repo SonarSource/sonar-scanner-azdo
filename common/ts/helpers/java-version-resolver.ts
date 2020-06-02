@@ -8,7 +8,7 @@ export default class JavaVersionResolver {
     this.javaHomeOriginalPath = tl.getVariable("JAVA_HOME");
     const javaNewPath = tl.getVariable(newJavaPath);
     if (javaNewPath) {
-      tl.debug("Java 11 path has been detected, switching to it for the analysis.");
+      tl.debug(`${newJavaPath} path has been detected, switching to it for the analysis.`);
       tl.setVariable("JAVA_HOME", javaNewPath);
       this.isJavaNewVersionSet = true;
     }
