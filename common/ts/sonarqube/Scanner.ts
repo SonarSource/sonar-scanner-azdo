@@ -6,7 +6,7 @@ import { PROP_NAMES, isWindows } from "../helpers/utils";
 export enum ScannerMode {
   MSBuild = "MSBuild",
   CLI = "CLI",
-  Other = "Other"
+  Other = "Other",
 }
 
 export default class Scanner {
@@ -67,12 +67,12 @@ export default class Scanner {
   }
 
   logIssueOnBuildSummaryForStdErr(tool) {
-    tool.on("stderr", data => {
+    tool.on("stderr", (data) => {
       if (data == null) {
         return;
       }
       data = data.toString().trim();
-      tl.command("task.logissue", { type: "error" }, data);
+      if (data.indexOf("WARNING: An illegal reflective access operation has occurred") !== -1) {
         //bypass those warning showing as error because they can't be catched for now by Scanner.
         tl.debug(data);
         return;
@@ -153,7 +153,7 @@ export class ScannerCLI extends Scanner {
         projectKey: tl.getInput("cliProjectKey", true),
         projectName: tl.getInput("cliProjectName"),
         projectVersion: tl.getInput("cliProjectVersion"),
-        projectSources: tl.getInput("cliSources")
+        projectSources: tl.getInput("cliSources"),
       },
       mode
     );
@@ -253,7 +253,7 @@ export class ScannerMSBuild extends Scanner {
       projectKey: tl.getInput("projectKey", true),
       projectName: tl.getInput("projectName"),
       projectVersion: tl.getInput("projectVersion"),
-      organization: tl.getInput("organization")
+      organization: tl.getInput("organization"),
     });
   }
 }

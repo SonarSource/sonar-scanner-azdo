@@ -113,7 +113,7 @@ export default class TaskReport {
             ceTaskUrl: settings.get("ceTaskUrl"),
             dashboardUrl: settings.get("dashboardUrl"),
             projectKey: settings.get("projectKey"),
-            serverUrl: settings.get("serverUrl")
+            serverUrl: settings.get("serverUrl"),
           });
           return Promise.resolve(taskReport);
         } catch (err) {

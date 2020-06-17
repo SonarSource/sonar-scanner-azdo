@@ -20,7 +20,7 @@ const TASK_REPORT = new TaskReport({
   ceTaskUrl: "http://taskurl1",
   dashboardUrl: "http://dashboardurl1",
   projectKey: "projectKey1",
-  serverUrl: "http:/serverUrl1"
+  serverUrl: "http:/serverUrl1",
 });
 
 const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
@@ -47,7 +47,7 @@ it("check multiple report status and set global quality gate for build propertie
     componentKey: "key",
     status: "OK",
     type: EndpointType.SonarCloud,
-    componentName: "componentName"
+    componentName: "componentName",
   });
 
   const taskReportArray: TaskReport[] = [];
@@ -56,7 +56,7 @@ it("check multiple report status and set global quality gate for build propertie
     ceTaskUrl: "string",
     dashboardUrl: "string",
     projectKey: "string",
-    serverUrl: "string"
+    serverUrl: "string",
   });
 
   taskReportArray.push(taskReport);
