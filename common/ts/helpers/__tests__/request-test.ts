@@ -30,7 +30,7 @@ describe("getServerVersion", () => {
 
     const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
 
-    request.getServerVersion(endpoint).then(actual => {
+    request.getServerVersion(endpoint).then((actual) => {
       expect(actual).toBe(new SemVer("8.0.0"));
     });
   });
@@ -44,7 +44,7 @@ describe("getJSON", () => {
 
     const query: request.RequestData = { username: "mickael", location: "geneva" };
 
-    request.getJSON(endpoint, "/get", query).then(actual => {
+    request.getJSON(endpoint, "/get", query).then((actual) => {
       const actualJson = JSON.parse(actual);
       expect(actualJson.args.location).toBe("geneva");
     });
@@ -61,7 +61,7 @@ describe("get", () => {
 
     const query: request.RequestData = { username: "mickael", location: "geneva" };
 
-    request.callGet(endpoint, "/get", true, query).then(response => {
+    request.callGet(endpoint, "/get", true, query).then((response) => {
       const actualJson = JSON.parse(response);
       expect(actualJson.args.location).toBe("geneva");
     });
@@ -80,7 +80,7 @@ describe("get", () => {
 
     const endpoint = new Endpoint(EndpointType.SonarCloud, endpointData);
 
-    request.callGet(endpoint, "/status/304", true).then(actual => {
+    request.callGet(endpoint, "/status/304", true).then((actual) => {
       expect(actual).toContain(
         "[Error: [SonarScanner] API GET '/status/304' failed, status code was: 304]"
       );
@@ -102,7 +102,7 @@ describe("get", () => {
 
     endpoint.auth.user = "admin";
 
-    request.callGet(endpoint, "/headers", true).then(response => {
+    request.callGet(endpoint, "/headers", true).then((response) => {
       const actualJson = JSON.parse(response);
       expect(actualJson.headers.Authorization).toBe("Basic YWRtaW46");
     });

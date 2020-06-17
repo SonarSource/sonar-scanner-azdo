@@ -43,7 +43,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   }
 
   tl.getDelimitedInput("extraProperties", "\n")
-    .filter(keyValue => !keyValue.startsWith("#"))
+    .filter((keyValue) => !keyValue.startsWith("#"))
     .map((keyValue) => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 

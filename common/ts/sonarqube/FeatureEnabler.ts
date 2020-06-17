@@ -4,7 +4,7 @@ import { EndpointType } from "./Endpoint";
 export enum Features {
   FEATURE_BRANCHES_AND_PULLREQUEST = "sonar.branchesandpullrequest",
   FEATURE_NEW_REPORT_TASK_LOCATION = "sonar.newreporttasklocation",
-  FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED = "sonar.pullrequestprovider.deprecated"
+  FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED = "sonar.pullrequestprovider.deprecated",
 }
 
 const featureToggleMap = new Map();

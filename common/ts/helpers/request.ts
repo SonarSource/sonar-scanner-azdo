@@ -28,7 +28,7 @@ export function callGet(
         baseUrl: endpoint.url,
         uri: path,
         json: isJson,
-        ...options
+        ...options,
       },
       (error, response, body) => {
         if (error) {
