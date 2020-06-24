@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarqube",
   "name": "SonarQube",
-  "version": "4.10.0",
+  "version": "4.11.0",
   "branding": {
     "color": "rgb(67, 157, 210)",
     "theme": "dark"
@@ -18,14 +18,21 @@
       "version": "[15.2,)"
     }
   ],
-  "description":
-    "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
+  "description": "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
   "categories": ["Build and release"],
   "icons": {
     "default": "extension-icon.png"
   },
-  "tags": ["build", "ci", "continuous integration", "code quality", "code analysis", "SAST", "security"],
+  "tags": [
+    "build",
+    "ci",
+    "continuous integration",
+    "code quality",
+    "code analysis",
+    "SAST",
+    "security"
+  ],
   "content": {
     "details": {
       "path": "overview.md"
@@ -123,8 +130,7 @@
               {
                 "id": "username",
                 "name": "Token",
-                "description":
-                  "Authentication Token generated through SonarQube (go to My Account > Security > Generate Tokens)",
+                "description": "Authentication Token generated through SonarQube (go to My Account > Security > Generate Tokens)",
                 "inputMode": "passwordbox",
                 "isConfidential": true,
                 "validation": {

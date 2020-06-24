@@ -3,18 +3,16 @@
   "name": "SonarQubePrepare",
   "friendlyName": "Prepare Analysis Configuration",
   "description": "Prepare SonarQube analysis configuration",
-  "helpMarkDown":
-    "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+  "helpMarkDown": "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
   "visibility": ["Build"],
   "author": "sonarsource",
   "version": {
     "Major": 4,
-    "Minor": 10,
+    "Minor": 11,
     "Patch": 0
   },
-  "releaseNotes":
-    "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
+  "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
   "minimumAgentVersion": "1.95.1",
   "instanceNameFormat": "Prepare analysis on SonarQube",
   "groups": [
@@ -30,8 +28,7 @@
       "type": "connectedService:sonarqube",
       "label": "SonarQube Server Endpoint",
       "required": true,
-      "helpMarkDown":
-        "Select the SonarQube server endpoint for your project. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token."
+      "helpMarkDown": "Select the SonarQube server endpoint for your project. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token."
     },
     {
       "name": "scannerMode",
@@ -39,8 +36,7 @@
       "label": "Choose the way to run the analysis",
       "defaultValue": "MSBuild",
       "required": true,
-      "helpMarkDown":
-        "####MSBuild\n* Put this task before your MSBuild task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
+      "helpMarkDown": "####MSBuild\n* Put this task before your MSBuild task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
       "options": {
         "MSBuild": "Integrate with MSBuild",
         "Other": "Integrate with Maven or Gradle",
@@ -66,8 +62,7 @@
       "defaultValue": "sonar-project.properties",
       "label": "Settings File",
       "required": false,
-      "helpMarkDown":
-        "More information is available [here](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+      "helpMarkDown": "More information is available [here](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
       "visibleRule": "scannerMode = CLI && configMode = file"
     },
     {
@@ -126,23 +121,20 @@
       "label": "Sources directory root",
       "defaultValue": ".",
       "required": true,
-      "helpMarkDown":
-        "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarQube property",
+      "helpMarkDown": "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarQube property",
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {
       "name": "extraProperties",
       "type": "multiLine",
       "label": "Additional Properties",
-      "defaultValue":
-        "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin",
+      "defaultValue": "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin",
       "required": false,
       "properties": {
         "resizable": "true",
         "rows": "5"
       },
-      "helpMarkDown":
-        "[Additional properties](https://redirect.sonarsource.com/doc/analysis-parameters.html) to be passed to the scanner. Specify each key=value pair on a new line.",
+      "helpMarkDown": "[Additional properties](https://redirect.sonarsource.com/doc/analysis-parameters.html) to be passed to the scanner. Specify each key=value pair on a new line.",
       "groupName": "advanced"
     }
   ],
