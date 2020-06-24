@@ -3,14 +3,13 @@
   "name": "SonarCloudPrepare",
   "friendlyName": "Prepare Analysis Configuration",
   "description": "Prepare SonarCloud analysis configuration",
-  "helpMarkDown":
-    "[More Information](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
+  "helpMarkDown": "[More Information](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
   "category": "Build",
   "visibility": ["Build"],
   "author": "sonarsource",
   "version": {
     "Major": 1,
-    "Minor": 11,
+    "Minor": 12,
     "Patch": 0
   },
   "minimumAgentVersion": "1.95.1",
@@ -28,8 +27,7 @@
       "type": "connectedService:sonarcloud",
       "label": "SonarCloud Service Endpoint",
       "required": true,
-      "helpMarkDown":
-        "Select the SonarCloud endpoint for your project. To create one, click the Manage link and create a new SonarCloud Service Endpoint, then enter your SonarCloud account token."
+      "helpMarkDown": "Select the SonarCloud endpoint for your project. To create one, go to your **Project Settings**, then **Service Connections** and create a new SonarCloud Service Endpoint, you will have enter your SonarCloud account token.\n If you are on the build pipeline classic editor, click on the Manage link to be redirected to that page."
     },
     {
       "name": "organization",
@@ -47,8 +45,7 @@
       "label": "Choose the way to run the analysis",
       "defaultValue": "MSBuild",
       "required": true,
-      "helpMarkDown":
-        "####MSBuild\n* Put this task before your MSBuild task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarCloud Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
+      "helpMarkDown": "####MSBuild\n* Put this task before your MSBuild task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarCloud Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
       "options": {
         "MSBuild": "Integrate with MSBuild",
         "Other": "Integrate with Maven or Gradle",
@@ -74,8 +71,7 @@
       "defaultValue": "sonar-project.properties",
       "label": "Settings File",
       "required": false,
-      "helpMarkDown":
-        "More information is available [here](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
+      "helpMarkDown": "More information is available [here](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
       "visibleRule": "scannerMode = CLI && configMode = file"
     },
     {
@@ -134,23 +130,20 @@
       "label": "Sources directory root",
       "defaultValue": ".",
       "required": true,
-      "helpMarkDown":
-        "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarCloud property",
+      "helpMarkDown": "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarCloud property",
       "visibleRule": "scannerMode = CLI && configMode = manual"
     },
     {
       "name": "extraProperties",
       "type": "multiLine",
       "label": "Additional Properties",
-      "defaultValue":
-        "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin",
+      "defaultValue": "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin",
       "required": false,
       "properties": {
         "resizable": "true",
         "rows": "5"
       },
-      "helpMarkDown":
-        "[Additional properties](https://sonarcloud.io/documentation/analysis/analysis-parameters/) to be passed to the scanner. Specify each key=value pair on a new line.",
+      "helpMarkDown": "[Additional properties](https://sonarcloud.io/documentation/analysis/analysis-parameters/) to be passed to the scanner. Specify each key=value pair on a new line.",
       "groupName": "advanced"
     }
   ],
@@ -160,8 +153,7 @@
       "endpointId": "$(SonarCloud)",
       "endpointUrl": "{{endpoint.url}}/api/organizations/search?member=true",
       "resultSelector": "jsonpath:$.organizations[*]",
-      "resultTemplate":
-        "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{name}}} ({{{key}}})\" }"
+      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{name}}} ({{{key}}})\" }"
     }
   ],
   "execution": {
