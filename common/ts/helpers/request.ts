@@ -1,7 +1,7 @@
 import * as request from "request";
 import * as semver from "semver";
 import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint from "../sonarqube/Endpoint";
+import Endpoint from "../sonar/Endpoint";
 
 export interface RequestData {
   [x: string]: any;
