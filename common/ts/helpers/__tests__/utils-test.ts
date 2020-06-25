@@ -1,8 +1,6 @@
 import * as fs from "fs-extra";
 import { setIfNotEmpty, toCleanJSON, getTaskVersion } from "../utils";
 
-jest.mock("fs-extra");
-
 describe("toCleanJSON", () => {
   it("should jsonify", () => {
     expect(toCleanJSON({ foo: "a", bar: "b" })).toBe('{"foo":"a","bar":"b"}');
