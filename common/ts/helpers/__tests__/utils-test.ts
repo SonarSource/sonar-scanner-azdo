@@ -1,5 +1,5 @@
-import { setIfNotEmpty, toCleanJSON, getTaskVersion } from "../utils";
 import * as fs from "fs-extra";
+import { setIfNotEmpty, toCleanJSON, getTaskVersion } from "../utils";
 
 jest.mock("fs-extra");
 
