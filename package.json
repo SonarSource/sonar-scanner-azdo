@@ -96,6 +96,6 @@
     "singleQuote": false
   },
   "dependencies": {
-    "azure-pipelines-task-lib": "^2.8.0"
+    "azure-pipelines-task-lib": "^2.9.5"
   }
 }
