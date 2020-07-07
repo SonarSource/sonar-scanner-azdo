@@ -11,7 +11,7 @@
     "guid-typescript": "1.0.9",
     "request": "2.88.2",
     "request-promise-native": "^1.0.7",
-    "semver": "5.5.0"
+    "semver": "5.7.1"
   },
   "engines": {
     "node": ">=6"
