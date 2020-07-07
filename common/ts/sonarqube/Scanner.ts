@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs-extra";
 import * as tl from "azure-pipelines-task-lib/task";
-import { PROP_NAMES, isWindows, getTaskVersion } from "../helpers/utils";
+import { PROP_NAMES, isWindows } from "../helpers/utils";
 
 export enum ScannerMode {
   MSBuild = "MSBuild",
@@ -109,11 +109,8 @@ interface ScannerCLIData {
 }
 
 export class ScannerCLI extends Scanner {
-  rootPath: string;
-
   constructor(rootPath: string, private readonly data: ScannerCLIData, private cliMode?: string) {
     super(rootPath, ScannerMode.CLI);
-    this.rootPath = rootPath;
   }
 
   public toSonarProps() {
@@ -142,9 +139,6 @@ export class ScannerCLI extends Scanner {
     if (this.isDebug()) {
       scannerRunner.arg("-X");
     }
-
-    scannerRunner.arg(`--from=ScannerAzureDevOps/${getTaskVersion(this.rootPath)}`);
-
     await scannerRunner.exec();
   }
 
