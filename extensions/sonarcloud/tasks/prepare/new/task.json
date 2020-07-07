@@ -27,7 +27,7 @@
       "type": "connectedService:sonarcloud",
       "label": "SonarCloud Service Endpoint",
       "required": true,
-      "helpMarkDown": "Select the SonarCloud endpoint for your project. To create one, go to your **Project Settings**, then **Service Connections** and create a new SonarCloud Service Endpoint, you will have enter your SonarCloud account token.\n If you are on the build pipeline classic editor, click on the Manage link to be redirected to that page."
+      "helpMarkDown": "Select the SonarCloud endpoint for your project. To create one, go to your **Project Settings**, then **Service Connections** and create a new SonarCloud Service Endpoint, you will have to enter your SonarCloud account token.\n If you are on the build pipeline classic editor, click on the Manage link to be redirected to that page."
     },
     {
       "name": "organization",
