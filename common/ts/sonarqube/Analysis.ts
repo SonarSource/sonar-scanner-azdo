@@ -23,6 +23,7 @@ export default class Analysis {
   constructor(
     private readonly analysis: IAnalysis,
     private readonly endpointType: EndpointType,
+    private readonly warnings: string[],
     private readonly dashboardUrl?: string,
     private readonly metrics?: Metrics,
     private readonly projectName?: string
@@ -48,6 +49,7 @@ export default class Analysis {
       this.getQualityGateSection(),
       this.getQualityGateDetailSection(),
       this.getDashboardLink(),
+      this.getWarnings(),
     ]
       .join(" \r\n")
       .trim();
@@ -98,6 +100,7 @@ export default class Analysis {
         </td>
       </tr>`;
     });
+
     const tableStyle = `
       margin-top: 8px;
       border-top: 1px solid #eee;
@@ -117,6 +120,16 @@ export default class Analysis {
     }
     const linkText = `Detailed ${this.endpointType} report &gt;`;
     return `[${linkText}](${this.dashboardUrl})`;
+  }
+
+  public getWarnings() {
+    if (this.warnings.some((w) => w.includes("Please update to at least Java 11"))) {
+      return `<br><span>&#9888;</span><b>${this.warnings.find((w) =>
+        w.includes("Please update to at least Java 11")
+      )}</b>`;
+    } else {
+      return "";
+    }
   }
 
   private getQualityGateColor() {
@@ -140,17 +153,19 @@ export default class Analysis {
     endpoint,
     metrics,
     dashboardUrl,
+    warnings,
   }: {
     analysisId: string;
     dashboardUrl?: string;
     endpoint: Endpoint;
     projectName?: string;
     metrics?: Metrics;
+    warnings: string[];
   }): Promise<Analysis> {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
     return getJSON(endpoint, "/api/qualitygates/project_status", { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
-        new Analysis(projectStatus, endpoint.type, dashboardUrl, metrics, projectName),
+        new Analysis(projectStatus, endpoint.type, warnings, dashboardUrl, metrics, projectName),
       (err) => {
         if (err && err.message) {
           tl.error(`[SQ] Error retrieving analysis: ${err.message}`);

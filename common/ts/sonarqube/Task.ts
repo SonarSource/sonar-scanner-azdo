@@ -10,6 +10,7 @@ interface ITask {
   errorMessage?: string;
   type: string;
   componentName: string;
+  warnings: string[];
 }
 
 export default class Task {
@@ -23,6 +24,10 @@ export default class Task {
     return this.task.componentName;
   }
 
+  public get warnings() {
+    return this.task.warnings;
+  }
+
   public static waitForTaskCompletion(
     endpoint: Endpoint,
     taskId: string,
@@ -30,8 +35,9 @@ export default class Task {
     delay = 1000
   ): Promise<Task> {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
-    return getJSON(endpoint, `/api/ce/task`, { id: taskId }).then(
+    return getJSON(endpoint, `/api/ce/task`, { id: taskId, additionalFields: "warnings" }).then(
       ({ task }: { task: ITask }) => {
+        tl.warning(JSON.stringify(task));
         tl.debug(`[SQ] Task status:` + task.status);
         if (tries <= 0) {
           throw new TimeOutReachedError();

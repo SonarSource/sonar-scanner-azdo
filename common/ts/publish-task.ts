@@ -68,6 +68,7 @@ export async function getReportForTask(
       endpoint,
       metrics,
       projectName: task.componentName,
+      warnings: task.warnings,
     });
 
     if (analysis.status === "ERROR" || analysis.status === "WARN" || analysis.status === "NONE") {
