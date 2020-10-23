@@ -34,6 +34,7 @@ const GET_ANALYSIS_DATA = {
   dashboardUrl: "https://dashboard.url",
   endpoint: ENDPOINT,
   metrics: METRICS,
+  warnings: [],
 };
 
 beforeEach(() => {
@@ -84,4 +85,16 @@ it("should display the project name", async () => {
     projectName: "project_name",
   });
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
+});
+
+it("should display Java 11 warning", async () => {
+  const analysis = await Analysis.getAnalysis({
+    ...GET_ANALYSIS_DATA,
+    warnings: [
+      "The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.",
+    ],
+  });
+  expect(analysis.getWarnings()).toStrictEqual(
+    "<br><span>&#9888;</span><b>The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.</b>"
+  );
 });

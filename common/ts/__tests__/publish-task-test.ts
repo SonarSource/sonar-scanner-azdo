@@ -48,6 +48,7 @@ it("check multiple report status and set global quality gate for build propertie
     status: "OK",
     type: EndpointType.SonarCloud,
     componentName: "componentName",
+    warnings: [],
   });
 
   const taskReportArray: TaskReport[] = [];
@@ -69,6 +70,7 @@ it("check multiple report status and set global quality gate for build propertie
   const returnedAnalysisOk = new Analysis(
     { status: "OK", conditions: [] },
     EndpointType.SonarCloud,
+    [],
     "",
     null,
     null
@@ -111,6 +113,7 @@ it("check multiple report status and set global quality gate for build propertie
     status: "OK",
     type: EndpointType.SonarCloud,
     componentName: "componentName",
+    warnings: [],
   });
 
   const taskReportArray: TaskReport[] = [];
@@ -134,6 +137,7 @@ it("check multiple report status and set global quality gate for build propertie
   const returnedAnalysisOk = new Analysis(
     { status: "OK", conditions: [] },
     EndpointType.SonarCloud,
+    [],
     "",
     null,
     null
@@ -142,6 +146,7 @@ it("check multiple report status and set global quality gate for build propertie
   const returnedAnalysisError = new Analysis(
     { status: "ERROR", conditions: [] },
     EndpointType.SonarCloud,
+    [],
     "",
     null,
     null
@@ -218,12 +223,14 @@ it("get report string for single report", async () => {
     status: "status",
     type: EndpointType.SonarQube,
     componentName: "componentName",
+    warnings: [],
   });
   jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
   // Mock converting the Task into an html report
   const returnedAnalysis = new Analysis(
     { status: "", conditions: [] },
     EndpointType.SonarCloud,
+    [],
     "",
     null,
     null
@@ -240,6 +247,7 @@ it("get report string for single report", async () => {
     endpoint: SQ_ENDPOINT,
     metrics: { metrics: [] },
     projectName: "componentName",
+    warnings: [],
   });
 
   expect(result).toBe("dummy html");
