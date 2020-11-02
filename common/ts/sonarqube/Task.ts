@@ -37,7 +37,6 @@ export default class Task {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
     return getJSON(endpoint, `/api/ce/task`, { id: taskId, additionalFields: "warnings" }).then(
       ({ task }: { task: ITask }) => {
-        tl.warning(JSON.stringify(task));
         tl.debug(`[SQ] Task status:` + task.status);
         if (tries <= 0) {
           throw new TimeOutReachedError();
