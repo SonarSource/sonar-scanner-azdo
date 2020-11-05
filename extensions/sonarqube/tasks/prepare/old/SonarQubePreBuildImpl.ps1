@@ -8,7 +8,7 @@ function InvokePreBuildTask
 
     $currentDir = (Get-Item -Path ".\" -Verbose).FullName
     $bootstrapperDir = [System.IO.Path]::Combine($currentDir, "SonarQubeScannerMsBuild") 
-    $bootstrapperPath = [System.IO.Path]::Combine($bootstrapperDir, "MSBuild.SonarQube.Runner.exe")
+    $bootstrapperPath = [System.IO.Path]::Combine($bootstrapperDir, "SonarScanner.MSBuild.exe")
     $dashboardUrl = GetDashboardUrl $serviceEndpoint.Url $projectKey
     Write-Verbose "Dashboard Url: $dashboardUrl"
     
