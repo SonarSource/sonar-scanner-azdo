@@ -9,7 +9,7 @@
   "author": "sonarsource",
   "version": {
     "Major": 3,
-    "Minor": 13,
+    "Minor": 14,
     "Patch": 0
   },
   "demands": ["msbuild", "java"],
