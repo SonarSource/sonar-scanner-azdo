@@ -11,8 +11,8 @@
   "author": "sonarsource",
   "version": {
     "Major": 1,
-    "Minor": 11,
-    "Patch": 0
+    "Minor": 10,
+    "Patch": 1
   },
   "minimumAgentVersion": "1.95.1",
   "inputs": [
