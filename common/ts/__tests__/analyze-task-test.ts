@@ -1,6 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as analyze from "../../ts/analyze-task";
-import Scanner, { ScannerCLI, ScannerMode } from "../sonarqube/Scanner";
+import Scanner, { ScannerCLI, ScannerMode } from "../sonar/Scanner";
 
 it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);

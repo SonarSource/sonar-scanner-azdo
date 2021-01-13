@@ -1,5 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Scanner, { ScannerMode } from "./sonarqube/Scanner";
+import Scanner, { ScannerMode } from "./sonar/Scanner";
 import JavaVersionResolver from "./helpers/java-version-resolver";
 
 const JAVA_11_PATH_ENV_NAME = "JAVA_HOME_11_X64";

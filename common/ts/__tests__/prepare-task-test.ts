@@ -3,11 +3,11 @@ import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
 import { SemVer } from "semver";
 import * as azdoApiUtils from "../helpers/azdo-api-utils";
-import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
+import Endpoint, { EndpointType } from "../sonar/Endpoint";
 import * as prept from "../prepare-task";
 import * as request from "../helpers/request";
-import Scanner, { ScannerMSBuild } from "../sonarqube/Scanner";
-import FeatureEnabler from "../sonarqube/FeatureEnabler";
+import Scanner, { ScannerMSBuild } from "../sonar/Scanner";
+import SonarInstance from "../sonar/SonarInstance";
 
 import GitInterfaces = require("../node_modules/azure-devops-node-api/interfaces/GitInterfaces");
 import WebApi = require("../node_modules/azure-devops-node-api/WebApi");
@@ -187,11 +187,19 @@ describe("populateBranchAndPrProps", () => {
     const repoName = "myRepo";
     jest.spyOn(tl, "getVariable").mockImplementationOnce(() => repoName);
 
-    const featureEnabler = new FeatureEnabler(new SemVer("8.0.0"), EndpointType.SonarCloud);
+    const endpoint = new Endpoint(EndpointType.SonarCloud, {
+      url: null,
+      token: null,
+      username: null,
+      password: null,
+      organization: null,
+    });
+
+    const sonarInstance = new SonarInstance(endpoint, new SemVer("8.0.0"));
 
     const props: { [key: string]: string } = {};
 
-    jest.spyOn(featureEnabler, "isEnabled").mockReturnValue(false);
+    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(false);
 
     await prept.populateBranchAndPrProps(props);
 
@@ -227,11 +235,20 @@ describe("populateBranchAndPrProps", () => {
     const sourceBranch = "develop";
     jest.spyOn(tl, "getVariable").mockImplementationOnce(() => sourceBranch);
 
-    const featureEnabler = new FeatureEnabler(new SemVer("8.1.0"), EndpointType.SonarQube);
+    const endpoint = new Endpoint(EndpointType.SonarQube, {
+      url: null,
+      token: null,
+      username: null,
+      password: null,
+      organization: null,
+    });
+
+    const sonarInstance = new SonarInstance(endpoint, new SemVer("8.1.0"));
+    sonarInstance.init();
 
     const props: { [key: string]: string } = {};
 
-    jest.spyOn(featureEnabler, "isEnabled").mockReturnValue(true);
+    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(true);
 
     await prept.populateBranchAndPrProps(props);
 
@@ -267,11 +284,19 @@ describe("populateBranchAndPrProps", () => {
     const repoName = "myRepo";
     jest.spyOn(tl, "getVariable").mockImplementationOnce(() => repoName);
 
-    const featureEnabler = new FeatureEnabler(new SemVer("7.9.1"), EndpointType.SonarQube);
+    const endpoint = new Endpoint(EndpointType.SonarQube, {
+      url: null,
+      token: null,
+      username: null,
+      password: null,
+      organization: null,
+    });
+
+    const sonarInstance = new SonarInstance(endpoint, new SemVer("7.9.1"));
 
     const props: { [key: string]: string } = {};
 
-    jest.spyOn(featureEnabler, "isEnabled").mockReturnValue(true);
+    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(true);
 
     await prept.populateBranchAndPrProps(props);
 
@@ -309,11 +334,20 @@ describe("populateBranchAndPrProps", () => {
     const repoName = "myRepo";
     jest.spyOn(tl, "getVariable").mockImplementationOnce(() => repoName);
 
-    const featureEnabler = new FeatureEnabler(new SemVer("8.1.0"), EndpointType.SonarQube);
+    const endpoint = new Endpoint(EndpointType.SonarQube, {
+      url: null,
+      token: null,
+      username: null,
+      password: null,
+      organization: null,
+    });
+
+    const sonarInstance = new SonarInstance(endpoint, new SemVer("8.1.0"));
+    sonarInstance.init();
 
     const props: { [key: string]: string } = {};
 
-    jest.spyOn(featureEnabler, "isEnabled").mockReturnValue(false);
+    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(false);
 
     await prept.populateBranchAndPrProps(props);
 
@@ -343,11 +377,19 @@ describe("populateBranchAndPrProps", () => {
     const sourceBranch = "develop";
     jest.spyOn(tl, "getVariable").mockImplementationOnce(() => sourceBranch);
 
-    const featureEnabler = new FeatureEnabler(new SemVer("7.9.1"), EndpointType.SonarQube);
+    const endpoint = new Endpoint(EndpointType.SonarQube, {
+      url: null,
+      token: null,
+      username: null,
+      password: null,
+      organization: null,
+    });
+
+    const sonarInstance = new SonarInstance(endpoint, new SemVer("7.9.1"));
 
     const props: { [key: string]: string } = {};
 
-    jest.spyOn(featureEnabler, "isEnabled").mockReturnValue(false);
+    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(false);
 
     await prept.populateBranchAndPrProps(props);
 
@@ -375,11 +417,20 @@ describe("populateBranchAndPrProps", () => {
     const sourceBranch = "develop";
     jest.spyOn(tl, "getVariable").mockImplementationOnce(() => sourceBranch);
 
-    const featureEnabler = new FeatureEnabler(new SemVer("8.1.0"), EndpointType.SonarQube);
+    const endpoint = new Endpoint(EndpointType.SonarQube, {
+      url: null,
+      token: null,
+      username: null,
+      password: null,
+      organization: null,
+    });
+
+    const sonarInstance = new SonarInstance(endpoint, new SemVer("8.1.0"));
+    sonarInstance.init();
 
     const props: { [key: string]: string } = {};
 
-    jest.spyOn(featureEnabler, "isEnabled").mockReturnValue(true);
+    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(true);
 
     await prept.populateBranchAndPrProps(props);
 

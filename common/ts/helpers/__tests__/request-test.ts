@@ -1,6 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { SemVer } from "semver";
-import Endpoint, { EndpointType } from "../../sonarqube/Endpoint";
+import Endpoint, { EndpointType } from "../../sonar/Endpoint";
 import * as request from "../request";
 
 beforeEach(() => {
