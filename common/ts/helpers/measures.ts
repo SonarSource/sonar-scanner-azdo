@@ -22,7 +22,7 @@ export function useFormatter(
   formatter: Formatter,
   options?: IOptions
 ): string {
-  return value !== undefined && value !== "" ? formatter(value, options) : "";
+  return value !== undefined && value !== '' ? formatter(value, options) : '';
 }
 
 export function getFormatter(type: string): Formatter {
@@ -46,7 +46,7 @@ export function numberFormatter(
   minimumFractionDigits = 0,
   maximumFractionDigits = minimumFractionDigits
 ) {
-  const { format } = new Intl.NumberFormat("en-US", {
+  const { format } = new Intl.NumberFormat('en-US', {
     minimumFractionDigits,
     maximumFractionDigits,
   });
@@ -83,17 +83,17 @@ export function percentFormatter(
   value: string | number,
   options: { decimals?: number } = {}
 ): string {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     value = parseFloat(value);
   }
   if (options.decimals) {
     return `${numberFormatter(value, options.decimals)}%`;
   }
-  return value === 100 ? "100%" : numberFormatter(value, 1) + "%";
+  return value === 100 ? '100%' : numberFormatter(value, 1) + '%';
 }
 
 export function ratingFormatter(value: string | number): string {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     value = parseInt(value, 10);
   }
   return String.fromCharCode(97 + value - 1).toUpperCase();
@@ -101,10 +101,10 @@ export function ratingFormatter(value: string | number): string {
 
 export function levelFormatter(value: string): string {
   const l10nKeys = {
-    ERROR: "Failed",
-    WARN: "Warning",
-    OK: "Passed",
-    NONE: "None",
+    ERROR: 'Failed',
+    WARN: 'Warning',
+    OK: 'Passed',
+    NONE: 'None',
   };
   const result = l10nKeys[value.toUpperCase()];
   return result ? result : value;
@@ -112,10 +112,10 @@ export function levelFormatter(value: string): string {
 
 export function comparatorFormatter(value: string): string {
   const l10nKeys = {
-    EQ: "&#61;",
-    GT: "&#62;",
-    LT: "&#60;",
-    NE: "&#8800;",
+    EQ: '&#61;',
+    GT: '&#62;',
+    LT: '&#60;',
+    NE: '&#8800;',
   };
   const result = l10nKeys[value.toUpperCase()];
   return result ? result : value;
@@ -165,7 +165,7 @@ export function formatDuration(
   hours: number,
   minutes: number
 ): string {
-  let formatted = "";
+  let formatted = '';
   if (shouldDisplayDays(days)) {
     formatted += `${isNegative ? -1 * days : days}d`;
   }
@@ -188,29 +188,29 @@ export function formatDurationShort(
 ): string {
   if (shouldDisplayDaysInShortFormat(days)) {
     const roundedDays = Math.round(days);
-    const formattedDays = formatMeasure(isNegative ? -1 * roundedDays : roundedDays, "SHORT_INT");
-    return formattedDays + "d";
+    const formattedDays = formatMeasure(isNegative ? -1 * roundedDays : roundedDays, 'SHORT_INT');
+    return formattedDays + 'd';
   }
 
   if (shouldDisplayHoursInShortFormat(hours)) {
     const roundedHours = Math.round(hours);
     const formattedHours = formatMeasure(
       isNegative ? -1 * roundedHours : roundedHours,
-      "SHORT_INT"
+      'SHORT_INT'
     );
     return `${formattedHours}h`;
   }
 
-  const formattedMinutes = formatMeasure(isNegative ? -1 * minutes : minutes, "SHORT_INT");
+  const formattedMinutes = formatMeasure(isNegative ? -1 * minutes : minutes, 'SHORT_INT');
   return `${formattedMinutes}min`;
 }
 
 export function durationFormatter(value: string | number): string {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     value = parseInt(value, 10);
   }
   if (value === 0) {
-    return "0";
+    return '0';
   }
   const hoursInDay = HOURS_IN_DAY;
   const isNegative = value < 0;
@@ -223,11 +223,11 @@ export function durationFormatter(value: string | number): string {
 }
 
 export function shortDurationFormatter(value: string | number): string {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     value = parseInt(value, 10);
   }
   if (value === 0) {
-    return "0";
+    return '0';
   }
   const hoursInDay = HOURS_IN_DAY;
   const isNegative = value < 0;

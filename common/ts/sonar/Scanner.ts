@@ -1,12 +1,12 @@
-import * as path from "path";
-import * as fs from "fs-extra";
-import * as tl from "azure-pipelines-task-lib/task";
-import { PROP_NAMES, isWindows } from "../helpers/utils";
+import * as path from 'path';
+import * as fs from 'fs-extra';
+import * as tl from 'azure-pipelines-task-lib/task';
+import { PROP_NAMES, isWindows } from '../helpers/utils';
 
 export enum ScannerMode {
-  MSBuild = "MSBuild",
-  CLI = "CLI",
-  Other = "Other",
+  MSBuild = 'MSBuild',
+  CLI = 'CLI',
+  Other = 'Other',
 }
 
 export default class Scanner {
@@ -53,8 +53,8 @@ export default class Scanner {
     switch (mode) {
       case ScannerMode.Other:
         tl.warning(
-          `[SonarScanner] When using Maven or Gradle, don't use the analyze task but instead tick the ` +
-            `"SonarQube" option in the Maven/Gradle task to run the scanner as part of the build.`
+          '[SonarScanner] When using Maven or Gradle, don\'t use the analyze task but instead tick the ' +
+            '"SonarQube" option in the Maven/Gradle task to run the scanner as part of the build.'
         );
         return Scanner.getScanner(rootPath);
       case ScannerMode.MSBuild:
@@ -67,36 +67,36 @@ export default class Scanner {
   }
 
   logIssueOnBuildSummaryForStdErr(tool) {
-    tool.on("stderr", (data) => {
+    tool.on('stderr', (data) => {
       if (data == null) {
         return;
       }
       data = data.toString().trim();
-      if (data.indexOf("WARNING: An illegal reflective access operation has occurred") !== -1) {
+      if (data.indexOf('WARNING: An illegal reflective access operation has occurred') !== -1) {
         //bypass those warning showing as error because they can't be catched for now by Scanner.
         tl.debug(data);
         return;
       }
-      tl.command("task.logissue", { type: "error" }, data);
+      tl.command('task.logissue', { type: 'error' }, data);
     });
   }
 
   //Temporary warning message for Java version (MMF-2035)
   logIssueAsWarningForStdOut(tool) {
-    tool.on("stdout", (data) => {
+    tool.on('stdout', (data) => {
       if (data == null) {
         return;
       }
       data = data.toString().trim();
-      if (data.indexOf("Please update to at least Java 11") !== -1 && Scanner.getIsSonarCloud()) {
-        tl.command("task.logissue", { type: "warning" }, data);
+      if (data.indexOf('Please update to at least Java 11') !== -1 && Scanner.getIsSonarCloud()) {
+        tl.command('task.logissue', { type: 'warning' }, data);
       }
     });
   }
   //Temporary warning message for Java version (MMF-2035)
 
   isDebug() {
-    return tl.getVariable("system.debug") === "true";
+    return tl.getVariable('system.debug') === 'true';
   }
 }
 
@@ -114,7 +114,7 @@ export class ScannerCLI extends Scanner {
   }
 
   public toSonarProps() {
-    if (this.cliMode === "file") {
+    if (this.cliMode === 'file') {
       return { [PROP_NAMES.PROJECTSETTINGS]: this.data.projectSettings };
     }
     return {
@@ -126,34 +126,34 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    let scannerCliScript = tl.resolve(this.rootPath, "sonar-scanner", "bin", "sonar-scanner");
+    let scannerCliScript = tl.resolve(this.rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
 
     if (isWindows()) {
-      scannerCliScript += ".bat";
+      scannerCliScript += '.bat';
     } else {
-      await fs.chmod(scannerCliScript, "777");
+      await fs.chmod(scannerCliScript, '777');
     }
     const scannerRunner = tl.tool(scannerCliScript);
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
     if (this.isDebug()) {
-      scannerRunner.arg("-X");
+      scannerRunner.arg('-X');
     }
     await scannerRunner.exec();
   }
 
   public static getScanner(rootPath: string) {
-    const mode = tl.getInput("configMode");
-    if (mode === "file") {
-      return new ScannerCLI(rootPath, { projectSettings: tl.getInput("configFile", true) }, mode);
+    const mode = tl.getInput('configMode');
+    if (mode === 'file') {
+      return new ScannerCLI(rootPath, { projectSettings: tl.getInput('configFile', true) }, mode);
     }
     return new ScannerCLI(
       rootPath,
       {
-        projectKey: tl.getInput("cliProjectKey", true),
-        projectName: tl.getInput("cliProjectName"),
-        projectVersion: tl.getInput("cliProjectVersion"),
-        projectSources: tl.getInput("cliSources"),
+        projectKey: tl.getInput('cliProjectKey', true),
+        projectName: tl.getInput('cliProjectName'),
+        projectVersion: tl.getInput('cliProjectVersion'),
+        projectSources: tl.getInput('cliSources'),
       },
       mode
     );
@@ -186,26 +186,26 @@ export class ScannerMSBuild extends Scanner {
     if (isWindows()) {
       const scannerExePath = this.findFrameworkScannerPath();
       tl.debug(`Using classic scanner at ${scannerExePath}`);
-      tl.setVariable("SONARQUBE_SCANNER_MSBUILD_EXE", scannerExePath);
+      tl.setVariable('SONARQUBE_SCANNER_MSBUILD_EXE', scannerExePath);
       scannerRunner = this.getScannerRunner(scannerExePath, true);
     } else {
       const scannerDllPath = this.findDotnetScannerPath();
       tl.debug(`Using dotnet scanner at ${scannerDllPath}`);
-      tl.setVariable("SONARQUBE_SCANNER_MSBUILD_DLL", scannerDllPath);
+      tl.setVariable('SONARQUBE_SCANNER_MSBUILD_DLL', scannerDllPath);
       scannerRunner = this.getScannerRunner(scannerDllPath, false);
 
       // Need to set executable flag on the embedded scanner CLI
       await this.makeShellScriptExecutable(scannerDllPath);
     }
-    scannerRunner.arg("begin");
-    scannerRunner.arg("/k:" + this.data.projectKey);
+    scannerRunner.arg('begin');
+    scannerRunner.arg('/k:' + this.data.projectKey);
     if (this.data.organization) {
-      scannerRunner.arg("/o:" + this.data.organization);
+      scannerRunner.arg('/o:' + this.data.organization);
     }
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
     if (this.isDebug()) {
-      scannerRunner.arg("/d:sonar.verbose=true");
+      scannerRunner.arg('/d:sonar.verbose=true');
     }
     await scannerRunner.exec();
   }
@@ -213,9 +213,9 @@ export class ScannerMSBuild extends Scanner {
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
     const scannerCliShellScripts = tl.findMatch(
       scannerExecutablePath,
-      path.join(path.dirname(scannerExecutablePath), "sonar-scanner-*", "bin", "sonar-scanner")
+      path.join(path.dirname(scannerExecutablePath), 'sonar-scanner-*', 'bin', 'sonar-scanner')
     )[0];
-    await fs.chmod(scannerCliShellScripts, "777");
+    await fs.chmod(scannerCliShellScripts, '777');
   }
 
   private getScannerRunner(scannerPath: string, isExeScanner: boolean) {
@@ -223,26 +223,26 @@ export class ScannerMSBuild extends Scanner {
       return tl.tool(scannerPath);
     }
 
-    const dotnetToolPath = tl.which("dotnet", true);
+    const dotnetToolPath = tl.which('dotnet', true);
     const scannerRunner = tl.tool(dotnetToolPath);
     scannerRunner.arg(scannerPath);
     return scannerRunner;
   }
 
   private findFrameworkScannerPath(): string {
-    return tl.resolve(this.rootPath, "classic-sonar-scanner-msbuild", "SonarScanner.MSBuild.exe");
+    return tl.resolve(this.rootPath, 'classic-sonar-scanner-msbuild', 'SonarScanner.MSBuild.exe');
   }
 
   private findDotnetScannerPath(): string {
-    return tl.resolve(this.rootPath, "dotnet-sonar-scanner-msbuild", "SonarScanner.MSBuild.dll");
+    return tl.resolve(this.rootPath, 'dotnet-sonar-scanner-msbuild', 'SonarScanner.MSBuild.dll');
   }
 
   public async runAnalysis() {
     const scannerRunner = isWindows()
-      ? this.getScannerRunner(tl.getVariable("SONARQUBE_SCANNER_MSBUILD_EXE"), true)
-      : this.getScannerRunner(tl.getVariable("SONARQUBE_SCANNER_MSBUILD_DLL"), false);
+      ? this.getScannerRunner(tl.getVariable('SONARQUBE_SCANNER_MSBUILD_EXE'), true)
+      : this.getScannerRunner(tl.getVariable('SONARQUBE_SCANNER_MSBUILD_DLL'), false);
 
-    scannerRunner.arg("end");
+    scannerRunner.arg('end');
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
     await scannerRunner.exec();
@@ -250,10 +250,10 @@ export class ScannerMSBuild extends Scanner {
 
   public static getScanner(rootPath: string) {
     return new ScannerMSBuild(rootPath, {
-      projectKey: tl.getInput("projectKey", true),
-      projectName: tl.getInput("projectName"),
-      projectVersion: tl.getInput("projectVersion"),
-      organization: tl.getInput("organization"),
+      projectKey: tl.getInput('projectKey', true),
+      projectName: tl.getInput('projectName'),
+      projectVersion: tl.getInput('projectVersion'),
+      organization: tl.getInput('organization'),
     });
   }
 }

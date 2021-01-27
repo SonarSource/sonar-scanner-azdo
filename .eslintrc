@@ -92,6 +92,9 @@
     "one-var": ["warn", "never"],
     "operator-assignment": "warn",
 
+    "quotes": [2, "single", "avoid-escape"],
+    "jsx-quotes": [2, "prefer-single"],
+
     // es2015
     "no-duplicate-imports": "error",
     "no-useless-computed-key": "error",

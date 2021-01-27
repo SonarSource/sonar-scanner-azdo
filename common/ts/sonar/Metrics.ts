@@ -1,6 +1,6 @@
-import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint from "./Endpoint";
-import { getJSON } from "../helpers/request";
+import * as tl from 'azure-pipelines-task-lib/task';
+import Endpoint from './Endpoint';
+import { getJSON } from '../helpers/request';
 
 interface IMetric {
   custom?: boolean;
@@ -31,7 +31,7 @@ export default class Metrics {
 
   public static getAllMetrics(endpoint: Endpoint): Promise<Metrics | undefined> {
     return inner().catch((err) => {
-      tl.error(`[SonarScanner] Could not fetch metrics`);
+      tl.error('[SonarScanner] Could not fetch metrics');
       if (err && err.message) {
         tl.error(err.message);
       } else if (err) {
@@ -41,10 +41,10 @@ export default class Metrics {
     });
 
     function inner(
-      data: { f?: string; p?: number; ps?: number } = { f: "name", ps: 500 },
+      data: { f?: string; p?: number; ps?: number } = { f: 'name', ps: 500 },
       prev?: MetricsResponse
     ): Promise<Metrics> {
-      return getJSON(endpoint, "/api/metrics/search", data).then((r: MetricsResponse) => {
+      return getJSON(endpoint, '/api/metrics/search', data).then((r: MetricsResponse) => {
         const result = prev ? prev.metrics.concat(r.metrics) : r.metrics;
         if (r.p * r.ps >= r.total) {
           return new Metrics(result);

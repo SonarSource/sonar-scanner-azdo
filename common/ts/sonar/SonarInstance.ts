@@ -1,11 +1,11 @@
-import * as semver from "semver";
-import Endpoint, { EndpointType } from "./Endpoint";
-import * as internalRequest from "../helpers/request";
+import * as semver from 'semver';
+import Endpoint, { EndpointType } from './Endpoint';
+import * as internalRequest from '../helpers/request';
 
 export enum Features {
-  FEATURE_BRANCHES_AND_PULLREQUEST = "sonar.branchesandpullrequest",
-  FEATURE_NEW_REPORT_TASK_LOCATION = "sonar.newreporttasklocation",
-  FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED = "sonar.pullrequestprovider.deprecated",
+  FEATURE_BRANCHES_AND_PULLREQUEST = 'sonar.branchesandpullrequest',
+  FEATURE_NEW_REPORT_TASK_LOCATION = 'sonar.newreporttasklocation',
+  FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED = 'sonar.pullrequestprovider.deprecated',
 }
 
 const featureToggleMap = new Map();
@@ -40,13 +40,13 @@ export default class SonarInstance {
   }
 
   private getServerVersion(): Promise<semver.SemVer> {
-    return internalRequest.callGet(this.endpoint, "/api/server/version", false).then(semver.coerce);
+    return internalRequest.callGet(this.endpoint, '/api/server/version', false).then(semver.coerce);
   }
 
   private enableBranchesAndPullRequest() {
     if (
       this.endpoint.type === EndpointType.SonarCloud ||
-      this.serverVersion >= semver.parse("7.2.0")
+      this.serverVersion >= semver.parse('7.2.0')
     ) {
       featureToggleMap.set(Features.FEATURE_BRANCHES_AND_PULLREQUEST, true);
     }
@@ -55,7 +55,7 @@ export default class SonarInstance {
   private enableNewReportTaskLocation() {
     if (
       this.endpoint.type === EndpointType.SonarCloud ||
-      this.serverVersion >= semver.parse("7.2.0")
+      this.serverVersion >= semver.parse('7.2.0')
     ) {
       featureToggleMap.set(Features.FEATURE_NEW_REPORT_TASK_LOCATION, true);
     }
@@ -64,7 +64,7 @@ export default class SonarInstance {
   private enablePullRequestProviderDeprecatedProperty() {
     if (
       this.endpoint.type === EndpointType.SonarQube &&
-      this.serverVersion >= semver.parse("8.0.0")
+      this.serverVersion >= semver.parse('8.0.0')
     ) {
       featureToggleMap.set(Features.FEATURE_PULL_REQUEST_PROVIDER_PROPERTY_DEPRECATED, true);
     }

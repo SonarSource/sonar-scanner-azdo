@@ -1,7 +1,7 @@
-import * as request from "request";
-import * as semver from "semver";
-import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint from "../sonar/Endpoint";
+import * as request from 'request';
+import * as semver from 'semver';
+import * as tl from 'azure-pipelines-task-lib/task';
+import Endpoint from '../sonar/Endpoint';
 
 export interface RequestData {
   [x: string]: any;
@@ -33,7 +33,7 @@ export function callGet(
       (error, response, body) => {
         if (error) {
           tl.debug(`[SonarScanner] API GET '${path}' failed, error was: ${JSON.stringify(error)}`);
-          return reject(isJson ? {} : "");
+          return reject(isJson ? {} : '');
         }
         tl.debug(
           `Response: ${response.statusCode} Body: "${isString(body) ? body : JSON.stringify(body)}"`
@@ -41,16 +41,16 @@ export function callGet(
         if (response.statusCode < 200 || response.statusCode >= 300) {
           const errorMessage = `[SonarScanner] API GET '${path}' failed, status code was: ${response.statusCode}`;
           tl.debug(errorMessage);
-          return reject(isJson ? {} : "");
+          return reject(isJson ? {} : '');
         }
-        return resolve(body || (isJson ? {} : ""));
+        return resolve(body || (isJson ? {} : ''));
       }
     );
   });
 }
 
 export function isString(x) {
-  return Object.prototype.toString.call(x) === "[object String]";
+  return Object.prototype.toString.call(x) === '[object String]';
 }
 
 export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
@@ -58,5 +58,5 @@ export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): 
 }
 
 export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
-  return callGet(endpoint, "/api/server/version", false).then(semver.coerce);
+  return callGet(endpoint, '/api/server/version', false).then(semver.coerce);
 }
