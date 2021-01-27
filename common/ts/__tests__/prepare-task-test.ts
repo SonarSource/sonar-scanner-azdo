@@ -201,6 +201,7 @@ describe("populateBranchAndPrProps", () => {
 
     jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(false);
 
+    prept.setSonarInstance(sonarInstance);
     await prept.populateBranchAndPrProps(props);
 
     expect(props["sonar.pullrequest.key"]).toBe(prId);
@@ -250,6 +251,7 @@ describe("populateBranchAndPrProps", () => {
 
     jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(true);
 
+    prept.setSonarInstance(sonarInstance);
     await prept.populateBranchAndPrProps(props);
 
     expect(props["sonar.pullrequest.provider"]).toBeUndefined();
@@ -296,8 +298,9 @@ describe("populateBranchAndPrProps", () => {
 
     const props: { [key: string]: string } = {};
 
-    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(true);
+    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(false);
 
+    prept.setSonarInstance(sonarInstance);
     await prept.populateBranchAndPrProps(props);
 
     expect(props["sonar.pullrequest.key"]).toBe(prNumber);
@@ -347,8 +350,9 @@ describe("populateBranchAndPrProps", () => {
 
     const props: { [key: string]: string } = {};
 
-    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(false);
+    jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(true);
 
+    prept.setSonarInstance(sonarInstance);
     await prept.populateBranchAndPrProps(props);
 
     expect(props["sonar.pullrequest.key"]).toBe(prNumber);
@@ -391,6 +395,7 @@ describe("populateBranchAndPrProps", () => {
 
     jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(false);
 
+    prept.setSonarInstance(sonarInstance);
     await prept.populateBranchAndPrProps(props);
 
     expect(props["sonar.pullrequest.provider"]).toBe("bitbucketcloud");
@@ -432,6 +437,7 @@ describe("populateBranchAndPrProps", () => {
 
     jest.spyOn(sonarInstance, "isEnabled").mockReturnValue(true);
 
+    prept.setSonarInstance(sonarInstance);
     await prept.populateBranchAndPrProps(props);
 
     expect(props["sonar.pullrequest.provider"]).toBeUndefined();

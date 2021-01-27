@@ -11,6 +11,11 @@ import SonarInstance, { Features } from "./sonar/SonarInstance";
 const REPO_NAME_VAR = "Build.Repository.Name";
 let sonarInstance: SonarInstance;
 
+//for testing purposes
+export function setSonarInstance(sonarInstanceObject: SonarInstance) {
+  sonarInstance = sonarInstanceObject;
+}
+
 export default async function prepareTask(endpoint: Endpoint, rootPath: string) {
   if (
     endpoint.type === EndpointType.SonarQube &&
