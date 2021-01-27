@@ -400,18 +400,30 @@ gulp.task('deploy', gulp.series('build', 'deploy:buildinfo', 'deploy:vsix'));
  */
 gulp.task('sonarqube', done => {
   if (process.env.CIRRUS_BRANCH === 'master' && process.env.CIRRUS_PR === 'false') {
-    runSonnarQubeScanner(done, { 'sonar.analysis.sha1': process.env.CIRRUS_CHANGE_IN_REPO });
+    runSonnarQubeScanner(done, { 
+	'sonar.analysis.sha1': process.env.CIRRUS_CHANGE_IN_REPO,
+	'sonar.branch.name': process.env.CIRRUS_BRANCH
+	});
   } else if (process.env.CIRRUS_PR !== 'false') {
+	gulp.start('git-fetch-pr');
     runSonnarQubeScanner(done, {
-      'sonar.analysis.prNumber': process.env.CIRRUS_PR,
-      'sonar.branch.name': process.env.CIRRUS_BRANCH,
-      'sonar.branch.target': process.env.CIRRUS_BASE_BRANCH,
+	  'sonar.pullrequest.key': process.env.CIRRUS_PR,
+	  'sonar.pullrequest.branch': process.env.CIRRUS_BRANCH,
+      'sonar.pullrequest.base': process.env.CIRRUS_BASE_BRANCH,
       'sonar.analysis.sha1': process.env.CIRRUS_BASE_SHA
     });
   } else {
     done();
   }
 });
+
+gulp.task('git-fetch-pr', function (cb) {
+  exec('git fetch origin ' + process.env.CIRRUS_BASE_BRANCH, function (err, stdout, stderr) {
+	gutil.log(stdout);
+	gutil.log(stderr);
+    cb(err);
+  });
+})
 
 gulp.task('promote', () => {
   if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {

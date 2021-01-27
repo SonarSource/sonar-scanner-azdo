@@ -135,7 +135,7 @@ exports.getBuildInfo = function(packageJson, filePath) {
 exports.runSonnarQubeScanner = function(callback, options = {}) {
   const commonOptions = {
     'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
-    'sonar.projectName': 'SonarQube Scanner for TFS/VSTS',
+    'sonar.projectName': 'SonarScanner for Azure DevOps',
     'sonar.exclusions':
       'build/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, **/temp-find-method.ts',
     'sonar.coverage.exclusions':
@@ -146,7 +146,7 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
     'sonar.analysis.pipeline': process.env.CIRRUS_BUILD_ID,
     'sonar.analysis.repository': process.env.CIRRUS_REPO_FULL_NAME,
     'sonar.eslint.reportPaths': 'eslint-report.json',
-    'sonar.typescript.lcov.reportPaths': 'coverage/lcov.info'
+    'sonar.javascript.lcov.reportPaths': 'coverage/lcov.info'
   };
   sonarqubeScanner(
     {
