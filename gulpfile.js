@@ -23,7 +23,8 @@ const {
   getBuildInfo,
   npmInstallTask,
   runSonnarQubeScanner,
-  tfxCommand
+  tfxCommand,
+  gitFetchOriginBaseBranch
 } = require('./config/utils');
 const { scanner } = require('./config/config');
 const packageJSON = require('./package.json');
@@ -405,7 +406,7 @@ gulp.task('sonarqube', done => {
 	'sonar.branch.name': process.env.CIRRUS_BRANCH
 	});
   } else if (process.env.CIRRUS_PR !== 'false') {
-	gulp.start('git-fetch-pr');
+	gitFetchOriginBaseBranch();
     runSonnarQubeScanner(done, {
 	  'sonar.pullrequest.key': process.env.CIRRUS_PR,
 	  'sonar.pullrequest.branch': process.env.CIRRUS_BRANCH,
@@ -416,14 +417,6 @@ gulp.task('sonarqube', done => {
     done();
   }
 });
-
-gulp.task('git-fetch-pr', function (cb) {
-  exec('git fetch origin ' + process.env.CIRRUS_BASE_BRANCH, function (err, stdout, stderr) {
-	gutil.log(stdout);
-	gutil.log(stderr);
-    cb(err);
-  });
-})
 
 gulp.task('promote', () => {
   if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {

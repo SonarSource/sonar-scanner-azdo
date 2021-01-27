@@ -160,3 +160,7 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
     callback
   );
 };
+
+exports.gitFetchOriginBaseBranch = function() {
+	run(`git fetch origin ${process.env.CIRRUS_BASE_BRANCH}`);
+}
