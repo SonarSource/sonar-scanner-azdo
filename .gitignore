@@ -36,3 +36,5 @@ coverage/
 
 # eslint
 eslint-report.json
+
+package-lock.json
