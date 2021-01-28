@@ -54,7 +54,7 @@
     "format": "./node_modules/.bin/prettier --write --list-different \"{common,extensions}/**/*.{js,ts}\"",
     "format-check": "./node_modules/.bin/prettier --list-different \"{common,extensions}/**/*.{js,ts}\"",
     "install-dep": "./node_modules/.bin/gulp npminstall",
-    "lint": "eslint --ext js,ts --quiet \"{common,extensions}/**/*.{js,ts}\" --fix",
+    "lint": "eslint --ext js,ts --quiet \"{common,extensions}/**/*.{js,ts}\"",
     "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"{common,extensions}/**/*.{js,ts}\"",
     "test-build": "./node_modules/.bin/gulp build:test",
     "test": "./node_modules/.bin/jest",
@@ -93,7 +93,7 @@
   },
   "prettier": {
     "printWidth": 100,
-    "singleQuote": false
+    "singleQuote": true
   },
   "dependencies": {
     "azure-pipelines-task-lib": "^2.9.5"

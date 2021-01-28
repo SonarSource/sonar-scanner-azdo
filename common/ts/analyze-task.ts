@@ -8,7 +8,7 @@ export default async function analyzeTask(rootPath: string, isSonarCloud: boolea
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable('SONARQUBE_SCANNER_MODE')];
   if (!scannerMode) {
     throw new Error(
-      "[SonarScanner] The 'Prepare Analysis Configuration' task was not executed prior to this task"
+      '[SonarScanner] The "Prepare Analysis Configuration" task was not executed prior to this task'
     );
   }
   Scanner.setIsSonarCloud(isSonarCloud);

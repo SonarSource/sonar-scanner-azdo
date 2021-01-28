@@ -125,7 +125,7 @@ describe('getDefaultBranch', () => {
     expect(defaultBranch).toEqual('refs/heads/master');
 
     expect(tl.warning).toHaveBeenCalledWith(
-      "Unable to get default branch, defaulting to 'master': failing for some reason"
+      'Unable to get default branch, defaulting to "master": failing for some reason'
     );
   });
 });
@@ -471,7 +471,7 @@ describe('populateBranchAndPrProps', () => {
     await prept.populateBranchAndPrProps(props);
 
     expect(props['sonar.scanner.skip']).toBe('true');
-    expect(tl.warning).toHaveBeenCalledWith("Unsupported PR provider 'GitLab'");
+    expect(tl.warning).toHaveBeenCalledWith('Unsupported PR provider "GitLab"');
   });
 
   it('without pr id , should populate AzDo props, current branch is default branch', async () => {

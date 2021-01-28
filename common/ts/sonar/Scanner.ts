@@ -53,8 +53,8 @@ export default class Scanner {
     switch (mode) {
       case ScannerMode.Other:
         tl.warning(
-          '[SonarScanner] When using Maven or Gradle, don\'t use the analyze task but instead tick the ' +
-            '"SonarQube" option in the Maven/Gradle task to run the scanner as part of the build.'
+          `[SonarScanner] When using Maven or Gradle, don't use the analyze task but instead tick the
+            "SonarQube" option in the Maven/Gradle task to run the scanner as part of the build.`
         );
         return Scanner.getScanner(rootPath);
       case ScannerMode.MSBuild:

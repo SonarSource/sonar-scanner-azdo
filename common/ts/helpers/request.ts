@@ -13,7 +13,7 @@ export function callGet(
   isJson: boolean,
   query?: RequestData
 ): Promise<any> {
-  tl.debug(`[SonarScanner] API GET: '${path}' with query '${JSON.stringify(query)}'`);
+  tl.debug(`[SonarScanner] API GET: "${path}" with query "${JSON.stringify(query)}"`);
   return new Promise((resolve, reject) => {
     const options: request.CoreOptions = {};
     if (endpoint.auth && endpoint.auth.user) {
@@ -32,14 +32,14 @@ export function callGet(
       },
       (error, response, body) => {
         if (error) {
-          tl.debug(`[SonarScanner] API GET '${path}' failed, error was: ${JSON.stringify(error)}`);
+          tl.debug(`[SonarScanner] API GET "${path}" failed, error was: ${JSON.stringify(error)}`);
           return reject(isJson ? {} : '');
         }
         tl.debug(
           `Response: ${response.statusCode} Body: "${isString(body) ? body : JSON.stringify(body)}"`
         );
         if (response.statusCode < 200 || response.statusCode >= 300) {
-          const errorMessage = `[SonarScanner] API GET '${path}' failed, status code was: ${response.statusCode}`;
+          const errorMessage = `[SonarScanner] API GET "${path}" failed, status code was: ${response.statusCode}`;
           tl.debug(errorMessage);
           return reject(isJson ? {} : '');
         }

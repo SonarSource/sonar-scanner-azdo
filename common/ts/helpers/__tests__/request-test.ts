@@ -69,7 +69,7 @@ describe('get', () => {
     expect(tl.debug).toHaveBeenCalledTimes(1);
     expect(tl.debug).toHaveBeenNthCalledWith(
       1,
-      '[SonarScanner] API GET: \'/get\' with query \'{"username":"mickael","location":"geneva"}\''
+      '[SonarScanner] API GET: "/get" with query "{"username":"mickael","location":"geneva"}"'
     );
   });
 
@@ -82,14 +82,14 @@ describe('get', () => {
 
     request.callGet(endpoint, '/status/304', true).then((actual) => {
       expect(actual).toContain(
-        "[Error: [SonarScanner] API GET '/status/304' failed, status code was: 304]"
+        '[Error: [SonarScanner] API GET "/status/304" failed, status code was: 304]'
       );
     });
 
     expect(tl.debug).toHaveBeenCalledTimes(1);
     expect(tl.debug).toHaveBeenNthCalledWith(
       1,
-      '[SonarScanner] API GET: \'/status/304\' with query \'undefined\''
+      '[SonarScanner] API GET: "/status/304" with query "undefined"'
     );
   });
 

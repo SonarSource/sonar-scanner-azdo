@@ -95,7 +95,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
         props['sonar.pullrequest.provider'] = 'bitbucketcloud';
       }
     } else {
-      tl.warning(`Unsupported PR provider '${provider}'`);
+      tl.warning(`Unsupported PR provider "${provider}"`);
       props['sonar.scanner.skip'] = 'true';
     }
   } else {
@@ -156,7 +156,7 @@ export async function getDefaultBranch(collectionUrl: string) {
     tl.debug(`Default branch of this repository is '${repo.defaultBranch}'`);
     return repo.defaultBranch;
   } catch (e) {
-    tl.warning("Unable to get default branch, defaulting to 'master': " + e);
+    tl.warning('Unable to get default branch, defaulting to "master": ' + e);
     return DEFAULT;
   }
 }
