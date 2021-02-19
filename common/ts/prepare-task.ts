@@ -95,7 +95,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     const currentBranch = tl.getVariable("Build.SourceBranch");
     if (provider === "TfsGit") {
       isDefaultBranch = currentBranch === (await getDefaultBranch(collectionUrl));
-    } else if (provider === "Git" || provider === "GitHub") {
+    } else if (provider === "Git" || provider === "GitHub" || provider === "GitHubEnterprise") {
       // TODO for GitHub we should get the default branch configured on the repo
       isDefaultBranch = currentBranch === "refs/heads/master";
     } else if (provider === "Bitbucket") {
