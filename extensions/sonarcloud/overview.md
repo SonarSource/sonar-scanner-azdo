@@ -10,12 +10,12 @@ To get started in a few minutes, you can :
   - **Classic** build pipelines templates integrated while creating a new pipeline
   - **YAML** build pipeline templates available in our Sourcecode : https://github.com/SonarSource/sonar-scanner-vsts/tree/master/yaml-pipeline-templates
 - Benefit from a bunch of sample projects (using different build technologies), analyzed on SonarCloud, with their **YAML** pipelines files (See the SonarCloud badge on the README.md file for a link to SonarCloud project)
-  - [.NET Framework](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_git/sample-dotnet-framework-project)
-  - [.NET Core](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_git/sample-dotnet-core-project)
-  - [C++](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_git/sample-cpp-project)
-  - [Gradle](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_git/sample-gradle-project)
-  - [Maven](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_git/sample-maven-project)
-  - [Node.js](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_git/sample-nodejs-project)
+  - [.NET Framework](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-framework-project)
+  - [.NET Core](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-core-project)
+  - [C++](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-cpp-project)
+  - [Gradle](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-gradle-project)
+  - [Maven](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-maven-project)
+  - [Node.js](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-nodejs-project)
 
 ## About the SonarCloud Azure DevOps Marketplace Extension
 
