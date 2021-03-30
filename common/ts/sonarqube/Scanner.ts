@@ -1,7 +1,9 @@
 import * as path from "path";
+import * as semver from "semver";
 import * as fs from "fs-extra";
 import * as tl from "azure-pipelines-task-lib/task";
 import { PROP_NAMES, isWindows } from "../helpers/utils";
+import { ToolRunner } from "azure-pipelines-task-lib/toolrunner";
 
 export enum ScannerMode {
   MSBuild = "MSBuild",
@@ -168,6 +170,13 @@ interface ScannerMSData {
 }
 
 export class ScannerMSBuild extends Scanner {
+
+  readonly SCANNER_PATH_VARIABLE = "SONAR_SCANNER_DOTNET_PATH";
+  readonly SCANNER_USE_DLL_VERSION = "SONAR_SCANNER_DOTNET_USE_DLL_VERSION"
+  readonly MIN_DOTNET_MAJOR_VERSION = 2;
+  //Update this max once a new major release of dotnet / S4DN is made
+  readonly MAX_DOTNET_MAJOR_VERSION = 5;
+
   constructor(rootPath: string, private readonly data: ScannerMSData) {
     super(rootPath, ScannerMode.MSBuild);
   }
@@ -184,11 +193,15 @@ export class ScannerMSBuild extends Scanner {
     let scannerRunner;
 
     if (isWindows()) {
+
+      
+
       const scannerExePath = this.findFrameworkScannerPath();
       tl.debug(`Using classic scanner at ${scannerExePath}`);
       tl.setVariable("SONARQUBE_SCANNER_MSBUILD_EXE", scannerExePath);
       scannerRunner = this.getScannerRunner(scannerExePath, true);
     } else {
+
       const scannerDllPath = this.findDotnetScannerPath();
       tl.debug(`Using dotnet scanner at ${scannerDllPath}`);
       tl.setVariable("SONARQUBE_SCANNER_MSBUILD_DLL", scannerDllPath);
@@ -210,6 +223,36 @@ export class ScannerMSBuild extends Scanner {
     await scannerRunner.exec();
   }
 
+  private getDotnetMajorVersion() : number {
+    tl.debug("Trying to fetch used dotnet version using dotnet --version.");
+    var dotnetVersionRunner = this.getDotnetToolRunner();
+    dotnetVersionRunner.arg("--version");
+    var version = semver.parse(dotnetVersionRunner.execSync().stdout);
+    if(version == null){
+      tl.warning("Could not fetch dotnet version");
+      return null;
+    }
+
+    return version.major;
+  }
+
+  private getAndParseProvidedDotnetMajor(): number {
+    var providedDotnetMajorVersion = tl.getVariable("SONAR_SCANNER_DOTNET_MAJOR_VERSION");
+    if(providedDotnetMajorVersion){
+      tl.debug("Found a provided SONAR_SCANNER_DOTNET_MAJOR_VERSION variable, trying to parse it.");
+      var intMajorversion = parseInt(providedDotnetMajorVersion);
+      //Increase the max version each time a new major release of dotnet/ S4DN is done
+      if(isNaN(intMajorversion) || intMajorversion < this.MIN_DOTNET_MAJOR_VERSION || intMajorversion > this.MAX_DOTNET_MAJOR_VERSION){
+        tl.warning(`Failed to parse '${providedDotnetMajorVersion}' as a major version. 
+        It should be either a number or between ${this.MIN_DOTNET_MAJOR_VERSION} and ${this.MAX_DOTNET_MAJOR_VERSION}.`);
+        return null;
+      }
+      return intMajorversion;
+    }
+    tl.debug("No provided SONAR_SCANNER_DOTNET_MAJOR_VERSION variable found");
+    return null;
+  }
+
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
     const scannerCliShellScripts = tl.findMatch(
       scannerExecutablePath,
@@ -223,10 +266,14 @@ export class ScannerMSBuild extends Scanner {
       return tl.tool(scannerPath);
     }
 
-    const dotnetToolPath = tl.which("dotnet", true);
-    const scannerRunner = tl.tool(dotnetToolPath);
+    var scannerRunner = this.getDotnetToolRunner();
     scannerRunner.arg(scannerPath);
     return scannerRunner;
+  }
+
+  private getDotnetToolRunner() : ToolRunner {
+    const dotnetToolPath = tl.which("dotnet", true);
+    return tl.tool(dotnetToolPath);
   }
 
   private findFrameworkScannerPath(): string {
