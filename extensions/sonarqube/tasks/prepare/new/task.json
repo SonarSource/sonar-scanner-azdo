@@ -9,7 +9,7 @@
   "author": "sonarsource",
   "version": {
     "Major": 4,
-    "Minor": 18,
+    "Minor": 19,
     "Patch": 0
   },
   "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",

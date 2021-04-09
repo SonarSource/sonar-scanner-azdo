@@ -1,4 +1,4 @@
-const msBuildVersion = "5.1.0.28487";
+const msBuildVersion = "5.2.0.29862";
 const cliVersion = "4.4.0.2170"; // Has to be the same version as the one embedded in the Scanner for MSBuild
 
 const scannerUrlCommon =
