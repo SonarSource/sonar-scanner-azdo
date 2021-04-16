@@ -53,10 +53,10 @@ export function getNoSonar(baseUrl: string, path: string): Promise<any> {
     request.get(
       {
         method: "GET",
-        baseUrl: baseUrl,
+        baseUrl,
         uri: path,
         json: true,
-        headers: {'user-agent': 'sonar-azdo-extension'}
+        headers: { "user-agent": "sonar-azdo-extension" },
       },
       (error, response, body) => {
         if (error) {
