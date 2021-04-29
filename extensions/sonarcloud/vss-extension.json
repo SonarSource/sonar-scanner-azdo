@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarcloud",
   "name": "SonarCloud",
-  "version": "1.22.0",
+  "version": "1.23.0",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
@@ -15,11 +15,19 @@
   ],
   "description": "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
-  "categories": ["Azure Pipelines"],
+  "categories": [
+    "Azure Pipelines"
+  ],
   "icons": {
     "default": "extension-icon.png"
   },
-  "tags": ["build", "ci", "continuous integration", "code quality", "static code analysis"],
+  "tags": [
+    "build",
+    "ci",
+    "continuous integration",
+    "code quality",
+    "static code analysis"
+  ],
   "content": {
     "details": {
       "path": "overview.md"
@@ -72,12 +80,18 @@
       "path": "templates"
     }
   ],
-  "scopes": ["vso.build", "vso.code", "vso.test"],
+  "scopes": [
+    "vso.build",
+    "vso.code",
+    "vso.test"
+  ],
   "contributions": [
     {
       "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "tasks/prepare"
       }
@@ -85,7 +99,9 @@
     {
       "id": "ce096e50-6155-4de8-8800-4221aaeed4a1",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "tasks/analyze"
       }
@@ -93,7 +109,9 @@
     {
       "id": "38b27399-a642-40af-bb7d-9971f69712e8",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "tasks/publish"
       }
@@ -101,7 +119,9 @@
     {
       "id": "6350bfb8-c310-4cdd-af68-722f33cf440a",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "tasks/qgstatus"
       }
@@ -109,7 +129,10 @@
     {
       "id": "3c598f25-01c1-4c09-97c6-926476882688",
       "type": "ms.vss-dashboards-web.widget",
-      "targets": ["ms.vss-dashboards-web.widget-catalog", ".e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"],
+      "targets": [
+        "ms.vss-dashboards-web.widget-catalog",
+        ".e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"
+      ],
       "properties": {
         "name": "Code Quality",
         "description": "Shows the current quality status of your project based on SonarCloud.",
@@ -122,13 +145,17 @@
             "columnSpan": 1
           }
         ],
-        "supportedScopes": ["project_team"]
+        "supportedScopes": [
+          "project_team"
+        ]
       }
     },
     {
       "id": "e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd",
       "type": "ms.vss-dashboards-web.widget-configuration",
-      "targets": ["ms.vss-dashboards-web.widget-configuration"],
+      "targets": [
+        "ms.vss-dashboards-web.widget-configuration"
+      ],
       "properties": {
         "name": "Code Quality Configuration",
         "description": "Configures Code Quality Widget",
@@ -139,7 +166,9 @@
       "id": "343c5f6a-e4d5-4480-a764-506e1daa05df",
       "description": "Service endpoint type for SonarCloud Connections",
       "type": "ms.vss-endpoint.service-endpoint-type",
-      "targets": ["ms.vss-endpoint.endpoint-types"],
+      "targets": [
+        "ms.vss-endpoint.endpoint-types"
+      ],
       "properties": {
         "name": "sonarcloud",
         "displayName": "SonarCloud",
@@ -186,7 +215,9 @@
     {
       "id": "7ae27005-05c8-46d3-a5f2-06b3b15d608b",
       "type": "ms.vss-build.template",
-      "targets": ["ms.vss-build.templates"],
+      "targets": [
+        "ms.vss-build.templates"
+      ],
       "properties": {
         "name": "templates/maven"
       }
@@ -194,7 +225,9 @@
     {
       "id": "b17d1503-2143-4e01-aada-5f8e29759a32",
       "type": "ms.vss-build.template",
-      "targets": ["ms.vss-build.templates"],
+      "targets": [
+        "ms.vss-build.templates"
+      ],
       "properties": {
         "name": "templates/gradle"
       }
@@ -202,7 +235,9 @@
     {
       "id": "5f882e5A-b102-4fe4-b0b2-de4c812d1e18",
       "type": "ms.vss-build.template",
-      "targets": ["ms.vss-build.templates"],
+      "targets": [
+        "ms.vss-build.templates"
+      ],
       "properties": {
         "name": "templates/netcore"
       }
@@ -210,7 +245,9 @@
     {
       "id": "05fc4e32-1887-480d-93bf-337f6072348e",
       "type": "ms.vss-build.template",
-      "targets": ["ms.vss-build.templates"],
+      "targets": [
+        "ms.vss-build.templates"
+      ],
       "properties": {
         "name": "templates/netdesktop"
       }
@@ -218,7 +255,9 @@
     {
       "id": "f2dcb989-20d1-4a5c-b138-0dd8f53bcf97",
       "type": "ms.vss-build.template",
-      "targets": ["ms.vss-build.templates"],
+      "targets": [
+        "ms.vss-build.templates"
+      ],
       "properties": {
         "name": "templates/otherfile"
       }
@@ -226,7 +265,9 @@
     {
       "id": "1d772a94-aac4-4395-baf6-7d2d0cb17e5d",
       "type": "ms.vss-build.template",
-      "targets": ["ms.vss-build.templates"],
+      "targets": [
+        "ms.vss-build.templates"
+      ],
       "properties": {
         "name": "templates/othermanual"
       }
