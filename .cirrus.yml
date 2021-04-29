@@ -1,5 +1,6 @@
 # content of service-account-credentials.json, used to access to Google Cloud Platform
-gcp_credentials: ENCRYPTED[!1fcffe5cc2de4fbbda5befae835ca275a47c1148dabbbb7b5d21334604efba3ef8730d8bc5820952e575c7dd5177e433!]
+# Built on sonarqube-team GCP project
+gcp_credentials: ENCRYPTED[!e5f7207bd8d02d383733bef47e18296ac32e3b7d22eb480354e8dd8fdc0004be45a8a4e72c797bd66ee94eb3340fa363!]
 
 #
 # ENV VARIABLES
@@ -7,8 +8,8 @@ gcp_credentials: ENCRYPTED[!1fcffe5cc2de4fbbda5befae835ca275a47c1148dabbbb7b5d21
 env:
   ### Shared variables
   ARTIFACTORY_URL: ENCRYPTED[!2f8fa307d3289faa0aa6791f18b961627ae44f1ef46b136e1a1e63b0b4c86454dbb25520d49b339e2d50a1e1e5f95c88!]
-  ARTIFACTORY_DEPLOY_USERNAME: public-qa-deployer
-  ARTIFACTORY_DEPLOY_PASSWORD: ENCRYPTED[!ee8f6410a42b81c6c91c7b760e7be7796a7774b6e6e6acf3ff2ecf8c7c04c732865a0300673ea41155c0d19a989c0a5a!]
+  ARTIFACTORY_DEPLOY_USERNAME: repox-qa-deployer
+  ARTIFACTORY_DEPLOY_PASSWORD: ENCRYPTED[!d484e19f33c9ce63b165f70e414a33b1ac6c215a126791aacbf8059626caf0fd8a78e999a20af5c1a4ba01c0b0247921!]
   ARTIFACTORY_DEPLOY_REPO: sonarsource-public-qa
 
   GCF_ACCESS_TOKEN: ENCRYPTED[!1fb91961a5c01e06e38834e55755231d649dc62eca354593105af9f9d643d701ae4539ab6a8021278b8d9348ae2ce8be!]
@@ -34,9 +35,9 @@ build_task:
   <<: *ONLY_SONARSOURCE_QA
   gke_container:
     dockerfile: cirrus/Dockerfile
-    builder_image_project: ci-cd-215716
-    builder_image_name: docker-builder-v2
-    cluster_name: cirrus-uscentral1a-cluster
+    builder_image_project: sonarqube-team
+    builder_image_name: docker-builder-v20200915
+    cluster_name: cirrus-ci-cluster
     zone: us-central1-a
     namespace: default
     cpu: 1
@@ -57,9 +58,9 @@ promote_task:
   <<: *ONLY_SONARSOURCE_QA
   gke_container:
     dockerfile: cirrus/Dockerfile
-    builder_image_project: ci-cd-215716
-    builder_image_name: docker-builder-v2
-    cluster_name: cirrus-uscentral1a-cluster
+    builder_image_project: sonarqube-team
+    builder_image_name: docker-builder-v20200915
+    cluster_name: cirrus-ci-cluster
     zone: us-central1-a
     namespace: default
     cpu: 1
