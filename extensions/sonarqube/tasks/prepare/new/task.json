@@ -5,11 +5,13 @@
   "description": "Prepare SonarQube analysis configuration",
   "helpMarkDown": "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
-  "visibility": ["Build"],
+  "visibility": [
+    "Build"
+  ],
   "author": "sonarsource",
   "version": {
     "Major": 4,
-    "Minor": 19,
+    "Minor": 20,
     "Patch": 0
   },
   "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",

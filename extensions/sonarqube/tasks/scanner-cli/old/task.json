@@ -5,14 +5,18 @@
   "description": "[DEPRECATED] Use `Prepare Analysis` and `Run Analysis` tasks",
   "helpMarkDown": "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
-  "visibility": ["Build"],
+  "visibility": [
+    "Build"
+  ],
   "author": "sonarsource",
   "version": {
     "Major": 3,
-    "Minor": 11,
+    "Minor": 12,
     "Patch": 0
   },
-  "demands": ["java"],
+  "demands": [
+    "java"
+  ],
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "Perform a SonarQube analysis",
   "deprecated": true,

@@ -5,15 +5,19 @@
   "description": "Run scanner and upload the results to the SonarCloud server.",
   "helpMarkDown": "This task is not needed for Maven and Gradle projects since the scanner should be run as part of the build.\n\n[More Information](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
   "category": "Build",
-  "visibility": ["Build"],
+  "visibility": [
+    "Build"
+  ],
   "author": "sonarsource",
   "version": {
     "Major": 1,
-    "Minor": 21,
+    "Minor": 22,
     "Patch": 0
   },
   "minimumAgentVersion": "2.119.1",
-  "demands": ["java"],
+  "demands": [
+    "java"
+  ],
   "inputs": [],
   "execution": {
     "Node": {

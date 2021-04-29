@@ -5,11 +5,13 @@
   "description": "Prepare SonarCloud analysis configuration",
   "helpMarkDown": "[More Information](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
   "category": "Build",
-  "visibility": ["Build"],
+  "visibility": [
+    "Build"
+  ],
   "author": "sonarsource",
   "version": {
     "Major": 1,
-    "Minor": 18,
+    "Minor": 19,
     "Patch": 0
   },
   "minimumAgentVersion": "1.95.1",

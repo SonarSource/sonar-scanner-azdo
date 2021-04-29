@@ -5,14 +5,19 @@
   "description": "[DEPRECATED] Use new version of the task",
   "helpMarkDown": "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
   "category": "Build",
-  "visibility": ["Build"],
+  "visibility": [
+    "Build"
+  ],
   "author": "SonarSource",
   "version": {
     "Major": 3,
-    "Minor": 19,
+    "Minor": 20,
     "Patch": 0
   },
-  "demands": ["msbuild", "java"],
+  "demands": [
+    "msbuild",
+    "java"
+  ],
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "Complete the SonarQube analysis",
   "execution": {
