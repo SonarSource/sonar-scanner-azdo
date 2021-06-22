@@ -8,6 +8,6 @@
     "azure-pipelines-task-lib": "^2.8.0"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=6"
   }
 }
