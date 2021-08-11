@@ -1,4 +1,6 @@
 import * as path from "path";
+import * as _ from "lodash";
+import * as semver from "semver";
 import * as fs from "fs-extra";
 import * as tl from "azure-pipelines-task-lib/task";
 import * as toolLib from "azure-pipelines-tool-lib/tool";
@@ -282,12 +284,11 @@ export class ScannerMSBuild extends Scanner {
         const assetFound = _.find(githubRelease.assets, (asset) => asset.name.includes(tfm));
 
         if (assetFound) {
-          const toReturn = {
+          return {
             url: assetFound.browser_download_url,
             version: githubRelease.name,
             fileName: assetFound.name,
           };
-          return toReturn;
         }
 
         tl.warning("Could not fetch latest release url from GitHub.");
