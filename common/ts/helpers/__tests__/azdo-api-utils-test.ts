@@ -21,7 +21,9 @@ it('should build jsonpath body properly', () => {
     propertyValue: 'test',
   });
 
-  azdoApiUtils.addBuildProperty(properties).then(() => { return; });
+  azdoApiUtils.addBuildProperty(properties).then(() => {
+    return;
+  });
 
   expect(tl.debug).toHaveBeenCalledWith(jsonAsString);
 });
