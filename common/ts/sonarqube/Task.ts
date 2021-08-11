@@ -1,6 +1,6 @@
-import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint from "./Endpoint";
-import { getJSON } from "../helpers/request";
+import * as tl from 'azure-pipelines-task-lib/task';
+import Endpoint from './Endpoint';
+import { getJSON } from '../helpers/request';
 
 interface ITask {
   analysisId: string;
@@ -35,18 +35,18 @@ export default class Task {
     delay = 1000
   ): Promise<Task> {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
-    return getJSON(endpoint, `/api/ce/task`, { id: taskId, additionalFields: "warnings" }).then(
+    return getJSON(endpoint, `/api/ce/task`, { id: taskId, additionalFields: 'warnings' }).then(
       ({ task }: { task: ITask }) => {
         tl.debug(`[SQ] Task status:` + task.status);
         if (tries <= 0) {
           throw new TimeOutReachedError();
         }
-        const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : "";
+        const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : '';
         switch (task.status.toUpperCase()) {
-          case "CANCEL":
-          case "FAILED":
+          case 'CANCEL':
+          case 'FAILED':
             throw new Error(`[SQ] Task failed with status ${task.status}${errorInfo}`);
-          case "SUCCESS":
+          case 'SUCCESS':
             tl.debug(`[SQ] Task complete: ${JSON.stringify(task)}`);
             return new Task(task);
           default:

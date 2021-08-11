@@ -1,17 +1,17 @@
-import * as path from "path";
-import * as _ from "lodash";
-import * as semver from "semver";
-import * as fs from "fs-extra";
-import * as tl from "azure-pipelines-task-lib/task";
-import * as toolLib from "azure-pipelines-tool-lib/tool";
-import { ToolRunner } from "azure-pipelines-task-lib/toolrunner";
-import { getNoSonar } from "../helpers/request";
-import { PROP_NAMES, isWindows } from "../helpers/utils";
+import * as path from 'path';
+import * as _ from 'lodash';
+import * as semver from 'semver';
+import * as fs from 'fs-extra';
+import * as tl from 'azure-pipelines-task-lib/task';
+import * as toolLib from 'azure-pipelines-tool-lib/tool';
+import { ToolRunner } from 'azure-pipelines-task-lib/toolrunner';
+import { getNoSonar } from '../helpers/request';
+import { PROP_NAMES, isWindows } from '../helpers/utils';
 
 export enum ScannerMode {
-  MSBuild = "MSBuild",
-  CLI = "CLI",
-  Other = "Other",
+  MSBuild = 'MSBuild',
+  CLI = 'CLI',
+  Other = 'Other',
 }
 
 interface IScannerDotNetRelease {
@@ -78,36 +78,36 @@ export default class Scanner {
   }
 
   logIssueOnBuildSummaryForStdErr(tool) {
-    tool.on("stderr", (data) => {
+    tool.on('stderr', (data) => {
       if (data == null) {
         return;
       }
       data = data.toString().trim();
-      if (data.indexOf("WARNING: An illegal reflective access operation has occurred") !== -1) {
+      if (data.indexOf('WARNING: An illegal reflective access operation has occurred') !== -1) {
         //bypass those warning showing as error because they can't be catched for now by Scanner.
         tl.debug(data);
         return;
       }
-      tl.command("task.logissue", { type: "error" }, data);
+      tl.command('task.logissue', { type: 'error' }, data);
     });
   }
 
   //Temporary warning message for Java version (MMF-2035)
   logIssueAsWarningForStdOut(tool) {
-    tool.on("stdout", (data) => {
+    tool.on('stdout', (data) => {
       if (data == null) {
         return;
       }
       data = data.toString().trim();
-      if (data.indexOf("Please update to at least Java 11") !== -1 && Scanner.getIsSonarCloud()) {
-        tl.command("task.logissue", { type: "warning" }, data);
+      if (data.indexOf('Please update to at least Java 11') !== -1 && Scanner.getIsSonarCloud()) {
+        tl.command('task.logissue', { type: 'warning' }, data);
       }
     });
   }
   //Temporary warning message for Java version (MMF-2035)
 
   isDebug() {
-    return tl.getVariable("system.debug") === "true";
+    return tl.getVariable('system.debug') === 'true';
   }
 }
 
@@ -125,7 +125,7 @@ export class ScannerCLI extends Scanner {
   }
 
   public toSonarProps() {
-    if (this.cliMode === "file") {
+    if (this.cliMode === 'file') {
       return { [PROP_NAMES.PROJECTSETTINGS]: this.data.projectSettings };
     }
     return {
@@ -137,34 +137,34 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    let scannerCliScript = tl.resolve(this.rootPath, "sonar-scanner", "bin", "sonar-scanner");
+    let scannerCliScript = tl.resolve(this.rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
 
     if (isWindows()) {
-      scannerCliScript += ".bat";
+      scannerCliScript += '.bat';
     } else {
-      await fs.chmod(scannerCliScript, "777");
+      await fs.chmod(scannerCliScript, '777');
     }
     const scannerRunner = tl.tool(scannerCliScript);
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
     if (this.isDebug()) {
-      scannerRunner.arg("-X");
+      scannerRunner.arg('-X');
     }
     await scannerRunner.exec();
   }
 
   public static getScanner(rootPath: string) {
-    const mode = tl.getInput("configMode");
-    if (mode === "file") {
-      return new ScannerCLI(rootPath, { projectSettings: tl.getInput("configFile", true) }, mode);
+    const mode = tl.getInput('configMode');
+    if (mode === 'file') {
+      return new ScannerCLI(rootPath, { projectSettings: tl.getInput('configFile', true) }, mode);
     }
     return new ScannerCLI(
       rootPath,
       {
-        projectKey: tl.getInput("cliProjectKey", true),
-        projectName: tl.getInput("cliProjectName"),
-        projectVersion: tl.getInput("cliProjectVersion"),
-        projectSources: tl.getInput("cliSources"),
+        projectKey: tl.getInput('cliProjectKey', true),
+        projectName: tl.getInput('cliProjectName'),
+        projectVersion: tl.getInput('cliProjectVersion'),
+        projectSources: tl.getInput('cliSources'),
       },
       mode
     );
@@ -179,20 +179,20 @@ interface ScannerMSData {
 }
 
 export class ScannerMSBuild extends Scanner {
-  readonly SCANNER_LATEST_RELEASE_URL = "repos/SonarSource/sonar-scanner-msbuild/releases/latest";
-  readonly SCANNER_LATEST_RELEASE_BASEPATH = "https://api.github.com";
-  readonly SCANNER_PATH = "SONAR_SCANNER_DOTNET_PATH";
-  readonly SCANNER_USE_DLL_VERSION = "SONAR_SCANNER_DOTNET_USE_DLL_VERSION";
-  readonly SCANNER_DOTNET_PROVIDED_VERSION = "SONAR_SCANNER_DOTNET_MAJOR_VERSION";
+  readonly SCANNER_LATEST_RELEASE_URL = 'repos/SonarSource/sonar-scanner-msbuild/releases/latest';
+  readonly SCANNER_LATEST_RELEASE_BASEPATH = 'https://api.github.com';
+  readonly SCANNER_PATH = 'SONAR_SCANNER_DOTNET_PATH';
+  readonly SCANNER_USE_DLL_VERSION = 'SONAR_SCANNER_DOTNET_USE_DLL_VERSION';
+  readonly SCANNER_DOTNET_PROVIDED_VERSION = 'SONAR_SCANNER_DOTNET_MAJOR_VERSION';
   readonly MIN_DOTNET_MAJOR_VERSION = 2;
   //Update this max once a new major release of dotnet / S4DN is made
   readonly MAX_DOTNET_MAJOR_VERSION = 5;
-  readonly SCANNER_TOOL_NAME = "sonar-scanner-dotnet";
+  readonly SCANNER_TOOL_NAME = 'sonar-scanner-dotnet';
 
   readonly SCANNER_DOTNET_VERSION_MATRIX = new Map([
-    [2, "netcoreapp2.0"],
-    [3, "netcoreapp3.0"],
-    [5, "net5.0"],
+    [2, 'netcoreapp2.0'],
+    [3, 'netcoreapp3.0'],
+    [5, 'net5.0'],
   ]);
 
   constructor(rootPath: string, private readonly data: ScannerMSData) {
@@ -211,9 +211,9 @@ export class ScannerMSBuild extends Scanner {
     let scannerRunner;
     const useDllVersion = tl.getVariable(this.SCANNER_USE_DLL_VERSION);
     if (isWindows() && !useDllVersion) {
-      const release = await this.getLatestRelease("net46");
+      const release = await this.getLatestRelease('net46');
       tl.debug(`Fetched latest release : ${JSON.stringify(release)}`);
-      const scannerExePath = await this.checkCacheOrDownloadScanner(release, "net46");
+      const scannerExePath = await this.checkCacheOrDownloadScanner(release, 'net46');
       tl.debug(`Using scanner at ${scannerExePath}`);
       tl.setVariable(this.SCANNER_PATH, scannerExePath);
       scannerRunner = this.getScannerRunner(scannerExePath, true);
@@ -221,15 +221,15 @@ export class ScannerMSBuild extends Scanner {
       scannerRunner = await this.getDotNetScannerRunner();
     }
 
-    scannerRunner.arg("begin");
-    scannerRunner.arg("/k:" + this.data.projectKey);
+    scannerRunner.arg('begin');
+    scannerRunner.arg('/k:' + this.data.projectKey);
     if (this.data.organization) {
-      scannerRunner.arg("/o:" + this.data.organization);
+      scannerRunner.arg('/o:' + this.data.organization);
     }
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
     if (this.isDebug()) {
-      scannerRunner.arg("/d:sonar.verbose=true");
+      scannerRunner.arg('/d:sonar.verbose=true');
     }
     await scannerRunner.exec();
   }
@@ -261,10 +261,10 @@ export class ScannerMSBuild extends Scanner {
     if (!toolPath) {
       tl.debug(`Scanner for .NET v${release.version} was not found in cache, downloading...`);
       const downloadPath: string = await toolLib.downloadTool(release.url);
-      tl.assertAgent("2.115.0");
-      let extPath = tl.getVariable("Agent.TempDirectory");
+      tl.assertAgent('2.115.0');
+      let extPath = tl.getVariable('Agent.TempDirectory');
       if (!extPath) {
-        throw new Error("Expected Agent.TempDirectory to be set");
+        throw new Error('Expected Agent.TempDirectory to be set');
       }
 
       extPath = path.join(extPath, this.SCANNER_TOOL_NAME, release.version, tfm);
@@ -291,28 +291,28 @@ export class ScannerMSBuild extends Scanner {
           };
         }
 
-        tl.warning("Could not fetch latest release url from GitHub.");
+        tl.warning('Could not fetch latest release url from GitHub.');
         return null;
       }
     );
   }
 
   private getDotnetMajorVersion(): number {
-    tl.debug("Trying to fetch used dotnet version using dotnet --version.");
+    tl.debug('Trying to fetch used dotnet version using dotnet --version.');
     const dotnetVersionRunner = this.getDotnetToolRunner();
-    dotnetVersionRunner.arg("--version");
+    dotnetVersionRunner.arg('--version');
     try {
       const stdOut = dotnetVersionRunner.execSync().stdout;
       const version = semver.parse(stdOut);
       if (version == null) {
-        tl.warning("Could not fetch dotnet version.");
+        tl.warning('Could not fetch dotnet version.');
         return null;
       }
       tl.debug(`Found dotnet version ${version.major}`);
       return version.major;
     } catch (e) {
       throw new Error(
-        "An error has occured while trying to execute or parse dotnet --version command output : " +
+        'An error has occured while trying to execute or parse dotnet --version command output : ' +
           e
       );
     }
@@ -344,26 +344,26 @@ export class ScannerMSBuild extends Scanner {
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
     const scannerCliShellScripts = tl.findMatch(
       scannerExecutablePath,
-      path.join("sonar-scanner-*", "bin", "sonar-scanner*")
+      path.join('sonar-scanner-*', 'bin', 'sonar-scanner*')
     );
 
     for (const scannerCliShellScript of scannerCliShellScripts) {
-      await fs.chmod(scannerCliShellScript, "777");
+      await fs.chmod(scannerCliShellScript, '777');
     }
   }
 
   private getScannerRunner(scannerPath: string, isExeScanner: boolean) {
     if (isExeScanner) {
-      return tl.tool(path.join(scannerPath, "SonarScanner.MSBuild.exe"));
+      return tl.tool(path.join(scannerPath, 'SonarScanner.MSBuild.exe'));
     }
 
     const scannerRunner = this.getDotnetToolRunner();
-    scannerRunner.arg(path.join(scannerPath, "SonarScanner.MSBuild.dll"));
+    scannerRunner.arg(path.join(scannerPath, 'SonarScanner.MSBuild.dll'));
     return scannerRunner;
   }
 
   private getDotnetToolRunner(): ToolRunner {
-    const dotnetToolPath = tl.which("dotnet", true);
+    const dotnetToolPath = tl.which('dotnet', true);
     return tl.tool(dotnetToolPath);
   }
 
@@ -372,7 +372,7 @@ export class ScannerMSBuild extends Scanner {
       ? this.getScannerRunner(this.SCANNER_PATH, true)
       : this.getScannerRunner(this.SCANNER_PATH, false);
 
-    scannerRunner.arg("end");
+    scannerRunner.arg('end');
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
     await scannerRunner.exec();
@@ -380,10 +380,10 @@ export class ScannerMSBuild extends Scanner {
 
   public static getScanner(rootPath: string) {
     return new ScannerMSBuild(rootPath, {
-      projectKey: tl.getInput("projectKey", true),
-      projectName: tl.getInput("projectName"),
-      projectVersion: tl.getInput("projectVersion"),
-      organization: tl.getInput("organization"),
+      projectKey: tl.getInput('projectKey', true),
+      projectName: tl.getInput('projectName'),
+      projectVersion: tl.getInput('projectVersion'),
+      organization: tl.getInput('organization'),
     });
   }
 }

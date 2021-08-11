@@ -327,13 +327,14 @@ gulp.task('deploy', gulp.series('build', 'deploy:buildinfo', 'deploy:vsix'));
  */
 gulp.task('sonarqube', done => {
   if (process.env.CIRRUS_BRANCH === 'master' && process.env.CIRRUS_PR === 'false') {
-    runSonnarQubeScanner(done, { 'sonar.analysis.sha1': process.env.CIRRUS_CHANGE_IN_REPO });
+    runSonnarQubeScanner(done, { 'sonar.analysis.sha1': process.env.CIRRUS_CHANGE_IN_REPO, 'sonar.exclusions': '**/temp-find-method.ts' });
   } else if (process.env.CIRRUS_PR !== 'false') {
     runSonnarQubeScanner(done, {
       'sonar.analysis.prNumber': process.env.CIRRUS_PR,
       'sonar.branch.name': process.env.CIRRUS_BRANCH,
       'sonar.branch.target': process.env.CIRRUS_BASE_BRANCH,
-      'sonar.analysis.sha1': process.env.CIRRUS_BASE_SHA
+      'sonar.analysis.sha1': process.env.CIRRUS_BASE_SHA,
+      'sonar.exclusions': '**/temp-find-method.ts'
     });
   } else {
     done();

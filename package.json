@@ -1,6 +1,6 @@
 {
   "name": "sonar-scanner-vsts",
-  "version": "0.0.2-SNAPSHOT",
+  "version": "0.11.0",
   "repository": "SonarSource/sonar-scanner-vsts",
   "license": "LGPL-3.0",
   "devDependencies": {
@@ -64,7 +64,7 @@
     "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "jest": {
     "clearMocks": true,
@@ -93,7 +93,7 @@
   },
   "prettier": {
     "printWidth": 100,
-    "singleQuote": false
+    "singleQuote": true
   },
   "dependencies": {
     "azure-pipelines-task-lib": "^2.9.5",
