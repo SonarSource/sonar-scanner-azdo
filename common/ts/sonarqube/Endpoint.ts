@@ -18,7 +18,7 @@ export default class Endpoint {
   constructor(public type: EndpointType, private readonly data: EndpointData) {}
 
   public get auth() {
-    if (!this.data.token && this.data.password) {
+    if (!this.data.token && this.data.password && this.data.password.length > 0) {
       return { user: this.data.username, pass: this.data.password };
     }
     return { user: this.data.token || this.data.username };
@@ -40,7 +40,8 @@ export default class Endpoint {
     return {
       [PROP_NAMES.HOST_URL]: this.data.url,
       [PROP_NAMES.LOGIN]: this.data.token || this.data.username,
-      [PROP_NAMES.PASSSWORD]: this.data.password,
+      [PROP_NAMES.PASSSWORD]:
+        this.data.password && this.data.password.length > 0 ? this.data.password : null,
       [PROP_NAMES.ORG]: this.data.organization,
     };
   }

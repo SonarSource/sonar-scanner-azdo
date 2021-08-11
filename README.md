@@ -1,7 +1,7 @@
 SonarQube/SonarCloud Azure Pipelines Extension
 ========================================
 
-[![Build Status](https://sonarsource.visualstudio.com/_apis/public/build/definitions/399fb241-ecc7-4802-8697-dcdd01fbb832/10/badge)](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_build/index?definitionId=10)
+[![Build Status](https://dev.azure.com/sonarsource/_apis/public/build/definitions/399fb241-ecc7-4802-8697-dcdd01fbb832/10/badge)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/index?definitionId=10)
 
 Marketplace
 -----------
