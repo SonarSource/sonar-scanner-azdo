@@ -23,7 +23,6 @@ const {
   runSonnarQubeScanner,
   tfxCommand
 } = require('./config/utils');
-const { scanner } = require('./config/config');
 const packageJSON = require('./package.json');
 
 function copyIconsTask(icon = 'task_icon.png') {
