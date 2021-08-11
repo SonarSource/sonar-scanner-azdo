@@ -14,10 +14,10 @@ export enum ScannerMode {
   Other = 'Other',
 }
 
-interface IScannerDotNetRelease {
+interface IScannerRelease {
   url: string;
   version: string;
-  fileName: string;
+  fileName?: string;
 }
 
 export default class Scanner {
@@ -120,6 +120,11 @@ interface ScannerCLIData {
 }
 
 export class ScannerCLI extends Scanner {
+  readonly SCANNER_LATEST_RELEASE_URL = 'repos/SonarSource/sonar-scanner-cli/releases/latest';
+  readonly SCANNER_LATEST_RELEASE_BASEPATH = 'https://api.github.com';
+  readonly SCANNER_BINARIES_URL = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-"
+  readonly SCANNER_TOOL_NAME = 'sonar-scanner-cli';
+
   constructor(rootPath: string, private readonly data: ScannerCLIData, private cliMode?: string) {
     super(rootPath, ScannerMode.CLI);
   }
@@ -137,13 +142,19 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    let scannerCliScript = tl.resolve(this.rootPath, 'sonar-scanner', 'bin', 'sonar-scanner');
 
-    if (isWindows()) {
-      scannerCliScript += '.bat';
-    } else {
-      await fs.chmod(scannerCliScript, '777');
-    }
+    const release = await this.getLatestRelease();
+    tl.debug(`Fetched latest Scanner CLI version : ${JSON.stringify(release)}`);
+    const scannerPath = await this.checkCacheOrDownloadScanner(release);
+    tl.debug(`Using scanner at ${scannerPath}`);
+
+    let scannerCliScript = tl.resolve(scannerPath, 'bin');
+
+     if (isWindows()) {
+       scannerCliScript += '.bat';
+     } else {
+       await fs.chmod(scannerCliScript, '777');
+     }
     const scannerRunner = tl.tool(scannerCliScript);
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
@@ -167,6 +178,39 @@ export class ScannerCLI extends Scanner {
         projectSources: tl.getInput('cliSources'),
       },
       mode
+    );
+  }
+
+  private async checkCacheOrDownloadScanner(release: any): Promise<string> {
+    tl.debug(`Trying to find local installation of Scanner CLI v${release.version}`);
+    let toolPath = toolLib.findLocalTool(this.SCANNER_TOOL_NAME, release.version);
+    if (!toolPath) {
+      tl.debug(`Scanner CLI v${release.version} was not found in cache, downloading...`);
+      const downloadPath: string = await toolLib.downloadTool(release.url);
+      tl.assertAgent('2.115.0');
+      let extPath = tl.getVariable('Agent.TempDirectory');
+      if (!extPath) {
+        throw new Error('Expected Agent.TempDirectory to be set');
+      }
+
+      extPath = path.join(extPath, this.SCANNER_TOOL_NAME, release.version);
+      extPath = await toolLib.extractZip(downloadPath, extPath);
+
+      toolPath = await toolLib.cacheDir(path.join(extPath, `sonar-scanner-${release.version}`), this.SCANNER_TOOL_NAME, release.version);
+    }
+
+    return toolPath;
+  }
+
+  private getLatestRelease(): Promise<IScannerRelease> {
+    return getNoSonar(this.SCANNER_LATEST_RELEASE_BASEPATH, this.SCANNER_LATEST_RELEASE_URL).then(
+      (githubRelease) => {
+        tl.debug(JSON.stringify(githubRelease));
+          return {
+            url: `${this.SCANNER_BINARIES_URL}${githubRelease.name}.zip`,
+            version: githubRelease.name,
+          };
+      }
     );
   }
 }
@@ -276,7 +320,7 @@ export class ScannerMSBuild extends Scanner {
     return toolPath;
   }
 
-  private getLatestRelease(tfm: string): Promise<IScannerDotNetRelease> {
+  private getLatestRelease(tfm: string): Promise<IScannerRelease> {
     return getNoSonar(this.SCANNER_LATEST_RELEASE_BASEPATH, this.SCANNER_LATEST_RELEASE_URL).then(
       (githubRelease) => {
         tl.debug(JSON.stringify(githubRelease));

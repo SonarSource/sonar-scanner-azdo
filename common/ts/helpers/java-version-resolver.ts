@@ -2,7 +2,7 @@ import * as tl from 'azure-pipelines-task-lib/task';
 
 export default class JavaVersionResolver {
   private static javaHomeOriginalPath: string;
-  private static isJavaNewVersionSet: boolean = false;
+  private static isJavaNewVersionSet = false;
 
   public static setJavaHomeToIfAvailable(newJavaPath: string) {
     this.javaHomeOriginalPath = tl.getVariable('JAVA_HOME');
