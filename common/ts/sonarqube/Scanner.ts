@@ -122,7 +122,8 @@ interface ScannerCLIData {
 export class ScannerCLI extends Scanner {
   readonly SCANNER_LATEST_RELEASE_URL = 'repos/SonarSource/sonar-scanner-cli/releases/latest';
   readonly SCANNER_LATEST_RELEASE_BASEPATH = 'https://api.github.com';
-  readonly SCANNER_BINARIES_URL = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-"
+  readonly SCANNER_BINARIES_URL =
+    'https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-';
   readonly SCANNER_TOOL_NAME = 'sonar-scanner-cli';
 
   constructor(rootPath: string, private readonly data: ScannerCLIData, private cliMode?: string) {
@@ -142,7 +143,6 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-
     const release = await this.getLatestRelease();
     tl.debug(`Fetched latest Scanner CLI version : ${JSON.stringify(release)}`);
     const scannerPath = await this.checkCacheOrDownloadScanner(release);
@@ -150,11 +150,11 @@ export class ScannerCLI extends Scanner {
 
     let scannerCliScript = tl.resolve(scannerPath, 'bin');
 
-     if (isWindows()) {
-       scannerCliScript += '.bat';
-     } else {
-       await fs.chmod(scannerCliScript, '777');
-     }
+    if (isWindows()) {
+      scannerCliScript += '.bat';
+    } else {
+      await fs.chmod(scannerCliScript, '777');
+    }
     const scannerRunner = tl.tool(scannerCliScript);
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
@@ -196,7 +196,11 @@ export class ScannerCLI extends Scanner {
       extPath = path.join(extPath, this.SCANNER_TOOL_NAME, release.version);
       extPath = await toolLib.extractZip(downloadPath, extPath);
 
-      toolPath = await toolLib.cacheDir(path.join(extPath, `sonar-scanner-${release.version}`), this.SCANNER_TOOL_NAME, release.version);
+      toolPath = await toolLib.cacheDir(
+        path.join(extPath, `sonar-scanner-${release.version}`),
+        this.SCANNER_TOOL_NAME,
+        release.version
+      );
     }
 
     return toolPath;
@@ -206,10 +210,10 @@ export class ScannerCLI extends Scanner {
     return getNoSonar(this.SCANNER_LATEST_RELEASE_BASEPATH, this.SCANNER_LATEST_RELEASE_URL).then(
       (githubRelease) => {
         tl.debug(JSON.stringify(githubRelease));
-          return {
-            url: `${this.SCANNER_BINARIES_URL}${githubRelease.name}.zip`,
-            version: githubRelease.name,
-          };
+        return {
+          url: `${this.SCANNER_BINARIES_URL}${githubRelease.name}.zip`,
+          version: githubRelease.name,
+        };
       }
     );
   }
