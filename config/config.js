@@ -9,5 +9,5 @@ exports.scanner = {
   msBuildVersion,
   cliVersion,
   classicUrl: `${scannerUrlCommon}-net46.zip`,
-  dotnetUrl: `${scannerUrlCommon}-netcoreapp2.0.zip`,
+  dotnetUrl: `${scannerUrlCommon}-netcoreapp3.0.zip`,
 };
