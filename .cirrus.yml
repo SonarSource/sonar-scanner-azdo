@@ -43,7 +43,7 @@ build_task:
     cpu: 1
     memory: 2G
   env:
-    SONAR_TOKEN: ENCRYPTED[!5ba7cbb5bf9d168de69bcd444d9e884c9cf664be1115640cc64e49df6d241c309a87fc527cab533c08f289b167187017!]
+    SONAR_TOKEN: ENCRYPTED[!0d599f9fb1613db33388821ca04af23f090729902b4421ad0a53cea8393d1e9039f2e47d65a246781b0e2c3718c172a1!]
     SONAR_HOST_URL: https://next.sonarqube.com/sonarqube
   node_modules_cache:
     folder: node_modules
