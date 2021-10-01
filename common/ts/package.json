@@ -6,14 +6,14 @@
   "license": "LGPL-3.0",
   "dependencies": {
     "azure-devops-node-api": "^9.0.1",
-    "azure-pipelines-task-lib": "^2.8.0",
-    "fs-extra": "5.0.0",
+    "azure-pipelines-task-lib": "^3.1.9",
+    "fs-extra": "10.0.0",
     "guid-typescript": "1.0.9",
     "request": "2.88.2",
     "request-promise-native": "^1.0.8",
     "semver": "5.7.1"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   }
 }

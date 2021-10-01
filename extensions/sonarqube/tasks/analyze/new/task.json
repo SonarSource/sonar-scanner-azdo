@@ -21,7 +21,7 @@
   ],
   "inputs": [],
   "execution": {
-    "Node": {
+    "Node10": {
       "target": "analyze.js"
     }
   }
