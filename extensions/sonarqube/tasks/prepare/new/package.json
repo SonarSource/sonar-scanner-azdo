@@ -5,9 +5,9 @@
   "author": "SonarSource",
   "license": "LGPL-3.0",
   "dependencies": {
-    "azure-pipelines-task-lib": "^2.8.0"
+    "azure-pipelines-task-lib": "^3.1.9"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   }
 }

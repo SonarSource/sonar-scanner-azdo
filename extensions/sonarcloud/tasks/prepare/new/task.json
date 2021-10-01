@@ -159,7 +159,7 @@
     }
   ],
   "execution": {
-    "Node": {
+    "Node10": {
       "target": "prepare.js"
     }
   }
