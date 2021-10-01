@@ -28,7 +28,7 @@
   ],
   "dataSourceBindings": [],
   "execution": {
-    "Node10": {
+    "Node": {
       "target": "publish.js"
     }
   }
