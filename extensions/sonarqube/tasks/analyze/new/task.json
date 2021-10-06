@@ -12,7 +12,7 @@
   "version": {
     "Major": 4,
     "Minor": 23,
-    "Patch": 0
+    "Patch": 1
   },
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
   "minimumAgentVersion": "2.119.1",
@@ -21,7 +21,7 @@
   ],
   "inputs": [],
   "execution": {
-    "Node10": {
+    "Node": {
       "target": "analyze.js"
     }
   }
