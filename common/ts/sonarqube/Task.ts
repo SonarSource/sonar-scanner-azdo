@@ -14,7 +14,7 @@ interface ITask {
 }
 
 export default class Task {
-  constructor(private readonly task: ITask) { }
+  constructor(private readonly task: ITask) {}
 
   public get analysisId() {
     return this.task.analysisId;
@@ -26,7 +26,7 @@ export default class Task {
 
   public get warnings() {
     if (this.task.warnings) {
-      return this.task.warnings
+      return this.task.warnings;
     } else {
       return [];
     }
@@ -40,10 +40,10 @@ export default class Task {
   ): Promise<Task> {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
     let query = {};
-    if (endpoint.type == EndpointType.SonarQube) {
-      query = { id: taskId }
+    if (endpoint.type === EndpointType.SonarQube) {
+      query = { id: taskId };
     } else {
-      query = { id: taskId, additionalFields: "warnings" }
+      query = { id: taskId, additionalFields: "warnings" };
     }
     return getJSON(endpoint, `/api/ce/task`, query).then(
       ({ task }: { task: ITask }) => {
