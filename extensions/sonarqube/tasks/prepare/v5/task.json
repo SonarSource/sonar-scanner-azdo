@@ -1,0 +1,148 @@
+{
+  "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
+  "name": "SonarQubePrepare",
+  "friendlyName": "Prepare Analysis Configuration",
+  "description": "Prepare SonarQube analysis configuration",
+  "helpMarkDown": "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+  "category": "Build",
+  "visibility": [
+    "Build"
+  ],
+  "author": "sonarsource",
+  "version": {
+    "Major": 5,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
+  "minimumAgentVersion": "2.144.0",
+  "instanceNameFormat": "Prepare analysis on SonarQube",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "inputs": [
+    {
+      "name": "SonarQube",
+      "type": "connectedService:sonarqube",
+      "label": "SonarQube Server Endpoint",
+      "required": true,
+      "helpMarkDown": "Select the SonarQube server endpoint for your project. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token."
+    },
+    {
+      "name": "scannerMode",
+      "type": "radio",
+      "label": "Choose the way to run the analysis",
+      "defaultValue": "MSBuild",
+      "required": true,
+      "helpMarkDown": "####MSBuild\n* Put this task before your MSBuild task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
+      "options": {
+        "MSBuild": "Integrate with MSBuild",
+        "Other": "Integrate with Maven or Gradle",
+        "CLI": "Use standalone scanner"
+      }
+    },
+    {
+      "name": "configMode",
+      "type": "radio",
+      "label": "Mode",
+      "defaultValue": "file",
+      "required": true,
+      "helpMarkDown": "Choose your preferred configuration method",
+      "options": {
+        "file": "Store configuration with my source code (sonar-project.properties)",
+        "manual": "Manually provide configuration"
+      },
+      "visibleRule": "scannerMode = CLI"
+    },
+    {
+      "name": "configFile",
+      "type": "filePath",
+      "defaultValue": "sonar-project.properties",
+      "label": "Settings File",
+      "required": false,
+      "helpMarkDown": "More information is available [here](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+      "visibleRule": "scannerMode = CLI && configMode = file"
+    },
+    {
+      "name": "cliProjectKey",
+      "type": "string",
+      "label": "Project Key",
+      "required": true,
+      "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
+      "visibleRule": "scannerMode = CLI && configMode = manual"
+    },
+    {
+      "name": "projectKey",
+      "type": "string",
+      "label": "Project Key",
+      "required": true,
+      "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
+      "visibleRule": "scannerMode = MSBuild"
+    },
+    {
+      "name": "cliProjectName",
+      "type": "string",
+      "label": "Project Name",
+      "required": false,
+      "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
+      "visibleRule": "scannerMode = CLI && configMode = manual"
+    },
+    {
+      "name": "projectName",
+      "type": "string",
+      "label": "Project Name",
+      "required": false,
+      "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
+      "visibleRule": "scannerMode = MSBuild"
+    },
+    {
+      "name": "cliProjectVersion",
+      "type": "string",
+      "label": "Project Version",
+      "defaultValue": "1.0",
+      "required": false,
+      "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
+      "visibleRule": "scannerMode = CLI && configMode = manual"
+    },
+    {
+      "name": "projectVersion",
+      "type": "string",
+      "label": "Project Version",
+      "defaultValue": "1.0",
+      "required": false,
+      "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
+      "visibleRule": "scannerMode = MSBuild"
+    },
+    {
+      "name": "cliSources",
+      "type": "filePath",
+      "label": "Sources directory root",
+      "defaultValue": ".",
+      "required": true,
+      "helpMarkDown": "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarQube property",
+      "visibleRule": "scannerMode = CLI && configMode = manual"
+    },
+    {
+      "name": "extraProperties",
+      "type": "multiLine",
+      "label": "Additional Properties",
+      "defaultValue": "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin",
+      "required": false,
+      "properties": {
+        "resizable": "true",
+        "rows": "5"
+      },
+      "helpMarkDown": "[Additional properties](https://redirect.sonarsource.com/doc/analysis-parameters.html) to be passed to the scanner. Specify each key=value pair on a new line.",
+      "groupName": "advanced"
+    }
+  ],
+  "execution": {
+    "Node10": {
+      "target": "prepare.js"
+    }
+  }
+}

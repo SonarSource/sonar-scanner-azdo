@@ -1,0 +1,35 @@
+{
+  "id": "291ed61f-1ee4-45d3-b1b0-bf822d9095ef",
+  "name": "SonarQubePublish",
+  "friendlyName": "Publish Quality Gate Result",
+  "description":
+    "Publish SonarQube's Quality Gate result on the Azure DevOps build result, to be used after the actual analysis.",
+  "helpMarkDown":
+    "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+  "category": "Build",
+  "visibility": ["Build"],
+  "author": "sonarsource",
+  "version": {
+    "Major": 5,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "2.144.0",
+  "inputs": [
+    {
+      "name": "pollingTimeoutSec",
+      "type": "string",
+      "label": "Timeout (s)",
+      "defaultValue": "300",
+      "required": true,
+      "helpMarkDown":
+        "This task will poll SonarQube until the analysis is completed, or until the timeout is reached. It also add a build property with the quality gate status of the current build(s) analyses."
+    }
+  ],
+  "dataSourceBindings": [],
+  "execution": {
+    "Node10": {
+      "target": "publish.js"
+    }
+  }
+}
