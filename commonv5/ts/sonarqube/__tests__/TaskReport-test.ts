@@ -5,7 +5,6 @@ import * as tl from "azure-pipelines-task-lib/task";
 import * as semver from "semver";
 import TaskReport from "../TaskReport";
 import Endpoint, { EndpointType } from "../Endpoint";
-import * as tempFindMethods from "../../helpers/temp-find-method";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -83,7 +82,7 @@ serverUrl=http://sonar`,
 it("should find report files for SonarCloud", async () => {
   // using spyOn so we can reset the original behaviour
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
-  jest.spyOn(tempFindMethods, "findMatch").mockImplementation(() => ["path1", "path2"]);
+  jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
 
   const endpoint = new Endpoint(EndpointType.SonarCloud, null);
 
@@ -104,8 +103,8 @@ it("should find report files for SonarCloud", async () => {
     "**",
     "report-task.txt"
   );
-  expect(tempFindMethods.findMatch).toHaveBeenCalledTimes(1);
-  expect(tempFindMethods.findMatch).toHaveBeenCalledWith(
+  expect(tl.findMatch).toHaveBeenCalledTimes(1);
+  expect(tl.findMatch).toHaveBeenCalledWith(
     "mock root search path",
     expectedSearchPath
   );
@@ -114,7 +113,7 @@ it("should find report files for SonarCloud", async () => {
 it("should find report files for SonarQube above 7.2.0", async () => {
   // using spyOn so we can reset the original behaviour
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
-  jest.spyOn(tempFindMethods, "findMatch").mockImplementation(() => ["path1", "path2"]);
+  jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
 
   const endpoint = new Endpoint(EndpointType.SonarQube, null);
 
@@ -135,8 +134,8 @@ it("should find report files for SonarQube above 7.2.0", async () => {
     "**",
     "report-task.txt"
   );
-  expect(tempFindMethods.findMatch).toHaveBeenCalledTimes(1);
-  expect(tempFindMethods.findMatch).toHaveBeenCalledWith(
+  expect(tl.findMatch).toHaveBeenCalledTimes(1);
+  expect(tl.findMatch).toHaveBeenCalledWith(
     "mock root search path",
     expectedSearchPath
   );
@@ -145,7 +144,7 @@ it("should find report files for SonarQube above 7.2.0", async () => {
 it("should find report files for SonarQube below 7.2.0", async () => {
   // using spyOn so we can reset the original behaviour
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
-  jest.spyOn(tempFindMethods, "findMatch").mockImplementation(() => ["path1", "path2"]);
+  jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
 
   const endpoint = new Endpoint(EndpointType.SonarQube, null);
 
@@ -162,8 +161,8 @@ it("should find report files for SonarQube below 7.2.0", async () => {
   // path separators in Windows/non-Windows
   const expectedSearchPath = path.join("**", "report-task.txt");
 
-  expect(tempFindMethods.findMatch).toHaveBeenCalledTimes(1);
-  expect(tempFindMethods.findMatch).toHaveBeenCalledWith(
+  expect(tl.findMatch).toHaveBeenCalledTimes(1);
+  expect(tl.findMatch).toHaveBeenCalledWith(
     "mock root search path",
     expectedSearchPath
   );
