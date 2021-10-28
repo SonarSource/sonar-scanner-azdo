@@ -16,6 +16,7 @@ exports.pathAllFiles = function(...paths) {
 
 const buildPath = resolveApp('build');
 const commonPath = resolveApp('common');
+const commonv5Path = resolveApp('commonv5');
 const extensionsPath = resolveApp('extensions');
 
 exports.paths = {
@@ -35,12 +36,17 @@ exports.paths = {
     old: path.join(commonPath, 'powershell'),
     new: path.join(commonPath, 'ts')
   },
+  commonv5: {
+    new: path.join(commonv5Path, 'ts')
+  },
   extensions: {
     root: extensionsPath,
     tasks: {
       root: path.join(extensionsPath, '**', 'tasks'),
       old: path.join(extensionsPath, '**', 'tasks', '**', 'old'),
-      new: path.join(extensionsPath, '**', 'tasks', '**', 'new')
+      new: path.join(extensionsPath, '**', 'tasks', '**', 'new'),
+      v4: path.join(extensionsPath, '**', 'tasks', '**', 'v4'),
+      v5: path.join(extensionsPath, '**', 'tasks', '**', 'v5')
     }
   }
 };
