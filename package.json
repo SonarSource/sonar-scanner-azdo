@@ -51,13 +51,13 @@
     "promote": "./node_modules/.bin/gulp promote",
     "burgr": "./node_modules/.bin/gulp burgr",
     "sonarqube": "./node_modules/.bin/gulp sonarqube",
-    "format": "./node_modules/.bin/prettier --write --list-different \"{common,extensions}/**/*.{js,ts}\"",
-    "format-check": "./node_modules/.bin/prettier --list-different \"{common,extensions}/**/*.{js,ts}\"",
+    "format": "./node_modules/.bin/prettier --write --list-different \"{commonv5,common,extensions}/**/*.{js,ts}\"",
+    "format-check": "./node_modules/.bin/prettier --list-different \"{commonv5,common,extensions}/**/*.{js,ts}\"",
     "install-dep": "./node_modules/.bin/gulp npminstall",
     "install-depv4": "./node_modules/.bin/gulp npminstallv4",
     "install-depv5": "./node_modules/.bin/gulp npminstallv5",
-    "lint": "eslint --ext js,ts --quiet \"{common,extensions}/**/*.{js,ts}\"",
-    "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"{common,extensions}/**/*.{js,ts}\"",
+    "lint": "eslint --ext js,ts --quiet \"{commonv5,common,extensions}/**/*.{js,ts}\"",
+    "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"{commonv5,common,extensions}/**/*.{js,ts}\"",
     "test-build": "./node_modules/.bin/gulp build:test",
     "test": "./node_modules/.bin/jest",
     "test-ci": "./node_modules/.bin/jest --coverage",
@@ -71,7 +71,8 @@
   "jest": {
     "clearMocks": true,
     "collectCoverageFrom": [
-      "common/**/*.ts"
+      "common/**/*.ts",
+      "commonv5/**/*.ts"
     ],
     "coverageDirectory": "coverage",
     "coverageReporters": [

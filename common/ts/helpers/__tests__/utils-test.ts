@@ -1,4 +1,4 @@
-import { setIfNotEmpty, toCleanJSON } from "../utils";
+import { sanitizeVariable, setIfNotEmpty, toCleanJSON } from "../utils";
 
 describe("toCleanJSON", () => {
   it("should jsonify", () => {
@@ -6,6 +6,16 @@ describe("toCleanJSON", () => {
   });
   it("should clean the jsonified object", () => {
     expect(toCleanJSON({ foo: "a", bar: undefined, baz: "" })).toBe('{"foo":"a","baz":""}');
+  });
+});
+
+describe("sanitizeVariable", () => {
+  it("should sanitize username and pass", () => {
+    expect(
+      sanitizeVariable(
+        '{ "foo": "a", "bar": "b", "sonar.login": "aaabbbccc", "sonar.password": "fffjjjkkk" }'
+      )
+    ).toBe('{"foo":"a","bar":"b"}');
   });
 });
 
