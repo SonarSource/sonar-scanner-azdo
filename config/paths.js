@@ -44,7 +44,7 @@ exports.paths = {
     tasks: {
       root: path.join(extensionsPath, '**', 'tasks'),
       old: path.join(extensionsPath, '**', 'tasks', '**', 'old'),
-      new: path.join(extensionsPath, '**', 'tasks', '**', 'new'),
+      scv1: path.join(extensionsPath, '**', 'tasks', '**', 'v1'),
       v4: path.join(extensionsPath, '**', 'tasks', '**', 'v4'),
       v5: path.join(extensionsPath, '**', 'tasks', '**', 'v5')
     }

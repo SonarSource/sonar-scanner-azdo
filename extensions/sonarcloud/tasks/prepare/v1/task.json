@@ -14,7 +14,7 @@
     "Minor": 22,
     "Patch": 0
   },
-  "minimumAgentVersion": "1.95.1",
+  "minimumAgentVersion": "2.144.0",
   "instanceNameFormat": "Prepare analysis on SonarCloud",
   "groups": [
     {
@@ -159,7 +159,7 @@
     }
   ],
   "execution": {
-    "Node": {
+    "Node10": {
       "target": "prepare.js"
     }
   }
