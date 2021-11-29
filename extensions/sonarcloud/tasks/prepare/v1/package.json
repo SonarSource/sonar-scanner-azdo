@@ -1,11 +1,11 @@
 {
-  "name": "publish",
+  "name": "prepare",
   "version": "4.0.0",
-  "description": "SonarCloud Task Publish",
+  "description": "SonarCloud Task Prepare",
   "author": "SonarSource",
   "license": "LGPL-3.0",
   "dependencies": {
-    "azure-pipelines-task-lib": "^2.8.0"
+    "azure-pipelines-task-lib": "^3.1.10"
   },
   "engines": {
     "node": ">=6"
