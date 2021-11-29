@@ -135,9 +135,9 @@ exports.getBuildInfo = function(packageJson, filePath) {
 exports.runSonnarQubeScanner = function(callback, options = {}) {
   const commonOptions = {
     'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
-    'sonar.projectName': 'SonarQube Scanner for TFS/VSTS',
+    'sonar.projectName': 'Azure DevOps extension for SonarQube/SonarCloud',
     'sonar.exclusions':
-      'build/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, **/temp-find-method.ts',
+      'build/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, **/temp-find-method.ts, **/package-lock.json',
     'sonar.coverage.exclusions':
       'gulpfile.js, build/**, config/**, coverage/**, extensions/**, scripts/**, **/__tests__/**, **/temp-find-method.ts',
     'sonar.tests': '.',

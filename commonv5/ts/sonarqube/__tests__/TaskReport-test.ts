@@ -104,10 +104,7 @@ it("should find report files for SonarCloud", async () => {
     "report-task.txt"
   );
   expect(tl.findMatch).toHaveBeenCalledTimes(1);
-  expect(tl.findMatch).toHaveBeenCalledWith(
-    "mock root search path",
-    expectedSearchPath
-  );
+  expect(tl.findMatch).toHaveBeenCalledWith("mock root search path", expectedSearchPath);
 });
 
 it("should find report files for SonarQube above 7.2.0", async () => {
@@ -135,10 +132,7 @@ it("should find report files for SonarQube above 7.2.0", async () => {
     "report-task.txt"
   );
   expect(tl.findMatch).toHaveBeenCalledTimes(1);
-  expect(tl.findMatch).toHaveBeenCalledWith(
-    "mock root search path",
-    expectedSearchPath
-  );
+  expect(tl.findMatch).toHaveBeenCalledWith("mock root search path", expectedSearchPath);
 });
 
 it("should find report files for SonarQube below 7.2.0", async () => {
@@ -162,8 +156,5 @@ it("should find report files for SonarQube below 7.2.0", async () => {
   const expectedSearchPath = path.join("**", "report-task.txt");
 
   expect(tl.findMatch).toHaveBeenCalledTimes(1);
-  expect(tl.findMatch).toHaveBeenCalledWith(
-    "mock root search path",
-    expectedSearchPath
-  );
+  expect(tl.findMatch).toHaveBeenCalledWith("mock root search path", expectedSearchPath);
 });

@@ -575,7 +575,6 @@ gulp.task('sonarqube', done => {
     runSonnarQubeScanner(done, {
       'sonar.analysis.prNumber': process.env.CIRRUS_PR,
       'sonar.branch.name': process.env.CIRRUS_BRANCH,
-      'sonar.branch.target': process.env.CIRRUS_BASE_BRANCH,
       'sonar.analysis.sha1': process.env.CIRRUS_BASE_SHA
     });
   } else {

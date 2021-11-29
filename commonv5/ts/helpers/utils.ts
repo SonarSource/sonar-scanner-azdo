@@ -25,6 +25,14 @@ export function setIfNotEmpty(props: { [key: string]: string }, key: string, val
   }
 }
 
+export function sanitizeVariable(jsonPayload: string) {
+  const jsonObj = JSON.parse(jsonPayload);
+  delete jsonObj[PROP_NAMES.LOGIN];
+  delete jsonObj[PROP_NAMES.PASSSWORD];
+  jsonPayload = toCleanJSON(jsonObj);
+  return jsonPayload;
+}
+
 export function isWindows() {
   return tl.getPlatform() === tl.Platform.Windows;
 }
