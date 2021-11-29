@@ -11,7 +11,7 @@
   "author": "sonarsource",
   "version": {
     "Major": 4,
-    "Minor": 24,
+    "Minor": 25,
     "Patch": 0
   },
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
