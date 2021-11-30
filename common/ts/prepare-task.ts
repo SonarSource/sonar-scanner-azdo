@@ -4,7 +4,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
-import { toCleanJSON, sanitizeVariable } from "./helpers/utils";
+import { toCleanJSON } from "./helpers/utils";
 import { getServerVersion } from "./helpers/request";
 import * as azdoApiUtils from "./helpers/azdo-api-utils";
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from "./sonarqube/TaskReport";
@@ -55,7 +55,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   tl.setVariable("SONARQUBE_SCANNER_PARAMS", jsonParams);
 
   await scanner.runPrepare();
-  tl.setVariable("SONARQUBE_SCANNER_PARAMS", sanitizeVariable(jsonParams));
 }
 
 async function branchFeatureSupported(endpoint) {
