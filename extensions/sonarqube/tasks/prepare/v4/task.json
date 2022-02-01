@@ -11,8 +11,8 @@
   "author": "sonarsource",
   "version": {
     "Major": 4,
-    "Minor": 25,
-    "Patch": 1
+    "Minor": 26,
+    "Patch": 0
   },
   "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
   "minimumAgentVersion": "1.95.1",
