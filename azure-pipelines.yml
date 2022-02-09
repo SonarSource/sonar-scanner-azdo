@@ -1,0 +1,149 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: sonar-scanner-vsts-variables
+
+stages:
+- stage: build
+  displayName: 'Build:'
+  jobs:
+  - job: npminstall
+    displayName: 'NPM Install, CI and Build'
+    steps:
+    - task: Npm@1
+      displayName: 'Update npm'
+      inputs:
+        command: 'custom'
+        customCommand: 'i -g npm@latest'
+
+    - task: Bash@3
+      displayName: 'Install all dependencies'
+      inputs:
+        filePath: 'cirrus/cirrus-install.sh'
+        arguments: 'full'
+
+    - task: Npm@1
+      displayName: 'Run Validate-CI'
+      inputs:
+        command: 'custom'
+        customCommand: 'run validate-ci'
+
+    - task: Npm@1
+      displayName: 'Create test extension'
+      inputs:
+        command: 'custom'
+        customCommand: 'run test-build -- --publisher sonar-ci-publish'
+
+    - task: CopyFiles@2
+      displayName: 'Copy artefacts to build directory'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/build'
+        Contents: '*.vsix'
+        TargetFolder: '$(Agent.BuildDirectory)/a'
+
+    - task: PowerShell@2
+      displayName: 'Fetch extensions versions and rename vsix'
+      name: versions
+      inputs:
+        targetType: 'inline'
+        script: |
+            # Write your PowerShell commands here.
+            
+            . (Join-Path "azp" "helpers.ps1")
+
+            $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarqube/vss-extension.json"
+            $version = Get-ExtensionVersion $sqExtensionManifest 'SonarQube'
+
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}.$env:BUILD_BUILDID-sonarqube.vsix"
+
+            Write-Host "##vso[task.setvariable variable=SQ_EXT_NAME]$extensionNewName"
+            Write-Host "##vso[task.setvariable variable=SQ_VERSION;isOutput=true]$version"
+
+            Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-0.0.2-SNAPSHOT-sonarqube.vsix" -NewName $extensionNewName
+
+            $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarcloud/vss-extension.json"
+            $version = Get-ExtensionVersion $scExtensionManifest 'SonarCloud'
+
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}.$env:BUILD_BUILDID-sonarcloud.vsix"
+
+            Write-Host "##vso[task.setvariable variable=SC_EXT_NAME]$extensionNewName"
+            Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$version"
+
+            Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-0.0.2-SNAPSHOT-sonarcloud.vsix" -NewName $extensionNewName
+        pwsh: true
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish artifacts on the build'
+      inputs:
+        PathtoPublish: '$(Agent.BuildDirectory)/a'
+        ArtifactName: 'extensions'
+- stage: unpublish
+  dependsOn: build
+  displayName: 'Unpublish:'
+  jobs:
+  - job: 'unpublishextensions'
+    displayName: 'Unpublish extensions on Marketplace'
+    steps: 
+    - task: TfxInstaller@3
+      displayName: 'Install TFX CLI'
+      inputs:
+        version: 'v0.10.x'
+    - task: UnpublishAzureDevOpsExtension@3
+      displayName: 'Remove SonarCloud extension from CI publisher'
+      inputs:
+        connectTo: 'VsTeam'
+        connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
+        method: 'id'
+        publisherId: 'sonar-ci-publish'
+        extensionId: 'sonarcloud'
+    - task: UnpublishAzureDevOpsExtension@3
+      displayName: 'Remove SonarQube extension from CI publisher'
+      inputs:
+        connectTo: 'VsTeam'
+        connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
+        method: 'id'
+        publisherId: 'sonar-ci-publish'
+        extensionId: 'sonarqube'
+- stage: publish
+  dependsOn: 
+    - build
+    - unpublish
+  displayName: 'Publish:'
+  jobs:
+  - job: 'publishextensions'
+    displayName: 'Publish extensions on Marketplace'
+    variables:
+      sqExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SQ_VERSION'] ]
+      scExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_VERSION'] ]
+    steps: 
+      - task: TfxInstaller@3
+        displayName: 'Install TFX CLI'
+        inputs:
+          version: 'v0.10.x'
+      - task: DownloadBuildArtifacts@1
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'extensions'
+          downloadPath: '$(System.ArtifactsDirectory)'
+      - task: PublishAzureDevOpsExtension@3
+        displayName: 'Publish SonarCloud extension'
+        inputs:
+          connectTo: 'VsTeam'
+          connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
+          fileType: 'vsix'
+          vsixFile: '$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion).$(Build.BuildId)-sonarcloud.vsix'
+          extensionName: '[Test] SonarCloud ITs'
+          updateTasksVersion: false
+          updateTasksId: true
+          extensionVisibility: 'private'
+          shareWith: 'sonarsource-integration-tests'
+          cwd: '$(System.ArtifactsDirectory)'
