@@ -11,6 +11,8 @@ pool:
 
 variables:
   - group: sonar-scanner-vsts-variables
+  - name: System.debug
+    value: true
 
 stages:
 - stage: build
