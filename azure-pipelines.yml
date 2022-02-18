@@ -97,12 +97,12 @@ stages:
         PathtoPublish: '$(Agent.BuildDirectory)/a'
         ArtifactName: 'extensions'
 - stage: unpublish
-  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: succeeded()
   dependsOn: build
-  displayName: 'Unpublish:'
+  displayName: 'Unpublish test extension:'
   jobs:
   - job: 'unpublishextensions'
-    displayName: 'Unpublish extensions on Marketplace'
+    displayName: 'Unpublish test extensions on Marketplace'
     variables:
       publisher: $(SonarSourceITPublisher)
     steps: 
@@ -111,7 +111,7 @@ stages:
       inputs:
         version: 'v0.10.x'
     - task: UnpublishAzureDevOpsExtension@3
-      displayName: 'Remove SonarCloud extension from CI publisher'
+      displayName: 'Remove SonarCloud test extension from CI publisher'
       inputs:
         connectTo: 'VsTeam'
         connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
@@ -119,7 +119,7 @@ stages:
         publisherId: '$(publisher)'
         extensionId: 'sonarcloud'
     - task: UnpublishAzureDevOpsExtension@3
-      displayName: 'Remove SonarQube extension from CI publisher'
+      displayName: 'Remove SonarQube test extension from CI publisher'
       inputs:
         connectTo: 'VsTeam'
         connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
@@ -127,14 +127,14 @@ stages:
         publisherId: '$(publisher)'
         extensionId: 'sonarqube'
 - stage: publish
-  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: succeeded()
   dependsOn: 
     - build
     - unpublish
-  displayName: 'Publish:'
+  displayName: 'Publish test extensions:'
   jobs:
   - job: 'publishextensions'
-    displayName: 'Publish extensions on Marketplace'
+    displayName: 'Publish test extensions on Marketplace'
     variables:
       sqExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SQ_VERSION'] ]
       scExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_VERSION'] ]
@@ -146,13 +146,14 @@ stages:
         inputs:
           version: 'v0.10.x'
       - task: DownloadBuildArtifacts@1
+        displayName: 'Download artifacts'
         inputs:
           buildType: 'current'
           downloadType: 'single'
           artifactName: 'extensions'
           downloadPath: '$(System.ArtifactsDirectory)'
       - task: PublishAzureDevOpsExtension@3
-        displayName: 'Publish SonarCloud extension'
+        displayName: 'Publish SonarCloud test extension'
         inputs:
           connectTo: 'VsTeam'
           connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
@@ -179,7 +180,7 @@ stages:
     - build
     - publish
   displayName: 'QA:'
-  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: succeeded()
   jobs:
   - job: 'runqa'
     displayName: 'Run QA'
