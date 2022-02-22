@@ -33,7 +33,7 @@ namespace AzureDevOpsExtension.IntegrationTests
     {
         private string GetBase64EncodedToken()
         {
-            return Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(String.Format("{0}:", Environment.GetEnvironmentVariable("SC_TOKEN"))));
+            return Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{Environment.GetEnvironmentVariable("SC_TOKEN")}:"));
         }
 
         private HttpClient GetHttpClient()
