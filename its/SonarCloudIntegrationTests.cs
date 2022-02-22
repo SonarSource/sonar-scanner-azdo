@@ -77,7 +77,7 @@ namespace AzureDevOpsExtension.IntegrationTests
             Debug.WriteLine($"[{testAssets.LogPrefix}]Build completed.");
 
             Assert.AreEqual(BuildResult.Succeeded, currentBuildResult.Result);
-            await AssertVersionsOfTasksAreCorrect(currentBuildResult);
+            await AssertVersionsOfTasksAreCorrect(currentBuildResult, testAssets.ShouldAssertAnalyzeVersion);
 
             await AssertNcLocAndCoverage(testAssets.ProjectKey, testAssets.NcLocs, testAssets.Coverage);
         }
@@ -102,7 +102,7 @@ namespace AzureDevOpsExtension.IntegrationTests
             Assert.AreEqual(expectedCoverage, actualCoverage);
         }
 
-        private async Task AssertVersionsOfTasksAreCorrect(Build currentBuildResult, bool shouldAssertAnalyze = true)
+        private async Task AssertVersionsOfTasksAreCorrect(Build currentBuildResult, bool shouldAssertAnalyze)
         {
             var buildProperties = await _buildHttpClient.GetBuildPropertiesAsync(Environment.GetEnvironmentVariable("ITS_PROJECT_NAME"), currentBuildResult.Id);
             var actualPrepareVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourcePrepareTaskVersion"));

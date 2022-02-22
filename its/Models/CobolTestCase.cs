@@ -30,6 +30,7 @@ namespace IntegrationTests.Models
 			base.PipelineName = Environment.GetEnvironmentVariable("ITS_SCANNERCLI_PIPELINE_NAME");
 			base.ProjectKey = Environment.GetEnvironmentVariable("ITS_SCANNERCLI_SC_PROJECT_KEY");
 			base.LogPrefix = "ScannerCLI/Cobol";
+			base.ShouldAssertAnalyzeVersion = true;
 		}
 	}
 }

@@ -28,6 +28,7 @@ namespace IntegrationTests.Models
 		public string PipelineName { get; set; }
 		public string ProjectKey { get; set; }
 		public string LogPrefix { get; set; }
+		public bool ShouldAssertAnalyzeVersion { get; set; }
 	}
 }
 

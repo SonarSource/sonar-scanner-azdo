@@ -30,6 +30,7 @@ namespace IntegrationTests.Models
 			base.PipelineName = Environment.GetEnvironmentVariable("ITS_DOTNET_PIPELINE_NAME");
 			base.ProjectKey = Environment.GetEnvironmentVariable("ITS_DOTNET_SC_PROJECT_KEY");
 			base.LogPrefix = "S4NET - .NET Framework";
+			base.ShouldAssertAnalyzeVersion = true;
 		}
 	}
 }
