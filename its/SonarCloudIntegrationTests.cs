@@ -1,9 +1,31 @@
+/*
+ * Azure DevOps extension for SonarQube/SonarCloud ITs
+ * Copyright (C) 2016-2022 SonarSource SA
+ * mailto: info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+using IntegrationTests.Models;
 using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -11,17 +33,16 @@ using System.Threading.Tasks;
 
 namespace AzureDevOpsExtension.IntegrationTests
 {
-    [TestClass]
+    [TestFixture]
     public class SonarCloudIntegrationTests
     {
-        public TestContext TestContext { get; set; }
 
         private static SonarCloudCallWrapper _scInstance;
         private static String _buildParameters;
         private static BuildHttpClient _buildHttpClient;
 
-        [ClassInitialize]
-        public static void SetupTests(TestContext testContext)
+        [OneTimeSetUp]
+        public void SetupTests()
         {
             _scInstance = new SonarCloudCallWrapper();
             _buildParameters = "{\"IT_TRIGGER_BUILD\":\"true\"}";
@@ -30,99 +51,42 @@ namespace AzureDevOpsExtension.IntegrationTests
             _buildHttpClient = connection.GetClient<BuildHttpClient>();
         }
 
-        [TestMethod]
-        public async Task Execute_Scannercli_Build_And_Analysis()
+        public static IEnumerable<BuildTestCase> GetTestCases()
         {
-            Debug.WriteLine("[Scannercli]Deleting SonarCloud project if it already exists...");
+            yield return new DotnetFrameworkTestCase();
+            yield return new CobolTestCase();
+            yield return new MavenTestCase();
+            yield return new GradleTestCase();
+        }
+
+        [Test]
+        [TestCaseSource("GetTestCases")]
+        public async Task Execute_Build_And_Analysis(BuildTestCase testAssets)
+        {
+            Debug.WriteLine($"[{testAssets.LogPrefix}]Deleting SonarCloud project if it already exists...");
             //We first delete the project on SonarCloud
-            var isProjectDeleted = await _scInstance.DeleteProjectAsync(Environment.GetEnvironmentVariable("SC_SCANNERCLI_PROJECT_KEY"));
+            var isProjectDeleted = await _scInstance.DeleteProjectAsync(testAssets.ProjectKey);
 
-            Assert.AreEqual(true, isProjectDeleted);
+            Assert.IsTrue(isProjectDeleted);
 
-            Debug.WriteLine("[Scannercli]SonarCloud project has been successfully deleted...");
-            Debug.WriteLine("[Scannercli]Queuing the corresponding build and waiting for its completion...");
+            Debug.WriteLine($"[{testAssets.LogPrefix}]SonarCloud project has been successfully deleted...");
+            Debug.WriteLine($"[{testAssets.LogPrefix}]Queuing the corresponding build and waiting for its completion...");
 
-            Build currentBuildResult = await ExecuteBuildAndWaitForCompleted(Environment.GetEnvironmentVariable("AZDO_ITS_SCANNERCLI_PIPELINE_NAME"));
+            Build currentBuildResult = await ExecuteBuildAndWaitForCompleted(testAssets.PipelineName);
 
-            Debug.WriteLine("[Scannercli]Build completed.");
+            Debug.WriteLine($"[{testAssets.LogPrefix}]Build completed.");
 
             Assert.AreEqual(BuildResult.Succeeded, currentBuildResult.Result);
             await AssertVersionsOfTasksAreCorrect(currentBuildResult);
 
-            await AssertNcLocAndCoverage(Environment.GetEnvironmentVariable("SC_SCANNERCLI_PROJECT_KEY"), 1735, 0.5);
+            await AssertNcLocAndCoverage(testAssets.ProjectKey, testAssets.NcLocs, testAssets.Coverage);
         }
 
-        [TestMethod]
-        public async Task Execute_Gradle_Build_And_Analysis()
-        {
-            Debug.WriteLine("[Gradle]Deleting SonarCloud project if it already exists...");
-            //We first delete the project on SonarCloud
-            var isProjectDeleted = await _scInstance.DeleteProjectAsync(Environment.GetEnvironmentVariable("SC_GRADLE_PROJECT_KEY"));
-
-            Assert.AreEqual(true, isProjectDeleted);
-
-            Debug.WriteLine("[Gradle]SonarCloud project has been successfully deleted...");
-            Debug.WriteLine("[Gradle]Queuing the corresponding build and waiting for its completion...");
-
-            Build currentBuildResult = await ExecuteBuildAndWaitForCompleted(Environment.GetEnvironmentVariable("AZDO_ITS_GRADLE_PIPELINE_NAME"));
-
-            Debug.WriteLine("[Gradle]Build completed.");
-
-            Assert.AreEqual(BuildResult.Succeeded, currentBuildResult.Result);
-            await AssertVersionsOfTasksAreCorrect(currentBuildResult, false);
-
-            await AssertNcLocAndCoverage(Environment.GetEnvironmentVariable("SC_GRADLE_PROJECT_KEY"), 9, 50);
-        }
-
-        [TestMethod]
-        public async Task Execute_Maven_Build_And_Analysis()
-        {
-            Debug.WriteLine("[Maven]Deleting SonarCloud project if it already exists...");
-            //We first delete the project on SonarCloud
-            var isProjectDeleted = await _scInstance.DeleteProjectAsync(Environment.GetEnvironmentVariable("SC_MAVEN_PROJECT_KEY"));
-
-            Assert.AreEqual(true, isProjectDeleted);
-
-            Debug.WriteLine("[Maven]SonarCloud project has been successfully deleted...");
-            Debug.WriteLine("[Maven]Queuing the corresponding build and waiting for its completion...");
-
-            Build currentBuildResult = await ExecuteBuildAndWaitForCompleted(Environment.GetEnvironmentVariable("AZDO_ITS_MAVEN_PIPELINE_NAME"));
-
-            Debug.WriteLine("[Maven]Build completed.");
-
-            Assert.AreEqual(BuildResult.Succeeded, currentBuildResult.Result);
-            await AssertVersionsOfTasksAreCorrect(currentBuildResult, false);
-
-            await AssertNcLocAndCoverage(Environment.GetEnvironmentVariable("SC_MAVEN_PROJECT_KEY"), 211, 23.1);
-        }
-
-        [TestMethod]
-        public async Task Execute_Dotnet_Build_And_Analysis()
-        {
-            Debug.WriteLine("[Dotnet]Deleting SonarCloud project if it already exists...");
-            //We first delete the project on SonarCloud
-            var isProjectDeleted = await _scInstance.DeleteProjectAsync(Environment.GetEnvironmentVariable("SC_DOTNET_PROJECT_KEY"));
-
-            Assert.AreEqual(true, isProjectDeleted);
-
-            Debug.WriteLine("[Dotnet]SonarCloud project has been successfully deleted...");
-            Debug.WriteLine("[Dotnet]Queuing the corresponding build and waiting for its completion...");
-
-            Build currentBuildResult = await ExecuteBuildAndWaitForCompleted(Environment.GetEnvironmentVariable("AZDO_ITS_DOTNET_PIPELINE_NAME"));
-
-            Debug.WriteLine("[Dotnet]Build completed.");
-
-            Assert.AreEqual(BuildResult.Succeeded, currentBuildResult.Result);
-
-            await AssertVersionsOfTasksAreCorrect(currentBuildResult);
-
-            await AssertNcLocAndCoverage(Environment.GetEnvironmentVariable("SC_DOTNET_PROJECT_KEY"), 43, 25);
-        }
 
         private static VssConnection GetAzDoConnection()
         {
             VssBasicCredential credentials = new VssBasicCredential(string.Empty, Environment.GetEnvironmentVariable("AZURE_TOKEN"));
-            VssConnection connection = new VssConnection(new Uri(String.Concat(Environment.GetEnvironmentVariable("AZDO_BASE_URL"), Environment.GetEnvironmentVariable("AZDO_ITS_ORGA"))), credentials);
+            VssConnection connection = new VssConnection(new Uri(String.Concat(Environment.GetEnvironmentVariable("AZDO_BASE_URL"), Environment.GetEnvironmentVariable("ITS_ORGA"))), credentials);
 
             return connection;
         }
@@ -140,7 +104,7 @@ namespace AzureDevOpsExtension.IntegrationTests
 
         private async Task AssertVersionsOfTasksAreCorrect(Build currentBuildResult, bool shouldAssertAnalyze = true)
         {
-            var buildProperties = await _buildHttpClient.GetBuildPropertiesAsync(Environment.GetEnvironmentVariable("AZDO_ITS_PROJECT_NAME"), currentBuildResult.Id);
+            var buildProperties = await _buildHttpClient.GetBuildPropertiesAsync(Environment.GetEnvironmentVariable("ITS_PROJECT_NAME"), currentBuildResult.Id);
             var actualPrepareVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourcePrepareTaskVersion"));
             var actualAnalyzeVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourceAnalyzeTaskVersion"));
             var actualPublishVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourcePublishTaskVersion"));
@@ -162,7 +126,7 @@ namespace AzureDevOpsExtension.IntegrationTests
 
         private async Task<Build> ExecuteBuildAndWaitForCompleted(string pipelineName)
         {
-            var definitions = await _buildHttpClient.GetDefinitionsAsync(project: Environment.GetEnvironmentVariable("AZDO_ITS_PROJECT_NAME"));
+            var definitions = await _buildHttpClient.GetDefinitionsAsync(project: Environment.GetEnvironmentVariable("ITS_PROJECT_NAME"));
             var target = definitions.FirstOrDefault(d => d.Name == pipelineName);
 
             var queuedBuild = await _buildHttpClient.QueueBuildAsync(new Build
