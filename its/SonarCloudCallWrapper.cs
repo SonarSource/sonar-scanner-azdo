@@ -31,16 +31,19 @@ namespace AzureDevOpsExtension.IntegrationTests
 {
     public class SonarCloudCallWrapper
     {
+        private string _sonarCloudToken => Environment.GetEnvironmentVariable("SC_TOKEN");
+        private string _sonarCloudBaseUrl => Environment.GetEnvironmentVariable("SC_BASE_URL");
+
         private string GetBase64EncodedToken()
         {
-            return Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{Environment.GetEnvironmentVariable("SC_TOKEN")}:"));
+            return Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{_sonarCloudToken}:"));
         }
 
         private HttpClient GetHttpClient()
         {
             var httpClient = new HttpClient()
             {
-                BaseAddress = new Uri(Environment.GetEnvironmentVariable("SC_BASE_URL")),
+                BaseAddress = new Uri(_sonarCloudBaseUrl),
             };
 
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {GetBase64EncodedToken()}");

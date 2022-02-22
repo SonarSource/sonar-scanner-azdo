@@ -37,9 +37,19 @@ namespace AzureDevOpsExtension.IntegrationTests
     public class SonarCloudIntegrationTests
     {
 
-        private static SonarCloudCallWrapper _scInstance;
-        private static String _buildParameters;
-        private static BuildHttpClient _buildHttpClient;
+        private SonarCloudCallWrapper _scInstance;
+        private String _buildParameters;
+        private BuildHttpClient _buildHttpClient;
+
+        private static string _azureToken => Environment.GetEnvironmentVariable("AZURE_TOKEN");
+        private static string _azureBaseUrl => Environment.GetEnvironmentVariable("AZDO_BASE_URL");
+        private static string _azureDevOpsItsOrganization = Environment.GetEnvironmentVariable("ITS_ORGA");
+        private static string _azureDevOpsItsProjectName => Environment.GetEnvironmentVariable("ITS_PROJECT_NAME");
+
+        private static string _expectedPrepareTaskVersion => Environment.GetEnvironmentVariable("PREPARE_TASK_VERSION");
+        private static string _expectedAnalyzeTaskVersion => Environment.GetEnvironmentVariable("ANALYZE_TASK_VERSION");
+        private static string _expectedPublishTaskVersion => Environment.GetEnvironmentVariable("PUBLISH_TASK_VERSION");
+
 
         [OneTimeSetUp]
         public void SetupTests()
@@ -85,8 +95,8 @@ namespace AzureDevOpsExtension.IntegrationTests
 
         private static VssConnection GetAzDoConnection()
         {
-            VssBasicCredential credentials = new VssBasicCredential(string.Empty, Environment.GetEnvironmentVariable("AZURE_TOKEN"));
-            VssConnection connection = new VssConnection(new Uri(String.Concat(Environment.GetEnvironmentVariable("AZDO_BASE_URL"), Environment.GetEnvironmentVariable("ITS_ORGA"))), credentials);
+            VssBasicCredential credentials = new VssBasicCredential(string.Empty, _azureToken);
+            VssConnection connection = new VssConnection(new Uri(String.Concat(_azureBaseUrl, _azureDevOpsItsOrganization)), credentials);
 
             return connection;
         }
@@ -104,29 +114,25 @@ namespace AzureDevOpsExtension.IntegrationTests
 
         private async Task AssertVersionsOfTasksAreCorrect(Build currentBuildResult, bool shouldAssertAnalyze)
         {
-            var buildProperties = await _buildHttpClient.GetBuildPropertiesAsync(Environment.GetEnvironmentVariable("ITS_PROJECT_NAME"), currentBuildResult.Id);
+            var buildProperties = await _buildHttpClient.GetBuildPropertiesAsync(_azureDevOpsItsProjectName, currentBuildResult.Id);
             var actualPrepareVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourcePrepareTaskVersion"));
             var actualAnalyzeVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourceAnalyzeTaskVersion"));
             var actualPublishVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourcePublishTaskVersion"));
 
-            var expectedPrepareVersion = System.Environment.GetEnvironmentVariable("PREPARE_TASK_VERSION");
-            var expectedAnalyzeVersion = System.Environment.GetEnvironmentVariable("ANALYZE_TASK_VERSION");
-            var expectedPublishVersion = System.Environment.GetEnvironmentVariable("PUBLISH_TASK_VERSION");
-
-            Assert.AreEqual(expectedPrepareVersion, actualPrepareVersion.Value.ToString());
+            Assert.AreEqual(_expectedPrepareTaskVersion, actualPrepareVersion.Value.ToString());
 
             if (shouldAssertAnalyze)
             {
-                Assert.AreEqual(expectedAnalyzeVersion, actualAnalyzeVersion.Value.ToString());
+                Assert.AreEqual(_expectedAnalyzeTaskVersion, actualAnalyzeVersion.Value.ToString());
             }
 
-            Assert.AreEqual(expectedPublishVersion, actualPublishVersion.Value.ToString());
+            Assert.AreEqual(_expectedPublishTaskVersion, actualPublishVersion.Value.ToString());
                 
         }
 
         private async Task<Build> ExecuteBuildAndWaitForCompleted(string pipelineName)
         {
-            var definitions = await _buildHttpClient.GetDefinitionsAsync(project: Environment.GetEnvironmentVariable("ITS_PROJECT_NAME"));
+            var definitions = await _buildHttpClient.GetDefinitionsAsync(project: _azureDevOpsItsProjectName);
             var target = definitions.FirstOrDefault(d => d.Name == pipelineName);
 
             var queuedBuild = await _buildHttpClient.QueueBuildAsync(new Build
