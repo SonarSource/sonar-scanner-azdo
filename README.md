@@ -34,9 +34,9 @@ Developer documentation
 
 ### How to set the environment
 
-* Install NPM / Node.js
+* Install NPM (v8 or higher) / Node.js (v6 or higher)
 * npm install -g tfx-cli
-* npm install
+* ./cirrus/cirrus-install.sh full
 
 ### Package a production build
 
@@ -44,7 +44,7 @@ Developer documentation
 
 ### Package a test build
 
-* npm run test-build -- --publisher name
+* npm run test-build -- --publisher <publisher-id>
 
 ### Run tests
 
