@@ -66,7 +66,8 @@
     "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=6",
+    "npm": ">=8"
   },
   "jest": {
     "clearMocks": true,
