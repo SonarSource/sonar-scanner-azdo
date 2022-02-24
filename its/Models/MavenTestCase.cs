@@ -30,7 +30,6 @@ namespace IntegrationTests.Models
 			base.PipelineName = Environment.GetEnvironmentVariable("ITS_MAVEN_PIPELINE_NAME");
 			base.ProjectKey = Environment.GetEnvironmentVariable("ITS_MAVEN_SC_PROJECT_KEY");
 			base.LogPrefix = "Maven";
-			base.ShouldAssertAnalyzeVersion = false;
 		}
 	}
 }

@@ -30,7 +30,6 @@ namespace IntegrationTests.Models
 			base.PipelineName = Environment.GetEnvironmentVariable("ITS_GRADLE_PIPELINE_NAME");
 			base.ProjectKey = Environment.GetEnvironmentVariable("ITS_GRADLE_SC_PROJECT_KEY");
 			base.LogPrefix = "Gradle";
-			base.ShouldAssertAnalyzeVersion = false;
 		}
 	}
 }
