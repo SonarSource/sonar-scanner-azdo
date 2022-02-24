@@ -1,10 +1,10 @@
 /* istanbul ignore file */
 /*Can be deleted once https://www.npmjs.com/package/azure-pipelines-task-lib v3.1.0 will be release */
-import * as tl from 'azure-pipelines-task-lib/task';
-import path = require('path');
-import fs = require('fs');
-import im = require('azure-pipelines-task-lib/internal');
-import minimatch = require('minimatch');
+import * as tl from "azure-pipelines-task-lib/task";
+import path = require("path");
+import fs = require("fs");
+import im = require("azure-pipelines-task-lib/internal");
+import minimatch = require("minimatch");
 
 function _debugMatchOptions(options: tl.MatchOptions): void {
   tl.debug(`matchOptions.debug: '${options.debug}'`);
@@ -27,7 +27,7 @@ function _getDefaultMatchOptions(): tl.MatchOptions {
     noglobstar: false,
     dot: true,
     noext: false,
-    nocase: process.platform == 'win32',
+    nocase: process.platform == "win32",
     nonull: false,
     matchBase: false,
     nocomment: false,
@@ -68,10 +68,10 @@ export function findMatch(
   matchOptions?: tl.MatchOptions
 ): string[] {
   // apply defaults for parameters and trace
-  defaultRoot = defaultRoot || tl.getVariable('system.defaultWorkingDirectory') || process.cwd();
+  defaultRoot = defaultRoot || tl.getVariable("system.defaultWorkingDirectory") || process.cwd();
   tl.debug(`defaultRoot: '${defaultRoot}'`);
   patterns = patterns || [];
-  patterns = typeof patterns == 'string' ? ([patterns] as string[]) : patterns;
+  patterns = typeof patterns == "string" ? ([patterns] as string[]) : patterns;
   findOptions = findOptions || _getDefaultFindOptions();
   _debugFindOptions(findOptions);
   matchOptions = matchOptions || _getDefaultMatchOptions();
@@ -86,9 +86,9 @@ export function findMatch(
     tl.debug(`pattern: '${pattern}'`);
 
     // trim and skip empty
-    pattern = (pattern || '').trim();
+    pattern = (pattern || "").trim();
     if (!pattern) {
-      tl.debug('skipping empty pattern');
+      tl.debug("skipping empty pattern");
       continue;
     }
 
@@ -96,8 +96,8 @@ export function findMatch(
     let matchOptions = im._cloneMatchOptions(originalMatchOptions);
 
     // skip comments
-    if (!matchOptions.nocomment && im._startsWith(pattern, '#')) {
-      tl.debug('skipping comment');
+    if (!matchOptions.nocomment && im._startsWith(pattern, "#")) {
+      tl.debug("skipping comment");
       continue;
     }
 
@@ -107,7 +107,7 @@ export function findMatch(
     // determine whether pattern is include or exclude
     let negateCount = 0;
     if (!matchOptions.nonegate) {
-      while (pattern.charAt(negateCount) == '!') {
+      while (pattern.charAt(negateCount) == "!") {
         negateCount++;
       }
 
@@ -134,8 +134,8 @@ export function findMatch(
     } else {
       // convert slashes on Windows before calling braceExpand(). unfortunately this means braces cannot
       // be escaped on Windows, this limitation is consistent with current limitations of minimatch (3.0.3).
-      tl.debug('expanding braces');
-      let convertedPattern = process.platform == 'win32' ? pattern.replace(/\\/g, '/') : pattern;
+      tl.debug("expanding braces");
+      let convertedPattern = process.platform == "win32" ? pattern.replace(/\\/g, "/") : pattern;
       expanded = (minimatch as any).braceExpand(convertedPattern);
     }
 
@@ -148,9 +148,9 @@ export function findMatch(
       }
 
       // trim and skip empty
-      pattern = (pattern || '').trim();
+      pattern = (pattern || "").trim();
       if (!pattern) {
-        tl.debug('skipping empty pattern');
+        tl.debug("skipping empty pattern");
         continue;
       }
 
@@ -165,7 +165,7 @@ export function findMatch(
         tl.debug(`findPath: '${findPath}'`);
 
         if (!findPath) {
-          tl.debug('skipping empty path');
+          tl.debug("skipping empty path");
           continue;
         }
 
@@ -178,11 +178,11 @@ export function findMatch(
             fs.statSync(findPath);
             findResults.push(findPath);
           } catch (err) {
-            if (err.code != 'ENOENT') {
+            if (err.code != "ENOENT") {
               throw err;
             }
 
-            tl.debug('ENOENT');
+            tl.debug("ENOENT");
           }
         } else {
           findResults = find(findPath, findOptions);
@@ -191,18 +191,18 @@ export function findMatch(
         tl.debug(`found ${findResults.length} paths`);
 
         // apply the pattern
-        tl.debug('applying include pattern');
+        tl.debug("applying include pattern");
         if (findInfo.adjustedPattern != pattern) {
           tl.debug(`adjustedPattern: '${findInfo.adjustedPattern}'`);
           pattern = findInfo.adjustedPattern;
         }
 
         let matchResults: string[] = minimatch.match(findResults, pattern, matchOptions);
-        tl.debug(matchResults.length + ' matches');
+        tl.debug(matchResults.length + " matches");
 
         // union the results
         for (let matchResult of matchResults) {
-          let key = process.platform == 'win32' ? matchResult.toUpperCase() : matchResult;
+          let key = process.platform == "win32" ? matchResult.toUpperCase() : matchResult;
           results[key] = matchResult;
         }
       } else {
@@ -210,10 +210,10 @@ export function findMatch(
         if (
           matchOptions.matchBase &&
           !im._isRooted(pattern) &&
-          (process.platform == 'win32' ? pattern.replace(/\\/g, '/') : pattern).indexOf('/') < 0
+          (process.platform == "win32" ? pattern.replace(/\\/g, "/") : pattern).indexOf("/") < 0
         ) {
           // do not root the pattern
-          tl.debug('matchBase and basename only');
+          tl.debug("matchBase and basename only");
         } else {
           // root the exclude pattern
           pattern = im._ensurePatternRooted(defaultRoot, pattern);
@@ -221,17 +221,17 @@ export function findMatch(
         }
 
         // apply the pattern
-        tl.debug('applying exclude pattern');
+        tl.debug("applying exclude pattern");
         let matchResults: string[] = minimatch.match(
           Object.keys(results).map((key: string) => results[key]),
           pattern,
           matchOptions
         );
-        tl.debug(matchResults.length + ' matches');
+        tl.debug(matchResults.length + " matches");
 
         // substract the results
         for (let matchResult of matchResults) {
-          let key = process.platform == 'win32' ? matchResult.toUpperCase() : matchResult;
+          let key = process.platform == "win32" ? matchResult.toUpperCase() : matchResult;
           delete results[key];
         }
       }
@@ -241,7 +241,7 @@ export function findMatch(
   let finalResult: string[] = Object.keys(results)
     .map((key: string) => results[key])
     .sort();
-  tl.debug(finalResult.length + ' final results');
+  tl.debug(finalResult.length + " final results");
   return finalResult;
 }
 
@@ -254,7 +254,7 @@ export function findMatch(
  */
 export function find(findPath: string, options?: tl.FindOptions): string[] {
   if (!findPath) {
-    tl.debug('no path specified');
+    tl.debug("no path specified");
     return [];
   }
 
@@ -271,8 +271,8 @@ export function find(findPath: string, options?: tl.FindOptions): string[] {
   try {
     fs.lstatSync(findPath);
   } catch (err) {
-    if (err.code == 'ENOENT') {
-      tl.debug('0 results');
+    if (err.code == "ENOENT") {
+      tl.debug("0 results");
       return [];
     }
 
@@ -301,7 +301,7 @@ export function find(findPath: string, options?: tl.FindOptions): string[] {
           // use stat (following all symlinks)
           stats = fs.statSync(item.path);
         } catch (err) {
-          if (err.code == 'ENOENT' && options.allowBrokenSymbolicLinks) {
+          if (err.code == "ENOENT" && options.allowBrokenSymbolicLinks) {
             // fallback to lstat (broken symlinks allowed)
             stats = fs.lstatSync(item.path);
             tl.debug(`  ${item.path} (broken symlink)`);
@@ -314,7 +314,7 @@ export function find(findPath: string, options?: tl.FindOptions): string[] {
           // use stat (following symlinks for the specified path and this is the specified path)
           stats = fs.statSync(item.path);
         } catch (err) {
-          if (err.code == 'ENOENT' && options.allowBrokenSymbolicLinks) {
+          if (err.code == "ENOENT" && options.allowBrokenSymbolicLinks) {
             // fallback to lstat (broken symlinks allowed)
             stats = fs.lstatSync(item.path);
             tl.debug(`  ${item.path} (broken symlink)`);
@@ -342,7 +342,7 @@ export function find(findPath: string, options?: tl.FindOptions): string[] {
 
           // test for a cycle
           if (traversalChain.some((x: string) => x == realPath)) {
-            tl.debug('    cycle detected');
+            tl.debug("    cycle detected");
             continue;
           }
 
@@ -366,7 +366,7 @@ export function find(findPath: string, options?: tl.FindOptions): string[] {
     tl.debug(`${result.length} results`);
     return result;
   } catch (err) {
-    throw new Error(tl.loc('LIB_OperationFailed', 'find', err.message));
+    throw new Error(tl.loc("LIB_OperationFailed", "find", err.message));
   }
 }
 
