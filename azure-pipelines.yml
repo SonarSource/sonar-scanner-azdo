@@ -81,15 +81,6 @@ stages:
             Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$version"
 
             Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-0.0.2-SNAPSHOT-sonarcloud.vsix" -NewName $extensionNewName
-
-            $version = Get-AzureDevopsTaskVersion "$env:BUILD_SOURCESDIRECTORY/build/extensions" "sonarcloud" "analyze" "v1"
-            Write-Host "##vso[task.setvariable variable=SC_V1_ANALYZE_VERSION;isOutput=true]$version"
-
-            $version = Get-AzureDevopsTaskVersion "$env:BUILD_SOURCESDIRECTORY/build/extensions" "sonarcloud" "prepare" "v1"
-            Write-Host "##vso[task.setvariable variable=SC_V1_PREPARE_VERSION;isOutput=true]$version"
-
-            $version = Get-AzureDevopsTaskVersion "$env:BUILD_SOURCESDIRECTORY/build/extensions" "sonarcloud" "publish" "v1"
-            Write-Host "##vso[task.setvariable variable=SC_V1_PUBLISH_VERSION;isOutput=true]$version"
         pwsh: true
     - task: PublishBuildArtifacts@1
       displayName: 'Publish artifacts on the build'
@@ -184,10 +175,6 @@ stages:
   jobs:
   - job: 'runqa'
     displayName: 'Run QA'
-    variables:
-         PrepareVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_V1_PREPARE_VERSION'] ]
-         AnalyzeVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_V1_ANALYZE_VERSION'] ]
-         PublishVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_V1_PUBLISH_VERSION'] ]
     steps: 
      - task: DotNetCoreCLI@2
        displayName: 'Run Integration tests project'
@@ -195,9 +182,6 @@ stages:
          SC_TOKEN: $(SonarCloudToken)
          SC_BASE_URL: $(SonarCloudBaseUrl)
          AZURE_TOKEN: $(PAT)
-         PREPARE_TASK_VERSION: $(PrepareVersion)
-         ANALYZE_TASK_VERSION: $(AnalyzeVersion)
-         PUBLISH_TASK_VERSION: $(PublishVersion)
          AZDO_BASE_URL: $(AzdoBaseUrl)
          ITS_ORGA: $(AzdoItsOrga)
          ITS_PROJECT_NAME: $(AzdoItsProjectName)
