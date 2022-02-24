@@ -38,7 +38,6 @@ namespace AzureDevOpsExtension.IntegrationTests
     {
 
         private SonarCloudCallWrapper _scInstance;
-        private String _buildParameters;
         private BuildHttpClient _buildHttpClient;
 
         private static string _azureToken => Environment.GetEnvironmentVariable("AZURE_TOKEN");
@@ -46,16 +45,11 @@ namespace AzureDevOpsExtension.IntegrationTests
         private static string _azureDevOpsItsOrganization = Environment.GetEnvironmentVariable("ITS_ORGA");
         private static string _azureDevOpsItsProjectName => Environment.GetEnvironmentVariable("ITS_PROJECT_NAME");
 
-        private static string _expectedPrepareTaskVersion => Environment.GetEnvironmentVariable("PREPARE_TASK_VERSION");
-        private static string _expectedAnalyzeTaskVersion => Environment.GetEnvironmentVariable("ANALYZE_TASK_VERSION");
-        private static string _expectedPublishTaskVersion => Environment.GetEnvironmentVariable("PUBLISH_TASK_VERSION");
-
 
         [OneTimeSetUp]
         public void SetupTests()
         {
             _scInstance = new SonarCloudCallWrapper();
-            _buildParameters = "{\"IT_TRIGGER_BUILD\":\"true\"}";
             VssConnection connection = GetAzDoConnection();
 
             _buildHttpClient = connection.GetClient<BuildHttpClient>();
@@ -87,7 +81,6 @@ namespace AzureDevOpsExtension.IntegrationTests
             Debug.WriteLine($"[{testAssets.LogPrefix}]Build completed.");
 
             Assert.AreEqual(BuildResult.Succeeded, currentBuildResult.Result);
-            await AssertVersionsOfTasksAreCorrect(currentBuildResult, testAssets.ShouldAssertAnalyzeVersion);
 
             await AssertNcLocAndCoverage(testAssets.ProjectKey, testAssets.NcLocs, testAssets.Coverage);
         }
@@ -112,24 +105,6 @@ namespace AzureDevOpsExtension.IntegrationTests
             Assert.AreEqual(expectedCoverage, actualCoverage);
         }
 
-        private async Task AssertVersionsOfTasksAreCorrect(Build currentBuildResult, bool shouldAssertAnalyze)
-        {
-            var buildProperties = await _buildHttpClient.GetBuildPropertiesAsync(_azureDevOpsItsProjectName, currentBuildResult.Id);
-            var actualPrepareVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourcePrepareTaskVersion"));
-            var actualAnalyzeVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourceAnalyzeTaskVersion"));
-            var actualPublishVersion = buildProperties.FirstOrDefault(p => p.Key.Equals("SonarSourcePublishTaskVersion"));
-
-            Assert.AreEqual(_expectedPrepareTaskVersion, actualPrepareVersion.Value.ToString());
-
-            if (shouldAssertAnalyze)
-            {
-                Assert.AreEqual(_expectedAnalyzeTaskVersion, actualAnalyzeVersion.Value.ToString());
-            }
-
-            Assert.AreEqual(_expectedPublishTaskVersion, actualPublishVersion.Value.ToString());
-                
-        }
-
         private async Task<Build> ExecuteBuildAndWaitForCompleted(string pipelineName)
         {
             var definitions = await _buildHttpClient.GetDefinitionsAsync(project: _azureDevOpsItsProjectName);
@@ -141,8 +116,7 @@ namespace AzureDevOpsExtension.IntegrationTests
                 {
                     Id = target.Id
                 },
-                Project = target.Project,
-                Parameters = _buildParameters
+                Project = target.Project
             });
 
             
