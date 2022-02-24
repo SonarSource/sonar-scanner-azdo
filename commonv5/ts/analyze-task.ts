@@ -1,19 +1,12 @@
-import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import JavaVersionResolver from "./helpers/java-version-resolver";
-import { extractAndPublishTaskVersion } from "./helpers/task-version-utils";
 import { EndpointType, EndpointData } from "./sonarqube/Endpoint";
 import { sanitizeVariable, PROP_NAMES } from "./helpers/utils";
 
 const JAVA_11_PATH_ENV_NAME = "JAVA_HOME_11_X64";
 
 export default async function analyzeTask(rootPath: string, isSonarCloud: boolean = false) {
-  if (tl.getVariable("IT_TRIGGER_BUILD")) {
-    const taskJsonPath = path.join(__dirname, "..", "task.json");
-    await extractAndPublishTaskVersion("SonarSourceAnalyzeTaskVersion", taskJsonPath);
-  }
-
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable("SONARQUBE_SCANNER_MODE")];
   if (!scannerMode) {
     throw new Error(

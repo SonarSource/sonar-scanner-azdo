@@ -5,7 +5,6 @@ import { SemVer } from "semver";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import * as prept from "../prepare-task";
 import * as request from "../helpers/request";
-import * as taskVersionUtils from "../helpers/task-version-utils";
 import Scanner, { ScannerMSBuild } from "../sonarqube/Scanner";
 
 beforeEach(() => {
@@ -26,7 +25,6 @@ it("should display warning for dedicated extension for Sonarcloud", async () => 
   jest.spyOn(tl, "warning").mockImplementation(() => null);
   jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, "runPrepare").mockImplementation(() => null);
-  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
   jest.spyOn(prept, "getDefaultBranch").mockResolvedValue("refs/heads/master");
@@ -57,7 +55,6 @@ it("should build report task path from variables", () => {
 
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => reportDirectory);
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => buildNumber);
-  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
 
   const actual = prept.reportPath();
 

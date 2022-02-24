@@ -1,11 +1,9 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as analyze from "../../ts/analyze-task";
-import * as taskVersionUtils from "../helpers/task-version-utils";
 import Scanner, { ScannerCLI, ScannerMode } from "../sonarqube/Scanner";
 
 it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
-  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
 
   const expectedError = new Error(
     "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task"
@@ -18,9 +16,6 @@ it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
 });
 
 it("should run scanner", async () => {
-  //IT_TRIGGER_BUILD
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce("false");
-
   //SONARQUBE_SCANNER_MODE
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
 
@@ -33,8 +28,6 @@ it("should run scanner", async () => {
   const scanner = new ScannerCLI(__dirname, { projectSettings: "scanner.properties" });
 
   jest.spyOn(Scanner, "getAnalyzeScanner").mockImplementation(() => scanner);
-
-  jest.spyOn(taskVersionUtils, "extractAndPublishTaskVersion").mockImplementation(() => null);
 
   //SONARQUBE_SCANNER_PARAMS
   jest
