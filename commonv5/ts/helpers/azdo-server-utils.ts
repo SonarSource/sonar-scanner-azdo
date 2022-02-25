@@ -32,12 +32,12 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
   );
 }
 
-export async function fillBuildProperty(sonarQualityGateStatus: string) {
+export async function fillBuildProperty(propertyName: string, propertyValue: string) {
   const properties: azdoApiUtils.IPropertyBag[] = [];
 
   properties.push({
-    propertyName: "sonarglobalqualitygate",
-    propertyValue: sonarQualityGateStatus,
+    propertyName,
+    propertyValue,
   });
 
   await azdoApiUtils.addBuildProperty(properties);

@@ -45,7 +45,7 @@ export default async function publishTask(endpointType: EndpointType) {
 
   tl.debug(`Overall Quality Gate status: ${globalQualityGateStatus}`);
 
-  await fillBuildProperty(globalQualityGateStatus);
+  await fillBuildProperty("sonarglobalqualitygate", globalQualityGateStatus);
 
   publishBuildSummary(analyses.join("\r\n"), endpoint.type);
 }

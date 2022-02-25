@@ -102,7 +102,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: ok`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 2`);
-  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("ok");
+  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "ok");
 });
 
 it("check multiple report status and set global quality gate for build properties should be failed", async () => {
@@ -178,7 +178,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: failed`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 3`);
-  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("failed");
+  expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "failed");
 });
 
 it("get report string should return undefined if ceTask times out", async () => {
@@ -260,7 +260,6 @@ it("get report string should fail for non-timeout errors", async () => {
   });
   jest.spyOn(Analysis, "getAnalysis");
   jest.spyOn(tl, "warning").mockImplementation(() => null);
-
   expect.assertions(1);
   try {
     await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);

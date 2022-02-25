@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "AzureDevOpsExtension.IntegrationTests": {
+      "commandName": "Project"
+    }
+  }
+}
