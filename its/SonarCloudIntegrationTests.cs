@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using IntegrationTests;
 using IntegrationTests.Models;
 using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.VisualStudio.Services.Common;
@@ -40,10 +41,10 @@ namespace AzureDevOpsExtension.IntegrationTests
         private SonarCloudCallWrapper _scInstance;
         private BuildHttpClient _buildHttpClient;
 
-        private static string _azureToken => Environment.GetEnvironmentVariable("AZURE_TOKEN");
-        private static string _azureBaseUrl => Environment.GetEnvironmentVariable("AZDO_BASE_URL");
-        private static string _azureDevOpsItsOrganization = Environment.GetEnvironmentVariable("ITS_ORGA");
-        private static string _azureDevOpsItsProjectName => Environment.GetEnvironmentVariable("ITS_PROJECT_NAME");
+        private static string _azureToken => EnvironmentVariableWrapper.GetVariableOrThrow("AZURE_TOKEN");
+        private static string _azureBaseUrl => EnvironmentVariableWrapper.GetVariableOrThrow("AZDO_BASE_URL");
+        private static string _azureDevOpsItsOrganization = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_ORGA");
+        private static string _azureDevOpsItsProjectName => EnvironmentVariableWrapper.GetVariableOrThrow("ITS_PROJECT_NAME");
 
 
         [OneTimeSetUp]

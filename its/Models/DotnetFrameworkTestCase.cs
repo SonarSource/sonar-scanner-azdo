@@ -25,10 +25,10 @@ namespace IntegrationTests.Models
 	{
 		public DotnetFrameworkTestCase()
 		{
-			base.Coverage = Double.Parse(Environment.GetEnvironmentVariable("ITS_DOTNET_EXPECTED_COVERAGE"));
-			base.NcLocs = Int64.Parse(Environment.GetEnvironmentVariable("ITS_DOTNET_EXPECTED_NCLOCS"));
-			base.PipelineName = Environment.GetEnvironmentVariable("ITS_DOTNET_PIPELINE_NAME");
-			base.ProjectKey = Environment.GetEnvironmentVariable("ITS_DOTNET_SC_PROJECT_KEY");
+			base.Coverage = Double.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_DOTNET_EXPECTED_COVERAGE"));
+			base.NcLocs = Int64.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_DOTNET_EXPECTED_NCLOCS"));
+			base.PipelineName = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_DOTNET_PIPELINE_NAME");
+			base.ProjectKey = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_DOTNET_SC_PROJECT_KEY");
 			base.LogPrefix = "S4NET - .NET Framework";
 		}
 	}

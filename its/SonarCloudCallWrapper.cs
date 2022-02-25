@@ -19,6 +19,7 @@
  */
 
 using AzureDevOpsExtension.IntegrationTests.Models;
+using IntegrationTests;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -31,8 +32,8 @@ namespace AzureDevOpsExtension.IntegrationTests
 {
     public class SonarCloudCallWrapper
     {
-        private string _sonarCloudToken => Environment.GetEnvironmentVariable("SC_TOKEN");
-        private string _sonarCloudBaseUrl => Environment.GetEnvironmentVariable("SC_BASE_URL");
+        private string _sonarCloudToken => EnvironmentVariableWrapper.GetVariableOrThrow("SC_TOKEN");
+        private string _sonarCloudBaseUrl => EnvironmentVariableWrapper.GetVariableOrThrow("SC_BASE_URL");
 
         private string GetBase64EncodedToken()
         {
@@ -53,66 +54,42 @@ namespace AzureDevOpsExtension.IntegrationTests
 
         private async Task<MeasureBaseModel> GetNclocAndCoverageForComponent(string component)
         {
-            try
-            {
-                var httpClient = GetHttpClient();
+            var httpClient = GetHttpClient();
 
-                var httpResult = await httpClient.GetAsync($"/api/measures/component?component={component}&metricKeys=coverage,ncloc");
+            var httpResult = await httpClient.GetAsync($"/api/measures/component?component={component}&metricKeys=coverage,ncloc");
 
-                var resultContent = JsonConvert.DeserializeObject<MeasureBaseModel>(await httpResult.Content.ReadAsStringAsync());
+            var resultContent = JsonConvert.DeserializeObject<MeasureBaseModel>(await httpResult.Content.ReadAsStringAsync());
 
-                return resultContent;
-
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"An exception has been raised while issuing HTTP call : " + ex.Message + " ;; " + ex.StackTrace);
-                return null;
-            }
+            return resultContent;
         }
 
         public async Task<double> GetCodeCoveragePercentageForProjectAsync(string projectKey)
         {
-            try
+            var measures = await GetNclocAndCoverageForComponent(projectKey);
+
+            var coverage = measures?.component.measures.FirstOrDefault(m => m.metric.Equals("coverage"));
+
+            if (coverage != null && double.TryParse(coverage.value, out double coverageValue))
             {
-                var measures = await GetNclocAndCoverageForComponent(projectKey);
-
-                var coverage = measures?.component.measures.FirstOrDefault(m => m.metric.Equals("coverage"));
-
-                if (coverage != null && double.TryParse(coverage.value, out double coverageValue))
-                {
-                    return coverageValue;
-                }
-
-                return double.NaN;
+                return coverageValue;
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("An exception has been raised : " + ex.Message + " ;; " + ex.StackTrace);
-                return double.NaN;
-            }
+
+            return double.NaN;
         }
 
         public async Task<long> GetNclocForProjectAsync(string projectKey)
         {
-            try
+
+            var measures = await GetNclocAndCoverageForComponent(projectKey);
+
+            var ncloc = measures.component.measures.FirstOrDefault(m => m.metric.Equals("ncloc"));
+
+            if (ncloc != null && long.TryParse(ncloc.value, out long nclocValue))
             {
-                var measures = await GetNclocAndCoverageForComponent(projectKey);
-
-                var ncloc = measures.component.measures.FirstOrDefault(m => m.metric.Equals("ncloc"));
-
-                if (ncloc != null && long.TryParse(ncloc.value, out long nclocValue))
-                {
-                    return nclocValue;
-                }
-
-                return 0L;
+                return nclocValue;
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("An exception has been raised : " + ex.Message + " ;; " + ex.StackTrace);
-                return 0L;
-            }
+
+            return 0L;
         }
 
         public async Task<bool> DeleteProjectAsync(string projectKey)
