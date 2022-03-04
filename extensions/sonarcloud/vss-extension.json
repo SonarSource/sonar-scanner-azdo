@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarcloud",
   "name": "SonarCloud",
-  "version": "1.30.0",
+  "version": "1.30.1",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
@@ -52,7 +52,7 @@
       "uri": "https://community.sonarsource.com/"
     },
     "privacypolicy": {
-      "uri": "https://sonarcloud.io/documentation/privacy/"
+      "uri": "https://docs.sonarcloud.io/appendices/privacy-policy/"
     }
   },
   "CustomerQnASupport": {
