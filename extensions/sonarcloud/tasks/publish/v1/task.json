@@ -5,14 +5,14 @@
   "description":
     "Publish SonarCloud's Quality Gate result on the Azure Pipelines build result. To be used after the actual analysis.",
   "helpMarkDown":
-    "[More Information](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
+    "[More Information](https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-azure-devops/)",
   "category": "Build",
   "visibility": ["Build"],
   "author": "sonarsource",
   "version": {
     "Major": 1,
     "Minor": 11,
-    "Patch": 0
+    "Patch": 1
   },
   "minimumAgentVersion": "2.144.0",
   "inputs": [

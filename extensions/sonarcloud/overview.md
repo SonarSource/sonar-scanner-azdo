@@ -79,5 +79,4 @@ Example of a failing Quality Gate:
 ![Failed Qualiy Gate](img/sq-analysis-report-failed.png)
 
 [sc]: https://sonarcloud.io
-[getstarted]: https://aka.ms/sonarcloudlab
-[msft_learn]: https://docs.microsoft.com/en-us/learn/modules/scan-for-vulnerabilities/5-scan-pipeline
+[getstarted]: https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud/

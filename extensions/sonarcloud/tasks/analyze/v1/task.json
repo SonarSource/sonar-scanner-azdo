@@ -3,7 +3,7 @@
   "name": "SonarCloudAnalyze",
   "friendlyName": "Run Code Analysis",
   "description": "Run scanner and upload the results to the SonarCloud server.",
-  "helpMarkDown": "This task is not needed for Maven and Gradle projects since the scanner should be run as part of the build.\n\n[More Information](https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-azure-devops/)",
+  "helpMarkDown": "This task is not needed for Maven and Gradle projects since the scanner should be run as part of the build.\n\n[More Information](https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-azure-devops/)",
   "category": "Build",
   "visibility": [
     "Build"
@@ -12,7 +12,7 @@
   "version": {
     "Major": 1,
     "Minor": 29,
-    "Patch": 0
+    "Patch": 1
   },
   "minimumAgentVersion": "2.144.0",
   "demands": [
