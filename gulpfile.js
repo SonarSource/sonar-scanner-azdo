@@ -432,8 +432,9 @@ gulp.task('tfx', done => {
   done();
 });
 
-gulp.task('cycloneDX', done => {
+gulp.task('cycloneDX', done => {  
   cycloneDXCommand();
+  done();
 });
 
 gulp.task('build', gulp.series('clean', 'copy', 'tfx', 'cycloneDX'));
