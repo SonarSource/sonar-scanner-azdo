@@ -127,7 +127,7 @@ exports.getBuildInfo = function(packageJson, filePath) {
             type: 'vsix',
             sha1,
             md5,
-            json,
+            type: 'json',
             name: path.basename(filePath)
           };
         })
