@@ -100,7 +100,7 @@ exports.getBuildInfo = function(packageJson, filePath) {
   const packageVersion = fullVersion(packageJson.version);
   const vsixPaths = globby.sync(path.join(paths.build.root, '*.vsix'));
   const qualifierMatch = new RegExp(`${packageVersion}-(.+)\.vsix$`);
-  const sbom = path.join(paths.build.root, 'sbom.json');
+  const sbom = path.join(paths.appDirectory, 'sbom.json');
   const [sbomSha1, sbomMd5] = fileHashsum(sbom)
   return {
     version: '1.0.1',
