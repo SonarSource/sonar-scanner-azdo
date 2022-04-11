@@ -100,6 +100,8 @@ exports.getBuildInfo = function(packageJson, filePath) {
   const packageVersion = fullVersion(packageJson.version);
   const vsixPaths = globby.sync(path.join(paths.build.root, '*.vsix'));
   const qualifierMatch = new RegExp(`${packageVersion}-(.+)\.vsix$`);
+  const sbom = path.join(paths.build.root, 'sbom.json');
+  const [sbomSha1, sbomMd5] = fileHashsum(sbom)
   return {
     version: '1.0.1',
     name: packageJson.name,
@@ -127,11 +129,20 @@ exports.getBuildInfo = function(packageJson, filePath) {
             type: 'vsix',
             sha1,
             md5,
-            type: 'json',
             name: path.basename(filePath)
           };
         })
+      },
+      {
+        id: `org.sonarsource.scanner.vsts:sbom:${packageVersion}`,        
+        artifacts: {          
+          type: 'json',
+          sbomSha1,
+          sbomMd5,
+          name: path.basename(sbom)
+        }
       }
+
     ],
     properties: {
       'java.specification.version': '1.8', // Workaround for https://jira.sonarsource.com/browse/RA-115
