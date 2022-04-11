@@ -69,7 +69,7 @@ exports.cycloneDXCommand = function() {
   run(
     `"${resolveApp(
       path.join('node_modules', '.bin', 'cyclonedx-node')
-    )}" -o "bom.json"`
+    )}" -o "sbom.json"`
   );
 };
 
