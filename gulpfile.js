@@ -23,7 +23,8 @@ const {
   getBuildInfo,
   npmInstallTask,
   runSonnarQubeScanner,
-  tfxCommand
+  tfxCommand,
+  cycloneDXCommand
 } = require('./config/utils');
 const { scanner } = require('./config/config');
 const packageJSON = require('./package.json');
@@ -431,7 +432,11 @@ gulp.task('tfx', done => {
   done();
 });
 
-gulp.task('build', gulp.series('clean', 'copy', 'tfx'));
+gulp.task('cycloneDX', done => {
+  cycloneDXCommand();
+});
+
+gulp.task('build', gulp.series('clean', 'copy', 'tfx', 'cycloneDX'));
 
 /*
  * =========================

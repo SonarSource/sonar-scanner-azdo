@@ -4,6 +4,7 @@
   "repository": "SonarSource/sonar-scanner-vsts",
   "license": "LGPL-3.0",
   "devDependencies": {
+    "@cyclonedx/bom":"3.6.0",
     "@types/fs-extra": "9.0.13",
     "@types/jest": "27.0.2",
     "@types/jest-when": "2.7.3",
@@ -11,7 +12,7 @@
     "@types/request": "2.47.0",
     "@types/semver": "5.5.0",
     "@types/tmp": "0.2.1",
-    "@types/yargs": "13.0.2",
+    "@types/yargs": "13.0.2",    
     "dateformat": "3.0.3",
     "del": "3.0.0",
     "eslint": "5.16.0",

@@ -65,6 +65,15 @@ exports.tfxCommand = function(extensionPath, packageJSON, params = '') {
   );
 };
 
+exports.cycloneDXCommand = function() {  
+  run(
+    `"${resolveApp(
+      path.join('node_modules', '.bin', 'cyclonedx-node')
+    )}" -o "bom.json"`
+  );
+};
+
+
 function fullVersion(version) {
   const buildNumber = process.env.BUILD_NUMBER;
   if (version.endsWith('-SNAPSHOT') && buildNumber) {
@@ -118,6 +127,7 @@ exports.getBuildInfo = function(packageJson, filePath) {
             type: 'vsix',
             sha1,
             md5,
+            json,
             name: path.basename(filePath)
           };
         })
