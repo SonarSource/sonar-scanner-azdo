@@ -16,6 +16,12 @@ const jeditor = require('gulp-json-editor');
 const es = require('event-stream');
 const mergeStream = require('merge-stream');
 const typescript = require('typescript');
+const exec = require('gulp-exec');
+const map = require('map-stream')
+const Vinyl = require('vinyl');
+const collect = require("gulp-collect");
+const del = require('del');
+const aside = require('gulp-aside');
 const { paths, pathAllFiles } = require('./config/paths');
 const {
   fileHashsum,
@@ -26,6 +32,7 @@ const {
   tfxCommand
 } = require('./config/utils');
 const { scanner } = require('./config/config');
+const { addSignature, getSignature } = require('./config/gulp-sign.js');
 const packageJSON = require('./package.json');
 
 function copyIconsTask(icon = 'task_icon.png') {
@@ -290,6 +297,58 @@ gulp.task('tasks:v5:commonv5:copy', () => {
   return commonPipe;
 });
 
+gulp.task('tasks:cycloneDx:sonarcloud', () => cycloneDxPipe(
+  'sonarcloud',
+  path.join(paths.extensions.root, 'sonarcloud'), 
+  paths.commonv5.new
+));
+
+gulp.task('tasks:cycloneDx:sonarqube', () => cycloneDxPipe(
+  'sonarqube',
+  path.join(paths.extensions.root, 'sonarqube'),
+  paths.common.new,
+  paths.commonv5.new
+));
+
+var cycloneDxPipe = (flavour, ...ps) => {
+  return mergeStream(ps.map(p => 
+    gulp.src(path.join(p, '**', 'package.json'), {
+      read: false,
+      ignore: path.join(p, '**', 'node_modules', '**')
+    })
+  ))
+  .pipe(exec(file => `npm run cyclonedx-run -- --output ${file.dirname}/cyclonedx.json ${file.dirname}`))
+  .pipe(exec.reporter())
+  .pipe(map((file, done) => {
+    file.contents = fs.readFileSync(`${file.dirname}/cyclonedx.json`)
+    file.basename = "cyclonedx.json"
+    done(null, file)
+  }))
+  .pipe(collect.list(files => {
+    var mergeFile = new Vinyl({
+      cwd: files[files.length - 1].cwd,
+      base: files[files.length - 1].base,
+      path: path.join(paths.build.root, `${packageJSON.name}-${fullVersion(packageJSON.version)}-${flavour}-cyclonedx.json`),
+      contents: null
+    });
+    mergeFile.inputFiles = files.map(f => f.path)
+    return [mergeFile]
+  }))
+  .pipe(exec(file => `cyclonedx merge \
+    --hierarchical \
+    --name ${packageJSON.name}-${flavour} \
+    --version ${fullVersion(packageJSON.version)} \
+    --input-files ${file.inputFiles.join(' ')} \
+    --output-file ${file.path}`))
+  .pipe(exec.reporter())
+  .pipe(map((file, done) => {del(file.inputFiles); done(null, null)}))
+}
+
+gulp.task(
+  'cycloneDx',
+  gulp.series('tasks:cycloneDx:sonarqube', 'tasks:cycloneDx:sonarcloud')
+)
+
 // gulp.task(
 //   'tasks:new:bundle',
 //   gulp.series('npminstall', 'tasks:new:ts', 'tasks:new:common:ts', 'tasks:new:copy', 'tasks:new:common:copy')
@@ -431,7 +490,7 @@ gulp.task('tfx', done => {
   done();
 });
 
-gulp.task('build', gulp.series('clean', 'copy', 'tfx'));
+gulp.task('build', gulp.series('clean', 'copy', 'tfx', 'cycloneDx'));
 
 /*
  * =========================
@@ -501,7 +560,7 @@ gulp.task('deploy:vsix', () => {
   const { name } = packageJSON;
   const packageVersion = fullVersion(packageJSON.version);
   return mergeStream(
-    globby.sync(path.join(paths.build.root, '*.vsix')).map(filePath => {
+    globby.sync(path.join(paths.build.root, '*{.vsix,-cyclonedx.json,.asc}')).map(filePath => {
       const [sha1, md5] = fileHashsum(filePath);
       return gulp
         .src(filePath)
@@ -521,7 +580,7 @@ gulp.task('deploy:vsix', () => {
               'vcs.revision': process.env.CIRRUS_CHANGE_IN_REPO,
               'vcs.branch': process.env.CIRRUS_BRANCH,
               'build.name': name,
-              'build.number': process.env.CIRRUS_BUILD_ID
+              'build.number': process.env.BUILD_NUMBER
             },
             request: {
               headers: {
@@ -561,7 +620,16 @@ gulp.task('deploy:buildinfo', () => {
     .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
 });
 
-gulp.task('deploy', gulp.series('build', 'deploy:buildinfo', 'deploy:vsix'));
+gulp.task('sign', () => {
+  return gulp.src(path.join(paths.build.root, '*{.vsix,-cyclonedx.json}'))
+  .pipe(getSignature({
+    privateKeyArmored: process.env.GPG_SIGNING_KEY,
+    passphrase: process.env.GPG_SIGNING_PASSPHRASE
+  }))
+  .pipe(gulp.dest(paths.build.root))
+});
+
+gulp.task('deploy', gulp.series('build', 'sign', 'deploy:buildinfo', 'deploy:vsix'));
 
 /*
  * =========================
