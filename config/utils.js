@@ -90,6 +90,7 @@ exports.fileHashsum = fileHashsum;
 exports.getBuildInfo = function(packageJson, filePath) {
   const packageVersion = fullVersion(packageJson.version);
   const vsixPaths = globby.sync(path.join(paths.build.root, '*.vsix'));
+  const additionalPaths = globby.sync(path.join(paths.build.root, '*{-cyclonedx.json,.asc}'));
   const qualifierMatch = new RegExp(`${packageVersion}-(.+)\.vsix$`);
   return {
     version: '1.0.1',
@@ -112,10 +113,10 @@ exports.getBuildInfo = function(packageJson, filePath) {
             )
             .join(',')
         },
-        artifacts: vsixPaths.map(filePath => {
+        artifacts: [...vsixPaths, ...additionalPaths].map(filePath => {
           const [sha1, md5] = fileHashsum(filePath);
           return {
-            type: 'vsix',
+            type: path.extname(filePath).slice(1),
             sha1,
             md5,
             name: path.basename(filePath)

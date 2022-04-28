@@ -45,6 +45,8 @@ build_task:
   env:
     SONAR_TOKEN: ENCRYPTED[!0d599f9fb1613db33388821ca04af23f090729902b4421ad0a53cea8393d1e9039f2e47d65a246781b0e2c3718c172a1!]
     SONAR_HOST_URL: https://next.sonarqube.com/sonarqube
+    GPG_SIGNING_KEY: ENCRYPTED[!cc216dfe592f79db8006f2a591f8f98b40aa2b078e92025623594976fd32f6864c1e6b6ba74b50647f608e2418e6c336!]
+    GPG_SIGNING_PASSPHRASE: ENCRYPTED[!314a8fc344f45e462dd5e8dccd741d7562283a825e78ebca27d4ae9db8e65ce618e7f6aece386b2782a5abe5171467bd!]
   node_modules_cache:
     folder: node_modules
   install_script:
