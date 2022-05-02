@@ -37,6 +37,7 @@
     "jest-when": "3.4.1",
     "map-stream": "^0.1.0",
     "merge-stream": "2.0.0",
+    "needle": "^3.1.0",
     "openpgp": "^5.2.1",
     "prettier": "2.4.1",
     "request": "2.85.0",

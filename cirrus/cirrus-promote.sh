@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-source cirrus-env BUILD
+source cirrus-env PROMOTE
 
 npm run promote && npm run burgr

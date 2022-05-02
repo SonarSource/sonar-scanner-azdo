@@ -22,6 +22,7 @@ const Vinyl = require('vinyl');
 const collect = require("gulp-collect");
 const del = require('del');
 const aside = require('gulp-aside');
+const needle = require('needle');
 const { paths, pathAllFiles } = require('./config/paths');
 const {
   fileHashsum,
@@ -650,29 +651,32 @@ gulp.task('sonarqube', done => {
   }
 });
 
-gulp.task('promote', () => {
-  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
+gulp.task('promote', (cb) => {
+  if (process.env.CIRRUS_BRANCH !== 'master' && !process.env.CIRRUS_PR) {
     gutil.log('Not on master nor PR, skip promote');
     return gutil.noop;
   }
-  return request
-    .get(
-      {
-        url: [
-          process.env.PROMOTE_URL,
-          process.env.GITHUB_REPO,
-          process.env.GITHUB_BRANCH,
-          process.env.BUILD_NUMBER,
-          process.env.PULL_REQUEST
-        ].join('/')
+  return needle(
+    'post',
+    `${process.env.ARTIFACTORY_URL}/api/build/promote/${process.env.CIRRUS_REPO_NAME}/${process.env.BUILD_NUMBER}`,
+    {
+      status: `it-passed${process.env.CIRRUS_PR ? "-pr" : ""}`,
+      sourceRepo: process.env.ARTIFACTORY_DEPLOY_REPO,
+      targetRepo: process.env.ARTIFACTORY_DEPLOY_REPO.replace("qa", process.env.CIRRUS_PR ? "dev" : "builds")
+    },
+    {
+      headers: {
+        'X-JFrog-Art-Api': process.env.PROMOTE_API_KEY,
       },
-      (error, response, body) => {
-        if (error) {
-          gutil.log('error:', error);
-        }
-      }
-    )
-    .auth(null, null, true, process.env.GCF_ACCESS_TOKEN);
+      json: true
+    }
+  ).then(resp => {
+    if(resp.statusCode != 200) {
+      cb(new Error(resp.statusMessage + "\n" + JSON.stringify(resp.body, null, 2)))
+    }
+  }).catch(err => {
+    cb(new Error(err))
+  })
 });
 
 gulp.task('burgr', () => {
