@@ -194,7 +194,8 @@ it("get report string should return undefined if ceTask times out", async () => 
   expect(result).toBeUndefined();
   expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
   expect(tl.warning).toBeCalledWith(
-    "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result."
+    "Task '111' takes too long to complete. Stopping after 999s of polling. " +
+      "No quality gate will be displayed on build result."
   );
   expect(Analysis.getAnalysis).not.toBeCalled();
 });
@@ -317,9 +318,11 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
   expect(serverUtils.publishBuildSummary).toBeCalledWith("\r\n", EndpointType.SonarCloud);
 
   expect(tl.warning).toBeCalledWith(
-    "Task '111' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result."
+    "Task '111' takes too long to complete. Stopping after 1s of polling. " +
+      "No quality gate will be displayed on build result."
   );
   expect(tl.warning).toBeCalledWith(
-    "Task '222' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result."
+    "Task '222' takes too long to complete. Stopping after 1s of polling. " +
+      "No quality gate will be displayed on build result."
   );
 });

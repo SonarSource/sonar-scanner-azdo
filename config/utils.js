@@ -38,26 +38,26 @@ function npmInstall(packagePath) {
 }
 exports.npmInstall = npmInstall;
 
-exports.npmInstallTask = function(packagePath) {
+exports.npmInstallTask = function (packagePath) {
   const packageJson = fs.readJsonSync(packagePath);
   if (packageJson) {
     if (packageJson.devDependencies && Object.keys(packageJson.devDependencies).length > 0) {
       fail(
         'Task package.json should not contain dev dependencies. Offending package.json: ' +
-          packagePath
+        packagePath
       );
     }
     npmInstall(packagePath);
   }
 };
 
-exports.tfxCommand = function(extensionPath, packageJSON, params = '') {
+exports.tfxCommand = function (extensionPath, packageJSON, params = '') {
   const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
   run(
     `"${resolveApp(
       path.join('node_modules', '.bin', 'tfx')
     )}" extension create --output-path "../../${packageJSON.name}-${fullVersion(
-      packageJSON.version
+      vssExtension.version
     )}-${vssExtension.id}.vsix" ${params}`,
     {
       cwd: resolveApp(extensionPath)
@@ -87,10 +87,10 @@ function fileHashsum(filePath) {
 }
 exports.fileHashsum = fileHashsum;
 
-exports.getBuildInfo = function(packageJson, filePath) {
-  const packageVersion = fullVersion(packageJson.version);
-  const vsixPaths = globby.sync(path.join(paths.build.root, '*.vsix'));
-  const additionalPaths = globby.sync(path.join(paths.build.root, '*{-cyclonedx.json,.asc}'));
+exports.getBuildInfo = function (packageJson, extensionManifest, product, filePath) {
+  const packageVersion = fullVersion(extensionManifest.version);
+  const vsixPaths = globby.sync(path.join(paths.build.root, `*${product}.vsix`));
+  const additionalPaths = globby.sync(path.join(paths.build.root, `*${product}{-cyclonedx.json,.asc}`));
   const qualifierMatch = new RegExp(`${packageVersion}-(.+)\.vsix$`);
   return {
     version: '1.0.1',
@@ -107,8 +107,7 @@ exports.getBuildInfo = function(packageJson, filePath) {
           artifactsToDownload: vsixPaths
             .map(
               filePath =>
-                `org.sonarsource.scanner.vsts:${packageJson.name}:vsix:${
-                  filePath.match(qualifierMatch)[1]
+                `org.sonarsource.scanner.vsts:${packageJson.name}:vsix:${filePath.match(qualifierMatch)[1]
                 }`
             )
             .join(',')
@@ -133,12 +132,30 @@ exports.getBuildInfo = function(packageJson, filePath) {
   };
 };
 
-exports.runSonnarQubeScanner = function(callback, options = {}) {
-  const commonOptions = {
+exports.runSonnarQubeScanner = function (callback, options = {}) {
+  const customOptions = {
     'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
-    'sonar.projectName': 'Azure DevOps extension for SonarQube/SonarCloud',
+    'sonar.projectName': 'Azure DevOps extension for SonarQube',
     'sonar.exclusions':
-      'build/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, **/temp-find-method.ts, **/package-lock.json',
+      'build/**, extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**,' +
+      '**/temp-find-method.ts, **/package-lock.json'
+  };
+  runSonarQubeScannerImpl(callback, customOptions, options);
+};
+
+exports.runSonnarQubeScannerForSonarCloud = function (callback, options = {}) {
+  const customOptions = {
+    'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts-sonarcloud',
+    'sonar.projectName': 'Azure DevOps extension for SonarCloud',
+    'sonar.exclusions':
+      'build/**, extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, ' + 
+      '**/temp-find-method.ts, **/package-lock.json'
+  };
+  runSonarQubeScannerImpl(callback, customOptions, options);
+};
+
+function runSonarQubeScannerImpl(callback, customOptions, options = {}) {
+  const commonOptions = {
     'sonar.coverage.exclusions':
       'gulpfile.js, build/**, config/**, coverage/**, extensions/**, scripts/**, **/__tests__/**, **/temp-find-method.ts',
     'sonar.tests': '.',
@@ -154,10 +171,11 @@ exports.runSonnarQubeScanner = function(callback, options = {}) {
       serverUrl: process.env.SONAR_HOST_URL || process.env.SONAR_HOST_URL_EXTERNAL_PR,
       token: process.env.SONAR_TOKEN || process.env.SONAR_TOKEN_EXTERNAL_PR,
       options: {
+        ...customOptions,
         ...commonOptions,
         ...options
       }
     },
     callback
   );
-};
+}

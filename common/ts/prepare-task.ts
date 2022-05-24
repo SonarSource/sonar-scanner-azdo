@@ -18,7 +18,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
       endpoint.url.startsWith("https://sonarqube.com"))
   ) {
     tl.warning(
-      "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud"
+      "There is a dedicated extension for SonarCloud: " +
+        "https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud"
     );
   }
 
@@ -30,7 +31,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   if (await branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
-    so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
+    so we keep it like that for now, waiting for a hardening that will refactor this 
+    (at least by renaming the method name) */
     tl.debug(
       "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location."
     );

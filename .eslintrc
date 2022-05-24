@@ -5,7 +5,7 @@
     "browser": true,
     "es6": true,
     "jest": true,
-    "node": true
+    "node": true                                        
   },
 
   "parserOptions": {
@@ -91,6 +91,7 @@
     "no-unneeded-ternary": "warn",
     "one-var": ["warn", "never"],
     "operator-assignment": "warn",
+    "max-len": ["error", { "code": 120 }],
 
     // es2015
     "no-duplicate-imports": "error",
