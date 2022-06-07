@@ -67,20 +67,24 @@ stages:
             $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarqube/vss-extension.json"
             $version = Get-ExtensionVersion $sqExtensionManifest 'SonarQube'
 
-            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}.$env:BUILD_BUILDID-sonarqube.vsix"
+            $formattedVersion = Format-SnapshotVersion $version
+
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${formattedVersion}-sonarqube.vsix"
 
             Write-Host "##vso[task.setvariable variable=SQ_EXT_NAME]$extensionNewName"
-            Write-Host "##vso[task.setvariable variable=SQ_VERSION;isOutput=true]$version"
+            Write-Host "##vso[task.setvariable variable=SQ_VERSION;isOutput=true]$formattedVersion"
 
             Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarqube.vsix" -NewName $extensionNewName
 
             $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarcloud/vss-extension.json"
             $version = Get-ExtensionVersion $scExtensionManifest 'SonarCloud'
 
-            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}.$env:BUILD_BUILDID-sonarcloud.vsix"
+            $formattedVersion = Format-SnapshotVersion $version
+
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${formattedVersion}-sonarcloud.vsix"
 
             Write-Host "##vso[task.setvariable variable=SC_EXT_NAME]$extensionNewName"
-            Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$version"
+            Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$formattedVersion"
 
             Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarcloud.vsix" -NewName $extensionNewName
         pwsh: true
@@ -151,7 +155,7 @@ stages:
           connectTo: 'VsTeam'
           connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
           fileType: 'vsix'
-          vsixFile: '$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion).$(Build.BuildId)-sonarcloud.vsix'
+          vsixFile: '$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion)-sonarcloud.vsix'
           extensionName: '[Test] SonarCloud ITs'
           updateTasksVersion: false
           updateTasksId: false
