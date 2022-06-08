@@ -30,12 +30,6 @@ function Replace-SnapshotVersion([Parameter(Mandatory = $true, Position = 0)][st
 
     Set-Content -Path $manifestPath -Value $manifestContent
 
-    Write-Host 'New file content'
-
-    $newContent = Get-Content -Path $manifestPath
-
-    Write-Host $newContent
-
     return $formattedVersion
 }
 

@@ -85,24 +85,6 @@ stages:
 
             $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarqube/vss-extension.json"
 
-            Write-Host "-----------------manifest in build----------------"
-
-            $content = Get-Content $sqExtensionManifest
-
-            Write-Host $content
-
-            Write-Host "-----------------//manifest in build----------------"
-
-            Write-Host "-----------------manifest in extensions----------------"
-
-            $sqExtensionManifestInExt = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarqube/vss-extension.json"
-
-            $content = Get-Content $sqExtensionManifestInExt
-
-            Write-Host $content
-
-            Write-Host "-----------------//manifest in extensions----------------"
-
             $version = Get-ExtensionVersion $sqExtensionManifest
 
             Write-Host "Fetched ext version ${version} for SonarQube"
@@ -111,8 +93,6 @@ stages:
 
             Write-Host "##vso[task.setvariable variable=SQ_EXT_NAME]$extensionNewName"
             Write-Host "##vso[task.setvariable variable=SQ_VERSION;isOutput=true]$version"
-
-            Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarqube.vsix" -NewName $extensionNewName
 
             $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarcloud/vss-extension.json"
             $version = Get-ExtensionVersion $scExtensionManifest
@@ -123,8 +103,6 @@ stages:
 
             Write-Host "##vso[task.setvariable variable=SC_EXT_NAME]$extensionNewName"
             Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$version"
-
-            Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarcloud.vsix" -NewName $extensionNewName
         pwsh: true
     - task: PublishBuildArtifacts@1
       displayName: 'Publish artifacts on the build'
