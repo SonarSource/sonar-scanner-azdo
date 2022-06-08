@@ -21,6 +21,26 @@ function Format-SnapshotVersion(
     return $version
 }
 
+function Replace-SnapshotVersion([Parameter(Mandatory = $true, Position = 0)][string]$manifestPath){
+
+    $manifestContent = Get-Content $manifestPath
+    Write-Host $manifestContent
+    $extensionManifestContent = Get-Content "$manifestPath" | ConvertFrom-Json
+    $version = $extensionManifestContent.version
+    
+    $formattedVersion = Format-SnapshotVersion $version
+
+    Write-Host "Replacing version ${version} in ${manifestPath} by ${formattedVersion}"
+
+    $manifestContent.replace($version, $formattedVersion)
+
+    Write-Host $manifestContent
+
+    $manifestContent | Out-File $manifestPath
+
+    return $formattedVersion
+}
+
 function Get-AzureDevopsTaskVersion(
     [Parameter(Mandatory = $true, Position = 0)][string]$basePath,
     [Parameter(Mandatory = $true, Position = 1)][string]$product,

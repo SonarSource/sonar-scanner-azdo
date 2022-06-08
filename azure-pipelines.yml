@@ -41,6 +41,35 @@ stages:
         command: 'custom'
         customCommand: 'run validate-ci'
 
+    - task: PowerShell@2
+      displayName: 'Replace snapshot version in manifests'
+      name: replace
+      inputs:
+        targetType: 'inline'
+        script: |
+            # Write your PowerShell commands here.
+            
+            . (Join-Path "azp" "helpers.ps1")
+
+            $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarqube/vss-extension.json"
+
+            $formattedVersion = Replace-SnapshotVersion $sqExtensionManifest
+
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${formattedVersion}-sonarqube.vsix"
+
+            Write-Host "##vso[task.setvariable variable=SQ_EXT_NAME]$extensionNewName"
+            Write-Host "##vso[task.setvariable variable=SQ_VERSION;isOutput=true]$formattedVersion"
+
+            $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarcloud/vss-extension.json"
+
+            $formattedVersion =Replace-SnapshotVersion $scExtensionManifest
+
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${formattedVersion}-sonarcloud.vsix"
+
+            Write-Host "##vso[task.setvariable variable=SC_EXT_NAME]$extensionNewName"
+            Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$formattedVersion"
+        pwsh: true
+
     - task: Npm@1
       displayName: 'Create test extension'
       inputs:
