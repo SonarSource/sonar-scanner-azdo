@@ -1,14 +1,8 @@
 function Get-ExtensionVersion(
-    [Parameter(Mandatory = $true, Position = 0)][string]$manifestPath,
-    [Parameter(Mandatory = $true, Position = 1)][string]$product) {
-
-    Write-Host "Reading the ${product} extension version from '${manifestPath}' ..."
-
+    [Parameter(Mandatory = $true, Position = 0)][string]$manifestPath) {
+    
     $extensionManifestContent = Get-Content "$manifestPath" | ConvertFrom-Json
     $version = $extensionManifestContent.version
-    Write-Host "${product} extension version is '${version}'"
-    # Set the variable to it can be used by other tasks
-    
     return $version
 }
 
@@ -32,11 +26,11 @@ function Replace-SnapshotVersion([Parameter(Mandatory = $true, Position = 0)][st
 
     Write-Host "Replacing version ${version} in ${manifestPath} by ${formattedVersion}"
 
-    $manifestContent.replace($version, $formattedVersion)
+    $manifestContent.Replace($version, $formattedVersion)
 
     Write-Host $manifestContent
 
-    $manifestContent | Out-File $manifestPath
+    $manifestContent | Set-Content $manifestPath
 
     return $formattedVersion
 }

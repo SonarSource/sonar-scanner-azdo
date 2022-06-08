@@ -66,9 +66,16 @@ exports.tfxCommand = function (extensionPath, packageJSON, params = '') {
 };
 
 function fullVersion(version) {
-  const buildNumber = process.env.BUILD_NUMBER;
-  if (version.endsWith('-SNAPSHOT') && buildNumber) {
-    return version.replace('-SNAPSHOT', '.' + buildNumber);
+  const buildNumber = process.env.BUILD_NUMBER; //cirrus
+  const buildNumberAzdo = process.env.BUILD_BUILDID; //azure pipelines
+  if (version.endsWith('-SNAPSHOT')) {
+    if (buildNumber) {
+      return version.replace('-SNAPSHOT', '.' + buildNumber);
+    } else if (buildNumberAzdo) {
+      return version.replace('-SNAPSHOT', '.' + buildNumberAzdo);
+    } else
+      return version;
+
   }
   return version;
 }
@@ -148,7 +155,7 @@ exports.runSonnarQubeScannerForSonarCloud = function (callback, options = {}) {
     'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts-sonarcloud',
     'sonar.projectName': 'Azure DevOps extension for SonarCloud',
     'sonar.exclusions':
-      'build/**, extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, ' + 
+      'build/**, extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, ' +
       '**/temp-find-method.ts, **/package-lock.json, gulpfile.js'
   };
   runSonarQubeScannerImpl(callback, customOptions, options);
