@@ -26,11 +26,15 @@ function Replace-SnapshotVersion([Parameter(Mandatory = $true, Position = 0)][st
 
     Write-Host "Replacing version ${version} in ${manifestPath} by ${formattedVersion}"
 
-    $manifestContent.Replace($version, $formattedVersion)
+    $manifestContent = $manifestContent.Replace($version, $formattedVersion)
 
-    Write-Host $manifestContent
+    Set-Content -Path $manifestPath -Value $manifestContent
 
-    $manifestContent | Set-Content $manifestPath
+    Write-Host 'New file content'
+
+    $newContent = Get-Content -Path $manifestPath
+
+    Write-Host $newContent
 
     return $formattedVersion
 }
