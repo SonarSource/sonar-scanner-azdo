@@ -40,8 +40,7 @@ export async function addBuildProperty(properties: IPropertyBag[]) {
     await buildApi.updateBuildProperties(customHeader, jsonPatchBody, teamProjectId, +buildId);
   } catch (exception) {
     tl.warning(
-      "Failed to create a build property. Not blocking unless you are using the Sonar Pre-Deployment gate in " +
-        "Release Pipelines. Exception : " +
+      "Failed to create a build property. Not blocking unless you are using the Sonar Pre-Deployment gate in Release Pipelines. Exception : " +
         exception
     );
   }

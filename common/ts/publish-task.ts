@@ -79,12 +79,7 @@ export async function getReportForTask(
   } catch (e) {
     if (e instanceof TimeOutReachedError) {
       tl.warning(
-        "Task '" +
-          taskReport.ceTaskId +
-          "' takes too long to complete. " +
-          "Stopping after " +
-          timeoutSec +
-          "s of polling. No quality gate will be displayed on build result."
+        `Task '${taskReport.ceTaskId}' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
       );
     } else {
       throw e;

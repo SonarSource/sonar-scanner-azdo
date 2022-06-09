@@ -18,7 +18,6 @@ function Format-SnapshotVersion(
 function Replace-SnapshotVersion([Parameter(Mandatory = $true, Position = 0)][string]$manifestPath){
 
     $manifestContent = Get-Content $manifestPath
-    Write-Host $manifestContent
     $extensionManifestContent = Get-Content "$manifestPath" | ConvertFrom-Json
     $version = $extensionManifestContent.version
     

@@ -32,8 +32,7 @@ it("should display warning for dedicated extension for Sonarcloud", async () => 
   await prept.default(SQ_ENDPOINT, __dirname);
 
   expect(tl.warning).toHaveBeenCalledWith(
-    "There is a dedicated extension for SonarCloud: " +
-      "https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud"
+    "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud"
   );
 });
 
