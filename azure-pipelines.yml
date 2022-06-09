@@ -41,6 +41,25 @@ stages:
         command: 'custom'
         customCommand: 'run validate-ci'
 
+    - task: PowerShell@2
+      displayName: 'Replace snapshot version in manifests'
+      name: replace
+      inputs:
+        targetType: 'inline'
+        script: |
+            # Write your PowerShell commands here.
+            
+            . (Join-Path "azp" "helpers.ps1")
+
+            $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarqube/vss-extension.json"
+
+            Replace-SnapshotVersion $sqExtensionManifest
+
+            $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarcloud/vss-extension.json"
+
+            Replace-SnapshotVersion $scExtensionManifest
+        pwsh: true
+
     - task: Npm@1
       displayName: 'Create test extension'
       inputs:
@@ -65,24 +84,25 @@ stages:
             . (Join-Path "azp" "helpers.ps1")
 
             $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarqube/vss-extension.json"
-            $version = Get-ExtensionVersion $sqExtensionManifest 'SonarQube'
 
-            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}.$env:BUILD_BUILDID-sonarqube.vsix"
+            $version = Get-ExtensionVersion $sqExtensionManifest
+
+            Write-Host "Fetched ext version ${version} for SonarQube"
+
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarqube.vsix"
 
             Write-Host "##vso[task.setvariable variable=SQ_EXT_NAME]$extensionNewName"
             Write-Host "##vso[task.setvariable variable=SQ_VERSION;isOutput=true]$version"
 
-            Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-0.0.2-SNAPSHOT-sonarqube.vsix" -NewName $extensionNewName
-
             $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarcloud/vss-extension.json"
-            $version = Get-ExtensionVersion $scExtensionManifest 'SonarCloud'
+            $version = Get-ExtensionVersion $scExtensionManifest
 
-            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}.$env:BUILD_BUILDID-sonarcloud.vsix"
+            Write-Host "Fetched ext version ${version} for SonarCloud"
+
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarcloud.vsix"
 
             Write-Host "##vso[task.setvariable variable=SC_EXT_NAME]$extensionNewName"
             Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$version"
-
-            Rename-Item -Path "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-0.0.2-SNAPSHOT-sonarcloud.vsix" -NewName $extensionNewName
         pwsh: true
     - task: PublishBuildArtifacts@1
       displayName: 'Publish artifacts on the build'
@@ -151,7 +171,7 @@ stages:
           connectTo: 'VsTeam'
           connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
           fileType: 'vsix'
-          vsixFile: '$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion).$(Build.BuildId)-sonarcloud.vsix'
+          vsixFile: '$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion)-sonarcloud.vsix'
           extensionName: '[Test] SonarCloud ITs'
           updateTasksVersion: false
           updateTasksId: false

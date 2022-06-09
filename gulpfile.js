@@ -30,11 +30,13 @@ const {
   getBuildInfo,
   npmInstallTask,
   runSonnarQubeScanner,
+  runSonnarQubeScannerForSonarCloud,
   tfxCommand
 } = require('./config/utils');
 const { scanner } = require('./config/config');
 const { addSignature, getSignature } = require('./config/gulp-sign.js');
 const packageJSON = require('./package.json');
+const { string } = require('yargs');
 
 function copyIconsTask(icon = 'task_icon.png') {
   return () =>
@@ -300,7 +302,7 @@ gulp.task('tasks:v5:commonv5:copy', () => {
 
 gulp.task('tasks:cycloneDx:sonarcloud', () => cycloneDxPipe(
   'sonarcloud',
-  path.join(paths.extensions.root, 'sonarcloud'), 
+  path.join(paths.extensions.root, 'sonarcloud'),
   paths.commonv5.new
 ));
 
@@ -312,37 +314,40 @@ gulp.task('tasks:cycloneDx:sonarqube', () => cycloneDxPipe(
 ));
 
 var cycloneDxPipe = (flavour, ...ps) => {
-  return mergeStream(ps.map(p => 
+  const extensionPath = path.join(paths.extensions.root, flavour);
+  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+  const packageVersion = fullVersion(vssExtension.version);
+  return mergeStream(ps.map(p =>
     gulp.src(path.join(p, '**', 'package.json'), {
       read: false,
       ignore: path.join(p, '**', 'node_modules', '**')
     })
   ))
-  .pipe(exec(file => `npm run cyclonedx-run -- --output ${file.dirname}/cyclonedx.json ${file.dirname}`))
-  .pipe(exec.reporter())
-  .pipe(map((file, done) => {
-    file.contents = fs.readFileSync(`${file.dirname}/cyclonedx.json`)
-    file.basename = "cyclonedx.json"
-    done(null, file)
-  }))
-  .pipe(collect.list(files => {
-    var mergeFile = new Vinyl({
-      cwd: files[files.length - 1].cwd,
-      base: files[files.length - 1].base,
-      path: path.join(paths.build.root, `${packageJSON.name}-${fullVersion(packageJSON.version)}-${flavour}-cyclonedx.json`),
-      contents: null
-    });
-    mergeFile.inputFiles = files.map(f => f.path)
-    return [mergeFile]
-  }))
-  .pipe(exec(file => `cyclonedx merge \
+    .pipe(exec(file => `npm run cyclonedx-run -- --output ${file.dirname}/cyclonedx.json ${file.dirname}`))
+    .pipe(exec.reporter())
+    .pipe(map((file, done) => {
+      file.contents = fs.readFileSync(`${file.dirname}/cyclonedx.json`)
+      file.basename = "cyclonedx.json"
+      done(null, file)
+    }))
+    .pipe(collect.list(files => {
+      var mergeFile = new Vinyl({
+        cwd: files[files.length - 1].cwd,
+        base: files[files.length - 1].base,
+        path: path.join(paths.build.root, `${packageJSON.name}-${packageVersion}-${flavour}-cyclonedx.json`),
+        contents: null
+      });
+      mergeFile.inputFiles = files.map(f => f.path)
+      return [mergeFile]
+    }))
+    .pipe(exec(file => `cyclonedx merge \
     --hierarchical \
     --name ${packageJSON.name}-${flavour} \
-    --version ${fullVersion(packageJSON.version)} \
+    --version ${packageVersion} \
     --input-files ${file.inputFiles.join(' ')} \
     --output-file ${file.path}`))
-  .pipe(exec.reporter())
-  .pipe(map((file, done) => {del(file.inputFiles); done(null, null)}))
+    .pipe(exec.reporter())
+    .pipe(map((file, done) => { del(file.inputFiles); done(null, null) }))
 }
 
 gulp.task(
@@ -410,9 +415,9 @@ gulp.task('scanner:copy', () => {
       'classic-sonar-scanner-msbuild'
     ),
     path.join(paths.build.extensions.sonarqubeTasks,
-    'prepare',
-    'v5',
-    'classic-sonar-scanner-msbuild'
+      'prepare',
+      'v5',
+      'classic-sonar-scanner-msbuild'
     ),
     path.join(
       paths.build.extensions.sonarcloudTasks,
@@ -549,7 +554,7 @@ gulp.task('build:test', gulp.series('clean', 'copy', 'test', 'tfx:test'));
  *  DEPLOY TASKS
  * =========================
  */
-gulp.task('deploy:vsix', () => {
+gulp.task('deploy:vsix:sonarqube', () => {
   if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
     gutil.log('Not on master nor PR, skip deploy:vsix');
     return gutil.noop;
@@ -559,10 +564,13 @@ gulp.task('deploy:vsix', () => {
     return gutil.noop;
   }
   const { name } = packageJSON;
-  const packageVersion = fullVersion(packageJSON.version);
+
   return mergeStream(
-    globby.sync(path.join(paths.build.root, '*{.vsix,-cyclonedx.json,.asc}')).map(filePath => {
+    globby.sync(path.join(paths.build.root, '*sonarqube{.vsix,-cyclonedx.json,.asc}')).map(filePath => {
       const [sha1, md5] = fileHashsum(filePath);
+      const extensionPath = path.join(paths.build.extensions.root, 'sonarqube');
+      const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+      const packageVersion = fullVersion(vssExtension.version);
       return gulp
         .src(filePath)
         .pipe(
@@ -573,6 +581,8 @@ gulp.task('deploy:vsix', () => {
               process.env.ARTIFACTORY_DEPLOY_REPO +
               '/org/sonarsource/scanner/vsts/' +
               name +
+              '/' +
+              'sonarqube' +
               '/' +
               packageVersion,
             username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
@@ -596,7 +606,59 @@ gulp.task('deploy:vsix', () => {
   );
 });
 
-gulp.task('deploy:buildinfo', () => {
+gulp.task('deploy:vsix:sonarcloud', () => {
+  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
+    gutil.log('Not on master nor PR, skip deploy:vsix');
+    return gutil.noop;
+  }
+  if (process.env.CIRRUS_PR === 'true' && process.env.DEPLOY_PULL_REQUEST === 'false') {
+    gutil.log('On PR, but artifacts should not be deployed, skip deploy:vsix');
+    return gutil.noop;
+  }
+  const { name } = packageJSON;
+
+  return mergeStream(
+    globby.sync(path.join(paths.build.root, '*sonarcloud{.vsix,-cyclonedx.json,.asc}')).map(filePath => {
+      const extensionPath = path.join(paths.build.extensions.root, 'sonarcloud');
+      const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+      const packageVersion = fullVersion(vssExtension.version);
+      const [sha1, md5] = fileHashsum(filePath);
+      return gulp
+        .src(filePath)
+        .pipe(
+          artifactoryUpload({
+            url:
+              process.env.ARTIFACTORY_URL +
+              '/' +
+              process.env.ARTIFACTORY_DEPLOY_REPO +
+              '/org/sonarsource/scanner/vsts/' +
+              name +
+              '/' +
+              'sonarcloud' +
+              '/' +
+              packageVersion,
+            username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
+            password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
+            properties: {
+              'vcs.revision': process.env.CIRRUS_CHANGE_IN_REPO,
+              'vcs.branch': process.env.CIRRUS_BRANCH,
+              'build.name': name,
+              'build.number': process.env.BUILD_NUMBER
+            },
+            request: {
+              headers: {
+                'X-Checksum-MD5': md5,
+                'X-Checksum-Sha1': sha1
+              }
+            }
+          })
+        )
+        .on('error', gutil.log);
+    })
+  );
+});
+
+gulp.task('deploy:buildinfo:sonarqube', () => {
   if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -605,12 +667,15 @@ gulp.task('deploy:buildinfo', () => {
     gutil.log('On PR, but artifacts should not be deployed, skip deploy:buildinfo');
     return gutil.noop;
   }
-  console.log('deploy build info', getBuildInfo(packageJSON))
+
+  const extensionPath = path.join(paths.build.extensions.root, 'sonarqube');
+  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+  console.log('deploy sonarqube build info', getBuildInfo(packageJSON, vssExtension, 'sonarqube'))
   return request
     .put(
       {
         url: process.env.ARTIFACTORY_URL + '/api/build',
-        json: getBuildInfo(packageJSON)
+        json: getBuildInfo(packageJSON, vssExtension, 'sonarqube')
       },
       (error, response, body) => {
         if (error) {
@@ -619,32 +684,87 @@ gulp.task('deploy:buildinfo', () => {
       }
     )
     .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
+
+});
+
+gulp.task('deploy:buildinfo:sonarcloud', () => {
+  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
+    gutil.log('Not on master nor PR, skip deploy:buildinfo');
+    return gutil.noop;
+  }
+  if (process.env.CIRRUS_PR === 'true' && process.env.DEPLOY_PULL_REQUEST === 'false') {
+    gutil.log('On PR, but artifacts should not be deployed, skip deploy:buildinfo');
+    return gutil.noop;
+  }
+
+  const extensionPath = path.join(paths.build.extensions.root, 'sonarcloud');
+  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+
+  console.log('deploy build info', getBuildInfo(packageJSON, vssExtension, 'sonarcloud'))
+  return request
+    .put(
+      {
+        url: process.env.ARTIFACTORY_URL + '/api/build',
+        json: getBuildInfo(packageJSON, vssExtension, 'sonarcloud')
+      },
+      (error, response, body) => {
+        if (error) {
+          gutil.log('error:', error);
+        }
+      }
+    )
+    .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
+
 });
 
 gulp.task('sign', () => {
   return gulp.src(path.join(paths.build.root, '*{.vsix,-cyclonedx.json}'))
-  .pipe(getSignature({
-    privateKeyArmored: process.env.GPG_SIGNING_KEY,
-    passphrase: process.env.GPG_SIGNING_PASSPHRASE
-  }))
-  .pipe(gulp.dest(paths.build.root))
+    .pipe(getSignature({
+      privateKeyArmored: process.env.GPG_SIGNING_KEY,
+      passphrase: process.env.GPG_SIGNING_PASSPHRASE
+    }))
+    .pipe(gulp.dest(paths.build.root))
 });
 
-gulp.task('deploy', gulp.series('build', 'sign', 'deploy:buildinfo', 'deploy:vsix'));
+gulp.task('deploy', gulp.series('build', 'sign', 'deploy:buildinfo:sonarqube', 'deploy:vsix:sonarqube', 'deploy:buildinfo:sonarcloud', 'deploy:vsix:sonarcloud'));
 
 /*
  * =========================
  *  MISC TASKS
  * =========================
  */
-gulp.task('sonarqube', done => {
+
+gulp.task('sonarqube-analysis:sonarqube', done => {
+  const extensionPath = path.join(paths.extensions.root, 'sonarqube')
+  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+  const projectVersion = vssExtension.version;
   if (process.env.CIRRUS_BRANCH === 'master' && process.env.CIRRUS_PR === 'false') {
-    runSonnarQubeScanner(done, { 'sonar.analysis.sha1': process.env.CIRRUS_CHANGE_IN_REPO });
+    runSonnarQubeScanner(done, { 'sonar.analysis.sha1': process.env.CIRRUS_CHANGE_IN_REPO, 'sonar.projectVersion': projectVersion });
+
   } else if (process.env.CIRRUS_PR !== 'false') {
     runSonnarQubeScanner(done, {
       'sonar.analysis.prNumber': process.env.CIRRUS_PR,
       'sonar.branch.name': process.env.CIRRUS_BRANCH,
-      'sonar.analysis.sha1': process.env.CIRRUS_BASE_SHA
+      'sonar.analysis.sha1': process.env.CIRRUS_BASE_SHA,
+      'sonar.projectVersion': projectVersion
+    });
+  } else {
+    done();
+  }
+});
+
+gulp.task('sonarqube-analysis:sonarcloud', done => {
+  const extensionPath = path.join(paths.extensions.root, 'sonarcloud')
+  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+  const projectVersion = vssExtension.version;
+  if (process.env.CIRRUS_BRANCH === 'master' && process.env.CIRRUS_PR === 'false') {
+    runSonnarQubeScannerForSonarCloud(done, { 'sonar.analysis.sha1': process.env.CIRRUS_CHANGE_IN_REPO, 'sonar.projectVersion': projectVersion });
+  } else if (process.env.CIRRUS_PR !== 'false') {
+    runSonnarQubeScannerForSonarCloud(done, {
+      'sonar.analysis.prNumber': process.env.CIRRUS_PR,
+      'sonar.branch.name': process.env.CIRRUS_BRANCH,
+      'sonar.analysis.sha1': process.env.CIRRUS_BASE_SHA,
+      'sonar.projectVersion': projectVersion
     });
   } else {
     done();
@@ -671,7 +791,7 @@ gulp.task('promote', (cb) => {
       json: true
     }
   ).then(resp => {
-    if(resp.statusCode != 200) {
+    if (resp.statusCode != 200) {
       cb(new Error(resp.statusMessage + "\n" + JSON.stringify(resp.body, null, 2)))
     }
   }).catch(err => {
@@ -679,13 +799,19 @@ gulp.task('promote', (cb) => {
   })
 });
 
-gulp.task('burgr', () => {
+gulp.task('burgr:sonarcloud', () => {
   if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
     gutil.log('Not on master nor PR, skip burgr');
     return gutil.noop;
   }
-  const packageVersion = fullVersion(packageJSON.version);
-  const urls = ['sonarqube', 'sonarcloud'].map(variant => `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/${packageVersion}/sonar-scanner-vsts-${packageVersion}-${variant}.vsix`).join(',');
+
+  const extensionPath = path.join(paths.extensions.root, 'sonarcloud')
+  const manifestFile = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+  const extensionVersion = manifestFile.version;
+  const packageVersion = fullVersion(extensionVersion);
+
+  const url = `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/sonarcloud/${packageVersion}/sonar-scanner-vsts-${packageVersion}-sonarcloud.vsix`
+
   return request
     .post(
       {
@@ -698,7 +824,7 @@ gulp.task('burgr', () => {
         ].join('/'),
         json: {
           version: packageVersion,
-          url: urls,
+          url,
           buildNumber: process.env.BUILD_NUMBER
         }
       },
@@ -709,6 +835,47 @@ gulp.task('burgr', () => {
       }
     )
     .auth(process.env.BURGR_USERNAME, process.env.BURGR_PASSWORD, true);
+
+});
+
+gulp.task('burgr:sonarqube', () => {
+  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
+    gutil.log('Not on master nor PR, skip burgr');
+    return gutil.noop;
+  }
+
+  const extensionPath = path.join(paths.extensions.root, 'sonarqube')
+  const manifestFile = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+  const extensionVersion = manifestFile.version;
+  const packageVersion = fullVersion(extensionVersion);
+
+  const url = `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/sonarqube/${packageVersion}/sonar-scanner-vsts-${packageVersion}-sonarqube.vsix`
+
+  return request
+    .post(
+      {
+        url: [
+          process.env.BURGR_URL,
+          'api/promote',
+          process.env.CIRRUS_REPO_OWNER,
+          process.env.CIRRUS_REPO_NAME,
+          process.env.CIRRUS_BUILD_ID
+        ].join('/'),
+        json: {
+          version: packageVersion,
+          url,
+          buildNumber: process.env.BUILD_NUMBER
+        }
+      },
+      (error, response, body) => {
+        if (error) {
+          gutil.log('error:', error);
+        }
+      }
+    )
+    .auth(process.env.BURGR_USERNAME, process.env.BURGR_PASSWORD, true);
+
+
 });
 
 gulp.task('default', gulp.series('build'));
