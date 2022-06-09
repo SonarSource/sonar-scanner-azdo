@@ -73,9 +73,9 @@ function fullVersion(version) {
       return version.replace('-SNAPSHOT', '.' + buildNumber);
     } else if (buildNumberAzdo) {
       return version.replace('-SNAPSHOT', '.' + buildNumberAzdo);
-    } else
+    } else {
       return version;
-
+    }
   }
   return version;
 }
