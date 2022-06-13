@@ -1,4 +1,4 @@
-Please review our [contribution guidelines](https://github.com/SonarSource/sonar-scanner-vsts/blob/master/contributing.md).
+Please review our [contribution guidelines](https://github.com/SonarSource/sonar-scanner-vsts/blob/master/docs/contributing.md).
 
 And please ensure your pull request adheres to the following guidelines: 
 
