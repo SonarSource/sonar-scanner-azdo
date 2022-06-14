@@ -690,36 +690,6 @@ gulp.task('deploy:buildinfo', () => {
 
 });
 
-/* gulp.task('deploy:buildinfo:sonarcloud', () => {
-  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
-    gutil.log('Not on master nor PR, skip deploy:buildinfo');
-    return gutil.noop;
-  }
-  if (process.env.CIRRUS_PR === 'true' && process.env.DEPLOY_PULL_REQUEST === 'false') {
-    gutil.log('On PR, but artifacts should not be deployed, skip deploy:buildinfo');
-    return gutil.noop;
-  }
-
-  const extensionPath = path.join(paths.build.extensions.root, 'sonarcloud');
-  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
-
-  console.log('deploy build info', getBuildInfo(packageJSON, vssExtension, 'sonarcloud'))
-  return request
-    .put(
-      {
-        url: process.env.ARTIFACTORY_URL + '/api/build',
-        json: getBuildInfo(packageJSON, vssExtension, 'sonarcloud')
-      },
-      (error, response, body) => {
-        if (error) {
-          gutil.log('error:', error);
-        }
-      }
-    )
-    .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
-
-}); */
-
 gulp.task('sign', () => {
   return gulp.src(path.join(paths.build.root, '*{.vsix,-cyclonedx.json}'))
     .pipe(getSignature({
