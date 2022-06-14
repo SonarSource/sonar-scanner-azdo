@@ -94,12 +94,12 @@ exports.fileHashsum = fileHashsum;
 exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionManifest) {
   const sqPackageVersion = fullVersion(sqExtensionManifest.version);
   const sqVsixPaths = globby.sync(path.join(paths.build.root, `*-sonarqube.vsix`));
-  const sqAdditionalPaths = globby.sync(path.join(paths.build.root, `*{-sonarqube-cyclonedx.json,-sonarqube.asc}`));
+  const sqAdditionalPaths = globby.sync(path.join(paths.build.root, `*{-sonarqube-cyclonedx.json,-sonarqube.*.asc}`));
   const sqQualifierMatch = new RegExp(`${sqPackageVersion}-(.+)\.vsix$`);
 
   const scPackageVersion = fullVersion(scExtensionManifest.version);
   const scVsixPaths = globby.sync(path.join(paths.build.root, `*-sonarcloud.vsix`));
-  const scAdditionalPaths = globby.sync(path.join(paths.build.root, `*{-sonarcloud-cyclonedx.json,-sonarcloud.asc}`));
+  const scAdditionalPaths = globby.sync(path.join(paths.build.root, `*{-sonarcloud-cyclonedx.json,-sonarcloud.*.asc}`));
   const scQualifierMatch = new RegExp(`${scPackageVersion}-(.+)\.vsix$`);
   return {
     version: '1.0.1',
