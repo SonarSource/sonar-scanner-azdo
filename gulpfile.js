@@ -566,7 +566,7 @@ gulp.task('deploy:vsix:sonarqube', () => {
   const { name } = packageJSON;
 
   return mergeStream(
-    globby.sync(path.join(paths.build.root, '*sonarqube{.vsix,-cyclonedx.json,.asc}')).map(filePath => {
+    globby.sync(path.join(paths.build.root, '*{-sonarqube.vsix,-sonarqube-cyclonedx.json,-sonarqube*.asc}')).map(filePath => {
       const [sha1, md5] = fileHashsum(filePath);
       const extensionPath = path.join(paths.build.extensions.root, 'sonarqube');
       const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
@@ -618,7 +618,7 @@ gulp.task('deploy:vsix:sonarcloud', () => {
   const { name } = packageJSON;
 
   return mergeStream(
-    globby.sync(path.join(paths.build.root, '*sonarcloud{.vsix,-cyclonedx.json,.asc}')).map(filePath => {
+    globby.sync(path.join(paths.build.root, '*{-sonarcloud.vsix,-sonarcloud-cyclonedx.json,-sonarcloud*.asc}')).map(filePath => {
       const extensionPath = path.join(paths.build.extensions.root, 'sonarcloud');
       const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
       const packageVersion = fullVersion(vssExtension.version);
@@ -658,7 +658,7 @@ gulp.task('deploy:vsix:sonarcloud', () => {
   );
 });
 
-gulp.task('deploy:buildinfo:sonarqube', () => {
+gulp.task('deploy:buildinfo', () => {
   if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -668,44 +668,17 @@ gulp.task('deploy:buildinfo:sonarqube', () => {
     return gutil.noop;
   }
 
-  const extensionPath = path.join(paths.build.extensions.root, 'sonarqube');
-  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
-  console.log('deploy sonarqube build info', getBuildInfo(packageJSON, vssExtension, 'sonarqube'))
+  const sqExtensionPath = path.join(paths.build.extensions.root, 'sonarqube');
+  const sqVssExtension = fs.readJsonSync(path.join(sqExtensionPath, 'vss-extension.json'));
+  const scExtensionPath = path.join(paths.build.extensions.root, 'sonarcloud');
+  const scVssExtension = fs.readJsonSync(path.join(scExtensionPath, 'vss-extension.json'));
+  const buildInfo = getBuildInfo(packageJSON, sqVssExtension, scVssExtension)
+  console.log('deploy build info', buildInfo)
   return request
     .put(
       {
         url: process.env.ARTIFACTORY_URL + '/api/build',
-        json: getBuildInfo(packageJSON, vssExtension, 'sonarqube')
-      },
-      (error, response, body) => {
-        if (error) {
-          gutil.log('error:', error);
-        }
-      }
-    )
-    .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
-
-});
-
-gulp.task('deploy:buildinfo:sonarcloud', () => {
-  if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
-    gutil.log('Not on master nor PR, skip deploy:buildinfo');
-    return gutil.noop;
-  }
-  if (process.env.CIRRUS_PR === 'true' && process.env.DEPLOY_PULL_REQUEST === 'false') {
-    gutil.log('On PR, but artifacts should not be deployed, skip deploy:buildinfo');
-    return gutil.noop;
-  }
-
-  const extensionPath = path.join(paths.build.extensions.root, 'sonarcloud');
-  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
-
-  console.log('deploy build info', getBuildInfo(packageJSON, vssExtension, 'sonarcloud'))
-  return request
-    .put(
-      {
-        url: process.env.ARTIFACTORY_URL + '/api/build',
-        json: getBuildInfo(packageJSON, vssExtension, 'sonarcloud')
+        json: buildInfo
       },
       (error, response, body) => {
         if (error) {
@@ -726,7 +699,7 @@ gulp.task('sign', () => {
     .pipe(gulp.dest(paths.build.root))
 });
 
-gulp.task('deploy', gulp.series('build', 'sign', 'deploy:buildinfo:sonarqube', 'deploy:vsix:sonarqube', 'deploy:buildinfo:sonarcloud', 'deploy:vsix:sonarcloud'));
+gulp.task('deploy', gulp.series('build', 'sign', 'deploy:buildinfo', 'deploy:vsix:sonarqube', 'deploy:vsix:sonarcloud'));
 
 /*
  * =========================

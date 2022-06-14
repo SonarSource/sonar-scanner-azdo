@@ -6,22 +6,21 @@ function Get-ExtensionVersion(
     return $version
 }
 
-function Format-SnapshotVersion(
+function Format-Version(
     [Parameter(Mandatory = $true, Position = 0)][string]$version) {
-    if ($version -contains "-SNAPSHOT" && -Not [string]::IsNullOrEmpty($env:BUILD_BUILDID)) {
-        Write-Host 'condition met'
-        $version = $version.replace("-SNAPSHOT", ".$env:BUILD_BUILDID")
+    if (-Not [string]::IsNullOrEmpty($env:BUILD_BUILDID)) {
+        $version = "$version.$env:BUILD_BUILDID"
     }
     return $version
 }
 
-function Replace-SnapshotVersion([Parameter(Mandatory = $true, Position = 0)][string]$manifestPath){
+function Replace-Version([Parameter(Mandatory = $true, Position = 0)][string]$manifestPath){
 
     $manifestContent = Get-Content $manifestPath
     $extensionManifestContent = Get-Content "$manifestPath" | ConvertFrom-Json
     $version = $extensionManifestContent.version
     
-    $formattedVersion = Format-SnapshotVersion $version
+    $formattedVersion = Format-Version $version
 
     Write-Host "Replacing version ${version} in ${manifestPath} by ${formattedVersion}"
 

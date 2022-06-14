@@ -42,7 +42,7 @@ stages:
         customCommand: 'run validate-ci'
 
     - task: PowerShell@2
-      displayName: 'Replace snapshot version in manifests'
+      displayName: 'Append build id in version in manifests'
       name: replace
       inputs:
         targetType: 'inline'
@@ -53,11 +53,11 @@ stages:
 
             $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarqube/vss-extension.json"
 
-            Replace-SnapshotVersion $sqExtensionManifest
+            Replace-Version $sqExtensionManifest
 
             $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarcloud/vss-extension.json"
 
-            Replace-SnapshotVersion $scExtensionManifest
+            Replace-Version $scExtensionManifest
         pwsh: true
 
     - task: Npm@1
