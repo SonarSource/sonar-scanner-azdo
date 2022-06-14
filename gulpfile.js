@@ -658,7 +658,7 @@ gulp.task('deploy:vsix:sonarcloud', () => {
   );
 });
 
-gulp.task('deploy:buildinfo:sonarqube', () => {
+gulp.task('deploy:buildinfo', () => {
   if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -668,14 +668,17 @@ gulp.task('deploy:buildinfo:sonarqube', () => {
     return gutil.noop;
   }
 
-  const extensionPath = path.join(paths.build.extensions.root, 'sonarqube');
-  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
-  console.log('deploy sonarqube build info', getBuildInfo(packageJSON, vssExtension, 'sonarqube'))
+  const sqExtensionPath = path.join(paths.build.extensions.root, 'sonarqube');
+  const sqVssExtension = fs.readJsonSync(path.join(sqExtensionPath, 'vss-extension.json'));
+  const scExtensionPath = path.join(paths.build.extensions.root, 'sonarcloud');
+  const scVssExtension = fs.readJsonSync(path.join(scExtensionPath, 'vss-extension.json'));
+  const buildInfo = getBuildInfo(packageJSON, sqVssExtension, scVssExtension)
+  console.log('deploy build info', buildInfo)
   return request
     .put(
       {
         url: process.env.ARTIFACTORY_URL + '/api/build',
-        json: getBuildInfo(packageJSON, vssExtension, 'sonarqube')
+        json: buildInfo
       },
       (error, response, body) => {
         if (error) {
@@ -687,7 +690,7 @@ gulp.task('deploy:buildinfo:sonarqube', () => {
 
 });
 
-gulp.task('deploy:buildinfo:sonarcloud', () => {
+/* gulp.task('deploy:buildinfo:sonarcloud', () => {
   if (process.env.CIRRUS_BRANCH !== 'master' && process.env.CIRRUS_PR === 'false') {
     gutil.log('Not on master nor PR, skip deploy:buildinfo');
     return gutil.noop;
@@ -715,7 +718,7 @@ gulp.task('deploy:buildinfo:sonarcloud', () => {
     )
     .auth(process.env.ARTIFACTORY_DEPLOY_USERNAME, process.env.ARTIFACTORY_DEPLOY_PASSWORD, true);
 
-});
+}); */
 
 gulp.task('sign', () => {
   return gulp.src(path.join(paths.build.root, '*{.vsix,-cyclonedx.json}'))
@@ -726,7 +729,7 @@ gulp.task('sign', () => {
     .pipe(gulp.dest(paths.build.root))
 });
 
-gulp.task('deploy', gulp.series('build', 'sign', 'deploy:buildinfo:sonarqube', 'deploy:vsix:sonarqube', 'deploy:buildinfo:sonarcloud', 'deploy:vsix:sonarcloud'));
+gulp.task('deploy', gulp.series('build', 'sign', 'deploy:buildinfo', 'deploy:vsix:sonarqube', 'deploy:vsix:sonarcloud'));
 
 /*
  * =========================

@@ -68,16 +68,13 @@ exports.tfxCommand = function (extensionPath, packageJSON, params = '') {
 function fullVersion(version) {
   const buildNumber = process.env.BUILD_NUMBER; //cirrus
   const buildNumberAzdo = process.env.BUILD_BUILDID; //azure pipelines
-  if (version.endsWith('-SNAPSHOT')) {
-    if (buildNumber) {
-      return version.replace('-SNAPSHOT', '.' + buildNumber);
-    } else if (buildNumberAzdo) {
-      return version.replace('-SNAPSHOT', '.' + buildNumberAzdo);
-    } else {
-      return version;
-    }
+  if (buildNumber) {
+    return `${version}.${buildNumber}`;
+  } else if (buildNumberAzdo) {
+    return `${version}.${buildNumberAzdo}`;
+  } else {
+    return version;
   }
-  return version;
 }
 exports.fullVersion = fullVersion;
 
@@ -94,11 +91,16 @@ function fileHashsum(filePath) {
 }
 exports.fileHashsum = fileHashsum;
 
-exports.getBuildInfo = function (packageJson, extensionManifest, product, filePath) {
-  const packageVersion = fullVersion(extensionManifest.version);
-  const vsixPaths = globby.sync(path.join(paths.build.root, `*${product}.vsix`));
-  const additionalPaths = globby.sync(path.join(paths.build.root, `*${product}{-cyclonedx.json,.asc}`));
-  const qualifierMatch = new RegExp(`${packageVersion}-(.+)\.vsix$`);
+exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionManifest) {
+  const sqPackageVersion = fullVersion(sqExtensionManifest.version);
+  const sqVsixPaths = globby.sync(path.join(paths.build.root, `*-sonarqube.vsix`));
+  const sqAdditionalPaths = globby.sync(path.join(paths.build.root, `*{-sonarqube-cyclonedx.json,-sonarqube.asc}`));
+  const sqQualifierMatch = new RegExp(`${sqPackageVersion}-(.+)\.vsix$`);
+
+  const scPackageVersion = fullVersion(scExtensionManifest.version);
+  const scVsixPaths = globby.sync(path.join(paths.build.root, `*-sonarcloud.vsix`));
+  const scAdditionalPaths = globby.sync(path.join(paths.build.root, `*{-sonarcloud-cyclonedx.json,-sonarcloud.asc}`));
+  const scQualifierMatch = new RegExp(`${scPackageVersion}-(.+)\.vsix$`);
   return {
     version: '1.0.1',
     name: packageJson.name,
@@ -109,17 +111,38 @@ exports.getBuildInfo = function (packageJson, extensionManifest, product, filePa
     vcsUrl: `https://github.com/${process.env.CIRRUS_REPO_FULL_NAME}.git`,
     modules: [
       {
-        id: `org.sonarsource.scanner.vsts:${packageJson.name}:${packageVersion}`,
+        id: `org.sonarsource.scanner.vsts:${packageJson.name}-sonarqube:${sqPackageVersion}`,
         properties: {
-          artifactsToDownload: vsixPaths
+          artifactsToDownload: sqVsixPaths
             .map(
               filePath =>
-                `org.sonarsource.scanner.vsts:${packageJson.name}:vsix:${filePath.match(qualifierMatch)[1]
+                `org.sonarsource.scanner.vsts:${packageJson.name}-sonarqube:vsix:${filePath.match(sqQualifierMatch)[1]
                 }`
             )
             .join(',')
         },
-        artifacts: [...vsixPaths, ...additionalPaths].map(filePath => {
+        artifacts: [...sqVsixPaths, ...sqAdditionalPaths].map(filePath => {
+          const [sha1, md5] = fileHashsum(filePath);
+          return {
+            type: path.extname(filePath).slice(1),
+            sha1,
+            md5,
+            name: path.basename(filePath)
+          };
+        })
+      },
+      {
+        id: `org.sonarsource.scanner.vsts:${packageJson.name}-sonarcloud:${scPackageVersion}`,
+        properties: {
+          artifactsToDownload: scVsixPaths
+            .map(
+              filePath =>
+                `org.sonarsource.scanner.vsts:${packageJson.name}-sonarcloud:vsix:${filePath.match(scQualifierMatch)[1]
+                }`
+            )
+            .join(',')
+        },
+        artifacts: [...scVsixPaths, ...scAdditionalPaths].map(filePath => {
           const [sha1, md5] = fileHashsum(filePath);
           return {
             type: path.extname(filePath).slice(1),
@@ -132,7 +155,8 @@ exports.getBuildInfo = function (packageJson, extensionManifest, product, filePa
     ],
     properties: {
       'java.specification.version': '1.8', // Workaround for https://jira.sonarsource.com/browse/RA-115
-      'buildInfo.env.PROJECT_VERSION': packageVersion,
+      'buildInfo.env.SC_PROJECT_VERSION': scPackageVersion,
+      'buildInfo.env.SQ_PROJECT_VERSION': sqPackageVersion,
       'buildInfo.env.ARTIFACTORY_DEPLOY_REPO': process.env.ARTIFACTORY_DEPLOY_REPO,
       'buildInfo.env.TRAVIS_COMMIT': process.env.CIRRUS_CHANGE_IN_REPO
     }
