@@ -66,11 +66,12 @@ exports.tfxCommand = function (extensionPath, packageJSON, params = '') {
 };
 
 function fullVersion(version) {
+  console.log("incoming version : " + version)
   const buildNumber = process.env.BUILD_NUMBER; //cirrus
   const buildNumberAzdo = process.env.BUILD_BUILDID; //azure pipelines
   if (buildNumber) {
     return `${version}.${buildNumber}`;
-  } else if (buildNumberAzdo) {
+  } else if (buildNumberAzdo && version.indexOf(`.${buildNumberAzdo}`) == -1) {
     return `${version}.${buildNumberAzdo}`;
   } else {
     return version;
