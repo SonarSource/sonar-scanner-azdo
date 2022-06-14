@@ -566,7 +566,7 @@ gulp.task('deploy:vsix:sonarqube', () => {
   const { name } = packageJSON;
 
   return mergeStream(
-    globby.sync(path.join(paths.build.root, '*sonarqube{.vsix,-cyclonedx.json,.asc}')).map(filePath => {
+    globby.sync(path.join(paths.build.root, '*{-sonarqube.vsix,-sonarqube-cyclonedx.json,-sonarqube*.asc}')).map(filePath => {
       const [sha1, md5] = fileHashsum(filePath);
       const extensionPath = path.join(paths.build.extensions.root, 'sonarqube');
       const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
@@ -618,7 +618,7 @@ gulp.task('deploy:vsix:sonarcloud', () => {
   const { name } = packageJSON;
 
   return mergeStream(
-    globby.sync(path.join(paths.build.root, '*sonarcloud{.vsix,-cyclonedx.json,.asc}')).map(filePath => {
+    globby.sync(path.join(paths.build.root, '*{-sonarcloud.vsix,-sonarcloud-cyclonedx.json,-sonarcloud*.asc}')).map(filePath => {
       const extensionPath = path.join(paths.build.extensions.root, 'sonarcloud');
       const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
       const packageVersion = fullVersion(vssExtension.version);
