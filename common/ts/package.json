@@ -5,7 +5,7 @@
   "author": "SonarSource",
   "license": "LGPL-3.0",
   "dependencies": {
-    "azure-devops-node-api": "^9.0.1",
+    "azure-devops-node-api": "^11.2.0",
     "azure-pipelines-task-lib": "^2.8.0",
     "fs-extra": "5.0.0",
     "guid-typescript": "1.0.9",
