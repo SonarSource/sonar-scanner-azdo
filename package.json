@@ -44,7 +44,7 @@
     "semver": "5.5.0",
     "sonarqube-scanner": "2.8.1",
     "stream": "^0.0.2",
-    "tfx-cli": "0.9.3",
+    "tfx-cli": "0.12.0",
     "through2": "^4.0.2",
     "tmp": "0.2.1",
     "ts-jest": "27.0.7",
