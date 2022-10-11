@@ -53,7 +53,7 @@ export default class Task {
         }
         const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : "";
         switch (task.status.toUpperCase()) {
-          case "CANCEL":
+          case "CANCELED":
           case "FAILED":
             throw new Error(`[SQ] Task failed with status ${task.status}${errorInfo}`);
           case "SUCCESS":
