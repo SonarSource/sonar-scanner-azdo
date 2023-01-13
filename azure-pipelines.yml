@@ -122,7 +122,7 @@ stages:
     - task: TfxInstaller@3
       displayName: 'Install TFX CLI'
       inputs:
-        version: 'v0.10.x'
+        version: 'v0.12.x'
     - task: UnpublishAzureDevOpsExtension@3
       displayName: 'Remove SonarCloud test extension from CI publisher'
       inputs:
@@ -157,7 +157,7 @@ stages:
       - task: TfxInstaller@3
         displayName: 'Install TFX CLI'
         inputs:
-          version: 'v0.10.x'
+          version: 'v0.12.x'
       - task: DownloadBuildArtifacts@1
         displayName: 'Download artifacts'
         inputs:
