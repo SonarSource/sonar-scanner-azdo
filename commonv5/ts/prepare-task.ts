@@ -62,7 +62,7 @@ async function branchFeatureSupported(endpoint) {
     return true;
   }
   const serverVersion = await getServerVersion(endpoint);
-  return serverVersion >= semver.parse("7.2.0");
+  return semver.satisfies(serverVersion, '>=7.2.0');
 }
 
 export async function populateBranchAndPrProps(props: { [key: string]: string }) {
