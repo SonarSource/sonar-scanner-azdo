@@ -57,7 +57,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   await scanner.runPrepare();
 }
 
-async function branchFeatureSupported(endpoint) {
+export async function branchFeatureSupported(endpoint) {
   if (endpoint.type === EndpointType.SonarCloud) {
     return true;
   }
