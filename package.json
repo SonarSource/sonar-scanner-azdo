@@ -42,7 +42,7 @@
     "prettier": "2.4.1",
     "request": "2.85.0",
     "semver": "5.5.0",
-    "sonarqube-scanner": "2.8.1",
+    "sonarqube-scanner": "3.0.0",
     "stream": "^0.0.2",
     "tfx-cli": "0.12.0",
     "through2": "^4.0.2",
