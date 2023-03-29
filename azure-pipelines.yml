@@ -29,11 +29,16 @@ stages:
         command: 'custom'
         customCommand: 'i -g npm@latest'
 
-    - task: Bash@3
+    - task: Npm@1
+      displayName: 'Install dependencies'
+      inputs:
+        command: 'install'
+
+    - task: Npm@1
       displayName: 'Install all dependencies'
       inputs:
-        filePath: 'cirrus/cirrus-install.sh'
-        arguments: 'full'
+        command: 'custom'
+        customCommand: 'run install-dep-full'
 
     - task: Npm@1
       displayName: 'Run Validate-CI'
@@ -48,7 +53,7 @@ stages:
         targetType: 'inline'
         script: |
             # Write your PowerShell commands here.
-            
+
             . (Join-Path "azp" "helpers.ps1")
 
             $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarqube/vss-extension.json"
@@ -80,7 +85,7 @@ stages:
         targetType: 'inline'
         script: |
             # Write your PowerShell commands here.
-            
+
             . (Join-Path "azp" "helpers.ps1")
 
             $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarqube/vss-extension.json"
@@ -118,7 +123,7 @@ stages:
     displayName: 'Unpublish test extensions on Marketplace'
     variables:
       publisher: $(SonarSourceITPublisher)
-    steps: 
+    steps:
     - task: TfxInstaller@3
       displayName: 'Install TFX CLI'
       inputs:
@@ -141,7 +146,7 @@ stages:
         extensionId: 'sonarqube'
 - stage: publish
   condition: succeeded()
-  dependsOn: 
+  dependsOn:
     - build
     - unpublish
   displayName: 'Publish test extensions:'
@@ -153,7 +158,7 @@ stages:
       scExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_VERSION'] ]
       itOrg: $(SonarSourceITOrganization)
       publisher: $(SonarSourceITPublisher)
-    steps: 
+    steps:
       - task: TfxInstaller@3
         displayName: 'Install TFX CLI'
         inputs:
@@ -189,7 +194,7 @@ stages:
           accounts: 'https://devops.azure.com/$(itOrg)'
 
 - stage: qa
-  dependsOn: 
+  dependsOn:
     - build
     - publish
   displayName: 'QA:'
@@ -197,7 +202,7 @@ stages:
   jobs:
   - job: 'runqa'
     displayName: 'Run QA'
-    steps: 
+    steps:
      - task: DotNetCoreCLI@2
        displayName: 'Run Integration tests project'
        env:

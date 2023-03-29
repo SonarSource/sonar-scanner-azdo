@@ -759,7 +759,7 @@ gulp.task('promote', (cb) => {
     },
     {
       headers: {
-        'X-JFrog-Art-Api': process.env.PROMOTE_API_KEY,
+        'Authorization': `Bearer ${process.env.ARTIFACTORY_PROMOTE_ACCESS_TOKEN}`
       },
       json: true
     }
