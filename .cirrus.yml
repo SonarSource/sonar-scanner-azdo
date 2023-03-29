@@ -3,15 +3,14 @@
 #
 env:
   ### Shared variables
-  ARTIFACTORY_URL: ENCRYPTED[!2f8fa307d3289faa0aa6791f18b961627ae44f1ef46b136e1a1e63b0b4c86454dbb25520d49b339e2d50a1e1e5f95c88!]
-  ARTIFACTORY_DEPLOY_USERNAME: repox-qa-deployer-sonarcloud-ef42e7
-  ARTIFACTORY_DEPLOY_PASSWORD: ENCRYPTED[!6bfe0bcba5a813ad3ec6dba0eca6bdf9aab90ef18f6dc439f3b595e3c336458e6354646b05ac6e15d913a5b2912d1cf4!]
+  ARTIFACTORY_URL: VAULT[development/kv/data/repox data.url]
+  ARTIFACTORY_DEPLOY_USERNAME: vault-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer
+  ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
+  # Possible values for ARTIFACTORY_DEPLOY_REPO: sonarsource-private-qa, sonarsource-public-qa
   ARTIFACTORY_DEPLOY_REPO: sonarsource-public-qa
-
-  BURGR_URL: ENCRYPTED[!c7e294da94762d7bac144abef6310c5db300c95979daed4454ca977776bfd5edeb557e1237e3aa8ed722336243af2d78!]
-  BURGR_USERNAME: ENCRYPTED[!b29ddc7610116de511e74bec9a93ad9b8a20ac217a0852e94a96d0066e6e822b95e7bc1fe152afb707f16b70605fddd3!]
-  BURGR_PASSWORD: ENCRYPTED[!83e130718e92b8c9de7c5226355f730e55fb46e45869149a9223e724bb99656878ef9684c5f8cfef434aa716e87f4cf2!]
-
+  BURGR_URL: VAULT[development/kv/data/burgr data.url]
+  BURGR_USERNAME: VAULT[development/kv/data/burgr data.cirrus_username]
+  BURGR_PASSWORD: VAULT[development/kv/data/burgr data.cirrus_password]
   ### Project variables
   DEPLOY_PULL_REQUEST: true
 
@@ -22,7 +21,7 @@ only_sonarsource_qa: &ONLY_SONARSOURCE_QA
   only_if: $CIRRUS_USER_COLLABORATOR == 'true' && ($CIRRUS_PR != "" || $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH =~ "branch-.*" || $CIRRUS_BRANCH =~ "dogfood-on-.*")
 
 docker_build_container_template: &CONTAINER_TEMPLATE
-  dockerfile: cirrus/Dockerfile
+  dockerfile: .cirrus/Dockerfile
   docker_arguments:
     CIRRUS_AWS_ACCOUNT: ${CIRRUS_AWS_ACCOUNT}
   cluster_name: ${CIRRUS_CLUSTER_NAME}
@@ -40,19 +39,23 @@ build_task:
   <<: *ONLY_SONARSOURCE_QA
   eks_container:
     <<: *CONTAINER_TEMPLATE
-    cpu: 1
-    memory: 2G
+    cpu: 2
+    memory: 4G
   env:
-    SONAR_TOKEN: ENCRYPTED[!0d599f9fb1613db33388821ca04af23f090729902b4421ad0a53cea8393d1e9039f2e47d65a246781b0e2c3718c172a1!]
-    SONAR_HOST_URL: https://next.sonarqube.com/sonarqube
-    GPG_SIGNING_KEY: ENCRYPTED[!cc216dfe592f79db8006f2a591f8f98b40aa2b078e92025623594976fd32f6864c1e6b6ba74b50647f608e2418e6c336!]
-    GPG_SIGNING_PASSPHRASE: ENCRYPTED[!314a8fc344f45e462dd5e8dccd741d7562283a825e78ebca27d4ae9db8e65ce618e7f6aece386b2782a5abe5171467bd!]
+    SONAR_TOKEN: VAULT[development/kv/data/next data.token]
+    SONAR_HOST_URL: VAULT[development/kv/data/next data.url]
+    GPG_SIGNING_KEY: VAULT[development/kv/data/sign data.key]
+    GPG_SIGNING_PASSPHRASE: VAULT[development/kv/data/sign data.passphrase]
   node_modules_cache:
     folder: node_modules
   install_script:
-    - ./cirrus/cirrus-install.sh full
+    - npm install
+    - npm run install-dep-full
   script:
-    - ./cirrus/cirrus-analyze-deploy.sh
+    - source cirrus-env BUILD
+    - npm run validate-ci
+    - npm run sonarqube
+    - npm run deploy
 
 promote_task:
   depends_on:
@@ -62,10 +65,12 @@ promote_task:
     <<: *CONTAINER_TEMPLATE
     cpu: 1
   env:
-    PROMOTE_API_KEY: ENCRYPTED[!74c3234a89c13d6a6bfb6a6da4a3c49eea7df03d10534c57ec664d31eaec660fc13108f8a1e5d1c9c97539639ef3480f!]
+    ARTIFACTORY_PROMOTE_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promoter access_token]
   node_modules_cache:
     folder: node_modules
   install_script:
-    - ./cirrus/cirrus-install.sh
+    - npm install
   script:
-    - ./cirrus/cirrus-promote.sh
+    - source cirrus-env PROMOTE
+    - npm run promote
+    - npm run burgr

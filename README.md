@@ -12,7 +12,7 @@ https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud
 Have Question or Feedback?
 --------------------------
 
-For support questions ("How do I?", "I got this error, why?", ...), please head to the [SonarSource forum](https://community.sonarsource.com/c/help). There are chances that a question similar to yours has already been answered. 
+For support questions ("How do I?", "I got this error, why?", ...), please head to the [SonarSource forum](https://community.sonarsource.com/c/help). There are chances that a question similar to yours has already been answered.
 
 Be aware that this forum is a community, so the standard pleasantries ("Hi", "Thanks", ...) are expected. And if you don't get an answer to your thread, you should sit on your hands for at least three days before bumping it. Operators are not standing by. :-)
 
@@ -36,7 +36,7 @@ Developer documentation
 
 * Install NPM (v8 or higher) / Node.js (v6 or higher)
 * npm install -g tfx-cli
-* ./cirrus/cirrus-install.sh full
+* npm run install-dep-full
 
 ### Package a production build
 
