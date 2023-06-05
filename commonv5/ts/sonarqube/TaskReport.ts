@@ -46,7 +46,7 @@ export default class TaskReport {
     let taskReportGlob: string;
     let taskReportGlobResult: string[];
 
-    if (endpoint.type === EndpointType.SonarQube && serverVersion < semver.parse("7.2.0")) {
+    if (endpoint.type === EndpointType.SonarQube && semver.satisfies(serverVersion, "<7.2.0")) {
       tl.debug(
         "SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file."
       );
