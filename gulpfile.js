@@ -340,7 +340,7 @@ var cycloneDxPipe = (flavour, ...ps) => {
       mergeFile.inputFiles = files.map(f => f.path)
       return [mergeFile]
     }))
-    .pipe(exec(file => `cyclonedx merge \
+    .pipe(exec(file => `npm run cyclonedx-run -- merge \
     --hierarchical \
     --name ${packageJSON.name}-${flavour} \
     --version ${packageVersion} \

@@ -34,25 +34,25 @@ Developer documentation
 
 ### How to set the environment
 
-* Install NPM (v8 or higher) / Node.js (v6 or higher)
-* npm install -g tfx-cli
-* npm run install-dep-full
+* Install NPM (v8 or higher) / Node.js (v14 or higher)
+* `npm install -g tfx-cli`
+* `npm run install-dep-full`
 
 ### Package a production build
 
-* npm run build
+* `npm run build`
 
 ### Package a test build
 
-* npm run test-build -- --publisher <publisher-id>
+* `npm run test-build -- --publisher <publisher-id>`
 
 ### Run tests
 
-* npm test
+* `npm test`
 
 License
 -------
 
-Copyright 2017-2020 SonarSource.
+Copyright 2017-2023 SonarSource.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt))
