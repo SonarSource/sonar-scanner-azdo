@@ -21,7 +21,6 @@ const map = require('map-stream')
 const Vinyl = require('vinyl');
 const collect = require("gulp-collect");
 const del = require('del');
-const aside = require('gulp-aside');
 const needle = require('needle');
 const { paths, pathAllFiles } = require('./config/paths');
 const {
