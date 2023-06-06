@@ -12,6 +12,7 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
   return new Promise((resolve, reject) => {
     const options: request.CoreOptions = {
       auth: endpoint.auth,
+      timeout: 10000,
     };
     if (query) {
       options.qs = query;
