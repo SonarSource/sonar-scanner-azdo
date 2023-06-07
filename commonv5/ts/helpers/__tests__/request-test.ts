@@ -28,7 +28,7 @@ describe("request", () => {
       () => false
     );
     expect(mockCallback).toBeCalledWith(
-      expect.objectContaining({ timeout: 10000 }),
+      expect.objectContaining({ timeout: 60000 }),
       expect.any(Function)
     );
   });
