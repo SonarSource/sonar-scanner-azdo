@@ -6,7 +6,7 @@ import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import { toCleanJSON } from "./helpers/utils";
 import { getServerVersion } from "./helpers/request";
-import * as azdoApiUtils from "./helpers/azdo-api-utils";
+import { parseScannerExtraProperties, getWebApi } from "./helpers/azdo-api-utils";
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from "./sonarqube/TaskReport";
 
 const REPO_NAME_VAR = "Build.Repository.Name";
@@ -25,7 +25,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
 
-  const props: { [key: string]: string } = {};
+  let props: { [key: string]: string } = {};
 
   if (await branchFeatureSupported(endpoint)) {
     await populateBranchAndPrProps(props);
@@ -37,6 +37,15 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     props["sonar.scanner.metadataFilePath"] = reportPath();
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
+
+  props = {
+    ...props,
+    ...parseScannerExtraProperties(),
+  };
+
+  tl.setVariable("SONARQUBE_SCANNER_MODE", scannerMode);
+  tl.setVariable("SONARQUBE_SCANNER_REPORTTASKFILE", props["sonar.scanner.metadataFilePath"]);
+  tl.setVariable("SONARQUBE_ENDPOINT", endpoint.toJson(), true);
 
   tl.getDelimitedInput("extraProperties", "\n")
     .filter((keyValue) => !keyValue.startsWith("#"))
@@ -139,7 +148,7 @@ export function reportPath(): string {
 export async function getDefaultBranch(collectionUrl: string) {
   const DEFAULT = "refs/heads/master";
   try {
-    const vsts = azdoApiUtils.getWebApi(collectionUrl);
+    const vsts = getWebApi(collectionUrl);
     const gitApi = await vsts.getGitApi();
     const repo = await gitApi.getRepository(
       tl.getVariable(REPO_NAME_VAR),
