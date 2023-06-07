@@ -79,92 +79,34 @@ serverUrl=http://sonar`,
   tmpReport2.removeCallback();
 });
 
-it("should find report files for SonarCloud", async () => {
+it.each([
+  [EndpointType.SonarQube, "7.2.0"],
+  [EndpointType.SonarQube, "10.0.0"],
+  [EndpointType.SonarQube, "20.0.0"],
+  [EndpointType.SonarCloud, "7.2.0"],
+  [EndpointType.SonarCloud, "10.0.0"],
+  [EndpointType.SonarCloud, "20.0.0"],
+])("should find report files for %p", (endpointType, version) => {
   // using spyOn so we can reset the original behaviour
-  jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
-  jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
+  jest.spyOn(tl, "getVariable").mockImplementation(() => "mock report task file path");
+  jest.spyOn(tl, "find").mockImplementation(() => ["path1", "path2"]);
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, null);
+  const endpoint = new Endpoint(endpointType, null);
 
-  const reportFiles = await TaskReport.findTaskFileReport(endpoint, new semver.SemVer("7.2.0"));
+  const reportFiles = TaskReport.findTaskFileReport(endpoint, new semver.SemVer(version));
 
   expect(reportFiles.length).toBe(2);
   expect(reportFiles[0]).toBe("path1");
   expect(reportFiles[1]).toBe("path2");
 
-  expect(tl.getVariable).toHaveBeenCalledTimes(2);
-  expect(tl.getVariable).toBeCalledWith("Agent.TempDirectory");
+  expect(tl.getVariable).toHaveBeenCalledTimes(1);
+  expect(tl.getVariable).toBeCalledWith("SONARQUBE_SCANNER_REPORTTASKFILE");
 
   // Calculate the expected path to take account of different
   // path separators in Windows/non-Windows
-  const expectedSearchPath = path.join(
-    "sonar",
-    tl.getVariable("Build.BuildNumber"),
-    "**",
-    "report-task.txt"
-  );
-  expect(tl.findMatch).toHaveBeenCalledTimes(1);
-  expect(tl.findMatch).toHaveBeenCalledWith("mock root search path", expectedSearchPath);
+  expect(tl.find).toHaveBeenCalledTimes(1);
+  expect(tl.find).toHaveBeenCalledWith("mock report task file path");
 });
-
-it("should find report files for SonarQube above 7.2.0", async () => {
-  // using spyOn so we can reset the original behaviour
-  jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
-  jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
-
-  const endpoint = new Endpoint(EndpointType.SonarQube, null);
-
-  const reportFiles = await TaskReport.findTaskFileReport(endpoint, new semver.SemVer("7.9.0"));
-
-  expect(reportFiles.length).toBe(2);
-  expect(reportFiles[0]).toBe("path1");
-  expect(reportFiles[1]).toBe("path2");
-
-  expect(tl.getVariable).toHaveBeenCalledTimes(2);
-  expect(tl.getVariable).toBeCalledWith("Agent.TempDirectory");
-
-  // Calculate the expected path to take account of different
-  // path separators in Windows/non-Windows
-  const expectedSearchPath = path.join(
-    "sonar",
-    tl.getVariable("Build.BuildNumber"),
-    "**",
-    "report-task.txt"
-  );
-  expect(tl.findMatch).toHaveBeenCalledTimes(1);
-  expect(tl.findMatch).toHaveBeenCalledWith("mock root search path", expectedSearchPath);
-});
-
-it.each(["10.0.0", "20.0.0"])(
-  "should find report files for SonarQube above %p",
-  async (version) => {
-    // using spyOn so we can reset the original behaviour
-    jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
-    jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
-
-    const endpoint = new Endpoint(EndpointType.SonarQube, null);
-
-    const reportFiles = await TaskReport.findTaskFileReport(endpoint, new semver.SemVer(version));
-
-    expect(reportFiles.length).toBe(2);
-    expect(reportFiles[0]).toBe("path1");
-    expect(reportFiles[1]).toBe("path2");
-
-    expect(tl.getVariable).toHaveBeenCalledTimes(2);
-    expect(tl.getVariable).toBeCalledWith("Agent.TempDirectory");
-
-    // Calculate the expected path to take account of different
-    // path separators in Windows/non-Windows
-    const expectedSearchPath = path.join(
-      "sonar",
-      tl.getVariable("Build.BuildNumber"),
-      "**",
-      "report-task.txt"
-    );
-    expect(tl.findMatch).toHaveBeenCalledTimes(1);
-    expect(tl.findMatch).toHaveBeenCalledWith("mock root search path", expectedSearchPath);
-  }
-);
 
 it("should find report files for SonarQube below 7.2.0", async () => {
   // using spyOn so we can reset the original behaviour

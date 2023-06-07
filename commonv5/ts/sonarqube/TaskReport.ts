@@ -1,6 +1,6 @@
 import * as path from "path";
-import * as fs from "fs-extra";
 import * as tl from "azure-pipelines-task-lib/task";
+import * as fs from "fs-extra";
 import * as semver from "semver";
 import Endpoint, { EndpointType } from "./Endpoint";
 
@@ -53,13 +53,12 @@ export default class TaskReport {
       taskReportGlob = path.join("**", REPORT_TASK_NAME);
       taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.BuildDirectory"), taskReportGlob);
     } else {
-      taskReportGlob = path.join(
-        SONAR_TEMP_DIRECTORY_NAME,
-        tl.getVariable("Build.BuildNumber"),
-        "**",
-        REPORT_TASK_NAME
-      );
-      taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.TempDirectory"), taskReportGlob);
+      const reportTaskFile = tl.getVariable("SONARQUBE_SCANNER_REPORTTASKFILE");
+      if (!reportTaskFile) {
+        throw TaskReport.throwInvalidReport("[SQ] Unable to find report task file.");
+      }
+      taskReportGlob = reportTaskFile;
+      taskReportGlobResult = tl.find(taskReportGlob);
     }
 
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
