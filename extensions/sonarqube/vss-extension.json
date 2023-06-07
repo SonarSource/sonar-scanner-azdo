@@ -21,7 +21,7 @@
   "description": "Detect bugs, vulnerabilities and code smells across project branches and pull requests.",
   "public": true,
   "categories": [
-    "Build and release"
+    "Azure Pipelines"
   ],
   "icons": {
     "default": "extension-icon.png"
