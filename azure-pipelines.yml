@@ -13,6 +13,8 @@ variables:
   - group: sonar-scanner-vsts-variables
   - name: System.debug
     value: true
+  - name: shouldRunIts
+    value: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'),startsWith(variables['Build.SourceBranch'], 'refs/heads/sprint')) ]
 
 stages:
 - stage: build
@@ -115,7 +117,7 @@ stages:
         PathtoPublish: '$(Agent.BuildDirectory)/a'
         ArtifactName: 'extensions'
 - stage: unpublish
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables.shouldRunIts, true))
   dependsOn: build
   displayName: 'Unpublish test extension:'
   jobs:
@@ -145,7 +147,7 @@ stages:
         publisherId: '$(publisher)'
         extensionId: 'sonarqube'
 - stage: publish
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables.shouldRunIts, true))
   dependsOn:
     - build
     - unpublish
@@ -198,7 +200,7 @@ stages:
     - build
     - publish
   displayName: 'QA:'
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables.shouldRunIts, true))
   jobs:
   - job: 'runqa'
     displayName: 'Run QA'
