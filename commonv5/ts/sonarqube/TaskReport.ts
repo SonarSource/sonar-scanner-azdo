@@ -1,6 +1,6 @@
-import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import * as fs from "fs-extra";
+import * as path from "path";
 import * as semver from "semver";
 import Endpoint, { EndpointType } from "./Endpoint";
 

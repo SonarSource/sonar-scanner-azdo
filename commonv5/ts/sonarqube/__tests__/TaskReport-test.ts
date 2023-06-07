@@ -1,10 +1,10 @@
-import * as path from "path";
-import { writeFileSync } from "fs";
-import { fileSync } from "tmp"; // eslint-disable-line import/no-extraneous-dependencies
 import * as tl from "azure-pipelines-task-lib/task";
+import { writeFileSync } from "fs";
+import * as path from "path";
 import * as semver from "semver";
-import TaskReport from "../TaskReport";
+import { fileSync } from "tmp"; // eslint-disable-line import/no-extraneous-dependencies
 import Endpoint, { EndpointType } from "../Endpoint";
+import TaskReport from "../TaskReport";
 
 beforeEach(() => {
   jest.restoreAllMocks();
