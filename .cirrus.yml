@@ -74,3 +74,32 @@ promote_task:
     - source cirrus-env PROMOTE
     - npm run promote
     - npm run burgr
+
+mend_scan_task:
+  depends_on:
+    - build
+  only_if:  $CIRRUS_BRANCH != "master"
+  timeout_in: 30m
+  eks_container:
+    <<: *CONTAINER_TEMPLATE
+    cpu: 2
+    memory: 2G
+  env:
+    WS_APIKEY: VAULT[development/kv/data/mend data.apikey]
+    WS_WSS_URL: VAULT[development/kv/data/mend data.url]
+    WS_USERKEY: VAULT[development/kv/data/mend data.userKey]
+    # No need to clone the full history.
+    # Depth of 1 is not enough because it would fail the build in case of consecutive pushes
+    # (example of error: "Hard resetting to c968ecaf7a1942dacecd78480b3751ac74d53c33...Failed to force reset to c968ecaf7a1942dacecd78480b3751ac74d53c33: object not found!")
+    CIRRUS_CLONE_DEPTH: 50
+  mend_script:
+    - npm install
+    - npm run install-dep-full
+    - source cirrus-env BUILD # to set the environment variable BUILD_NUMBER
+    - PROJECT_VERSION='TEST-VERSION'
+    - echo $PROJECT_VERSION
+    - source ws_scan.sh
+  allow_failures: $CIRRUS_CRON != "nightly"
+  always:
+    ws_artifacts:
+      path: "whitesource/**/*"
