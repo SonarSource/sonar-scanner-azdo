@@ -1,12 +1,12 @@
 import * as path from "path";
-import * as semver from "semver";
 import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
+import * as semver from "semver";
+import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
+import { getServerVersion } from "./helpers/request";
+import { toCleanJSON } from "./helpers/utils";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
-import { toCleanJSON } from "./helpers/utils";
-import { getServerVersion } from "./helpers/request";
-import { parseScannerExtraProperties, getWebApi } from "./helpers/azdo-api-utils";
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from "./sonarqube/TaskReport";
 
 const REPO_NAME_VAR = "Build.Repository.Name";
@@ -24,10 +24,11 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
+  const serverVersion = await getServerVersion(endpoint);
 
   let props: { [key: string]: string } = {};
 
-  if (await branchFeatureSupported(endpoint)) {
+  if (await branchFeatureSupported(endpoint, serverVersion)) {
     await populateBranchAndPrProps(props);
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
@@ -43,6 +44,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     ...parseScannerExtraProperties(),
   };
 
+  tl.setVariable("SONARQUBE_SERVER_VERSION", serverVersion.format());
   tl.setVariable("SONARQUBE_SCANNER_MODE", scannerMode);
   tl.setVariable("SONARQUBE_SCANNER_REPORTTASKFILE", props["sonar.scanner.metadataFilePath"]);
   tl.setVariable("SONARQUBE_ENDPOINT", endpoint.toJson(), true);
@@ -56,7 +58,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   tl.setVariable("SONARQUBE_ENDPOINT", endpoint.toJson(), true);
 
   const jsonParams = toCleanJSON({
-    ...endpoint.toSonarProps(),
+    ...endpoint.toSonarProps(serverVersion),
     ...scanner.toSonarProps(),
     ...props,
   });
@@ -66,11 +68,10 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   await scanner.runPrepare();
 }
 
-export async function branchFeatureSupported(endpoint) {
+export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
   if (endpoint.type === EndpointType.SonarCloud) {
     return true;
   }
-  const serverVersion = await getServerVersion(endpoint);
   return semver.satisfies(serverVersion, ">=7.2.0");
 }
 

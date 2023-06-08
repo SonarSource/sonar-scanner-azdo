@@ -2,9 +2,9 @@ import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
 import { SemVer } from "semver";
-import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
-import * as prept from "../prepare-task";
 import * as request from "../helpers/request";
+import * as prept from "../prepare-task";
+import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Scanner, { ScannerMSBuild } from "../sonarqube/Scanner";
 
 beforeEach(() => {
@@ -55,7 +55,7 @@ describe("branchFeatureSupported", () => {
     ) => {
       tl.debug(`${product} ${version}`);
       jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer(version));
-      const actual = await prept.branchFeatureSupported(endpoint);
+      const actual = await prept.branchFeatureSupported(endpoint, version);
       expect(actual).toBe(expectedBranchSupported);
     }
   );
