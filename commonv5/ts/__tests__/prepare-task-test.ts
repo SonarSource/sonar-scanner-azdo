@@ -2,9 +2,9 @@ import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
 import { SemVer } from "semver";
-import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
-import * as prept from "../prepare-task";
 import * as request from "../helpers/request";
+import * as prept from "../prepare-task";
+import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Scanner, { ScannerMSBuild } from "../sonarqube/Scanner";
 
 beforeEach(() => {
@@ -64,7 +64,7 @@ describe("branchFeatureSupported", () => {
 it("should build report task path from variables", () => {
   const reportDirectory = path.join("C:", "temp", "dir");
   const sonarSubDirectory = "sonar";
-  const buildNumber = "20250909.1";
+  const buildId = "1";
 
   const guid = Guid.create();
 
@@ -73,13 +73,13 @@ it("should build report task path from variables", () => {
   const reportFullPath = path.join(
     reportDirectory,
     sonarSubDirectory,
-    buildNumber,
+    buildId,
     guid.toString(),
     "report-task.txt"
   );
 
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => reportDirectory);
-  jest.spyOn(tl, "getVariable").mockImplementationOnce(() => buildNumber);
+  jest.spyOn(tl, "getVariable").mockImplementationOnce(() => buildId);
 
   const actual = prept.reportPath();
 
