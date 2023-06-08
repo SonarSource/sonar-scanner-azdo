@@ -1,12 +1,12 @@
 import * as path from "path";
-import * as semver from "semver";
 import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
+import * as semver from "semver";
+import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
+import { getServerVersion } from "./helpers/request";
+import { toCleanJSON } from "./helpers/utils";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
-import { toCleanJSON } from "./helpers/utils";
-import { getServerVersion } from "./helpers/request";
-import { parseScannerExtraProperties, getWebApi } from "./helpers/azdo-api-utils";
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from "./sonarqube/TaskReport";
 
 const REPO_NAME_VAR = "Build.Repository.Name";
@@ -134,7 +134,7 @@ export function reportPath(): string {
   return path.join(
     tl.getVariable("Agent.TempDirectory"),
     SONAR_TEMP_DIRECTORY_NAME,
-    tl.getVariable("Build.BuildNumber"),
+    tl.getVariable("Build.BuildId"),
     Guid.create().toString(),
     REPORT_TASK_NAME
   );
