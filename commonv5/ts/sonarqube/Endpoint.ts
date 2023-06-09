@@ -1,4 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import * as semver from "semver";
 import { PROP_NAMES } from "../helpers/utils";
 
 export enum EndpointType {
@@ -36,10 +37,16 @@ export default class Endpoint {
     return JSON.stringify({ type: this.type, data: this.data });
   }
 
-  public toSonarProps() {
+  public toSonarProps(serverVersion: semver.SemVer | string) {
+    const isSonarCloud = Boolean(this.data.token);
+    const authKey =
+      isSonarCloud || semver.satisfies(serverVersion, "<10.0.0")
+        ? PROP_NAMES.LOGIN
+        : PROP_NAMES.TOKEN;
+
     return {
       [PROP_NAMES.HOST_URL]: this.data.url,
-      [PROP_NAMES.LOGIN]: this.data.token || this.data.username,
+      [authKey]: this.data.token || this.data.username,
       [PROP_NAMES.PASSSWORD]:
         this.data.password && this.data.password.length > 0 ? this.data.password : null,
       [PROP_NAMES.ORG]: this.data.organization,

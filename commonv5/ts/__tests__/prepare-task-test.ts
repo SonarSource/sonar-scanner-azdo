@@ -55,7 +55,7 @@ describe("branchFeatureSupported", () => {
     ) => {
       tl.debug(`${product} ${version}`);
       jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer(version));
-      const actual = await prept.branchFeatureSupported(endpoint);
+      const actual = await prept.branchFeatureSupported(endpoint, version);
       expect(actual).toBe(expectedBranchSupported);
     }
   );
