@@ -26,12 +26,12 @@ it("last version doesn't exist, return another one", () => {
   expect(actualJavaPath).toBe(expectedJavaPath);
 });
 
-it("No specific version found, return NOTFOUND", () => {
+it("No specific version found, return undefined", () => {
   jest.spyOn(tl, "getVariable").mockReturnValue(undefined); // all of the array
 
   const actualJavaPath = JavaVersionResolver.lookupLatestAvailableJavaVersion();
 
-  expect(actualJavaPath).toBe("NOTFOUND");
+  expect(actualJavaPath).toBe(undefined);
 });
 
 it("Should set JAVA_HOME to value found for JAVA_HOME_17_X64", () => {

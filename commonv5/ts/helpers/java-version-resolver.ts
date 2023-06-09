@@ -9,7 +9,7 @@ export default class JavaVersionResolver {
   private static javaHomeOriginalPath: string;
   private static isJavaNewVersionSet: boolean = false;
 
-  public static lookupLatestAvailableJavaVersion(): string {
+  public static lookupLatestAvailableJavaVersion(): string | undefined {
     for (let i = 0; i < JAVA_VERSION.length; i++) {
       const javaEnvVariable = HOSTED_AGENT_JAVA_HOME_PATTERN.replace(
         "%%JAVAVERSION%%",
@@ -18,22 +18,23 @@ export default class JavaVersionResolver {
       tl.debug(`Trying to resolve ${javaEnvVariable} from environment variables...`);
       const javaPath = tl.getVariable(javaEnvVariable);
       if (javaPath) {
-        tl.debug(`${javaEnvVariable} was found with value ${javaPath}...`);
+        tl.debug(
+          `${javaEnvVariable} was found with value ${javaPath}, will switch to it for Sonar scanner...`
+        );
         return javaPath;
       } else {
         tl.debug(`No value found for ${javaEnvVariable}.`);
       }
     }
     tl.debug("No JAVA_HOME_XX_X64 found on the environment, nothing to do.");
-    return "NOTFOUND";
+    return undefined;
   }
 
   public static setJavaHomeToIfAvailable() {
     const latestJavaPath = this.lookupLatestAvailableJavaVersion();
 
-    if (latestJavaPath !== "NOTFOUND") {
+    if (latestJavaPath) {
       this.javaHomeOriginalPath = tl.getVariable("JAVA_HOME");
-      tl.debug(`${latestJavaPath} path has been provided, switching to it for the analysis.`);
       tl.setVariable("JAVA_HOME", latestJavaPath);
       this.isJavaNewVersionSet = true;
     }
