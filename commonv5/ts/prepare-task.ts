@@ -24,10 +24,11 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
+  const serverVersion = await getServerVersion(endpoint);
 
   let props: { [key: string]: string } = {};
 
-  if (await branchFeatureSupported(endpoint)) {
+  if (await branchFeatureSupported(endpoint, serverVersion)) {
     await populateBranchAndPrProps(props);
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
@@ -43,6 +44,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     ...parseScannerExtraProperties(),
   };
 
+  tl.setVariable("SONARQUBE_SERVER_VERSION", serverVersion.format());
   tl.setVariable("SONARQUBE_SCANNER_MODE", scannerMode);
   tl.setVariable("SONARQUBE_SCANNER_REPORTTASKFILE", props["sonar.scanner.metadataFilePath"]);
   tl.setVariable("SONARQUBE_ENDPOINT", endpoint.toJson(), true);
@@ -56,7 +58,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   tl.setVariable("SONARQUBE_ENDPOINT", endpoint.toJson(), true);
 
   const jsonParams = toCleanJSON({
-    ...endpoint.toSonarProps(),
+    ...endpoint.toSonarProps(serverVersion),
     ...scanner.toSonarProps(),
     ...props,
   });
@@ -66,11 +68,10 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   await scanner.runPrepare();
 }
 
-export async function branchFeatureSupported(endpoint) {
+export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
   if (endpoint.type === EndpointType.SonarCloud) {
     return true;
   }
-  const serverVersion = await getServerVersion(endpoint);
   return semver.satisfies(serverVersion, ">=7.2.0");
 }
 
