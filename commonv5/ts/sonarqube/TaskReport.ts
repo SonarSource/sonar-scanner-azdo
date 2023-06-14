@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import * as fs from "fs-extra";
+import { Guid } from "guid-typescript";
 import * as semver from "semver";
 import Endpoint, { EndpointType } from "./Endpoint";
 
@@ -17,6 +18,7 @@ interface ITaskReport {
 
 export default class TaskReport {
   private readonly report: ITaskReport;
+
   constructor(report: Partial<ITaskReport>) {
     for (const field of ["projectKey", "ceTaskId", "serverUrl"]) {
       if (!report[field as keyof ITaskReport]) {
@@ -42,6 +44,26 @@ export default class TaskReport {
     return this.report.dashboardUrl;
   }
 
+  public static getDefaultPathTemplate() {
+    return path.join(
+      SONAR_TEMP_DIRECTORY_NAME,
+      tl.getVariable("Build.BuildId"),
+      "<GUID>",
+      REPORT_TASK_NAME
+    );
+  }
+
+  public static getDefaultPath() {
+    return path.join(
+      tl.getVariable("Agent.TempDirectory"),
+      TaskReport.getDefaultPathTemplate().replace("<GUID>", Guid.create().toString())
+    );
+  }
+
+  public static getDefaultPathGlob() {
+    return TaskReport.getDefaultPathTemplate().replace("<GUID>", "**");
+  }
+
   public static findTaskFileReport(endpoint: Endpoint, serverVersion: semver.SemVer): string[] {
     let taskReportGlob: string;
     let taskReportGlobResult: string[];
@@ -52,13 +74,12 @@ export default class TaskReport {
       );
       taskReportGlob = path.join("**", REPORT_TASK_NAME);
       taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.BuildDirectory"), taskReportGlob);
-    } else {
-      const reportTaskFile = tl.getVariable("SONARQUBE_SCANNER_REPORTTASKFILE");
-      if (!reportTaskFile) {
-        throw TaskReport.throwInvalidReport("[SQ] Unable to find report task file.");
-      }
-      taskReportGlob = reportTaskFile;
+    } else if (tl.getVariable("SONARQUBE_SCANNER_REPORTTASKFILE")) {
+      taskReportGlob = tl.getVariable("SONARQUBE_SCANNER_REPORTTASKFILE");
       taskReportGlobResult = tl.find(taskReportGlob);
+    } else {
+      taskReportGlob = TaskReport.getDefaultPathGlob();
+      taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.TempDirectory"), taskReportGlob);
     }
 
     tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
