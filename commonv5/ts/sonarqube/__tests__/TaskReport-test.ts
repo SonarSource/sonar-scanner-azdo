@@ -99,7 +99,7 @@ it.each([
   expect(reportFiles[0]).toBe("path1");
   expect(reportFiles[1]).toBe("path2");
 
-  expect(tl.getVariable).toHaveBeenCalledTimes(1);
+  expect(tl.getVariable).toHaveBeenCalledTimes(2);
   expect(tl.getVariable).toBeCalledWith("SONARQUBE_SCANNER_REPORTTASKFILE");
 
   // Calculate the expected path to take account of different

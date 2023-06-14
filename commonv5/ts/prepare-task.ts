@@ -1,13 +1,11 @@
-import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
-import { Guid } from "guid-typescript";
 import * as semver from "semver";
 import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
 import { getServerVersion } from "./helpers/request";
 import { toCleanJSON } from "./helpers/utils";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
-import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from "./sonarqube/TaskReport";
+import TaskReport from "./sonarqube/TaskReport";
 
 const REPO_NAME_VAR = "Build.Repository.Name";
 
@@ -35,7 +33,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     tl.debug(
       "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location."
     );
-    props["sonar.scanner.metadataFilePath"] = reportPath();
+    props["sonar.scanner.metadataFilePath"] = TaskReport.getDefaultPath();
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
   }
 
@@ -129,16 +127,6 @@ function branchName(fullName: string) {
     return fullName.substring("refs/heads/".length);
   }
   return fullName;
-}
-
-export function reportPath(): string {
-  return path.join(
-    tl.getVariable("Agent.TempDirectory"),
-    SONAR_TEMP_DIRECTORY_NAME,
-    tl.getVariable("Build.BuildId"),
-    Guid.create().toString(),
-    REPORT_TASK_NAME
-  );
 }
 
 /**

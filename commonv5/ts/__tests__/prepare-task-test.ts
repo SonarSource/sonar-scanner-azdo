@@ -6,6 +6,7 @@ import * as request from "../helpers/request";
 import * as prept from "../prepare-task";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Scanner, { ScannerMSBuild } from "../sonarqube/Scanner";
+import TaskReport from "../sonarqube/TaskReport";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -81,7 +82,7 @@ it("should build report task path from variables", () => {
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => reportDirectory);
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => buildId);
 
-  const actual = prept.reportPath();
+  const actual = TaskReport.getDefaultPath();
 
   expect(actual).toEqual(reportFullPath);
 });
