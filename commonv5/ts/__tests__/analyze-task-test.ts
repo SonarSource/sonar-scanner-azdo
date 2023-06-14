@@ -9,7 +9,7 @@ it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
     "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task"
   );
   try {
-    await analyze.default(__dirname);
+    await analyze.default(__dirname, "JAVA_HOME");
   } catch (e) {
     expect(e).toEqual(expectedError);
   }
@@ -43,7 +43,7 @@ it("should run scanner", async () => {
 
   jest.spyOn(scanner, "runAnalysis").mockImplementation(() => null);
 
-  await analyze.default(__dirname);
+  await analyze.default(__dirname, "JAVA_HOME");
 
   expect(Scanner.getAnalyzeScanner).toHaveBeenCalledWith(__dirname, ScannerMode.CLI);
 

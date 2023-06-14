@@ -3,7 +3,11 @@ import JavaVersionResolver from "./helpers/java-version-resolver";
 import { sanitizeVariable } from "./helpers/utils";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 
-export default async function analyzeTask(rootPath: string, isSonarCloud: boolean = false) {
+export default async function analyzeTask(
+  rootPath: string,
+  jdkVersionSource: string,
+  isSonarCloud: boolean = false
+) {
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable("SONARQUBE_SCANNER_MODE")];
   if (!scannerMode) {
     throw new Error(
@@ -11,7 +15,7 @@ export default async function analyzeTask(rootPath: string, isSonarCloud: boolea
     );
   }
   Scanner.setIsSonarCloud(isSonarCloud);
-  JavaVersionResolver.setJavaHomeToIfAvailable();
+  JavaVersionResolver.setJavaVersion(jdkVersionSource);
   const scanner = Scanner.getAnalyzeScanner(rootPath, scannerMode);
   const sqScannerParams = tl.getVariable("SONARQUBE_SCANNER_PARAMS");
   await scanner.runAnalysis();

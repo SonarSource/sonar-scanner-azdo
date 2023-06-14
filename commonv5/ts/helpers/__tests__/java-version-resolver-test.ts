@@ -5,74 +5,56 @@ beforeEach(() => {
   jest.restoreAllMocks();
 });
 
-it("should return latest java version available", () => {
-  const expectedJavaPath = "/opt/bin/java/bin";
+describe("setJavaVersion", () => {
+  it("java_home set in task configuration, should do nothing", () => {
+    const expectedJavaPath = "/opt/bin/java/bin";
+    const jdkSource = "JAVA_HOME";
+    jest.spyOn(tl, "getInput").mockReturnValueOnce(jdkSource);
 
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce(expectedJavaPath); // JAVA_HOME_17_X64
+    jest.spyOn(tl, "getVariable").mockReturnValueOnce(expectedJavaPath); // JAVA_HOME
 
-  const actualJavaPath = JavaVersionResolver.lookupLatestAvailableJavaVersion();
+    JavaVersionResolver.setJavaVersion(jdkSource);
 
-  expect(actualJavaPath).toBe(expectedJavaPath);
+    const actualJavaHome = tl.getVariable("JAVA_HOME");
+
+    expect(actualJavaHome).toBe(expectedJavaPath);
+  });
+
+  it("JAVA_HOME_11_X64 set in task configuration, should switch to it", () => {
+    const java11Path = "/opt/bin/java11/bin";
+
+    const jdkSource = "JAVA_HOME_11_X64";
+    jest.spyOn(tl, "getInput").mockReturnValueOnce(jdkSource);
+
+    jest.spyOn(tl, "getVariable").mockReturnValueOnce(java11Path); // JAVA_HOME_11_X64
+
+    JavaVersionResolver.setJavaVersion(jdkSource);
+
+    const actualJavaHome = tl.getVariable("JAVA_HOME");
+
+    expect(actualJavaHome).toBe(java11Path);
+  });
 });
 
-it("last version doesn't exist, return another one", () => {
-  const expectedJavaPath = "/opt/bin/java/bin";
+describe("lookupVariable", () => {
+  it("java_home_11_x64 variable found, returning it", () => {
+    const javaHome11X64Value = "/opt/bin/java11/bin";
+    const jdkSource = "JAVA_HOME_11_X64";
 
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce(undefined); // JAVA_HOME_17_X64
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce(expectedJavaPath); // JAVA_HOME_11_X64
+    jest.spyOn(tl, "getVariable").mockReturnValueOnce(javaHome11X64Value); // JAVA_HOME_11_X64
 
-  const actualJavaPath = JavaVersionResolver.lookupLatestAvailableJavaVersion();
+    const actualJavaPath = JavaVersionResolver.lookupVariable(jdkSource);
 
-  expect(actualJavaPath).toBe(expectedJavaPath);
-});
+    expect(actualJavaPath).toBe(javaHome11X64Value);
+  });
 
-it("No specific version found, return undefined", () => {
-  jest.spyOn(tl, "getVariable").mockReturnValue(undefined); // all of the array
+  it("variable wanted not found, returning undefined", () => {
+    const jdkSource = "JAVA_HOME_11_X64";
 
-  const actualJavaPath = JavaVersionResolver.lookupLatestAvailableJavaVersion();
+    jest.spyOn(tl, "getVariable").mockReturnValueOnce(undefined); // JAVA_HOME_11_X64
 
-  expect(actualJavaPath).toBe(undefined);
-});
+    const actualJavaPath = JavaVersionResolver.lookupVariable(jdkSource);
 
-it("Should set JAVA_HOME to value found for JAVA_HOME_17_X64", () => {
-  const expectedJavaPath = "/opt/bin/java/bin";
-
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce(expectedJavaPath); // JAVA_HOME_17_X64
-
-  JavaVersionResolver.setJavaHomeToIfAvailable();
-
-  const actualJavaHome = tl.getVariable("JAVA_HOME");
-
-  expect(actualJavaHome).toBe(expectedJavaPath);
-});
-
-it("Should let JAVA_HOME with its original value", () => {
-  const expectedJavaPath = tl.getVariable("JAVA_HOME");
-
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce(undefined); // JAVA_HOME_17_X64
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce(undefined); // JAVA_HOME_11_X64
-
-  JavaVersionResolver.setJavaHomeToIfAvailable();
-
-  const actualJavaHome = tl.getVariable("JAVA_HOME");
-
-  expect(actualJavaHome).toBe(expectedJavaPath);
-});
-
-it("JAVA_HOME overriden, should be back to its default value", () => {
-  const originalJavaPath = tl.getVariable("JAVA_HOME");
-  const javaPathForReplace = "/opt/bin/java/bin";
-
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce(javaPathForReplace); // JAVA_HOME_17_X64
-
-  JavaVersionResolver.setJavaHomeToIfAvailable();
-
-  //Intermediate sanity check to verify that the value was well overriden
-  expect(tl.getVariable("JAVA_HOME")).toBe(javaPathForReplace);
-
-  JavaVersionResolver.revertJavaHomeToOriginal();
-
-  const actualJavaHome = tl.getVariable("JAVA_HOME");
-
-  expect(actualJavaHome).toBe(originalJavaPath);
+    expect(actualJavaPath).toBe(undefined);
+  });
 });

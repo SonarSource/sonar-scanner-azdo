@@ -3,7 +3,8 @@ import analyzeTask from "../../../../../common/ts/analyze-task";
 
 async function run() {
   try {
-    await analyzeTask(__dirname, true);
+    const jdkVersionSource = tl.getInput("jdkversion", true);
+    await analyzeTask(__dirname, jdkVersionSource, true);
   } catch (err) {
     tl.setResult(tl.TaskResult.Failed, err.message);
   }

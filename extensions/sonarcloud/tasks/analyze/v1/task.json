@@ -18,7 +18,21 @@
   "demands": [
     "java"
   ],
-  "inputs": [],
+  "inputs": [
+    {
+      "name": "jdkversion",
+      "type": "pickList",
+      "label": "JDK version source for analysis",
+      "defaultValue": "JAVA_HOME_11_X64",
+      "required": true,
+      "options": {
+          "JAVA_HOME": "Use built-in or provide JAVA_HOME",
+          "JAVA_HOME_11_X64": "Use built-in (hosted agent) JAVA_HOME_11_X64",
+          "JAVA_HOME_17_X64": "Use built-in (hosted agent) JAVA_HOME_17_X64"
+      },
+      "helpMarkDown": "Select the wanted Java version for the analysis : You can choose with either Self provided JAVA_HOME which will pick up the value of this env variable, or you can choose the built-in JAVA_HOME_XX_X64 value on hosted agent. Default value is JAVA_HOME_11_X64, however if you choose either of the proposed value and they are not available, JAVA_HOME value will be picked up instead."
+    }
+  ],
   "execution": {
     "Node10": {
       "target": "analyze.js"
