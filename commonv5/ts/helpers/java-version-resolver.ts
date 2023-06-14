@@ -1,42 +1,36 @@
 import * as tl from "azure-pipelines-task-lib/task";
 
-const HOSTED_AGENT_JAVA_HOME_PATTERN = "JAVA_HOME_%%JAVAVERSION%%_X64";
-
-// Add the version of Java in descending order when a new is out.
-const JAVA_VERSION = ["17", "11"];
-
 export default class JavaVersionResolver {
   private static javaHomeOriginalPath: string;
   private static isJavaNewVersionSet: boolean = false;
 
-  public static lookupLatestAvailableJavaVersion(): string | undefined {
-    for (let i = 0; i < JAVA_VERSION.length; i++) {
-      const javaEnvVariable = HOSTED_AGENT_JAVA_HOME_PATTERN.replace(
-        "%%JAVAVERSION%%",
-        JAVA_VERSION[i]
+  public static lookupVariable(jdkversionSource: string): string | undefined {
+    tl.debug(`Trying to resolve ${jdkversionSource} from environment variables...`);
+    const javaPath = tl.getVariable(jdkversionSource);
+    if (javaPath) {
+      tl.debug(
+        `${jdkversionSource} was found with value ${javaPath}, will switch to it for Sonar scanner...`
       );
-      tl.debug(`Trying to resolve ${javaEnvVariable} from environment variables...`);
-      const javaPath = tl.getVariable(javaEnvVariable);
-      if (javaPath) {
-        tl.debug(
-          `${javaEnvVariable} was found with value ${javaPath}, will switch to it for Sonar scanner...`
-        );
-        return javaPath;
-      } else {
-        tl.debug(`No value found for ${javaEnvVariable}.`);
-      }
+      return javaPath;
+    } else {
+      tl.debug(`No value found for ${jdkversionSource}.`);
+      return undefined;
     }
-    tl.debug("No JAVA_HOME_XX_X64 found on the environment, nothing to do.");
-    return undefined;
   }
 
-  public static setJavaHomeToIfAvailable() {
-    const latestJavaPath = this.lookupLatestAvailableJavaVersion();
-
-    if (latestJavaPath) {
-      this.javaHomeOriginalPath = tl.getVariable("JAVA_HOME");
-      tl.setVariable("JAVA_HOME", latestJavaPath);
-      this.isJavaNewVersionSet = true;
+  public static setJavaVersion(jdkversionSource: string) {
+    let newJavaPath = undefined;
+    if (jdkversionSource !== "JAVA_HOME") {
+      newJavaPath = this.lookupVariable(jdkversionSource);
+      if (newJavaPath) {
+        this.javaHomeOriginalPath = tl.getVariable("JAVA_HOME");
+        tl.setVariable("JAVA_HOME", newJavaPath);
+        this.isJavaNewVersionSet = true;
+      }
+    } else {
+      tl.debug(
+        `JAVA_HOME was specified in the Run Code Analysis task configuration, nothing to do.`
+      );
     }
   }
 
