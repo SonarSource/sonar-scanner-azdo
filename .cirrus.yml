@@ -78,7 +78,7 @@ promote_task:
 mend_scan_task:
   depends_on:
     - build
-  only_if:  $CIRRUS_BRANCH != "master"
+  only_if:  $CIRRUS_BRANCH == "master"
   timeout_in: 30m
   eks_container:
     <<: *CONTAINER_TEMPLATE
@@ -93,7 +93,6 @@ mend_scan_task:
     # (example of error: "Hard resetting to c968ecaf7a1942dacecd78480b3751ac74d53c33...Failed to force reset to c968ecaf7a1942dacecd78480b3751ac74d53c33: object not found!")
     CIRRUS_CLONE_DEPTH: 50
   mend_script:
-    - npm install
     - npm run install-dep-full
     - source cirrus-env BUILD # to set the environment variable BUILD_NUMBER
     - PROJECT_VERSION='NO-VERSION'
