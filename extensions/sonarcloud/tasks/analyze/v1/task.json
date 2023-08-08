@@ -11,7 +11,7 @@
   "author": "sonarsource",
   "version": {
     "Major": 1,
-    "Minor": 40,
+    "Minor": 41,
     "Patch": 0
   },
   "minimumAgentVersion": "2.144.0",
@@ -23,14 +23,14 @@
       "name": "jdkversion",
       "type": "pickList",
       "label": "JDK version source for analysis",
-      "defaultValue": "JAVA_HOME_11_X64",
+      "defaultValue": "JAVA_HOME_17_X64",
       "required": true,
       "options": {
           "JAVA_HOME": "Use JAVA_HOME",
           "JAVA_HOME_11_X64": "Use built-in JAVA_HOME_11_X64 (hosted agent)",
           "JAVA_HOME_17_X64": "Use built-in JAVA_HOME_17_X64 (hosted agent)"
       },
-      "helpMarkDown": "Select the wanted Java version for the analysis : You can choose with either Self provided JAVA_HOME which will pick up the value of this env variable, or you can choose the built-in JAVA_HOME_XX_X64 value on hosted agent. \nDefault value is JAVA_HOME_11_X64, however if you choose either of the proposed value and they are not available, JAVA_HOME value will be picked up instead."
+      "helpMarkDown": "Select the wanted Java version for the analysis : You can choose with either Self provided JAVA_HOME which will pick up the value of this env variable, or you can choose the built-in JAVA_HOME_XX_X64 value on hosted agent. \nDefault value is JAVA_HOME_17_X64, however if you choose either of the proposed value and they are not available, JAVA_HOME value will be picked up instead."
     }
   ],
   "execution": {
