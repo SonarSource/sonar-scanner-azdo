@@ -80,8 +80,8 @@ it("For SonarQube version < 10.0.0 login is used", () => {
   expect(result.toSonarProps("9.9.1")[PROP_NAMES.LOGIN]).toBe("tokenvalue");
 });
 
-// VSTS-302
-it("On SonarCloud login field is used instead of token", () => {
+// VSTS-302 + VSTS-310
+it("On SonarCloud token field is used instead of login", () => {
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://sonarcloud.io");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("tokenvalue");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
@@ -90,5 +90,5 @@ it("On SonarCloud login field is used instead of token", () => {
 
   const result = Endpoint.getEndpoint("sonarcloud", EndpointType.SonarCloud);
 
-  expect(result.toSonarProps("10.0.0")[PROP_NAMES.LOGIN]).toBe("tokenvalue");
+  expect(result.toSonarProps("8.2.4")).not.toContain(PROP_NAMES.LOGIN);
 });

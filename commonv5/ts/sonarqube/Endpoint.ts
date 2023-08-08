@@ -40,7 +40,7 @@ export default class Endpoint {
   public toSonarProps(serverVersion: semver.SemVer | string) {
     const isSonarCloud = Boolean(this.data.token);
     const authKey =
-      isSonarCloud || semver.satisfies(serverVersion, "<10.0.0")
+      !isSonarCloud && semver.satisfies(serverVersion, "<10.0.0")
         ? PROP_NAMES.LOGIN
         : PROP_NAMES.TOKEN;
 
