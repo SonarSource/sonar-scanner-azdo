@@ -85,7 +85,10 @@ Example of a failing Quality Gate:
 
 ![Failed Quality Gate](img/sq-analysis-report-failed.png)
 
+Learn More - [SonarCloud | Azure integration][learnmore]
+
 [sc]: https://sonarcloud.io
 [signup]: https://www.sonarsource.com/products/sonarcloud/signup/
 [opensource]: https://sonarcloud.io/explore/projects?sort=-analysis_date
 [getstarted]: https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud/
+[learnmore]: https://www.sonarsource.com/products/sonarcloud/features/integrations/azure-integration-2/
