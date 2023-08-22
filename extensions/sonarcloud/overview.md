@@ -1,14 +1,16 @@
-**[SonarCloud][sc]** is the leading online service for Code Quality & Security. It is totally free for open-source projects, and supports all major programming languages including C#, VB .Net, JavaScript, TypeScript, C/C++ and many more. If your code is closed source, SonarCloud also offers a paid plan to run private analyses.
+**[SonarCloud][sc]** enables your development team to deliver Clean Code consistently and efficiently by seamlessly integrating into your cloud DevOps platforms and extending your CI/CD workflow. This SaaS tool catches Security Vulnerabilities, Bugs, and Code Smells in your pull requests, branches, and throughout your repository, with more than 2 billion lines of code and 120,000+ active projects analyzed every week.
+
+You can start a no-commitment, 14-day trial of SonarCloud for your private repositories completely free. No need to speak with a sales rep or request a license key - get automatic code analysis results on your private projects in minutes! SonarCloud analysis is always free for open-source projects. You can create your free SonarCloud account [here][signup].
 
 This Azure DevOps extension provides build tasks that you can add in your build definition. You'll benefit from automated detection of bugs and vulnerabilities across all branches and Pull Requests. SonarCloud explains all coding issues in details, giving you chance to fix your code before even merging and deploying, all the while learning best practices along the way. At project level, you'll also get a dedicated widget that tracks the overall health of your application.
 
-To get started in a few minutes, you can :
+To get started in a few minutes, you can:
 
 - Follow this dedicated [Microsoft Lab][getstarted]
 - Follow the SonarCloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn].
-- Benefit from embedded templates for common analyses :
+- Benefit from embedded templates for common analyses:
   - **Classic** build pipelines templates integrated while creating a new pipeline
-  - **YAML** build pipeline templates available in our Sourcecode : https://github.com/SonarSource/sonar-scanner-vsts/tree/master/yaml-pipeline-templates
+  - **YAML** build pipeline templates available in our Sourcecode: https://github.com/SonarSource/sonar-scanner-vsts/tree/master/yaml-pipeline-templates
 - Benefit from a bunch of sample projects (using different build technologies), analyzed on SonarCloud, with their **YAML** pipelines files (See the SonarCloud badge on the README.md file for a link to SonarCloud project)
   - [.NET Framework](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-framework-project)
   - [.NET Core](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-core-project)
@@ -16,6 +18,9 @@ To get started in a few minutes, you can :
   - [Gradle](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-gradle-project)
   - [Maven](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-maven-project)
   - [Node.js](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-nodejs-project)
+- Get IDE Support with SonarLint integration to find code issues on the fly. SonarCloud rules and analysis settings synchronize to SonarLint, aligning teams around a single standard of Clean Code
+- Get a free analysis for open-source projects
+- **Start a no-commitment, free 14-day trial for your private repositories**
 
 ## About the SonarCloud Azure DevOps Marketplace Extension
 
@@ -25,12 +30,14 @@ This extension provides the following features:
 - Three build tasks (along with build templates) to get your projects analyzed easily:
   - **Prepare Analysis Configuration** task, to configure all the required settings before executing the build. This task is mandatory. In case of .NET solutions or Java projects, this tasks helps to integrate seamlessly with MSBuild, Maven and Gradle tasks.
   - **Run Code Analysis** task, to actually execute the analysis of the source code. Not required for Maven or Gradle projects.
-  - **Publish Quality Gate Result** task, to display the quality gate status in the build summary. This tasks is optional, as it can increase the overall build time.
+  - **Publish Quality Gate Result** task, to display the quality gate status in the build summary. This task is optional, as it can increase the overall build time.
 - Analysis of the branches and the **pull requests** of your projects
 - A **widget** to monitor the quality gate for your projects on your favorite dashboard
 - A **deployment gate (in preview)** allowing you to control your deployment process by checking the status of the Quality Gate of the last build related to the release pipeline executed.
 
 Note that the above features are **available for all Git repository providers in Azure DevOps**: Azure Repos Git, Bitbucket Cloud or GitHub.
+
+Want to see more examples of SonarCloud in action? You can [explore current Open Source projects in SonarCloud][opensource] that are using the Clean as You Code methodology.
 
 ## Highlighted Features
 
@@ -68,15 +75,20 @@ You can check the quality gate status of a build as a pre-deployment gate in rel
 
 #### In the build summary
 
-The **Publish Quality Gate Result** task waits for the analysis report to be consumed by the SonarCloud in order to flag the build job with the Quality Gate status. The Quality Gate is a major, out-of-the-box, feature of SonarCloud. It provides the ability to know at each analysis whether an application passes or fails the release criteria. In other words it tells you at every analysis whether an application is ready for production "quality-wise".
+The **Publish Quality Gate Result** task waits for the analysis report to be consumed by SonarCloud in order to flag the build job with the Quality Gate status. The Quality Gate is a major, out-of-the-box feature of SonarCloud. It provides the ability to know at each analysis whether an application passes or fails the release criteria. In other words it tells you at every analysis whether an application is ready for production "quality-wise".
 
 Example of a passing Quality Gate:
 
-![Passed Qualiy Gate](img/sq-analysis-report-passed.png)
+![Passed Quality Gate](img/sq-analysis-report-passed.png)
 
 Example of a failing Quality Gate:
 
-![Failed Qualiy Gate](img/sq-analysis-report-failed.png)
+![Failed Quality Gate](img/sq-analysis-report-failed.png)
+
+Learn More - [SonarCloud | Azure integration][learnmore]
 
 [sc]: https://sonarcloud.io
+[signup]: https://www.sonarsource.com/products/sonarcloud/signup/
+[opensource]: https://sonarcloud.io/explore/projects?sort=-analysis_date
 [getstarted]: https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud/
+[learnmore]: https://www.sonarsource.com/products/sonarcloud/features/integrations/azure-integration-2/
