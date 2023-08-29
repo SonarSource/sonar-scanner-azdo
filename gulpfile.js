@@ -30,7 +30,7 @@ const {
   cycloneDxPipe
 } = require('./config/utils');
 const { scanner } = require('./config/config');
-const { addSignature, getSignature } = require('./config/gulp-sign.js');
+const { gulpSign: getSignature } = require('./config/gulp-sign.js');
 const packageJSON = require('./package.json');
 const { string } = require('yargs');
 
