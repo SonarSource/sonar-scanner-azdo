@@ -4,27 +4,19 @@ const Vinyl = require('vinyl')
 const Stream = require('stream');
 const path = require('path');
 
-exports.getSignature = (opts = {}) => {
-    return through.obj(getTransform(opts, false))
-}
-
-exports.addSignature = (opts = {}) => {
-    return through.obj(getTransform(opts, true))
-};
-
-function getTransform(opts, keep) {
-    return function transform(file, encoding, callback) {
+exports.gulpSign = (opts = {}) => {
+    function transform(file, encoding, callback) {
         if (file.isNull()) {
-            this.push(file)
-            return callback()
+            this.push(file);
+            callback();
+            return;
         }
 
-        let stream = new Stream.PassThrough()
-
+        let stream;
         if (file.isBuffer() && !file.pipe) {
-            stream.end(file.contents)
+            stream = new Stream.PassThrough().end(file.contents);
         } else {
-            stream = file
+            stream = file;
         }
 
         sign(stream, opts.privateKeyArmored, opts.passphrase).then(signature => {
@@ -32,12 +24,13 @@ function getTransform(opts, keep) {
                 cwd: file.cwd,
                 base: file.base,
                 path: file.path + ".asc",
-                contents: signature
-            }))
-            if(keep) this.push(file)
-            callback()
-        })
+                contents: signature,
+            }));
+            callback();
+        });
     }
+
+    return through.obj(transform)
 }
 
 async function sign(content, privateKeyArmored, passphrase) {
