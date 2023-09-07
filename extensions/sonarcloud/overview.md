@@ -87,8 +87,8 @@ Example of a failing Quality Gate:
 
 Learn More - [SonarCloud | Azure integration][learnmore]
 
-[sc]: https://sonarcloud.io
-[signup]: https://www.sonarsource.com/products/sonarcloud/signup/
-[opensource]: https://sonarcloud.io/explore/projects?sort=-analysis_date
+[sc]: https://www.sonarsource.com/products/sonarcloud/?utm_medium=referral&utm_source=azure&utm_campaign=sc-product&utm_content=signup-sonarcloud-listing-x-x&utm_term=ww-psp-x
+[signup]: https://www.sonarsource.com/products/sonarcloud/signup/?utm_medium=referral&utm_source=azure&utm_campaign=sc-signup&utm_content=signup-sonarcloud-listing-x-x&utm_term=ww-psp-x
+[opensource]: https://sonarcloud.io/explore/projects?sort=-analysis_date?utm_medium=referral&utm_source=azure&utm_campaign=sc-signup&utm_content=signup-sonarcloud-listing-x-x&utm_term=ww-psp-x
 [getstarted]: https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud/
-[learnmore]: https://www.sonarsource.com/products/sonarcloud/features/integrations/azure-integration-2/
+[learnmore]: https://www.sonarsource.com/products/sonarcloud/features/integrations/azure-integration-2/?utm_medium=referral&utm_source=azure&utm_campaign=sc-signup&utm_content=signup-sonarcloud-listing-x-x&utm_term=ww-psp-x
