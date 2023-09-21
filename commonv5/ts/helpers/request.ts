@@ -7,13 +7,9 @@ interface RequestData {
   [x: string]: any;
 }
 
-function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestData): Promise<any> {
+function get(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
   tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
   const headers = {}
-
-  if (isJson) {
-    headers["Content-type"] = 'application/json'
-  }
 
   return axios({
     url: path,
@@ -42,9 +38,9 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
 }
 
 export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
-  return get(endpoint, path, true, query);
+  return get(endpoint, path, query);
 }
 
 export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
-  return get(endpoint, "/api/server/version", false).then(semver.coerce);
+  return get(endpoint, "/api/server/version").then(semver.coerce);
 }
