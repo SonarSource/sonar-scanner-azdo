@@ -24,7 +24,7 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
       password: endpoint.auth.pass
     },
     params: query,
-    headers: headers,
+    headers,
     timeout: 60000,
   }).then((response) => {
     tl.debug(

@@ -24,7 +24,7 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
       password: endpoint.auth.pass
     },
     params: query,
-    headers: headers
+    headers,
   }).then((response) => {
     tl.debug(
       `Response: ${response.status} Body: "${response.data}"`
