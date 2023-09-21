@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
-  "id": "squad-4",
+  "id": "sonarcloud",
   "name": "SonarCloud",
-  "version": "1.42.0",
+  "version": "1.44.0",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
   },
-  "publisher": "quentinchevrin",
+  "publisher": "sonarsource",
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services.Cloud"
@@ -43,7 +43,7 @@
   ],
   "links": {
     "home": {
-      "uri": "https://squad-4-core.sc-dev.io/"
+      "uri": "https://sonarcloud.io/"
     },
     "getstarted": {
       "uri": "https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud"
@@ -63,7 +63,7 @@
     "type": "git",
     "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
   },
-  "baseUri": "https://squad-4-core.sc-dev.io/",
+  "baseUri": "https://sonarclour.io/",
   "files": [
     {
       "path": "tasks"
@@ -175,8 +175,8 @@
         "icon": "icons/SonarCloud_endpoint.png",
         "url": {
           "displayName": "Server Url",
-          "value": "https://squad-4-core.sc-dev.io/",
-          "isVisible": false
+          "value": "https://sonarcloud.io/",
+          "isVisible": true
         },
         "dataSources": [
           {
