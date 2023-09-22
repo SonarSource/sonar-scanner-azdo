@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarcloud",
   "name": "SonarCloud",
-  "version": "1.44.0",
+  "version": "1.42.0",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
@@ -63,7 +63,7 @@
     "type": "git",
     "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
   },
-  "baseUri": "https://sonarclour.io/",
+  "baseUri": "https://sonarcloud.io/",
   "files": [
     {
       "path": "tasks"
@@ -175,8 +175,8 @@
         "icon": "icons/SonarCloud_endpoint.png",
         "url": {
           "displayName": "Server Url",
-          "value": "https://sonarcloud.io/",
-          "isVisible": true
+          "value": "https://sonarcloud.io",
+          "isVisible": false
         },
         "dataSources": [
           {
