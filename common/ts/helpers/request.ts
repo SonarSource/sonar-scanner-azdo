@@ -9,31 +9,31 @@ interface RequestData {
 
 function get(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
   tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
-  const headers = {}
+  const headers = {};
 
   return axios({
     url: path,
-    method: 'get',
+    method: "get",
     baseURL: endpoint.url,
     auth: {
       username: endpoint.auth.user,
-      password: endpoint.auth.pass
+      password: endpoint.auth.pass,
     },
     params: query,
     headers,
-  }).then((response) => {
-    tl.debug(
-      `Response: ${response.status} Body: "${response.data}"`
-    );
-
-    return response.data
-  }).catch((error) => {
-    if (error.response) {
-      tl.debug(`[SQ] API GET '${path}' failed, status code was: ${error.response.status}`)
-    } else {
-      tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`)
-    }
   })
+    .then((response) => {
+      tl.debug(`Response: ${response.status} Body: "${response.data}"`);
+
+      return response.data;
+    })
+    .catch((error) => {
+      if (error.response) {
+        tl.debug(`[SQ] API GET '${path}' failed, status code was: ${error.response.status}`);
+      } else {
+        tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`);
+      }
+    });
 }
 
 export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
