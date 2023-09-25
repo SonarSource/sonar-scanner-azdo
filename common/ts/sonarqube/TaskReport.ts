@@ -1,6 +1,6 @@
 import * as path from "path";
-import * as fs from "fs-extra";
 import * as tl from "azure-pipelines-task-lib/task";
+import * as fs from "fs-extra";
 import * as semver from "semver";
 import { findMatch } from "../helpers/temp-find-method";
 import Endpoint, { EndpointType } from "./Endpoint";
@@ -86,9 +86,7 @@ export default class TaskReport {
         return fs.access(filePath, fs.constants.R_OK).then(
           () => this.parseReportFile(filePath),
           () => {
-            return Promise.reject(
-              TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`)
-            );
+            throw TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`);
           }
         );
       })
@@ -100,9 +98,7 @@ export default class TaskReport {
       (fileContent) => {
         tl.debug(`[SQ] Parse Task report file: ${fileContent}`);
         if (!fileContent || fileContent.length <= 0) {
-          return Promise.reject(
-            TaskReport.throwInvalidReport(`[SQ] Error reading file: ${fileContent}`)
-          );
+          throw TaskReport.throwInvalidReport(`[SQ] Error reading file: ${fileContent}`);
         }
         try {
           const settings = TaskReport.createTaskReportFromString(fileContent);
@@ -113,22 +109,21 @@ export default class TaskReport {
             projectKey: settings.get("projectKey"),
             serverUrl: settings.get("serverUrl"),
           });
-          return Promise.resolve(taskReport);
+          return taskReport;
         } catch (err) {
           if (err && err.message) {
             tl.error(`[SQ] Parse Task report error: ${err.message}`);
           } else if (err) {
             tl.error(`[SQ] Parse Task report error: ${JSON.stringify(err)}`);
           }
-          return Promise.reject(err);
+          throw err;
         }
       },
-      (err) =>
-        Promise.reject(
-          TaskReport.throwInvalidReport(
-            `[SQ] Error reading file: ${err.message || JSON.stringify(err)}`
-          )
-        )
+      (err) => {
+        throw TaskReport.throwInvalidReport(
+          `[SQ] Error reading file: ${err.message || JSON.stringify(err)}`
+        );
+      }
     );
   }
 
