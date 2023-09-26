@@ -18,7 +18,7 @@ export function get(endpoint: Endpoint, path: string, query?: RequestData): Prom
       username: endpoint.auth.user,
       password: endpoint.auth.pass,
     },
-    params: query
+    params: query,
   })
     .then((response) => {
       tl.debug(`Response: ${response.status} Body: "${response.data}"`);
