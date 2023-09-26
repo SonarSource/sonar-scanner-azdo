@@ -31,6 +31,7 @@ export function get(endpoint: Endpoint, path: string, query?: RequestData): Prom
       } else {
         tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`);
       }
+      throw new Error(`[SQ] API GET '${path}' failed, error is ${error.message}`);
     });
 }
 
