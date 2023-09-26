@@ -7,9 +7,8 @@ interface RequestData {
   [x: string]: any;
 }
 
-function get(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
+export function get(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
   tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
-  const headers = {};
 
   return axios({
     url: path,
@@ -20,7 +19,6 @@ function get(endpoint: Endpoint, path: string, query?: RequestData): Promise<any
       password: endpoint.auth.pass,
     },
     params: query,
-    headers,
     timeout: 60000,
   })
     .then((response) => {
@@ -35,10 +33,6 @@ function get(endpoint: Endpoint, path: string, query?: RequestData): Promise<any
         tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`);
       }
     });
-}
-
-export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
-  return get(endpoint, path, query);
 }
 
 export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {

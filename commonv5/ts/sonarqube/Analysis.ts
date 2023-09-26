@@ -2,7 +2,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import Endpoint, { EndpointType } from "./Endpoint";
 import Metrics from "./Metrics";
 import { formatMeasure } from "../helpers/measures";
-import { getJSON } from "../helpers/request";
+import { get } from "../helpers/request";
 
 interface IAnalysis {
   status: string;
@@ -163,7 +163,7 @@ export default class Analysis {
     warnings: string[];
   }): Promise<Analysis> {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
-    return getJSON(endpoint, "/api/qualitygates/project_status", { analysisId }).then(
+    return get(endpoint, "/api/qualitygates/project_status", { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
         new Analysis(projectStatus, endpoint.type, warnings, dashboardUrl, metrics, projectName),
       (err) => {
