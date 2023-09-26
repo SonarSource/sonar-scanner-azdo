@@ -39,8 +39,8 @@ build_task:
   <<: *ONLY_SONARSOURCE_QA
   eks_container:
     <<: *CONTAINER_TEMPLATE
-    cpu: 2
-    memory: 4G
+    cpu: 3.4
+    memory: 11G
   env:
     SONAR_TOKEN: VAULT[development/kv/data/next data.token]
     SONAR_HOST_URL: VAULT[development/kv/data/next data.url]
