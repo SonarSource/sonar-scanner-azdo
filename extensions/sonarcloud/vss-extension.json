@@ -63,7 +63,7 @@
     "type": "git",
     "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
   },
-  "baseUri": "https://sonarcloud.io",
+  "baseUri": "https://sonarcloud.io/",
   "files": [
     {
       "path": "tasks"

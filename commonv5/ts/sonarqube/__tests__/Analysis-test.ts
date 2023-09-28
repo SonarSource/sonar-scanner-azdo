@@ -1,10 +1,10 @@
 import Analysis from "../Analysis";
-import { getJSON } from "../../helpers/request";
+import { get } from "../../helpers/request";
 import Metrics from "../Metrics";
 import Endpoint, { EndpointType } from "../Endpoint";
 
 jest.mock("../../helpers/request", () => ({
-  getJSON: jest.fn(() =>
+  get: jest.fn(() =>
     Promise.resolve({
       projectStatus: {
         status: "ERROR",
@@ -38,12 +38,12 @@ const GET_ANALYSIS_DATA = {
 };
 
 beforeEach(() => {
-  (getJSON as jest.Mock<any>).mockClear();
+  (get as jest.Mock<any>).mockClear();
 });
 
 it("should generate an analysis status with error", async () => {
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");
@@ -52,12 +52,12 @@ it("should generate an analysis status with error", async () => {
 });
 
 it("should generate a green analysis status", async () => {
-  (getJSON as jest.Mock<any>).mockImplementationOnce(() =>
+  (get as jest.Mock<any>).mockImplementationOnce(() =>
     Promise.resolve({ projectStatus: { status: "SUCCESS", conditions: [] } })
   );
 
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("SUCCESS");
@@ -71,7 +71,7 @@ it("should not fail when metrics are missing", async () => {
     dashboardUrl: undefined,
     metrics: undefined,
   });
-  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");
