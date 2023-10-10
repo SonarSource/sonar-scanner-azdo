@@ -5,19 +5,19 @@ const fs = require('fs-extra');
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
 
-function resolveApp(relativePath) {
+function resolveRelativePath(relativePath) {
   return path.resolve(appDirectory, relativePath);
 }
-exports.resolveApp = resolveApp;
+exports.resolveRelativePath = resolveRelativePath;
 
 exports.pathAllFiles = function(...paths) {
   return path.join(...paths, '**', '*');
 };
 
-const buildPath = resolveApp('build');
-const commonPath = resolveApp('common');
-const commonv5Path = resolveApp('commonv5');
-const extensionsPath = resolveApp('extensions');
+const buildPath = resolveRelativePath('build');
+const commonPath = resolveRelativePath('common');
+const commonv5Path = resolveRelativePath('commonv5');
+const extensionsPath = resolveRelativePath('extensions');
 
 exports.paths = {
   root: appDirectory,
