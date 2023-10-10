@@ -1,12 +1,20 @@
 /* eslint-disable no-console */
+const gulp = require('gulp');
 const crypto = require('crypto');
 const path = require('path');
 const { execSync } = require('child_process');
 const fs = require('fs-extra');
+const exec = require('gulp-exec');
 const dateformat = require('dateformat');
+const mergeStream = require('merge-stream');
+const gulpRename = require('gulp-rename');
+const map = require('map-stream');
+const gulpDel = require('del');
 const globby = require('globby');
 const sonarqubeScanner = require('sonarqube-scanner');
-const { paths, resolveApp } = require('./paths');
+const collect = require("gulp-collect");
+const Vinyl = require('vinyl');
+const { paths, resolveRelativePath } = require('./paths');
 
 function fail(message) {
   console.error('ERROR: ' + message);
@@ -54,13 +62,13 @@ exports.npmInstallTask = function (packagePath) {
 exports.tfxCommand = function (extensionPath, packageJSON, params = '') {
   const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
   run(
-    `"${resolveApp(
+    `"${resolveRelativePath(
       path.join('node_modules', '.bin', 'tfx')
     )}" extension create --output-path "../../${packageJSON.name}-${fullVersion(
       vssExtension.version
     )}-${vssExtension.id}.vsix" ${params}`,
     {
-      cwd: resolveApp(extensionPath)
+      cwd: resolveRelativePath(extensionPath)
     }
   );
 };
@@ -211,3 +219,61 @@ function runSonarQubeScannerImpl(callback, customOptions, options = {}) {
     callback
   );
 }
+
+function cycloneDxPipe(flavour, packageJSON, ...ps) {
+  const extensionPath = path.join(paths.extensions.root, flavour);
+  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+  const packageVersion = fullVersion(vssExtension.version);
+  return mergeStream(ps.map(p =>
+    gulp.src(path.join(p, '**', 'package.json'), {
+      read: false,
+      ignore: path.join(p, '**', 'node_modules', '**')
+    })
+  ))
+    .pipe(exec(file => `npm run cyclonedx-run -- --output ${file.dirname}/cyclonedx.json ${file.dirname}`))
+    .pipe(exec.reporter())
+    .pipe(map((file, done) => {
+      file.contents = fs.readFileSync(`${file.dirname}/cyclonedx.json`)
+      file.basename = "cyclonedx.json"
+      done(null, file)
+    }))
+    .pipe(collect.list(files => {
+      const mergeFile = new Vinyl({
+        cwd: files[files.length - 1].cwd,
+        base: files[files.length - 1].base,
+        path: path.join(paths.build.root, `${packageJSON.name}-${packageVersion}-${flavour}-cyclonedx.json`),
+        contents: null
+      });
+      mergeFile.inputFiles = files.map(f => f.path)
+      return [mergeFile]
+    }))
+    .pipe(exec(file => `npm run cyclonedx-run -- merge \
+    --hierarchical \
+    --name ${packageJSON.name}-${flavour} \
+    --version ${packageVersion} \
+    --input-files ${file.inputFiles.join(' ')} \
+    --output-file ${file.path}`))
+    .pipe(exec.reporter())
+    .pipe(map((file, done) => { gulpDel(file.inputFiles); done(null, null) }))
+}
+exports.cycloneDxPipe = cycloneDxPipe;
+
+function copyIconsTask(icon = 'task_icon.png') {
+  return () =>
+    mergeStream(
+      globby.sync(path.join(paths.extensions.root, '*'), { nodir: false }).map(extension => {
+        let iconPipe = gulp
+          .src(path.join(extension, 'tasks_icons', icon))
+          .pipe(gulpRename('icon.png'));
+        globby.sync(path.join(extension, 'tasks', '*', '*'), { nodir: false }).forEach(dir => {
+          iconPipe = iconPipe.pipe(
+            gulp.dest(
+              path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir))
+            )
+          );
+        });
+        return iconPipe;
+      })
+    );
+}
+exports.copyIconsTask = copyIconsTask;
