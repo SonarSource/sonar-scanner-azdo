@@ -28,8 +28,6 @@ it("should display warning for dedicated extension for Sonarcloud", async () => 
   jest.spyOn(scannerObject, "runPrepare").mockImplementation(() => null);
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
-  jest.spyOn(prept, "getDefaultBranch").mockResolvedValue("refs/heads/master");
-
   await prept.default(SQ_ENDPOINT, __dirname);
 
   expect(tl.warning).toHaveBeenCalledWith(
