@@ -1,5 +1,5 @@
-const msBuildVersion = "5.13.0.66756";
-const cliVersion = "4.8.0.2856"; // Has to be the same version as the one embedded in the Scanner for MSBuild
+const msBuildVersion = "5.14.0.78575";
+const cliVersion = "4.8.1.3023"; // Has to be the same version as the one embedded in the Scanner for MSBuild
 
 const scannerUrlCommon =
   `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/${msBuildVersion}/` +
