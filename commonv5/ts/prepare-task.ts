@@ -1,6 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as semver from "semver";
-import { parseScannerExtraProperties } from "./helpers/azdo-api-utils";
+import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
 import { getServerVersion } from "./helpers/request";
 import { toCleanJSON } from "./helpers/utils";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
@@ -27,7 +27,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   let props: { [key: string]: string } = {};
 
   if (await branchFeatureSupported(endpoint, serverVersion)) {
-    populateBranchAndPrProps(props);
+    await populateBranchAndPrProps(props);
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
     tl.debug(
@@ -73,7 +73,7 @@ export function branchFeatureSupported(endpoint, serverVersion: string | semver.
   return semver.satisfies(serverVersion, ">=7.2.0");
 }
 
-export function populateBranchAndPrProps(props: { [key: string]: string }) {
+export async function populateBranchAndPrProps(props: { [key: string]: string }) {
   const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri");
   const prId = tl.getVariable("System.PullRequest.PullRequestId");
   const provider = tl.getVariable("Build.Repository.Provider");
@@ -99,7 +99,23 @@ export function populateBranchAndPrProps(props: { [key: string]: string }) {
       props["sonar.scanner.skip"] = "true";
     }
   } else {
-    props["sonar.branch.name"] = branchName(tl.getVariable("Build.SourceBranch"));
+    let isDefaultBranch = true;
+    const currentBranch = tl.getVariable("Build.SourceBranch");
+    if (provider === "TfsGit") {
+      isDefaultBranch = currentBranch === (await getDefaultBranch(collectionUrl));
+    } else if (provider === "Git" || provider === "GitHub" || provider === "GitHubEnterprise") {
+      // TODO for GitHub we should get the default branch configured on the repo
+      isDefaultBranch = currentBranch === "refs/heads/master";
+    } else if (provider === "Bitbucket") {
+      // TODO for Bitbucket Cloud we should get the main branch configured on the repo
+      isDefaultBranch = currentBranch === "refs/heads/master";
+    } else if (provider === "Svn") {
+      isDefaultBranch = currentBranch === "trunk";
+    }
+    if (!isDefaultBranch) {
+      // VSTS-165 don't use Build.SourceBranchName
+      props["sonar.branch.name"] = branchName(tl.getVariable("Build.SourceBranch"));
+    }
   }
 }
 
@@ -111,4 +127,26 @@ function branchName(fullName: string) {
     return fullName.substring("refs/heads/".length);
   }
   return fullName;
+}
+
+/**
+ * Waiting for https://github.com/Microsoft/vsts-tasks/issues/7592
+ * query the repo to get the full name of the default branch.
+ * @param collectionUrl
+ */
+export async function getDefaultBranch(collectionUrl: string) {
+  const DEFAULT = "refs/heads/master";
+  try {
+    const vsts = getWebApi(collectionUrl);
+    const gitApi = await vsts.getGitApi();
+    const repo = await gitApi.getRepository(
+      tl.getVariable(REPO_NAME_VAR),
+      tl.getVariable("System.TeamProject")
+    );
+    tl.debug(`Default branch of this repository is '${repo.defaultBranch}'`);
+    return repo.defaultBranch;
+  } catch (e) {
+    tl.debug("Unable to get default branch, defaulting to 'master': " + e);
+    return DEFAULT;
+  }
 }
