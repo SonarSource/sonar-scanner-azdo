@@ -29,8 +29,14 @@ export function get(endpoint: Endpoint, path: string, query?: RequestData): Prom
     .catch((error) => {
       if (error.response) {
         tl.debug(`[SQ] API GET '${path}' failed, status code was: ${error.response.status}`);
+        tl.debug(`API GET error response data: ${JSON.stringify(error.response.data)}`);
       } else {
         tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`);
+      }
+      try {
+        tl.debug(`API GET error object: ${JSON.stringify(error)}`);
+      } catch {
+        //noop
       }
       throw new Error(`[SQ] API GET '${path}' failed, error is ${error.message}`);
     });
