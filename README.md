@@ -1,7 +1,7 @@
 SonarQube/SonarCloud Azure Pipelines Extension
 ========================================
 
-[![Build Status](https://dev.azure.com/sonarsource/_apis/public/build/definitions/399fb241-ecc7-4802-8697-dcdd01fbb832/10/badge)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/index?definitionId=10)
+[![Build Status](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_apis/build/status%2FSonarSource.sonar-scanner-vsts?branchName=master)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/latest?definitionId=126&branchName=master)
 
 Sonar's [Clean Code solutions](https://www.sonarsource.com/solutions/clean-code/?utm_medium=referral&utm_source=github&utm_campaign=clean-code&utm_content=sonar-scanner-vsts) help developers deliver high-quality, efficient code standards that benefit the entire team or organization.
 
