@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarqube",
   "name": "SonarQube",
-  "version": "5.17.1",
+  "version": "5.17.2",
   "branding": {
     "color": "rgb(67, 157, 210)",
     "theme": "dark"

@@ -1,10 +1,10 @@
+import { getJSON } from "../../helpers/request";
 import Analysis from "../Analysis";
-import { get } from "../../helpers/request";
-import Metrics from "../Metrics";
 import Endpoint, { EndpointType } from "../Endpoint";
+import Metrics from "../Metrics";
 
 jest.mock("../../helpers/request", () => ({
-  get: jest.fn(() =>
+  getJSON: jest.fn(() =>
     Promise.resolve({
       projectStatus: {
         status: "ERROR",
@@ -38,12 +38,12 @@ const GET_ANALYSIS_DATA = {
 };
 
 beforeEach(() => {
-  (get as jest.Mock<any>).mockClear();
+  (getJSON as jest.Mock<any>).mockClear();
 });
 
 it("should generate an analysis status with error", async () => {
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");
@@ -52,12 +52,12 @@ it("should generate an analysis status with error", async () => {
 });
 
 it("should generate a green analysis status", async () => {
-  (get as jest.Mock<any>).mockImplementationOnce(() =>
+  (getJSON as jest.Mock<any>).mockImplementationOnce(() =>
     Promise.resolve({ projectStatus: { status: "SUCCESS", conditions: [] } })
   );
 
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("SUCCESS");
@@ -71,7 +71,7 @@ it("should not fail when metrics are missing", async () => {
     dashboardUrl: undefined,
     metrics: undefined,
   });
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");
