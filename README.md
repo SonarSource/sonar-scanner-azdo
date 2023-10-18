@@ -3,14 +3,16 @@ SonarQube/SonarCloud Azure Pipelines Extension
 
 [![Build Status](https://dev.azure.com/sonarsource/_apis/public/build/definitions/399fb241-ecc7-4802-8697-dcdd01fbb832/10/badge)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/index?definitionId=10)
 
+Sonar's [Clean Code solutions](https://www.sonarsource.com/solutions/clean-code/?utm_medium=referral&utm_source=github&utm_campaign=clean-code&utm_content=sonar-scanner-vsts) help developers deliver high-quality, efficient code standards that benefit the entire team or organization.
+
 Marketplace
 -----------
 
 https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube
 https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud
 
-Have Question or Feedback?
---------------------------
+Have Questions or Feedback?
+---------------------------
 
 For support questions ("How do I?", "I got this error, why?", ...), please head to the [SonarSource forum](https://community.sonarsource.com/c/help). There are chances that a question similar to yours has already been answered.
 
