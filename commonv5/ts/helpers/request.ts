@@ -18,6 +18,9 @@ export function get(endpoint: Endpoint, path: string, query?: RequestData): Prom
       username: endpoint.auth.user,
       password: endpoint.auth.pass,
     },
+    headers: {
+      "User-Agent": undefined,
+    },
     params: query,
     timeout: 60000,
   })
