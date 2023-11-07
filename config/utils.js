@@ -8,6 +8,7 @@ const exec = require('gulp-exec');
 const dateformat = require('dateformat');
 const mergeStream = require('merge-stream');
 const gulpRename = require('gulp-rename');
+const gulpDownload = require('gulp-download');
 const map = require('map-stream');
 const gulpDel = require('del');
 const globby = require('globby');
@@ -40,6 +41,16 @@ function run(cl, options = {}) {
   return (output || '').toString().trim();
 }
 exports.run = run;
+
+// Return a stream that downloads the file if urlOrPath is a link, or copies it otherwise (if it is a relaitve path)
+function downloadOrCopy(urlOrPath) {
+  if (urlOrPath.startsWith('http')) {
+    return gulpDownload(urlOrPath);
+  } else {
+    return gulp.src(urlOrPath);
+  }
+}
+exports.downloadOrCopy = downloadOrCopy;
 
 function npmInstall(packagePath) {
   run(`cd ${path.dirname(packagePath)} && npm install && cd ${paths.root}`);

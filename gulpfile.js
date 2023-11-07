@@ -4,7 +4,6 @@ const request = require('request');
 const yargs = require('yargs');
 const artifactoryUpload = require('gulp-artifactory-upload');
 const decompress = require('gulp-decompress');
-const download = require('gulp-download');
 const gulp = require('gulp');
 const gulpDel = require('del');
 const gulpRename = require('gulp-rename');
@@ -27,7 +26,8 @@ const {
   runSonnarQubeScannerForSonarCloud,
   tfxCommand,
   copyIconsTask,
-  cycloneDxPipe
+  cycloneDxPipe,
+  downloadOrCopy
 } = require('./config/utils');
 const { scanner } = require('./config/config');
 const { gulpSign: getSignature } = require('./config/gulp-sign.js');
@@ -336,11 +336,11 @@ gulp.task('tasks:document-tasks-version', () => {
  * Download scanners
  */
 gulp.task('scanner:download', () => {
-  const classicDownload = download(scanner.classicUrl)
+  const classicDownload = downloadOrCopy(scanner.classicUrl)
     .pipe(decompress())
     .pipe(gulp.dest(paths.build.classicScanner));
 
-  const dotnetDownload = download(scanner.dotnetUrl)
+  const dotnetDownload = downloadOrCopy(scanner.dotnetUrl)
     .pipe(decompress())
     .pipe(gulp.dest(paths.build.dotnetScanner));
 
