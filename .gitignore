@@ -40,4 +40,8 @@ coverage/
 # eslint
 eslint-report.json
 
+# MacOS
 .DS_Store
+
+# Custom scanners
+/*.zip
