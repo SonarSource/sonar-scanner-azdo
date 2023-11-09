@@ -13,8 +13,8 @@ describe("sanitizeVariable", () => {
   it("should sanitize username and pass", () => {
     expect(
       sanitizeVariable(
-        '{ "foo": "a", "bar": "b", "sonar.login": "aaabbbccc", "sonar.password": "fffjjjkkk" }'
-      )
+        '{ "foo": "a", "bar": "b", "sonar.login": "aaabbbccc", "sonar.password": "fffjjjkkk" }',
+      ),
     ).toBe('{"foo":"a","bar":"b"}');
   });
 });

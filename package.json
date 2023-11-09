@@ -39,7 +39,7 @@
     "merge-stream": "2.0.0",
     "needle": "3.2.0",
     "openpgp": "5.10.1",
-    "prettier": "2.8.8",
+    "prettier": "3.0.3",
     "request": "2.88.2",
     "semver": "5.5.0",
     "sonarqube-scanner": "3.0.0",
@@ -105,10 +105,6 @@
     "transform": {
       ".(ts)$": "ts-jest"
     }
-  },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": false
   },
   "dependencies": {
     "azure-pipelines-task-lib": "4.4.0"

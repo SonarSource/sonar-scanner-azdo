@@ -13,6 +13,7 @@
   },
   "include": [
     "./common/ts/**/*.ts",
+    "./commonv5/ts/**/*.ts",
     "./extensions/**/*.ts"
   ]
 }

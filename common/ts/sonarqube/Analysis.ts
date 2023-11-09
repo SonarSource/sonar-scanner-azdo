@@ -1,8 +1,8 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint, { EndpointType } from "./Endpoint";
-import Metrics from "./Metrics";
 import { formatMeasure } from "../helpers/measures";
 import { get } from "../helpers/request";
+import Endpoint, { EndpointType } from "./Endpoint";
+import Metrics from "./Metrics";
 
 interface IAnalysis {
   status: string;
@@ -26,7 +26,7 @@ export default class Analysis {
     private readonly warnings: string[],
     private readonly dashboardUrl?: string,
     private readonly metrics?: Metrics,
-    private readonly projectName?: string
+    private readonly projectName?: string,
   ) {}
 
   public get status() {
@@ -39,7 +39,7 @@ export default class Analysis {
 
   public getFailedConditions() {
     return this.conditions.filter((condition) =>
-      ["WARN", "ERROR"].includes(condition.status.toUpperCase())
+      ["WARN", "ERROR"].includes(condition.status.toUpperCase()),
     );
   }
 
@@ -91,7 +91,7 @@ export default class Analysis {
         <td style="text-align:center; color:#fff; background-color:${this.getQualityGateColor()};">
           <span style="padding:0px 4px; line-height:20px;">${formatMeasure(
             condition.actualValue,
-            metric.type
+            metric.type,
           )}</span>
         </td>
         <td>
@@ -125,7 +125,7 @@ export default class Analysis {
   public getWarnings() {
     if (this.warnings.some((w) => w.includes("Please update to at least Java 11"))) {
       return `<br><span>&#9888;</span><b>${this.warnings.find((w) =>
-        w.includes("Please update to at least Java 11")
+        w.includes("Please update to at least Java 11"),
       )}</b>`;
     } else {
       return "";
@@ -173,7 +173,7 @@ export default class Analysis {
           tl.error(`[SQ] Error retrieving analysis: ${JSON.stringify(err)}`);
         }
         throw new Error(`[SQ] Could not fetch analysis for ID '${analysisId}'`);
-      }
+      },
     );
   }
 }

@@ -30,20 +30,22 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
         if (error) {
           return logAndReject(
             reject,
-            `[SQ] API GET '${path}' failed, error was: ${JSON.stringify(error)}`
+            `[SQ] API GET '${path}' failed, error was: ${JSON.stringify(error)}`,
           );
         }
         tl.debug(
-          `Response: ${response.statusCode} Body: "${isString(body) ? body : JSON.stringify(body)}"`
+          `Response: ${response.statusCode} Body: "${
+            isString(body) ? body : JSON.stringify(body)
+          }"`,
         );
         if (response.statusCode < 200 || response.statusCode >= 300) {
           return logAndReject(
             reject,
-            `[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`
+            `[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`,
           );
         }
         return resolve(body || (isJson ? {} : ""));
-      }
+      },
     );
   });
 }

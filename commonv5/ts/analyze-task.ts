@@ -6,12 +6,12 @@ import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 export default async function analyzeTask(
   rootPath: string,
   jdkVersionSource: string,
-  isSonarCloud: boolean = false
+  isSonarCloud: boolean = false,
 ) {
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable("SONARQUBE_SCANNER_MODE")];
   if (!scannerMode) {
     throw new Error(
-      "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task"
+      "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task",
     );
   }
   Scanner.setIsSonarCloud(isSonarCloud);

@@ -42,7 +42,7 @@ export default class Metrics {
 
     function inner(
       data: { f?: string; p?: number; ps?: number } = { f: "name", ps: 500 },
-      prev?: MetricsResponse
+      prev?: MetricsResponse,
     ): Promise<Metrics> {
       return getJSON(endpoint, "/api/metrics/search", data).then((r: MetricsResponse) => {
         const result = prev ? prev.metrics.concat(r.metrics) : r.metrics;

@@ -1,10 +1,10 @@
-import * as tl from "azure-pipelines-task-lib/task";
 import * as vm from "azure-devops-node-api";
 import {
   JsonPatchDocument,
   JsonPatchOperation,
   Operation,
 } from "azure-devops-node-api/interfaces/common/VSSInterfaces";
+import * as tl from "azure-pipelines-task-lib/task";
 
 export interface IPropertyBag {
   propertyName: string;
@@ -41,7 +41,7 @@ export async function addBuildProperty(properties: IPropertyBag[]) {
   } catch (exception) {
     tl.warning(
       "Failed to create a build property. Not blocking unless you are using the Sonar Pre-Deployment gate in Release Pipelines. Exception : " +
-        exception
+        exception,
     );
   }
 }

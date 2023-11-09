@@ -1,12 +1,12 @@
-import * as path from "path";
-import * as semver from "semver";
 import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
+import * as path from "path";
+import * as semver from "semver";
+import * as azdoApiUtils from "./helpers/azdo-api-utils";
+import { getServerVersion } from "./helpers/request";
+import { toCleanJSON } from "./helpers/utils";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
-import { toCleanJSON } from "./helpers/utils";
-import { getServerVersion } from "./helpers/request";
-import * as azdoApiUtils from "./helpers/azdo-api-utils";
 import { REPORT_TASK_NAME, SONAR_TEMP_DIRECTORY_NAME } from "./sonarqube/TaskReport";
 
 const REPO_NAME_VAR = "Build.Repository.Name";
@@ -18,7 +18,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
       endpoint.url.startsWith("https://sonarqube.com"))
   ) {
     tl.warning(
-      "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud"
+      "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud",
     );
   }
 
@@ -32,7 +32,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
     tl.debug(
-      "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location."
+      "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location.",
     );
     props["sonar.scanner.metadataFilePath"] = reportPath();
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
@@ -73,7 +73,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     props["sonar.pullrequest.key"] = prId;
     props["sonar.pullrequest.base"] = branchName(tl.getVariable("System.PullRequest.TargetBranch"));
     props["sonar.pullrequest.branch"] = branchName(
-      tl.getVariable("System.PullRequest.SourceBranch")
+      tl.getVariable("System.PullRequest.SourceBranch"),
     );
     if (provider === "TfsGit") {
       props["sonar.pullrequest.provider"] = "vsts";
@@ -127,7 +127,7 @@ export function reportPath(): string {
     SONAR_TEMP_DIRECTORY_NAME,
     tl.getVariable("Build.BuildNumber"),
     Guid.create().toString(),
-    REPORT_TASK_NAME
+    REPORT_TASK_NAME,
   );
 }
 
@@ -143,7 +143,7 @@ export async function getDefaultBranch(collectionUrl: string) {
     const gitApi = await vsts.getGitApi();
     const repo = await gitApi.getRepository(
       tl.getVariable(REPO_NAME_VAR),
-      tl.getVariable("System.TeamProject")
+      tl.getVariable("System.TeamProject"),
     );
     tl.debug(`Default branch of this repository is '${repo.defaultBranch}'`);
     return repo.defaultBranch;

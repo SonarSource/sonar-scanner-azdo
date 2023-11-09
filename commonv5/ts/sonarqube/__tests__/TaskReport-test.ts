@@ -20,7 +20,7 @@ ceTaskId=12345
 serverUrl=http://sonar`,
     {
       encoding: "utf-8",
-    }
+    },
   );
 
   const endpoint = new Endpoint(EndpointType.SonarCloud, null);
@@ -28,7 +28,7 @@ serverUrl=http://sonar`,
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
     new semver.SemVer("7.2.0"),
-    [tmpReport.name]
+    [tmpReport.name],
   );
 
   expect(reports).toHaveLength(1);
@@ -48,7 +48,7 @@ ceTaskId=12345
 serverUrl=http://sonar`,
     {
       encoding: "utf-8",
-    }
+    },
   );
 
   const tmpReport2 = fileSync();
@@ -60,7 +60,7 @@ ceTaskId=12345
 serverUrl=http://sonar`,
     {
       encoding: "utf-8",
-    }
+    },
   );
 
   const endpoint = new Endpoint(EndpointType.SonarCloud, null);
@@ -68,7 +68,7 @@ serverUrl=http://sonar`,
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
     new semver.SemVer("7.2.0"),
-    [tmpReport.name, tmpReport2.name]
+    [tmpReport.name, tmpReport2.name],
   );
 
   expect(reports).toHaveLength(2);

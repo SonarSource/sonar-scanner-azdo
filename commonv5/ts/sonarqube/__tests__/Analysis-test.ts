@@ -18,7 +18,7 @@ jest.mock("../../helpers/request", () => ({
           },
         ],
       },
-    })
+    }),
   ),
 }));
 
@@ -53,7 +53,7 @@ it("should generate an analysis status with error", async () => {
 
 it("should generate a green analysis status", async () => {
   (getJSON as jest.Mock<any>).mockImplementationOnce(() =>
-    Promise.resolve({ projectStatus: { status: "SUCCESS", conditions: [] } })
+    Promise.resolve({ projectStatus: { status: "SUCCESS", conditions: [] } }),
   );
 
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
@@ -95,6 +95,6 @@ it("should display Java 11 warning", async () => {
     ],
   });
   expect(analysis.getWarnings()).toStrictEqual(
-    "<br><span>&#9888;</span><b>The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.</b>"
+    "<br><span>&#9888;</span><b>The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.</b>",
   );
 });

@@ -1,6 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint, { EndpointType } from "../Endpoint";
 import { PROP_NAMES } from "../../helpers/utils";
+import Endpoint, { EndpointType } from "../Endpoint";
 
 beforeEach(() => {
   jest.restoreAllMocks();

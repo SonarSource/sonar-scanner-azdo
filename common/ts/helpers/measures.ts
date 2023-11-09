@@ -7,7 +7,7 @@ interface Formatter {
 export function formatMeasure(
   value: string | number | undefined,
   type: string,
-  options?: any
+  options?: any,
 ): string {
   const formatter = getFormatter(type);
   return useFormatter(value, formatter, options);
@@ -16,7 +16,7 @@ export function formatMeasure(
 function useFormatter(
   value: string | number | undefined,
   formatter: Formatter,
-  options?: any
+  options?: any,
 ): string {
   return value !== undefined && value !== "" ? formatter(value, options) : "";
 }
@@ -40,7 +40,7 @@ function getFormatter(type: string): Formatter {
 function numberFormatter(
   value: number,
   minimumFractionDigits = 0,
-  maximumFractionDigits = minimumFractionDigits
+  maximumFractionDigits = minimumFractionDigits,
 ) {
   const { format } = new Intl.NumberFormat("en-US", {
     minimumFractionDigits,
@@ -172,7 +172,7 @@ function formatDurationShort(
   isNegative: boolean,
   days: number,
   hours: number,
-  minutes: number
+  minutes: number,
 ): string {
   if (shouldDisplayDaysInShortFormat(days)) {
     const roundedDays = Math.round(days);
@@ -184,7 +184,7 @@ function formatDurationShort(
     const roundedHours = Math.round(hours);
     const formattedHours = formatMeasure(
       isNegative ? -1 * roundedHours : roundedHours,
-      "SHORT_INT"
+      "SHORT_INT",
     );
     return formattedHours + "h";
   }

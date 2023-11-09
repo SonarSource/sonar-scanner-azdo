@@ -1,15 +1,15 @@
-import * as tl from "azure-pipelines-task-lib/task";
 import { InvalidApiResourceVersionError } from "azure-devops-node-api/VsoClient";
+import * as tl from "azure-pipelines-task-lib/task";
 import { SemVer } from "semver";
+import * as apiUtils from "../helpers/azdo-api-utils";
+import * as serverUtils from "../helpers/azdo-server-utils";
+import * as request from "../helpers/request";
+import * as publishTask from "../publish-task";
 import Analysis from "../sonarqube/Analysis";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Metrics from "../sonarqube/Metrics";
 import Task, { TimeOutReachedError } from "../sonarqube/Task";
 import TaskReport from "../sonarqube/TaskReport";
-import * as publishTask from "../publish-task";
-import * as serverUtils from "../helpers/azdo-server-utils";
-import * as apiUtils from "../helpers/azdo-api-utils";
-import * as request from "../helpers/request";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -36,7 +36,7 @@ it("should fail unless SONARQUBE_SCANNER_PARAMS are supplied", async () => {
   expect(tl.getVariable).toBeCalledWith("SONARQUBE_SCANNER_PARAMS");
   expect(tl.setResult).toBeCalledWith(
     tl.TaskResult.Failed,
-    "The SonarCloud Prepare Analysis Configuration must be added."
+    "The SonarCloud Prepare Analysis Configuration must be added.",
   );
 });
 
@@ -73,7 +73,7 @@ it("check multiple report status and set global quality gate for build propertie
     [],
     "",
     null,
-    null
+    null,
   );
 
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
@@ -140,7 +140,7 @@ it("check multiple report status and set global quality gate for build propertie
     [],
     "",
     null,
-    null
+    null,
   );
 
   const returnedAnalysisError = new Analysis(
@@ -149,7 +149,7 @@ it("check multiple report status and set global quality gate for build propertie
     [],
     "",
     null,
-    null
+    null,
   );
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
@@ -194,7 +194,7 @@ it("get report string should return undefined if ceTask times out", async () => 
   expect(result).toBeUndefined();
   expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
   expect(tl.warning).toBeCalledWith(
-    "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result."
+    "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result.",
   );
   expect(Analysis.getAnalysis).not.toBeCalled();
 });
@@ -233,7 +233,7 @@ it("get report string for single report", async () => {
     [],
     "",
     null,
-    null
+    null,
   );
   jest.spyOn(Analysis, "getAnalysis").mockResolvedValue(returnedAnalysis);
   jest.spyOn(returnedAnalysis, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
@@ -306,7 +306,7 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
     () =>
       new Promise((resolve) => {
         return resolve();
-      })
+      }),
   );
 
   await publishTask.default(EndpointType.SonarCloud);
@@ -318,9 +318,9 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
   expect(serverUtils.publishBuildSummary).toBeCalledWith("\r\n", EndpointType.SonarCloud);
 
   expect(tl.warning).toBeCalledWith(
-    "Task '111' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result."
+    "Task '111' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
   );
   expect(tl.warning).toBeCalledWith(
-    "Task '222' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result."
+    "Task '222' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
   );
 });

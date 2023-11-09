@@ -1,6 +1,6 @@
-import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
+import * as path from "path";
 import { SemVer } from "semver";
 import * as request from "../helpers/request";
 import * as prept from "../prepare-task";
@@ -32,7 +32,7 @@ it("should display warning for dedicated extension for Sonarcloud", async () => 
   await prept.default(SQ_ENDPOINT, __dirname);
 
   expect(tl.warning).toHaveBeenCalledWith(
-    "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud"
+    "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud",
   );
 });
 
@@ -51,13 +51,13 @@ describe("branchFeatureSupported", () => {
       endpoint: Endpoint,
       product: string,
       version: string,
-      expectedBranchSupported: Boolean
+      expectedBranchSupported: Boolean,
     ) => {
       tl.debug(`${product} ${version}`);
       jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer(version));
       const actual = await prept.branchFeatureSupported(endpoint, version);
       expect(actual).toBe(expectedBranchSupported);
-    }
+    },
   );
 });
 
@@ -75,7 +75,7 @@ it("should build report task path from variables", () => {
     sonarSubDirectory,
     buildId,
     guid.toString(),
-    "report-task.txt"
+    "report-task.txt",
   );
 
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => reportDirectory);

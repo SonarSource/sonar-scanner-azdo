@@ -36,7 +36,7 @@ export default class Task {
     endpoint: Endpoint,
     taskId: string,
     tries: number,
-    delay = 1000
+    delay = 1000,
   ): Promise<Task> {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
     let query = {};
@@ -64,7 +64,7 @@ export default class Task {
               setTimeout(() => {
                 Task.waitForTaskCompletion(endpoint, taskId, tries, delay).then(resolve, reject);
                 tries--;
-              }, delay)
+              }, delay),
             );
         }
       },
@@ -75,7 +75,7 @@ export default class Task {
           tl.error(JSON.stringify(err));
         }
         throw new Error(`[SQ] Could not fetch task for ID '${taskId}'`);
-      }
+      },
     );
   }
 }

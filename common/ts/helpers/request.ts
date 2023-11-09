@@ -1,6 +1,6 @@
 import axios from "axios";
-import * as semver from "semver";
 import * as tl from "azure-pipelines-task-lib/task";
+import * as semver from "semver";
 import Endpoint from "../sonarqube/Endpoint";
 
 interface RequestData {

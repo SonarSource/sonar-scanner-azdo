@@ -16,7 +16,10 @@ export interface EndpointData {
 }
 
 export default class Endpoint {
-  constructor(public type: EndpointType, private readonly data: EndpointData) {}
+  constructor(
+    public type: EndpointType,
+    private readonly data: EndpointData,
+  ) {}
 
   public get auth() {
     if (!this.data.token && this.data.password && this.data.password.length > 0) {
@@ -58,7 +61,7 @@ export default class Endpoint {
     const token = tl.getEndpointAuthorizationParameter(
       id,
       "apitoken",
-      type !== EndpointType.SonarCloud
+      type !== EndpointType.SonarCloud,
     );
     const username = tl.getEndpointAuthorizationParameter(id, "username", true);
     const password = tl.getEndpointAuthorizationParameter(id, "password", true);
