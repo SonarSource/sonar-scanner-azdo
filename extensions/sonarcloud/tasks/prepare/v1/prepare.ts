@@ -1,12 +1,12 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint, { EndpointType } from "../../../../../common/ts/sonarqube/Endpoint";
 import prepareTask from "../../../../../common/ts/prepare-task";
+import Endpoint, { EndpointType } from "../../../../../common/ts/sonarqube/Endpoint";
 
 async function run() {
   try {
     const endpoint = Endpoint.getEndpoint(
       tl.getInput(EndpointType.SonarCloud, true),
-      EndpointType.SonarCloud
+      EndpointType.SonarCloud,
     );
     await prepareTask(endpoint, __dirname);
   } catch (err) {

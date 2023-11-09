@@ -1,7 +1,7 @@
-import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import * as fs from "fs-extra";
 import { Guid } from "guid-typescript";
+import * as path from "path";
 import * as semver from "semver";
 import Endpoint, { EndpointType } from "./Endpoint";
 
@@ -49,14 +49,14 @@ export default class TaskReport {
       SONAR_TEMP_DIRECTORY_NAME,
       tl.getVariable("Build.BuildId"),
       "<GUID>",
-      REPORT_TASK_NAME
+      REPORT_TASK_NAME,
     );
   }
 
   public static getDefaultPath() {
     return path.join(
       tl.getVariable("Agent.TempDirectory"),
-      TaskReport.getDefaultPathTemplate().replace("<GUID>", Guid.create().toString())
+      TaskReport.getDefaultPathTemplate().replace("<GUID>", Guid.create().toString()),
     );
   }
 
@@ -70,7 +70,7 @@ export default class TaskReport {
 
     if (endpoint.type === EndpointType.SonarQube && semver.satisfies(serverVersion, "<7.2.0")) {
       tl.debug(
-        "SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file."
+        "SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file.",
       );
       taskReportGlob = path.join("**", REPORT_TASK_NAME);
       taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.BuildDirectory"), taskReportGlob);
@@ -89,7 +89,7 @@ export default class TaskReport {
   public static createTaskReportsFromFiles(
     endpoint: Endpoint,
     serverVersion: semver.SemVer,
-    filePaths = TaskReport.findTaskFileReport(endpoint, serverVersion)
+    filePaths = TaskReport.findTaskFileReport(endpoint, serverVersion),
   ): Promise<TaskReport[]> {
     return Promise.all(
       filePaths.map((filePath) => {
@@ -97,8 +97,8 @@ export default class TaskReport {
           return Promise.reject(
             TaskReport.throwInvalidReport(
               `[SQ] Could not find '${REPORT_TASK_NAME}'.` +
-                ` Possible cause: the analysis did not complete successfully.`
-            )
+                ` Possible cause: the analysis did not complete successfully.`,
+            ),
           );
         }
         tl.debug(`[SQ] Read Task report file: ${filePath}`);
@@ -106,9 +106,9 @@ export default class TaskReport {
           () => this.parseReportFile(filePath),
           () => {
             throw TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`);
-          }
+          },
         );
-      })
+      }),
     );
   }
 
@@ -140,9 +140,9 @@ export default class TaskReport {
       },
       (err) => {
         throw TaskReport.throwInvalidReport(
-          `[SQ] Error reading file: ${err.message || JSON.stringify(err)}`
+          `[SQ] Error reading file: ${err.message || JSON.stringify(err)}`,
         );
-      }
+      },
     );
   }
 
@@ -165,7 +165,7 @@ export default class TaskReport {
   private static throwInvalidReport(debugMsg: string): Error {
     tl.error(debugMsg);
     return new Error(
-      "Invalid or missing task report. Check that the analysis finished successfully."
+      "Invalid or missing task report. Check that the analysis finished successfully.",
     );
   }
 }

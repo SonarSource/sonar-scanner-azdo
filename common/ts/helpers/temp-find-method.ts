@@ -65,7 +65,7 @@ export function findMatch(
   defaultRoot: string,
   patterns: string[] | string,
   findOptions?: tl.FindOptions,
-  matchOptions?: tl.MatchOptions
+  matchOptions?: tl.MatchOptions,
 ): string[] {
   // apply defaults for parameters and trace
   defaultRoot = defaultRoot || tl.getVariable("system.defaultWorkingDirectory") || process.cwd();
@@ -159,7 +159,7 @@ export function findMatch(
         let findInfo: im._PatternFindInfo = im._getFindInfoFromPattern(
           defaultRoot,
           pattern,
-          matchOptions
+          matchOptions,
         );
         let findPath: string = findInfo.findPath;
         tl.debug(`findPath: '${findPath}'`);
@@ -225,7 +225,7 @@ export function findMatch(
         let matchResults: string[] = minimatch.match(
           Object.keys(results).map((key: string) => results[key]),
           pattern,
-          matchOptions
+          matchOptions,
         );
         tl.debug(matchResults.length + " matches");
 

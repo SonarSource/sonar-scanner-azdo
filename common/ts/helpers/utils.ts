@@ -15,7 +15,7 @@ export const PROP_NAMES = {
 export function toCleanJSON(props: { [key: string]: string | undefined }) {
   return JSON.stringify(
     props,
-    Object.keys(props).filter((key) => props[key] != null)
+    Object.keys(props).filter((key) => props[key] != null),
   );
 }
 

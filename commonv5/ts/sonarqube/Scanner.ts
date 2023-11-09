@@ -1,6 +1,6 @@
-import * as path from "path";
-import * as fs from "fs-extra";
 import * as tl from "azure-pipelines-task-lib/task";
+import * as fs from "fs-extra";
+import * as path from "path";
 import { PROP_NAMES, isWindows } from "../helpers/utils";
 
 export enum ScannerMode {
@@ -10,7 +10,10 @@ export enum ScannerMode {
 }
 
 export default class Scanner {
-  constructor(public rootPath: string, public mode: ScannerMode) {}
+  constructor(
+    public rootPath: string,
+    public mode: ScannerMode,
+  ) {}
 
   //MMF-2035
   private static isSonarCloud: boolean;
@@ -54,7 +57,7 @@ export default class Scanner {
       case ScannerMode.Other:
         tl.warning(
           `[SQ] When using Maven or Gradle, don't use the analyze task but instead tick the ` +
-            `'SonarQube' option in the Maven/Gradle task to run the scanner as part of the build.`
+            `'SonarQube' option in the Maven/Gradle task to run the scanner as part of the build.`,
         );
         return Scanner.getScanner(rootPath);
       case ScannerMode.MSBuild:
@@ -109,7 +112,11 @@ interface ScannerCLIData {
 }
 
 export class ScannerCLI extends Scanner {
-  constructor(rootPath: string, private readonly data: ScannerCLIData, private cliMode?: string) {
+  constructor(
+    rootPath: string,
+    private readonly data: ScannerCLIData,
+    private cliMode?: string,
+  ) {
     super(rootPath, ScannerMode.CLI);
   }
 
@@ -155,7 +162,7 @@ export class ScannerCLI extends Scanner {
         projectVersion: tl.getInput("cliProjectVersion"),
         projectSources: tl.getInput("cliSources"),
       },
-      mode
+      mode,
     );
   }
 }
@@ -168,7 +175,10 @@ interface ScannerMSData {
 }
 
 export class ScannerMSBuild extends Scanner {
-  constructor(rootPath: string, private readonly data: ScannerMSData) {
+  constructor(
+    rootPath: string,
+    private readonly data: ScannerMSData,
+  ) {
     super(rootPath, ScannerMode.MSBuild);
   }
 
@@ -213,7 +223,7 @@ export class ScannerMSBuild extends Scanner {
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
     const scannerCliShellScripts = tl.findMatch(
       scannerExecutablePath,
-      path.join(path.dirname(scannerExecutablePath), "sonar-scanner-*", "bin", "sonar-scanner")
+      path.join(path.dirname(scannerExecutablePath), "sonar-scanner-*", "bin", "sonar-scanner"),
     )[0];
     await fs.chmod(scannerCliShellScripts, "777");
   }

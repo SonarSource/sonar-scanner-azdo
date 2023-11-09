@@ -1,10 +1,10 @@
-import * as path from "path";
 import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
+import * as path from "path";
 import { SemVer } from "semver";
-import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
-import * as prept from "../prepare-task";
 import * as request from "../helpers/request";
+import * as prept from "../prepare-task";
+import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Scanner, { ScannerMSBuild } from "../sonarqube/Scanner";
 
 beforeEach(() => {
@@ -32,7 +32,7 @@ it("should display warning for dedicated extension for Sonarcloud", async () => 
   await prept.default(SQ_ENDPOINT, __dirname);
 
   expect(tl.warning).toHaveBeenCalledWith(
-    "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud"
+    "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud",
   );
 });
 
@@ -50,7 +50,7 @@ it("should build report task path from variables", () => {
     sonarSubDirectory,
     buildNumber,
     guid.toString(),
-    "report-task.txt"
+    "report-task.txt",
   );
 
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => reportDirectory);

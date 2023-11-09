@@ -9,7 +9,7 @@ export default class JavaVersionResolver {
     const javaPath = tl.getVariable(jdkversionSource);
     if (javaPath) {
       tl.debug(
-        `${jdkversionSource} was found with value ${javaPath}, will switch to it for Sonar scanner...`
+        `${jdkversionSource} was found with value ${javaPath}, will switch to it for Sonar scanner...`,
       );
       return javaPath;
     } else {
@@ -29,7 +29,7 @@ export default class JavaVersionResolver {
       }
     } else {
       tl.debug(
-        `JAVA_HOME was specified in the Run Code Analysis task configuration, nothing to do.`
+        `JAVA_HOME was specified in the Run Code Analysis task configuration, nothing to do.`,
       );
     }
   }

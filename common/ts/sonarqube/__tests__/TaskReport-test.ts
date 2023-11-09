@@ -1,11 +1,11 @@
-import * as path from "path";
-import { writeFileSync } from "fs";
-import { fileSync } from "tmp"; // eslint-disable-line import/no-extraneous-dependencies
 import * as tl from "azure-pipelines-task-lib/task";
+import { writeFileSync } from "fs";
+import * as path from "path";
 import * as semver from "semver";
-import TaskReport from "../TaskReport";
-import Endpoint, { EndpointType } from "../Endpoint";
+import { fileSync } from "tmp"; // eslint-disable-line import/no-extraneous-dependencies
 import * as tempFindMethods from "../../helpers/temp-find-method";
+import Endpoint, { EndpointType } from "../Endpoint";
+import TaskReport from "../TaskReport";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -21,7 +21,7 @@ ceTaskId=12345
 serverUrl=http://sonar`,
     {
       encoding: "utf-8",
-    }
+    },
   );
 
   const endpoint = new Endpoint(EndpointType.SonarCloud, null);
@@ -29,7 +29,7 @@ serverUrl=http://sonar`,
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
     new semver.SemVer("7.2.0"),
-    [tmpReport.name]
+    [tmpReport.name],
   );
 
   expect(reports).toHaveLength(1);
@@ -49,7 +49,7 @@ ceTaskId=12345
 serverUrl=http://sonar`,
     {
       encoding: "utf-8",
-    }
+    },
   );
 
   const tmpReport2 = fileSync();
@@ -61,7 +61,7 @@ ceTaskId=12345
 serverUrl=http://sonar`,
     {
       encoding: "utf-8",
-    }
+    },
   );
 
   const endpoint = new Endpoint(EndpointType.SonarCloud, null);
@@ -69,7 +69,7 @@ serverUrl=http://sonar`,
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
     new semver.SemVer("7.2.0"),
-    [tmpReport.name, tmpReport2.name]
+    [tmpReport.name, tmpReport2.name],
   );
 
   expect(reports).toHaveLength(2);
@@ -102,12 +102,12 @@ it("should find report files for SonarCloud", async () => {
     "sonar",
     tl.getVariable("Build.BuildNumber"),
     "**",
-    "report-task.txt"
+    "report-task.txt",
   );
   expect(tempFindMethods.findMatch).toHaveBeenCalledTimes(1);
   expect(tempFindMethods.findMatch).toHaveBeenCalledWith(
     "mock root search path",
-    expectedSearchPath
+    expectedSearchPath,
   );
 });
 
@@ -133,12 +133,12 @@ it("should find report files for SonarQube above 7.2.0", async () => {
     "sonar",
     tl.getVariable("Build.BuildNumber"),
     "**",
-    "report-task.txt"
+    "report-task.txt",
   );
   expect(tempFindMethods.findMatch).toHaveBeenCalledTimes(1);
   expect(tempFindMethods.findMatch).toHaveBeenCalledWith(
     "mock root search path",
-    expectedSearchPath
+    expectedSearchPath,
   );
 });
 
@@ -165,6 +165,6 @@ it("should find report files for SonarQube below 7.2.0", async () => {
   expect(tempFindMethods.findMatch).toHaveBeenCalledTimes(1);
   expect(tempFindMethods.findMatch).toHaveBeenCalledWith(
     "mock root search path",
-    expectedSearchPath
+    expectedSearchPath,
   );
 });

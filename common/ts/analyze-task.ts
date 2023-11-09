@@ -1,20 +1,20 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import JavaVersionResolver from "./helpers/java-version-resolver";
-import { EndpointType, EndpointData } from "./sonarqube/Endpoint";
-import { sanitizeVariable, PROP_NAMES } from "./helpers/utils";
+import { PROP_NAMES, sanitizeVariable } from "./helpers/utils";
+import { EndpointData, EndpointType } from "./sonarqube/Endpoint";
+import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 
 const JAVA_11_PATH_ENV_NAME = "JAVA_HOME_11_X64";
 
 export default async function analyzeTask(
   rootPath: string,
   _jdkVersionSource: string = "",
-  isSonarCloud: boolean = false
+  isSonarCloud: boolean = false,
 ) {
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable("SONARQUBE_SCANNER_MODE")];
   if (!scannerMode) {
     throw new Error(
-      "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task"
+      "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task",
     );
   }
   Scanner.setIsSonarCloud(isSonarCloud);
@@ -24,7 +24,7 @@ export default async function analyzeTask(
   sqScannerParams = JSON.parse(sqScannerParams);
 
   const endpointData: { type: EndpointType; data: EndpointData } = JSON.parse(
-    tl.getVariable("SONARQUBE_ENDPOINT")
+    tl.getVariable("SONARQUBE_ENDPOINT"),
   );
   if (endpointData.data.token && endpointData.data.token.length > 0) {
     sqScannerParams[PROP_NAMES.LOGIN] = endpointData.data.token;

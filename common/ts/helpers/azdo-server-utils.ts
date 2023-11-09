@@ -28,7 +28,7 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
       type: "Distributedtask.Core.Summary",
       name: title,
     },
-    summaryPath
+    summaryPath,
   );
 }
 

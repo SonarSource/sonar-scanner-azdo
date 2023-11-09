@@ -6,7 +6,7 @@ it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
 
   const expectedError = new Error(
-    "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task"
+    "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task",
   );
   try {
     await analyze.default(__dirname);
@@ -38,7 +38,7 @@ it("should run scanner", async () => {
   jest
     .spyOn(tl, "getVariable")
     .mockReturnValueOnce(
-      '{"type":"SonarQube","data":{"url":"https://sonarqube.com/","username":"token"}}'
+      '{"type":"SonarQube","data":{"url":"https://sonarqube.com/","username":"token"}}',
     );
 
   jest.spyOn(scanner, "runAnalysis").mockImplementation(() => null);

@@ -1,6 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint from "./Endpoint";
 import { get } from "../helpers/request";
+import Endpoint from "./Endpoint";
 
 interface IMetric {
   custom?: boolean;
@@ -42,7 +42,7 @@ export default class Metrics {
 
     function inner(
       data: { f?: string; p?: number; ps?: number } = { f: "name", ps: 500 },
-      prev?: MetricsResponse
+      prev?: MetricsResponse,
     ): Promise<Metrics> {
       return get(endpoint, "/api/metrics/search", data).then((r: MetricsResponse) => {
         const result = prev ? prev.metrics.concat(r.metrics) : r.metrics;

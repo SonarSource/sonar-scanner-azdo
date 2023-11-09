@@ -35,7 +35,7 @@ it("should parse extra properties correctly", () => {
 # Put one key=value per line, example:
 # sonar.exclusions=**/*.bin
 sonar.scanner.metadataFilePath=/tmp/report-task-debug.txt
-sonar.scanner.metadataFilePath=/tmp/report-task-debug-override.txt`.split("\n")
+sonar.scanner.metadataFilePath=/tmp/report-task-debug-override.txt`.split("\n"),
   ); //extraProperties
   const props = azdoApiUtils.parseScannerExtraProperties();
 

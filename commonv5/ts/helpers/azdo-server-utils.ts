@@ -1,6 +1,6 @@
-import * as path from "path";
-import * as fs from "fs-extra";
 import * as tl from "azure-pipelines-task-lib/task";
+import * as fs from "fs-extra";
+import * as path from "path";
 import * as azdoApiUtils from "./../helpers/azdo-api-utils";
 
 export function publishBuildSummary(summary: string, endpointType = "SonarQube") {
@@ -28,7 +28,7 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
       type: "Distributedtask.Core.Summary",
       name: title,
     },
-    summaryPath
+    summaryPath,
   );
 }
 
