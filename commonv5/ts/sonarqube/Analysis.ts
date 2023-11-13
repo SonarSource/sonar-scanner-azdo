@@ -19,6 +19,30 @@ interface Condition {
   warningThreshold?: string;
 }
 
+const textStyle = (color: string = "#3E4357") => `
+  color: ${color};
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: -0.14px;`;
+
+const measureStyle = (backgroundColor: string) =>
+  `background-color: ${backgroundColor};
+  padding: 4px 8px;
+  margin: 0px 4px;
+  color: #fff;
+  letter-spacing: -0.12px;
+  line-height: normal;
+  font-weight: 500;
+  font-size: 12px;`;
+
+const separatorStyle = `
+  background: #EBECF0;
+  height: 1px;
+  margin: 16px 0px;`;
+
 export default class Analysis {
   constructor(
     private readonly analysis: IAnalysis,
@@ -47,6 +71,7 @@ export default class Analysis {
     tl.debug(`[SQ] Generate analysis report.'`);
     return [
       this.getQualityGateSection(),
+      this.getSeparator(),
       this.getQualityGateDetailSection(),
       this.getDashboardLink(),
       this.getWarnings(),
@@ -55,18 +80,14 @@ export default class Analysis {
       .trim();
   }
 
+  private getSeparator() {
+    return `<div style="${separatorStyle}"></div>`;
+  }
+
   private getQualityGateSection() {
-    const qgStyle = `background-color: ${this.getQualityGateColor()};
-      padding: 4px 12px;
-      color: #fff;
-      letter-spacing: 0.02em;
-      line-height: 24px;
-      font-weight: 600;
-      font-size: 12px;
-      margin-left: 15px;`;
-    return `<div style="padding-top: 8px;">
+    return `<div style="${textStyle()}">
       <span>${this.projectName ? this.projectName + " " : ""}Quality Gate</span>
-      <span style="${qgStyle}">
+      <span style="${measureStyle(this.getQualityGateColor())}">
         ${formatMeasure(this.status, "LEVEL")}
       </span>
     </div>`;
@@ -86,40 +107,33 @@ export default class Analysis {
 
       const threshold =
         condition.status === "WARN" ? condition.warningThreshold : condition.errorThreshold;
-      return `<tr>
-        <td><span style="padding-right:4px;">${metric.name}</span></td>
-        <td style="text-align:center; color:#fff; background-color:${this.getQualityGateColor()};">
-          <span style="padding:0px 4px; line-height:20px;">${formatMeasure(
-            condition.actualValue,
-            metric.type,
-          )}</span>
-        </td>
-        <td>
-          <span style="padding-left:4px">${formatMeasure(condition.comparator, "COMPARATOR")}</span>
-          <span style="padding-left:4px">${formatMeasure(threshold, metric.type)}</span>
-        </td>
-      </tr>`;
+      return `<li style="list-style: none; margin-top: 13px;">
+        <span>${metric.name}</span>
+        <span style="${measureStyle(this.getQualityGateColor())}">
+          ${formatMeasure(condition.actualValue, metric.type)}</span>
+        <span>(required ${
+          metric.type !== "RATING" ? formatMeasure(condition.comparator, "COMPARATOR") + " " : ""
+        }${formatMeasure(threshold, metric.type)})</span>
+      </li>`;
     });
 
-    const tableStyle = `
-      margin-top: 8px;
-      border-top: 1px solid #eee;
-      border-collapse: separate;
-      border-spacing: 0 4px;
-    `;
-    return `<table border="0" style="${tableStyle}">
-      <tbody>
+    return `<ul style="${textStyle()}">
         ${rows.join(" \r\n").trim()}
-      </tbody>
-    </table>\r\n\r\n`; // 2 carriage returns to prevent any malformed summary results
+    </ul>\r\n\r\n`; // 2 carriage returns to prevent any malformed summary results
   }
 
   private getDashboardLink() {
     if (!this.dashboardUrl) {
       return "";
     }
-    const linkText = `Detailed ${this.endpointType} report &gt;`;
-    return `[${linkText}](${this.dashboardUrl})`;
+    const linkText = `Detailed ${this.endpointType} report`;
+
+    return `<div style="margin-top: 16px;">
+        <a href="${this.dashboardUrl}" style="${textStyle("#5D6CD0")}">
+        ${linkText}
+        <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
+        </a>
+      </div>`;
   }
 
   public getWarnings() {
@@ -133,18 +147,13 @@ export default class Analysis {
   }
 
   private getQualityGateColor() {
-    switch (this.status) {
-      case "OK":
-        return "#00aa00";
-      case "WARN":
-        return "#ed7d20";
-      case "ERROR":
-        return "#d4333f";
-      case "NONE":
-        return "#b4b4b4";
-      default:
-        return "#b4b4b4";
-    }
+    const colors = {
+      OK: "#6EB712",
+      WARN: "#F5B840",
+      ERROR: "#D92D20",
+    };
+
+    return colors[this.status] ?? "#b4b4b4";
   }
 
   public static getAnalysis({

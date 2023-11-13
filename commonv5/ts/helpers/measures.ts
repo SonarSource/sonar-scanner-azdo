@@ -106,8 +106,8 @@ function levelFormatter(value: string): string {
 function comparatorFormatter(value: string): string {
   const l10nKeys = {
     EQ: "&#61;",
-    GT: "&#62;",
-    LT: "&#60;",
+    GT: "&le;",
+    LT: "&ge;",
     NE: "&#8800;",
   };
   const result = l10nKeys[value.toUpperCase()];
