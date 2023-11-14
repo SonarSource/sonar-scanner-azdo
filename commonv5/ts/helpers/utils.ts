@@ -1,17 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
-
-export const PROP_NAMES = {
-  HOST_URL: "sonar.host.url",
-  TOKEN: "sonar.token",
-  LOGIN: "sonar.login",
-  PASSSWORD: "sonar.password",
-  ORG: "sonar.organization",
-  PROJECTKEY: "sonar.projectKey",
-  PROJECTNAME: "sonar.projectName",
-  PROJECTVERSION: "sonar.projectVersion",
-  PROJECTSOURCES: "sonar.sources",
-  PROJECTSETTINGS: "project.settings",
-};
+import { PROP_NAMES } from "./constants";
 
 export function toCleanJSON(props: { [key: string]: string | undefined }) {
   return JSON.stringify(
