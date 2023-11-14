@@ -1,5 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { PROP_NAMES } from "../../helpers/utils";
+import { PROP_NAMES } from "../../helpers/constants";
 import Endpoint, { EndpointType } from "../Endpoint";
 
 beforeEach(() => {

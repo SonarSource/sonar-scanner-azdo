@@ -1,6 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as semver from "semver";
-import { PROP_NAMES } from "../helpers/utils";
+import { PROP_NAMES } from "../helpers/constants";
 
 export enum EndpointType {
   SonarCloud = "SonarCloud",

@@ -1,7 +1,8 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { PROP_NAMES, isWindows } from "../helpers/utils";
+import { PROP_NAMES } from "../helpers/constants";
+import { isWindows } from "../helpers/utils";
 
 export enum ScannerMode {
   MSBuild = "MSBuild",

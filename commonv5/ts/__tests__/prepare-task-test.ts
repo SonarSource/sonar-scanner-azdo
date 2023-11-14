@@ -2,6 +2,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import { Guid } from "guid-typescript";
 import * as path from "path";
 import { SemVer } from "semver";
+import { DEFAULT_BRANCH_NAME } from "../helpers/constants";
 import * as request from "../helpers/request";
 import * as prept from "../prepare-task";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
@@ -27,7 +28,7 @@ it("should display warning for dedicated extension for Sonarcloud", async () => 
   jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => scannerObject);
   jest.spyOn(scannerObject, "runPrepare").mockImplementation(() => null);
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
-  jest.spyOn(prept, "getDefaultBranch").mockResolvedValue("refs/heads/master");
+  jest.spyOn(prept, "getDefaultBranch").mockResolvedValue(DEFAULT_BRANCH_NAME);
 
   await prept.default(SQ_ENDPOINT, __dirname);
 
