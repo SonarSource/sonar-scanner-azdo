@@ -1,16 +1,18 @@
-import * as path from "path";
-import { writeFileSync } from "fs";
-import { fileSync } from "tmp"; // eslint-disable-line import/no-extraneous-dependencies
 import * as tl from "azure-pipelines-task-lib/task";
+import { writeFileSync } from "fs";
+import * as path from "path";
 import * as semver from "semver";
-import TaskReport from "../TaskReport";
+import { fileSync } from "tmp";
 import Endpoint, { EndpointType } from "../Endpoint";
+import TaskReport from "../TaskReport";
 
 beforeEach(() => {
   jest.restoreAllMocks();
 });
 
 it("should parse report-task.txt and preserve equals sign in url", async () => {
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
+
   const tmpReport = fileSync();
   writeFileSync(
     tmpReport.fd,
@@ -39,6 +41,8 @@ serverUrl=http://sonar`,
 });
 
 it("should parse all reports", async () => {
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
+
   const tmpReport = fileSync();
   writeFileSync(
     tmpReport.fd,
@@ -88,6 +92,7 @@ it.each([
   [EndpointType.SonarCloud, "20.0.0"],
 ])("should find report files for %p", (endpointType, version) => {
   // using spyOn so we can reset the original behaviour
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock report task file path");
   jest.spyOn(tl, "find").mockImplementation(() => ["path1", "path2"]);
 
@@ -108,14 +113,15 @@ it.each([
   expect(tl.find).toHaveBeenCalledWith("mock report task file path");
 });
 
-it("should find report files for SonarQube below 7.2.0", async () => {
+it("should find report files for SonarQube below 7.2.0", () => {
   // using spyOn so we can reset the original behaviour
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
   jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
 
   const endpoint = new Endpoint(EndpointType.SonarQube, null);
 
-  const reportFiles = await TaskReport.findTaskFileReport(endpoint, new semver.SemVer("7.0.0"));
+  const reportFiles = TaskReport.findTaskFileReport(endpoint, new semver.SemVer("7.0.0"));
 
   expect(reportFiles.length).toBe(2);
   expect(reportFiles[0]).toBe("path1");

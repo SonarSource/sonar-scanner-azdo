@@ -1,5 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import * as request from "request";
+import fetch from "node-fetch";
 import * as semver from "semver";
 import Endpoint from "../sonarqube/Endpoint";
 
@@ -7,62 +7,34 @@ interface RequestData {
   [x: string]: any;
 }
 
-function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestData): Promise<any> {
+export async function get<T>(
+  endpoint: Endpoint,
+  path: string,
+  isJson: boolean,
+  query?: RequestData,
+): Promise<T | string> {
   tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
-  return new Promise((resolve, reject) => {
-    const options: request.CoreOptions = {
-      auth: endpoint.auth,
-      timeout: 60000,
-    };
-    if (query) {
-      options.qs = query;
-      options.useQuerystring = true;
+
+  try {
+    const hasQuery = query && Object.keys(query).length > 0;
+    const fullUrl =
+      endpoint.url + path + (hasQuery ? "?" + new URLSearchParams(query).toString() : "");
+    const response = await fetch(fullUrl, endpoint.toFetchOptions(fullUrl));
+    if (isJson) {
+      return await response.json();
+    } else {
+      return await response.text();
     }
-    request.get(
-      {
-        method: "GET",
-        baseUrl: endpoint.url,
-        uri: path,
-        json: isJson,
-        ...options,
-      },
-      (error, response, body) => {
-        if (error) {
-          return logAndReject(
-            reject,
-            `[SQ] API GET '${path}' failed, error was: ${JSON.stringify(error)}`,
-          );
-        }
-        tl.debug(
-          `Response: ${response.statusCode} Body: "${
-            isString(body) ? body : JSON.stringify(body)
-          }"`,
-        );
-        if (response.statusCode < 200 || response.statusCode >= 300) {
-          return logAndReject(
-            reject,
-            `[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`,
-          );
-        }
-        return resolve(body || (isJson ? {} : ""));
-      },
-    );
-  });
+  } catch (error) {
+    if (error.response) {
+      tl.debug(`[SQ] API GET '${path}' failed, status code was: ${error.response.status}`);
+    } else {
+      tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`);
+    }
+    throw new Error(`[SQ] API GET '${path}' failed, error is ${error.message}`);
+  }
 }
 
-function isString(x) {
-  return Object.prototype.toString.call(x) === "[object String]";
-}
-
-export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
-  return get(endpoint, path, true, query);
-}
-
-export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
-  return get(endpoint, "/api/server/version", false).then(semver.coerce) as Promise<semver.SemVer>;
-}
-
-function logAndReject(reject, errMsg) {
-  tl.debug(errMsg);
-  return reject(new Error(errMsg));
+export async function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
+  return semver.coerce(await get<string>(endpoint, "/api/server/version", false));
 }

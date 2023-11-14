@@ -10,16 +10,6 @@ import TaskReport from "./sonarqube/TaskReport";
 const REPO_NAME_VAR = "Build.Repository.Name";
 
 export default async function prepareTask(endpoint: Endpoint, rootPath: string) {
-  if (
-    endpoint.type === EndpointType.SonarQube &&
-    (endpoint.url.startsWith("https://sonarcloud.io") ||
-      endpoint.url.startsWith("https://sonarqube.com"))
-  ) {
-    tl.warning(
-      "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud",
-    );
-  }
-
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
