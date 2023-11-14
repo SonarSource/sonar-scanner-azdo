@@ -41,6 +41,8 @@ it("should fail unless SONARQUBE_SCANNER_PARAMS are supplied", async () => {
 });
 
 it("check multiple report status and set global quality gate for build properties should be ok", async () => {
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockImplementation(() => null);
+
   // Mock waiting for the ceTask to complete and return a Task
   const returnedTaskOk = new Task({
     analysisId: "123",
@@ -106,6 +108,8 @@ it("check multiple report status and set global quality gate for build propertie
 });
 
 it("check multiple report status and set global quality gate for build properties should be failed", async () => {
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockImplementation(() => null);
+
   // Mock waiting for the ceTask to complete and return a Task
   const returnedTaskOk = new Task({
     analysisId: "123",

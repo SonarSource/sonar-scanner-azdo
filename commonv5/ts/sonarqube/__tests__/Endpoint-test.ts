@@ -8,6 +8,8 @@ beforeEach(() => {
 
 // VSTS-134
 it("should not return null password", () => {
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
+
   const enpoint = new Endpoint(EndpointType.SonarQube, {
     url: "http://foo",
     token: undefined,
@@ -15,11 +17,12 @@ it("should not return null password", () => {
     password: undefined,
     organization: undefined,
   });
-  expect(enpoint.auth).toEqual({ user: "token123" });
+  expect(enpoint.auth).toEqual({ username: "token123", password: "" });
 });
 
 // VSTS-250
 it("On SonarCloud password is always null", () => {
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://sonarcloud.io");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("username1243");
@@ -29,11 +32,12 @@ it("On SonarCloud password is always null", () => {
   const result = Endpoint.getEndpoint("sonarcloud", EndpointType.SonarCloud);
 
   expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSSWORD]).toBeNull();
-  expect(result.auth.pass).toBeUndefined();
+  expect(result.auth.password).toEqual("");
 });
 
 // VSTS-250
 it("On SonarQube password is empty should not be intepreted", () => {
+  jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://localhost:9000");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("username1243");
@@ -42,7 +46,7 @@ it("On SonarQube password is empty should not be intepreted", () => {
   const result = Endpoint.getEndpoint("sonarqube", EndpointType.SonarQube);
 
   expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSSWORD]).toBeNull();
-  expect(result.auth.pass).toBeUndefined();
+  expect(result.auth.password).toEqual("");
 });
 
 // VSTS-250
@@ -55,7 +59,7 @@ it("On SonarQube password is not empty should be intepreted", () => {
   const result = Endpoint.getEndpoint("sonarqube", EndpointType.SonarQube);
 
   expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSSWORD]).toEqual("P@ssword");
-  expect(result.auth.pass).toEqual("P@ssword");
+  expect(result.auth.password).toEqual("P@ssword");
 });
 
 // VSTS-302

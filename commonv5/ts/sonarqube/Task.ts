@@ -1,5 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { getJSON } from "../helpers/request";
+import { get } from "../helpers/request";
 import Endpoint, { EndpointType } from "./Endpoint";
 
 interface ITask {
@@ -45,7 +45,7 @@ export default class Task {
     } else {
       query = { id: taskId, additionalFields: "warnings" };
     }
-    return getJSON(endpoint, `/api/ce/task`, query).then(
+    return get(endpoint, `/api/ce/task`, true, query).then(
       ({ task }: { task: ITask }) => {
         tl.debug(`[SQ] Task status:` + task.status);
         if (tries <= 0) {

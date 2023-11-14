@@ -1,10 +1,10 @@
-import { getJSON } from "../../helpers/request";
+import { get } from "../../helpers/request";
 import Analysis from "../Analysis";
 import Endpoint, { EndpointType } from "../Endpoint";
 import Metrics from "../Metrics";
 
 jest.mock("../../helpers/request", () => ({
-  getJSON: jest.fn(() =>
+  get: jest.fn(() =>
     Promise.resolve({
       projectStatus: {
         status: "ERROR",
@@ -25,6 +25,7 @@ jest.mock("../../helpers/request", () => ({
 jest.mock("azure-pipelines-task-lib/task", () => ({
   debug: jest.fn(),
   error: jest.fn(),
+  getHttpProxyConfiguration: jest.fn().mockImplementation(() => null),
 }));
 
 const METRICS = new Metrics([{ key: "bugs", name: "Bugs", type: "INT" }]);
@@ -38,12 +39,12 @@ const GET_ANALYSIS_DATA = {
 };
 
 beforeEach(() => {
-  (getJSON as jest.Mock<any>).mockClear();
+  (get as jest.Mock<any>).mockClear();
 });
 
 it("should generate an analysis status with error", async () => {
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");
@@ -52,12 +53,12 @@ it("should generate an analysis status with error", async () => {
 });
 
 it("should generate a green analysis status", async () => {
-  (getJSON as jest.Mock<any>).mockImplementationOnce(() =>
+  (get as jest.Mock<any>).mockImplementationOnce(() =>
     Promise.resolve({ projectStatus: { status: "SUCCESS", conditions: [] } }),
   );
 
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("SUCCESS");
@@ -71,7 +72,7 @@ it("should not fail when metrics are missing", async () => {
     dashboardUrl: undefined,
     metrics: undefined,
   });
-  expect(getJSON).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");

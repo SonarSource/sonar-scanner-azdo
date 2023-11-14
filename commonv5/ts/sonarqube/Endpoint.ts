@@ -1,6 +1,11 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { RequestInit } from "node-fetch";
+import proxyAgent from "proxy-agent";
+import { getProxyForUrl } from "proxy-from-env";
 import * as semver from "semver";
 import { PROP_NAMES } from "../helpers/utils";
+
+const REQUEST_TIMEOUT = 60000;
 
 export enum EndpointType {
   SonarCloud = "SonarCloud",
@@ -16,24 +21,59 @@ export interface EndpointData {
 }
 
 export default class Endpoint {
-  constructor(
-    public type: EndpointType,
-    private readonly data: EndpointData,
-  ) {}
+  public type: EndpointType;
 
-  public get auth() {
-    if (!this.data.token && this.data.password && this.data.password.length > 0) {
-      return { user: this.data.username, pass: this.data.password };
+  private readonly data: EndpointData;
+
+  constructor(type: EndpointType, data: EndpointData) {
+    this.type = type;
+    this.data = data;
+    // Remove trailing slash at the end of the base url, if any
+    if (this.data) {
+      this.data.url = this.data?.url.replace(/\/$/, "");
     }
-    return { user: this.data.token || this.data.username };
-  }
-
-  public get organization() {
-    return this.data.organization;
   }
 
   public get url() {
     return this.data.url;
+  }
+
+  public get auth(): { username: string; password: string } {
+    // If using user/password
+    if (!this.data.token && this.data.password && this.data.password.length > 0) {
+      return { username: this.data.username, password: this.data.password };
+    }
+    // Using token
+    return { username: this.data.token || this.data.username, password: "" };
+  }
+
+  toFetchOptions(url: string): Partial<RequestInit> {
+    const options: Partial<RequestInit> = {
+      method: "get",
+      timeout: REQUEST_TIMEOUT,
+    };
+
+    // Add HTTP auth from this.auth
+    options.headers = {
+      Authorization: `Basic ${Buffer.from(`${this.auth.username}:${this.auth.password}`).toString(
+        "base64",
+      )}`,
+    };
+
+    // Add proxy configuration, when relevant
+    const envProxyUrl = getProxyForUrl(url);
+    const azureProxyUrl = tl.getHttpProxyConfiguration()?.proxyFormattedUrl;
+    if (envProxyUrl) {
+      options.agent = proxyAgent(envProxyUrl);
+      tl.debug("Using proxy agent from environment: " + JSON.stringify(options.agent));
+    } else if (azureProxyUrl) {
+      options.agent = proxyAgent(azureProxyUrl);
+      tl.debug("Using proxy agent from Azure: " + JSON.stringify(options.agent));
+    } else {
+      tl.debug("Not using a proxy agent");
+    }
+
+    return options;
   }
 
   public toJson() {
