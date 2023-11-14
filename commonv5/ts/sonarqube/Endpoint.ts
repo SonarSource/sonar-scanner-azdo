@@ -3,7 +3,7 @@ import { RequestInit } from "node-fetch";
 import proxyAgent from "proxy-agent";
 import { getProxyForUrl } from "proxy-from-env";
 import * as semver from "semver";
-import { PROP_NAMES } from "../helpers/utils";
+import { PROP_NAMES } from "../helpers/constants";
 
 const REQUEST_TIMEOUT = 60000;
 
