@@ -4,6 +4,7 @@ import { Guid } from "guid-typescript";
 import * as path from "path";
 import * as semver from "semver";
 import Endpoint, { EndpointType } from "./Endpoint";
+import { TaskVariables } from "../helpers/constants";
 
 export const REPORT_TASK_NAME = "report-task.txt";
 export const SONAR_TEMP_DIRECTORY_NAME = "sonar";
@@ -74,8 +75,8 @@ export default class TaskReport {
       );
       taskReportGlob = path.join("**", REPORT_TASK_NAME);
       taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.BuildDirectory"), taskReportGlob);
-    } else if (tl.getVariable("SONARQUBE_SCANNER_REPORTTASKFILE")) {
-      taskReportGlob = tl.getVariable("SONARQUBE_SCANNER_REPORTTASKFILE");
+    } else if (tl.getVariable(TaskVariables.SonarQubeScannerReportTaskFile)) {
+      taskReportGlob = tl.getVariable(TaskVariables.SonarQubeScannerReportTaskFile);
       taskReportGlobResult = tl.find(taskReportGlob);
     } else {
       taskReportGlob = TaskReport.getDefaultPathGlob();

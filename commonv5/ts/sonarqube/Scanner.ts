@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { PROP_NAMES } from "../helpers/constants";
+import { TaskVariables, PROP_NAMES } from "../helpers/constants";
 import { isWindows } from "../helpers/utils";
 
 export enum ScannerMode {
@@ -197,12 +197,12 @@ export class ScannerMSBuild extends Scanner {
     if (isWindows()) {
       const scannerExePath = this.findFrameworkScannerPath();
       tl.debug(`Using classic scanner at ${scannerExePath}`);
-      tl.setVariable("SONARQUBE_SCANNER_MSBUILD_EXE", scannerExePath);
+      tl.setVariable(TaskVariables.SonarQubeScannerMSBuildExe, scannerExePath);
       scannerRunner = this.getScannerRunner(scannerExePath, true);
     } else {
       const scannerDllPath = this.findDotnetScannerPath();
       tl.debug(`Using dotnet scanner at ${scannerDllPath}`);
-      tl.setVariable("SONARQUBE_SCANNER_MSBUILD_DLL", scannerDllPath);
+      tl.setVariable(TaskVariables.SonarQubeScannerMSBuildDll, scannerDllPath);
       scannerRunner = this.getScannerRunner(scannerDllPath, false);
 
       // Need to set executable flag on the embedded scanner CLI
@@ -250,8 +250,8 @@ export class ScannerMSBuild extends Scanner {
 
   public async runAnalysis() {
     const scannerRunner = isWindows()
-      ? this.getScannerRunner(tl.getVariable("SONARQUBE_SCANNER_MSBUILD_EXE"), true)
-      : this.getScannerRunner(tl.getVariable("SONARQUBE_SCANNER_MSBUILD_DLL"), false);
+      ? this.getScannerRunner(tl.getVariable(TaskVariables.SonarQubeScannerMSBuildExe), true)
+      : this.getScannerRunner(tl.getVariable(TaskVariables.SonarQubeScannerMSBuildDll), false);
 
     scannerRunner.arg("end");
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);

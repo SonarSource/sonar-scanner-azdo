@@ -1,4 +1,4 @@
-import { sanitizeVariable, setIfNotEmpty, toCleanJSON } from "../utils";
+import { sanitizeVariable, toCleanJSON } from "../utils";
 
 describe("toCleanJSON", () => {
   it("should jsonify", () => {
@@ -16,17 +16,5 @@ describe("sanitizeVariable", () => {
         '{ "foo": "a", "bar": "b", "sonar.login": "aaabbbccc", "sonar.password": "fffjjjkkk" }',
       ),
     ).toBe('{"foo":"a","bar":"b"}');
-  });
-});
-
-describe("setIfNotEmpty", () => {
-  it("should correctly set a property", () => {
-    const test = {};
-    setIfNotEmpty(test, "foo", "");
-    expect(test).toEqual({});
-    setIfNotEmpty(test, "foo", undefined);
-    expect(test).toEqual({});
-    setIfNotEmpty(test, "foo", "bar");
-    expect(test).toEqual({ foo: "bar" });
   });
 });

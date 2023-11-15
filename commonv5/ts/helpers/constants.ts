@@ -25,3 +25,16 @@ export const DEFAULT_BRANCH_NAME = "refs/heads/master";
 export enum AzureBuildVariables {
   BuildRepositoryName = "Build.Repository.Name",
 }
+
+export enum TaskVariables {
+  SonarQubeServerVersion = "SONARQUBE_SERVER_VERSION",
+  SonarQubeScannerMode = "SONARQUBE_SCANNER_MODE",
+  SonarQubeScannerParams = "SONARQUBE_SCANNER_PARAMS",
+  SonarQubeScannerReportTaskFile = "SONARQUBE_SCANNER_REPORTTASKFILE",
+  SonarQubeEndpoint = "SONARQUBE_ENDPOINT",
+  SonarQubeScannerMSBuildExe = "SONARQUBE_SCANNER_MSBUILD_EXE",
+  SonarQubeScannerMSBuildDll = "SONARQUBE_SCANNER_MSBUILD_DLL",
+  JavaHome = "JAVA_HOME",
+}
+
+export const TASK_MISSING_VARIABLE_ERROR_HINT = `Make sure you are not mixing tasks from different major versions. If you are using a multistage pipeline, make sure the tasks are in the same stage.`;
