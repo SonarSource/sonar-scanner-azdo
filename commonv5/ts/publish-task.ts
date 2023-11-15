@@ -6,21 +6,25 @@ import Endpoint, { EndpointData, EndpointType } from "./sonarqube/Endpoint";
 import Metrics from "./sonarqube/Metrics";
 import Task, { TimeOutReachedError } from "./sonarqube/Task";
 import TaskReport from "./sonarqube/TaskReport";
+import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "./helpers/constants";
 
 let globalQualityGateStatus = "";
 
-export default async function publishTask(endpointType: EndpointType) {
-  const params = tl.getVariable("SONARQUBE_SCANNER_PARAMS");
-  if (!params) {
+export default async function publishTask(_endpointType: EndpointType) {
+  const missingVariables = [
+    TaskVariables.SonarQubeScannerParams,
+    TaskVariables.SonarQubeEndpoint,
+  ].filter((variable) => typeof tl.getVariable(variable) === "undefined");
+  if (missingVariables.length > 0) {
     tl.setResult(
       tl.TaskResult.Failed,
-      `The ${endpointType} Prepare Analysis Configuration must be added.`,
+      `Variables are missing. Please make sure that you are running the Prepare and Analyze tasks before running the Publish task.\n${TASK_MISSING_VARIABLE_ERROR_HINT}`,
     );
     return;
   }
 
   const endpointData: { type: EndpointType; data: EndpointData } = JSON.parse(
-    tl.getVariable("SONARQUBE_ENDPOINT"),
+    tl.getVariable(TaskVariables.SonarQubeEndpoint),
   );
   const endpoint = new Endpoint(endpointData.type, endpointData.data);
   const metrics = await Metrics.getAllMetrics(endpoint);

@@ -1,4 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { TaskVariables } from "./constants";
 
 export default class JavaVersionResolver {
   private static javaHomeOriginalPath: string;
@@ -23,8 +24,8 @@ export default class JavaVersionResolver {
     if (jdkversionSource !== "JAVA_HOME") {
       newJavaPath = this.lookupVariable(jdkversionSource);
       if (newJavaPath) {
-        this.javaHomeOriginalPath = tl.getVariable("JAVA_HOME");
-        tl.setVariable("JAVA_HOME", newJavaPath);
+        this.javaHomeOriginalPath = tl.getVariable(TaskVariables.JavaHome);
+        tl.setVariable(TaskVariables.JavaHome, newJavaPath);
         this.isJavaNewVersionSet = true;
       }
     } else {
@@ -37,7 +38,7 @@ export default class JavaVersionResolver {
   public static revertJavaHomeToOriginal() {
     if (this.isJavaNewVersionSet) {
       tl.debug("Reverting JAVA_HOME to its initial path.");
-      tl.setVariable("JAVA_HOME", this.javaHomeOriginalPath);
+      tl.setVariable(TaskVariables.JavaHome, this.javaHomeOriginalPath);
     }
   }
 }

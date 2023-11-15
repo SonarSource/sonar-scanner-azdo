@@ -10,6 +10,7 @@ import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Metrics from "../sonarqube/Metrics";
 import Task, { TimeOutReachedError } from "../sonarqube/Task";
 import TaskReport from "../sonarqube/TaskReport";
+import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "../helpers/constants";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -28,15 +29,15 @@ const SQ_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoin
 const METRICS = new Metrics([]);
 
 it("should fail unless SONARQUBE_SCANNER_PARAMS are supplied", async () => {
-  jest.spyOn(tl, "getVariable").mockImplementation(() => null);
+  jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
   jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
   await publishTask.default(EndpointType.SonarCloud);
 
-  expect(tl.getVariable).toBeCalledWith("SONARQUBE_SCANNER_PARAMS");
-  expect(tl.setResult).toBeCalledWith(
+  expect(tl.getVariable).toHaveBeenCalledWith(TaskVariables.SonarQubeScannerParams);
+  expect(tl.setResult).toHaveBeenCalledWith(
     tl.TaskResult.Failed,
-    "The SonarCloud Prepare Analysis Configuration must be added.",
+    `Variables are missing. Please make sure that you are running the Prepare and Analyze tasks before running the Publish task.\n${TASK_MISSING_VARIABLE_ERROR_HINT}`,
   );
 });
 
@@ -288,8 +289,8 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
 
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
-  tl.setVariable("SONARQUBE_SCANNER_PARAMS", "anything...");
-  tl.setVariable("SONARQUBE_ENDPOINT", SC_ENDPOINT.toJson());
+  tl.setVariable(TaskVariables.SonarQubeScannerParams, "anything...");
+  tl.setVariable(TaskVariables.SonarQubeEndpoint, SC_ENDPOINT.toJson());
 
   // Mock finding two report files to process
   jest

@@ -1,5 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import JavaVersionResolver from "../java-version-resolver";
+import { TaskVariables } from "../constants";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -15,7 +16,7 @@ describe("setJavaVersion", () => {
 
     JavaVersionResolver.setJavaVersion(jdkSource);
 
-    const actualJavaHome = tl.getVariable("JAVA_HOME");
+    const actualJavaHome = tl.getVariable(TaskVariables.JavaHome);
 
     expect(actualJavaHome).toBe(expectedJavaPath);
   });
@@ -30,7 +31,7 @@ describe("setJavaVersion", () => {
 
     JavaVersionResolver.setJavaVersion(jdkSource);
 
-    const actualJavaHome = tl.getVariable("JAVA_HOME");
+    const actualJavaHome = tl.getVariable(TaskVariables.JavaHome);
 
     expect(actualJavaHome).toBe(java11Path);
   });

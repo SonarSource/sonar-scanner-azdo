@@ -1,22 +1,23 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import * as analyze from "../../ts/analyze-task";
+import analyzeTask from "../../ts/analyze-task";
 import Scanner, { ScannerCLI, ScannerMode } from "../sonarqube/Scanner";
+import { TASK_MISSING_VARIABLE_ERROR_HINT } from "../helpers/constants";
 
 it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
+  jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
-  const expectedError = new Error(
-    "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task",
+  await analyzeTask(__dirname, "JAVA_HOME");
+
+  expect(tl.setResult).toHaveBeenCalledWith(
+    tl.TaskResult.Failed,
+    `Variables are missing. Please make sure that you are running the Prepare task before running the Analyze task.\n${TASK_MISSING_VARIABLE_ERROR_HINT}`,
   );
-  try {
-    await analyze.default(__dirname, "JAVA_HOME");
-  } catch (e) {
-    expect(e).toEqual(expectedError);
-  }
 });
 
 it("should run scanner", async () => {
   //SONARQUBE_SCANNER_MODE
+  jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
 
   //JAVA_HOME
@@ -43,9 +44,9 @@ it("should run scanner", async () => {
 
   jest.spyOn(scanner, "runAnalysis").mockImplementation(() => null);
 
-  await analyze.default(__dirname, "JAVA_HOME");
+  await analyzeTask(__dirname, "JAVA_HOME");
 
   expect(Scanner.getAnalyzeScanner).toHaveBeenCalledWith(__dirname, ScannerMode.CLI);
 
-  expect(scanner.runAnalysis).toBeCalled();
+  expect(scanner.runAnalysis).toHaveBeenCalled();
 });

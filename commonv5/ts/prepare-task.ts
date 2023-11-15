@@ -5,6 +5,7 @@ import {
   AzureBuildVariables,
   AzureProvider,
   DEFAULT_BRANCH_NAME as DEFAULT_BRANCH_REF,
+  TaskVariables,
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
 import { toCleanJSON } from "./helpers/utils";
@@ -20,7 +21,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   let props: { [key: string]: string } = {};
 
   if (branchFeatureSupported(endpoint, serverVersion)) {
-    populateBranchAndPrProps(props);
+    await populateBranchAndPrProps(props);
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
     tl.debug(
@@ -35,18 +36,21 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     ...parseScannerExtraProperties(),
   };
 
-  tl.setVariable("SONARQUBE_SERVER_VERSION", serverVersion.format());
-  tl.setVariable("SONARQUBE_SCANNER_MODE", scannerMode);
-  tl.setVariable("SONARQUBE_SCANNER_REPORTTASKFILE", props["sonar.scanner.metadataFilePath"]);
-  tl.setVariable("SONARQUBE_ENDPOINT", endpoint.toJson(), true);
+  tl.setVariable(TaskVariables.SonarQubeServerVersion, serverVersion.format());
+  tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
+  tl.setVariable(
+    TaskVariables.SonarQubeScannerReportTaskFile,
+    props["sonar.scanner.metadataFilePath"],
+  );
+  tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
 
   tl.getDelimitedInput("extraProperties", "\n")
     .filter((keyValue) => !keyValue.startsWith("#"))
     .map((keyValue) => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 
-  tl.setVariable("SONARQUBE_SCANNER_MODE", scannerMode);
-  tl.setVariable("SONARQUBE_ENDPOINT", endpoint.toJson(), true);
+  tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
+  tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
 
   const jsonParams = toCleanJSON({
     ...endpoint.toSonarProps(serverVersion),
@@ -54,7 +58,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     ...props,
   });
 
-  tl.setVariable("SONARQUBE_SCANNER_PARAMS", jsonParams);
+  tl.setVariable(TaskVariables.SonarQubeScannerParams, jsonParams);
 
   await scanner.runPrepare();
 }
@@ -66,7 +70,7 @@ export function branchFeatureSupported(endpoint, serverVersion: string | semver.
   return semver.satisfies(serverVersion, ">=7.2.0");
 }
 
-export function populateBranchAndPrProps(props: { [key: string]: string }) {
+export async function populateBranchAndPrProps(props: { [key: string]: string }) {
   const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri");
   const provider = tl.getVariable("Build.Repository.Provider") as AzureProvider;
   const pullRequestId = tl.getVariable("System.PullRequest.PullRequestId");
@@ -103,7 +107,7 @@ export function populateBranchAndPrProps(props: { [key: string]: string }) {
       tl.warning(`Unsupported PR provider '${provider}'`);
       props["sonar.scanner.skip"] = "true";
     }
-  } else if (!isDefaultBranch()) {
+  } else if (!(await isDefaultBranch())) {
     // If analyzing a branch and not on default branch, specify branch
     props["sonar.branch.name"] = getBranchNameFromRef(tl.getVariable("Build.SourceBranch"));
   }

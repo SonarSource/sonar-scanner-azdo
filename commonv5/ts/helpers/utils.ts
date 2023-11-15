@@ -8,12 +8,6 @@ export function toCleanJSON(props: { [key: string]: string | undefined }) {
   );
 }
 
-export function setIfNotEmpty(props: { [key: string]: string }, key: string, value?: string) {
-  if (value) {
-    props[key] = value;
-  }
-}
-
 export function sanitizeVariable(jsonPayload: string) {
   const jsonObj = JSON.parse(jsonPayload);
   delete jsonObj[PROP_NAMES.LOGIN];
