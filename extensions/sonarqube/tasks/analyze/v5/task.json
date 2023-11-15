@@ -11,8 +11,8 @@
   "author": "sonarsource",
   "version": {
     "Major": 5,
-    "Minor": 17,
-    "Patch": 2
+    "Minor": 18,
+    "Patch": 0
   },
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
   "minimumAgentVersion": "2.144.0",
