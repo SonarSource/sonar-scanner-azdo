@@ -74,6 +74,9 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
       tl.getVariable("System.PullRequest.SourceBranch"),
     );
     if (provider === "TfsGit") {
+      // sonar.pullrequest.provider is deprecated in 8.1 and dropped between 8.1-8.9
+      // We keep this to support legacy versions of SQ and due to the fact that scanner
+      // is not rejecting this property. However we should drop it later on
       props["sonar.pullrequest.provider"] = "vsts";
       props["sonar.pullrequest.vsts.instanceUrl"] = collectionUrl;
       props["sonar.pullrequest.vsts.project"] = tl.getVariable("System.TeamProject");
