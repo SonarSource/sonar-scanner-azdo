@@ -19,7 +19,7 @@ interface Condition {
   warningThreshold?: string;
 }
 
-const textStyle = (color: string = "#3E4357") => `
+const textStyle = (color = "#3E4357") => `
   color: ${color};
   font-family: Inter;
   font-size: 14px;

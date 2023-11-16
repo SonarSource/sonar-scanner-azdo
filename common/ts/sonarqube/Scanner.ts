@@ -115,7 +115,7 @@ export class ScannerCLI extends Scanner {
   constructor(
     rootPath: string,
     private readonly data: ScannerCLIData,
-    private cliMode?: string,
+    private readonly cliMode?: string,
   ) {
     super(rootPath, ScannerMode.CLI);
   }

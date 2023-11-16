@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { TaskVariables, PROP_NAMES } from "../helpers/constants";
+import { PROP_NAMES, TaskVariables } from "../helpers/constants";
 import { isWindows } from "../helpers/utils";
 
 export enum ScannerMode {
@@ -116,7 +116,7 @@ export class ScannerCLI extends Scanner {
   constructor(
     rootPath: string,
     private readonly data: ScannerCLIData,
-    private cliMode?: string,
+    private readonly cliMode?: string,
   ) {
     super(rootPath, ScannerMode.CLI);
   }

@@ -55,9 +55,8 @@ export default class Endpoint {
 
     // Add HTTP auth from this.auth
     options.headers = {
-      Authorization: `Basic ${Buffer.from(`${this.auth.username}:${this.auth.password}`).toString(
-        "base64",
-      )}`,
+      Authorization:
+        "Basic " + Buffer.from(`${this.auth.username}:${this.auth.password}`).toString("base64"),
     };
 
     // Add proxy configuration, when relevant
