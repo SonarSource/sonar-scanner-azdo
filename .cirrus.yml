@@ -13,7 +13,7 @@ env:
   BURGR_PASSWORD: VAULT[development/kv/data/burgr data.cirrus_password]
   ### Project variables
   DEPLOY_PULL_REQUEST: true
-
+  NIGHTLY_CRON: 'nightly'
 #
 # RE-USABLE CONFIGS
 #
@@ -78,7 +78,7 @@ promote_task:
 mend_scan_task:
   depends_on:
     - build
-  only_if:  $CIRRUS_BRANCH == "master"
+  <<: *ONLY_SONARSOURCE_QA
   timeout_in: 30m
   eks_container:
     <<: *CONTAINER_TEMPLATE
@@ -98,7 +98,6 @@ mend_scan_task:
     - PROJECT_VERSION='NO-VERSION'
     - echo $PROJECT_VERSION
     - source ws_scan.sh
-  allow_failures: $CIRRUS_CRON != "nightly"
   always:
     ws_artifacts:
       path: "whitesource/**/*"
