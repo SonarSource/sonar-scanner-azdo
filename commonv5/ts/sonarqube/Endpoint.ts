@@ -1,6 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { HttpProxyAgent } from "http-proxy-agent";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { RequestInit } from "node-fetch";
-import proxyAgent from "proxy-agent";
 import { getProxyForUrl } from "proxy-from-env";
 import * as semver from "semver";
 import { PROP_NAMES } from "../helpers/constants";
@@ -47,7 +48,7 @@ export default class Endpoint {
     return { username: this.data.token || this.data.username, password: "" };
   }
 
-  toFetchOptions(url: string): Partial<RequestInit> {
+  toFetchOptions(endpointUrl: string): Partial<RequestInit> {
     const options: Partial<RequestInit> = {
       method: "get",
       timeout: REQUEST_TIMEOUT,
@@ -60,13 +61,14 @@ export default class Endpoint {
     };
 
     // Add proxy configuration, when relevant
-    const envProxyUrl = getProxyForUrl(url);
+    const envProxyUrl = getProxyForUrl(endpointUrl);
     const azureProxyUrl = tl.getHttpProxyConfiguration()?.proxyFormattedUrl;
+    const ProxyAgentClass = endpointUrl.startsWith("https://") ? HttpsProxyAgent : HttpProxyAgent;
     if (envProxyUrl) {
-      options.agent = proxyAgent(envProxyUrl);
+      options.agent = new ProxyAgentClass(envProxyUrl);
       tl.debug("Using proxy agent from environment: " + JSON.stringify(options.agent));
     } else if (azureProxyUrl) {
-      options.agent = proxyAgent(azureProxyUrl);
+      options.agent = new ProxyAgentClass(azureProxyUrl);
       tl.debug("Using proxy agent from Azure: " + JSON.stringify(options.agent));
     } else {
       tl.debug("Not using a proxy agent");

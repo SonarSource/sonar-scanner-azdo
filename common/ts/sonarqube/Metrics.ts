@@ -44,7 +44,7 @@ export default class Metrics {
       data: { f?: string; p?: number; ps?: number } = { f: "name", ps: 500 },
       prev?: MetricsResponse,
     ): Promise<Metrics> {
-      return get(endpoint, "/api/metrics/search", data).then((r: MetricsResponse) => {
+      return get(endpoint, "/api/metrics/search", true, data).then((r: MetricsResponse) => {
         const result = prev ? prev.metrics.concat(r.metrics) : r.metrics;
         if (r.p * r.ps >= r.total) {
           return new Metrics(result);
