@@ -163,7 +163,7 @@ export default class Analysis {
     warnings: string[];
   }): Promise<Analysis> {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
-    return get(endpoint, "/api/qualitygates/project_status", { analysisId }).then(
+    return get(endpoint, "/api/qualitygates/project_status", true, { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
         new Analysis(projectStatus, endpoint.type, warnings, dashboardUrl, metrics, projectName),
       (err) => {

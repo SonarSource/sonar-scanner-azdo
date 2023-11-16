@@ -1,5 +1,11 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { HttpProxyAgent } from "http-proxy-agent";
+import { HttpsProxyAgent } from "https-proxy-agent";
+import { RequestInit } from "node-fetch";
+import { getProxyForUrl } from "proxy-from-env";
 import { PROP_NAMES } from "../helpers/utils";
+
+export const REQUEST_TIMEOUT = 60000;
 
 export enum EndpointType {
   SonarCloud = "SonarCloud",
@@ -33,6 +39,35 @@ export default class Endpoint {
 
   public get url() {
     return this.data.url;
+  }
+
+  toFetchOptions(endpointUrl: string): Partial<RequestInit> {
+    const options: Partial<RequestInit> = {
+      method: "get",
+      timeout: REQUEST_TIMEOUT,
+    };
+
+    // Add HTTP auth from this.auth
+    options.headers = {
+      Authorization:
+        "Basic " + Buffer.from(`${this.auth.user}:${this.auth.pass ?? ""}`).toString("base64"),
+    };
+
+    // Add proxy configuration, when relevant
+    const envProxyUrl = getProxyForUrl(endpointUrl);
+    const azureProxyUrl = tl.getHttpProxyConfiguration()?.proxyFormattedUrl;
+    const ProxyAgentClass = endpointUrl.startsWith("https://") ? HttpsProxyAgent : HttpProxyAgent;
+    if (envProxyUrl) {
+      options.agent = new ProxyAgentClass(envProxyUrl);
+      tl.debug("Using proxy agent from environment: " + JSON.stringify(options.agent));
+    } else if (azureProxyUrl) {
+      options.agent = new ProxyAgentClass(azureProxyUrl);
+      tl.debug("Using proxy agent from Azure: " + JSON.stringify(options.agent));
+    } else {
+      tl.debug("Not using a proxy agent");
+    }
+
+    return options;
   }
 
   public toJson() {

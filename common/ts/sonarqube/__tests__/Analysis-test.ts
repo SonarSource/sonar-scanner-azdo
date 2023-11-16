@@ -43,7 +43,7 @@ beforeEach(() => {
 
 it("should generate an analysis status with error", async () => {
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");
@@ -57,7 +57,7 @@ it("should generate a green analysis status", async () => {
   );
 
   const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("SUCCESS");
@@ -71,7 +71,7 @@ it("should not fail when metrics are missing", async () => {
     dashboardUrl: undefined,
     metrics: undefined,
   });
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", {
+  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
     analysisId: "analysisId",
   });
   expect(analysis.status).toBe("ERROR");

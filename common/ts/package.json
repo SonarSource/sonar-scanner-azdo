@@ -5,11 +5,14 @@
   "author": "SonarSource",
   "license": "LGPL-3.0",
   "dependencies": {
-    "axios": "0.27.2",
     "azure-devops-node-api": "^12.1.0",
     "azure-pipelines-task-lib": "^4.4.0",
     "fs-extra": "5.0.0",
     "guid-typescript": "1.0.9",
+    "node-fetch": "2.7.0",
+    "http-proxy-agent": "4.0.1",
+    "https-proxy-agent": "5.0.1",
+    "proxy-from-env": "1.1.0",
     "semver": "5.7.1"
   },
   "engines": {
