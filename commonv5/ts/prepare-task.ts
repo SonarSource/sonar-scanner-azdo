@@ -4,7 +4,7 @@ import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils
 import {
   AzureBuildVariables,
   AzureProvider,
-  DEFAULT_BRANCH_NAME as DEFAULT_BRANCH_REF,
+  DEFAULT_BRANCH_REF,
   TaskVariables,
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
@@ -148,7 +148,7 @@ async function isDefaultBranch() {
     return currentBranch === DEFAULT_BRANCH_REF;
   }
 
-  return false;
+  return true;
 }
 
 /**
