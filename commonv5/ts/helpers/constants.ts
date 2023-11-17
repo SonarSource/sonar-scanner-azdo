@@ -20,7 +20,7 @@ export enum AzureProvider {
   Bitbucket = "Bitbucket",
 }
 
-export const DEFAULT_BRANCH_NAME = "refs/heads/master";
+export const DEFAULT_BRANCH_REF = "refs/heads/master";
 
 export enum AzureBuildVariables {
   BuildRepositoryName = "Build.Repository.Name",
