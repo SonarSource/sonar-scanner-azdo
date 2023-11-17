@@ -13,12 +13,14 @@ export async function get<T>(
   isJson: boolean,
   query?: RequestData,
 ): Promise<T | string> {
-  tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
+  const hasQuery = query && Object.keys(query).length > 0;
+  const fullUrl =
+    endpoint.url + path + (hasQuery ? "?" + new URLSearchParams(query).toString() : "");
+  tl.debug(
+    `[SQ] API GET: '${path}' with full URL "${fullUrl}" and query "${JSON.stringify(query)}"`,
+  );
 
   try {
-    const hasQuery = query && Object.keys(query).length > 0;
-    const fullUrl =
-      endpoint.url + path + (hasQuery ? "?" + new URLSearchParams(query).toString() : "");
     const response = await fetch(fullUrl, endpoint.toFetchOptions(fullUrl));
     if (isJson) {
       return await response.json();
@@ -33,6 +35,15 @@ export async function get<T>(
     }
     throw new Error(`[SQ] API GET '${path}' failed, error is ${error.message}`);
   }
+}
+
+export function startIgnoringCertificate() {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED_BACKUP = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
+export function stopIgnoringCertificate() {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = process.env.NODE_TLS_REJECT_UNAUTHORIZED_BACKUP;
 }
 
 export async function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
