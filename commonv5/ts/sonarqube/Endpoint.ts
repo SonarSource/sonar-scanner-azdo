@@ -62,7 +62,7 @@ export default class Endpoint {
 
     // Add proxy configuration, when relevant
     const envProxyUrl = getProxyForUrl(endpointUrl);
-    const azureProxyUrl = tl.getHttpProxyConfiguration()?.proxyFormattedUrl;
+    const azureProxyUrl = tl.getHttpProxyConfiguration(endpointUrl)?.proxyFormattedUrl;
     const ProxyAgentClass = endpointUrl.startsWith("https://") ? HttpsProxyAgent : HttpProxyAgent;
     if (envProxyUrl) {
       options.agent = new ProxyAgentClass(envProxyUrl);

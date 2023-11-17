@@ -35,6 +35,15 @@ export async function get(
   }
 }
 
+export function startIgnoringCertificate() {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED_BACKUP = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
+export function stopIgnoringCertificate() {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = process.env.NODE_TLS_REJECT_UNAUTHORIZED_BACKUP;
+}
+
 export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
   return get(endpoint, "/api/server/version", false).then(semver.coerce);
 }
