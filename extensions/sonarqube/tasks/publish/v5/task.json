@@ -10,7 +10,7 @@
   "version": {
     "Major": 5,
     "Minor": 5,
-    "Patch": 2
+    "Patch": 3
   },
   "minimumAgentVersion": "2.144.0",
   "inputs": [
