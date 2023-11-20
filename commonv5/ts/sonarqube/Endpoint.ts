@@ -2,9 +2,10 @@ import * as tl from "azure-pipelines-task-lib/task";
 import { HttpProxyAgent } from "http-proxy-agent";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import { RequestInit } from "node-fetch";
-import { getProxyForUrl } from "proxy-from-env";
 import * as semver from "semver";
+import { URL } from "url";
 import { PROP_NAMES } from "../helpers/constants";
+import { getProxyFromURI } from "../helpers/proxyFromEnv";
 
 const REQUEST_TIMEOUT = 60000;
 
@@ -61,7 +62,7 @@ export default class Endpoint {
     };
 
     // Add proxy configuration, when relevant
-    const envProxyUrl = getProxyForUrl(endpointUrl);
+    const envProxyUrl = getProxyFromURI(new URL(endpointUrl));
     const azureProxyUrl = tl.getHttpProxyConfiguration(endpointUrl)?.proxyFormattedUrl;
     const ProxyAgentClass = endpointUrl.startsWith("https://") ? HttpsProxyAgent : HttpProxyAgent;
     if (envProxyUrl) {
