@@ -12,7 +12,6 @@
     "http-proxy-agent": "4.0.1",
     "https-proxy-agent": "5.0.1",
     "node-fetch": "2.7.0",
-    "proxy-from-env": "1.1.0",
     "semver": "5.7.1"
   },
   "engines": {
