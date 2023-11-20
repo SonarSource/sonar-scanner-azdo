@@ -1,6 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { HttpProxyAgent } from "http-proxy-agent";
-import { HttpsProxyAgent } from "https-proxy-agent";
+import { HttpProxyAgent, HttpsProxyAgent } from "hpagent";
 import { RequestInit } from "node-fetch";
 import { URL } from "url";
 import { getProxyFromURI } from "../helpers/proxyFromEnv";
@@ -54,18 +53,23 @@ export default class Endpoint {
         "Basic " + Buffer.from(`${this.auth.user}:${this.auth.pass ?? ""}`).toString("base64"),
     };
 
-    // Add proxy configuration, when relevant
-    const envProxyUrl = getProxyFromURI(new URL(endpointUrl));
-    const azureProxyUrl = tl.getHttpProxyConfiguration()?.proxyFormattedUrl;
-    const ProxyAgentClass = endpointUrl.startsWith("https://") ? HttpsProxyAgent : HttpProxyAgent;
-    if (envProxyUrl) {
-      options.agent = new ProxyAgentClass(envProxyUrl);
-      tl.debug("Using proxy agent from environment: " + JSON.stringify(options.agent));
-    } else if (azureProxyUrl) {
-      options.agent = new ProxyAgentClass(azureProxyUrl);
-      tl.debug("Using proxy agent from Azure: " + JSON.stringify(options.agent));
+    // Fetch proxy from environment
+    // We ignore proxy set by agent proxy configuration, we need to discuss whether we want to itroduce it
+    // Currently users may pass environment variables (HTTP_PROXY,HTTPS_proxy etc.) to the task or agent to use proxy
+    // as a workaround
+    const proxyUrl = getProxyFromURI(new URL(endpointUrl))
+      ? getProxyFromURI(new URL(endpointUrl))
+      : undefined;
+    if (proxyUrl) {
+      tl.debug("Using proxy agent from environment: " + proxyUrl);
     } else {
       tl.debug("Not using a proxy agent");
+    }
+
+    // When proxy is used we use HttpsProxyAgent or HttpProxyAgent to handle it.
+    if (proxyUrl) {
+      const AgentClass = endpointUrl.startsWith("https://") ? HttpsProxyAgent : HttpProxyAgent;
+      options.agent = new AgentClass({ proxy: proxyUrl });
     }
 
     return options;

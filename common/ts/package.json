@@ -9,9 +9,8 @@
     "azure-pipelines-task-lib": "^4.4.0",
     "fs-extra": "5.0.0",
     "guid-typescript": "1.0.9",
+    "hpagent": "^1.2.0",
     "node-fetch": "2.7.0",
-    "http-proxy-agent": "4.0.1",
-    "https-proxy-agent": "5.0.1",
     "semver": "5.7.1"
   },
   "engines": {

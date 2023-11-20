@@ -35,6 +35,9 @@ function uriInNoProxy(url: URL, noProxy: string) {
   });
 }
 
+// This function is duplicated based on request library logic.
+// When https protocol is used by destination endpoint we allow using proxy from both
+// HTTP_PROXY and HTTPS_PROXY environment constiables.
 export function getProxyFromURI(url: URL) {
   // Decide the proper request proxy to use based on the request URI object and the
   // environmental constiables (NO_PROXY, HTTP_PROXY, etc.)

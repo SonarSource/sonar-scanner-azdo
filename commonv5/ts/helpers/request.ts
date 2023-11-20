@@ -47,5 +47,7 @@ export function stopIgnoringCertificate() {
 }
 
 export async function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
-  return semver.coerce(await get<string>(endpoint, "/api/server/version", false));
+  const serverVersion = await get<string>(endpoint, "/api/server/version", false);
+  tl.debug(`[SQ] Server version: ${serverVersion}`);
+  return semver.coerce(serverVersion);
 }
