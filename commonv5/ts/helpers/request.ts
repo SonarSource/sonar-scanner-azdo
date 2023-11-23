@@ -37,15 +37,6 @@ export async function get<T>(
   }
 }
 
-export function startIgnoringCertificate() {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED_BACKUP = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
-
-export function stopIgnoringCertificate() {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = process.env.NODE_TLS_REJECT_UNAUTHORIZED_BACKUP;
-}
-
 export async function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
   const serverVersion = await get<string>(endpoint, "/api/server/version", false);
   tl.debug(`[SQ] Server version: ${serverVersion}`);
