@@ -91,10 +91,10 @@ it("should display Java 11 warning", async () => {
   const analysis = await Analysis.getAnalysis({
     ...GET_ANALYSIS_DATA,
     warnings: [
-      "The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.",
+      "The version of Java (1.11.0_221) you have used to run this analysis is deprecated and we will stop accepting it from January 2024. Please update to at least Java 17.",
     ],
   });
   expect(analysis.getWarnings()).toStrictEqual(
-    "<br><span>&#9888;</span><b>The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.</b>",
+    "<br><span>&#9888;</span><b>The version of Java (1.11.0_221) you have used to run this analysis is deprecated and we will stop accepting it from January 2024. Please update to at least Java 17.</b>",
   );
 });

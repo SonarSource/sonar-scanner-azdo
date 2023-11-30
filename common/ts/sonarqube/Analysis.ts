@@ -123,9 +123,9 @@ export default class Analysis {
   }
 
   public getWarnings() {
-    if (this.warnings.some((w) => w.includes("Please update to at least Java 11"))) {
+    if (this.warnings.some((w) => w.includes("Please update to at least Java 17"))) {
       return `<br><span>&#9888;</span><b>${this.warnings.find((w) =>
-        w.includes("Please update to at least Java 11"),
+        w.includes("Please update to at least Java 17"),
       )}</b>`;
     } else {
       return "";
