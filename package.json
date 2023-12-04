@@ -109,6 +109,8 @@
     }
   },
   "dependencies": {
-    "azure-pipelines-task-lib": "4.4.0"
+    "azure-pipelines-task-lib": "4.4.0",
+    "guid-typescript": "^1.0.9",
+    "hpagent": "^1.2.0"
   }
 }
