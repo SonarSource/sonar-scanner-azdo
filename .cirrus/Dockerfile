@@ -11,7 +11,7 @@
 # AWS Registry. See section "eks_container" of .cirrus.yml
 #------------------------------------------------------------------------------
 ARG CIRRUS_AWS_ACCOUNT
-FROM ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:j11-latest
+FROM ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:j17-latest
 
 USER root
 
