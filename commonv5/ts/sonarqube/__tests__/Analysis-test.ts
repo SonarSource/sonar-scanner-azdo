@@ -1,26 +1,32 @@
-import { get } from "../../helpers/request";
 import Analysis from "../Analysis";
 import Endpoint, { EndpointType } from "../Endpoint";
 import Metrics from "../Metrics";
+import { AnalysisResult } from "../types";
 
-jest.mock("../../helpers/request", () => ({
-  get: jest.fn(() =>
-    Promise.resolve({
-      projectStatus: {
-        status: "ERROR",
-        conditions: [
-          {
-            status: "ERROR",
-            metricKey: "bugs",
-            comparator: "GT",
-            errorThreshold: "0",
-            actualValue: "1",
-          },
-        ],
-      },
-    }),
-  ),
-}));
+const MOCKED_METRICS = new Metrics([{ key: "bugs", name: "Bugs", type: "INT" }]);
+const MOCKED_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
+const MOCKED_PROJECT_STATUS_ERROR = {
+  status: "ERROR",
+  conditions: [
+    {
+      status: "ERROR",
+      metricKey: "bugs",
+      comparator: "GT",
+      errorThreshold: "0",
+      actualValue: "1",
+    },
+  ],
+};
+const MOCKED_PROJECT_STATUS_SUCCESS = {
+  status: "SUCCESS",
+  conditions: [],
+};
+const MOCKED_ANALYSIS_RESULT: AnalysisResult = {
+  dashboardUrl: "https://dashboard.url",
+  projectName: null,
+  metrics: MOCKED_METRICS,
+  warnings: [],
+};
 
 jest.mock("azure-pipelines-task-lib/task", () => ({
   debug: jest.fn(),
@@ -28,74 +34,57 @@ jest.mock("azure-pipelines-task-lib/task", () => ({
   getHttpProxyConfiguration: jest.fn().mockImplementation(() => null),
 }));
 
-const METRICS = new Metrics([{ key: "bugs", name: "Bugs", type: "INT" }]);
-const ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
-const GET_ANALYSIS_DATA = {
-  analysisId: "analysisId",
-  dashboardUrl: "https://dashboard.url",
-  endpoint: ENDPOINT,
-  metrics: METRICS,
-  warnings: [],
-};
+it("should generate an analysis status with error", () => {
+  const analysis = new Analysis(
+    MOCKED_ENDPOINT.type,
+    MOCKED_PROJECT_STATUS_ERROR,
+    MOCKED_ANALYSIS_RESULT,
+  );
 
-beforeEach(() => {
-  (get as jest.Mock<any>).mockClear();
-});
-
-it("should generate an analysis status with error", async () => {
-  const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
-    analysisId: "analysisId",
-  });
-  expect(analysis.status).toBe("ERROR");
   expect(analysis.getFailedConditions()).toHaveLength(1);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
-it("should generate a green analysis status", async () => {
-  (get as jest.Mock<any>).mockImplementationOnce(() =>
-    Promise.resolve({ projectStatus: { status: "SUCCESS", conditions: [] } }),
+it("should generate a green analysis status", () => {
+  const analysis = new Analysis(
+    MOCKED_ENDPOINT.type,
+    MOCKED_PROJECT_STATUS_SUCCESS,
+    MOCKED_ANALYSIS_RESULT,
   );
 
-  const analysis = await Analysis.getAnalysis(GET_ANALYSIS_DATA);
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
-    analysisId: "analysisId",
-  });
-  expect(analysis.status).toBe("SUCCESS");
   expect(analysis.getFailedConditions()).toHaveLength(0);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
-it("should not fail when metrics are missing", async () => {
-  const analysis = await Analysis.getAnalysis({
-    ...GET_ANALYSIS_DATA,
+it("should not fail when metrics are missing", () => {
+  const analysis = new Analysis(MOCKED_ENDPOINT.type, MOCKED_PROJECT_STATUS_ERROR, {
+    ...MOCKED_ANALYSIS_RESULT,
     dashboardUrl: undefined,
     metrics: undefined,
   });
-  expect(get).toHaveBeenCalledWith(ENDPOINT, "/api/qualitygates/project_status", true, {
-    analysisId: "analysisId",
-  });
-  expect(analysis.status).toBe("ERROR");
+
   expect(analysis.getFailedConditions()).toHaveLength(1);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
-it("should display the project name", async () => {
-  const analysis = await Analysis.getAnalysis({
-    ...GET_ANALYSIS_DATA,
+it("should display the project name", () => {
+  const analysis = new Analysis(MOCKED_ENDPOINT.type, MOCKED_PROJECT_STATUS_ERROR, {
+    ...MOCKED_ANALYSIS_RESULT,
     projectName: "project_name",
   });
+
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
-it("should display Java 11 warning", async () => {
-  const analysis = await Analysis.getAnalysis({
-    ...GET_ANALYSIS_DATA,
+it("should display Java 11 warning", () => {
+  const analysis = new Analysis(MOCKED_ENDPOINT.type, MOCKED_PROJECT_STATUS_ERROR, {
+    ...MOCKED_ANALYSIS_RESULT,
     warnings: [
       "The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.",
     ],
   });
-  expect(analysis.getWarnings()).toStrictEqual(
-    "<br><span>&#9888;</span><b>The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.</b>",
+
+  expect(analysis.getHtmlWarnings()).toContain(
+    "The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.",
   );
 });

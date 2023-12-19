@@ -1,8 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`should display the project name 1`] = `
-"<div style="
-  color: #3E4357;
+"<div style="color: #3E4357;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
@@ -20,20 +19,16 @@ exports[`should display the project name 1`] = `
   font-size: 12px;">
         Failed
       </span>
-    </div> 
-<div style="
-  background: #EBECF0;
+    </div><div style="background: #EBECF0;
   height: 1px;
-  margin: 16px 0px;"></div> 
-<ul style="
-  color: #3E4357;
+  margin: 16px 0px;"></div><ul style="color: #3E4357;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
   letter-spacing: -0.14px;">
-        <li style="list-style: none; margin-top: 13px;">
+      <li style="list-style: none; margin-top: 13px;">
         <span>Bugs</span>
         <span style="background-color: #D92D20;
   padding: 4px 8px;
@@ -46,27 +41,22 @@ exports[`should display the project name 1`] = `
           1</span>
         <span>(required &le; 0)</span>
       </li>
-    </ul>
-
- 
-<div style="margin-top: 16px;">
-        <a href="https://dashboard.url" style="
-  color: #5D6CD0;
+    </ul><div style="margin-top: 16px;">
+      <a href="https://dashboard.url" style="color: #5D6CD0;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
   letter-spacing: -0.14px;">
-        Detailed SonarQube report
-        <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
-        </a>
-      </div>"
+      Detailed SonarQube report
+      <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
+      </a>
+    </div>"
 `;
 
 exports[`should generate a green analysis status 1`] = `
-"<div style="
-  color: #3E4357;
+"<div style="color: #3E4357;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
@@ -84,30 +74,24 @@ exports[`should generate a green analysis status 1`] = `
   font-size: 12px;">
         SUCCESS
       </span>
-    </div> 
-<div style="
-  background: #EBECF0;
+    </div><div style="background: #EBECF0;
   height: 1px;
-  margin: 16px 0px;"></div> 
- 
-<div style="margin-top: 16px;">
-        <a href="https://dashboard.url" style="
-  color: #5D6CD0;
+  margin: 16px 0px;"></div><div style="margin-top: 16px;">
+      <a href="https://dashboard.url" style="color: #5D6CD0;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
   letter-spacing: -0.14px;">
-        Detailed SonarQube report
-        <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
-        </a>
-      </div>"
+      Detailed SonarQube report
+      <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
+      </a>
+    </div>"
 `;
 
 exports[`should generate an analysis status with error 1`] = `
-"<div style="
-  color: #3E4357;
+"<div style="color: #3E4357;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
@@ -125,20 +109,16 @@ exports[`should generate an analysis status with error 1`] = `
   font-size: 12px;">
         Failed
       </span>
-    </div> 
-<div style="
-  background: #EBECF0;
+    </div><div style="background: #EBECF0;
   height: 1px;
-  margin: 16px 0px;"></div> 
-<ul style="
-  color: #3E4357;
+  margin: 16px 0px;"></div><ul style="color: #3E4357;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
   letter-spacing: -0.14px;">
-        <li style="list-style: none; margin-top: 13px;">
+      <li style="list-style: none; margin-top: 13px;">
         <span>Bugs</span>
         <span style="background-color: #D92D20;
   padding: 4px 8px;
@@ -151,27 +131,22 @@ exports[`should generate an analysis status with error 1`] = `
           1</span>
         <span>(required &le; 0)</span>
       </li>
-    </ul>
-
- 
-<div style="margin-top: 16px;">
-        <a href="https://dashboard.url" style="
-  color: #5D6CD0;
+    </ul><div style="margin-top: 16px;">
+      <a href="https://dashboard.url" style="color: #5D6CD0;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
   letter-spacing: -0.14px;">
-        Detailed SonarQube report
-        <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
-        </a>
-      </div>"
+      Detailed SonarQube report
+      <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
+      </a>
+    </div>"
 `;
 
 exports[`should not fail when metrics are missing 1`] = `
-"<div style="
-  color: #3E4357;
+"<div style="color: #3E4357;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
@@ -189,9 +164,7 @@ exports[`should not fail when metrics are missing 1`] = `
   font-size: 12px;">
         Failed
       </span>
-    </div> 
-<div style="
-  background: #EBECF0;
+    </div><div style="background: #EBECF0;
   height: 1px;
   margin: 16px 0px;"></div>"
 `;

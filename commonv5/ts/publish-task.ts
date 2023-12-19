@@ -1,12 +1,13 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { fillBuildProperty, publishBuildSummary } from "./helpers/azdo-server-utils";
+import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
 import Analysis from "./sonarqube/Analysis";
 import Endpoint, { EndpointData, EndpointType } from "./sonarqube/Endpoint";
 import Metrics from "./sonarqube/Metrics";
 import Task, { TimeOutReachedError } from "./sonarqube/Task";
 import TaskReport from "./sonarqube/TaskReport";
-import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "./helpers/constants";
+import { fetchProjectStatus } from "./sonarqube/utils";
 
 let globalQualityGateStatus = "";
 
@@ -66,16 +67,19 @@ export async function getReportForTask(
 ): Promise<string> {
   try {
     const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
-    const analysis = await Analysis.getAnalysis({
-      analysisId: task.analysisId,
+    const projectStatus = await fetchProjectStatus(endpoint, task.analysisId);
+    const analysis = Analysis.getAnalysis(endpoint.type, projectStatus, {
       dashboardUrl: taskReport.dashboardUrl,
-      endpoint,
       metrics,
       projectName: task.componentName,
       warnings: task.warnings,
     });
 
-    if (analysis.status === "ERROR" || analysis.status === "WARN" || analysis.status === "NONE") {
+    if (
+      projectStatus.status === "ERROR" ||
+      projectStatus.status === "WARN" ||
+      projectStatus.status === "NONE"
+    ) {
       globalQualityGateStatus = "failed";
     }
 
