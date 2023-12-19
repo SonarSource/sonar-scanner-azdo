@@ -3,6 +3,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import { SemVer } from "semver";
 import * as apiUtils from "../helpers/azdo-api-utils";
 import * as serverUtils from "../helpers/azdo-server-utils";
+import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "../helpers/constants";
 import * as request from "../helpers/request";
 import * as publishTask from "../publish-task";
 import Analysis from "../sonarqube/Analysis";
@@ -10,7 +11,9 @@ import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Metrics from "../sonarqube/Metrics";
 import Task, { TimeOutReachedError } from "../sonarqube/Task";
 import TaskReport from "../sonarqube/TaskReport";
-import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "../helpers/constants";
+import { ProjectStatus } from "../sonarqube/types";
+import * as sqUtils from "../sonarqube/utils";
+import { fetchProjectStatus } from "../sonarqube/utils";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -22,6 +25,28 @@ const TASK_REPORT = new TaskReport({
   dashboardUrl: "http://dashboardurl1",
   projectKey: "projectKey1",
   serverUrl: "http:/serverUrl1",
+});
+
+const PROJECT_STATUS_OK: ProjectStatus = {
+  conditions: [],
+  status: "OK",
+};
+const ANALYSIS_OK = new Analysis(EndpointType.SonarCloud, PROJECT_STATUS_OK, {
+  warnings: [],
+  dashboardUrl: "",
+  metrics: null,
+  projectName: null,
+});
+
+const PROJECT_STATUS_ERROR: ProjectStatus = {
+  conditions: [],
+  status: "ERROR",
+};
+const ANALYSIS_ERROR = new Analysis(EndpointType.SonarCloud, PROJECT_STATUS_ERROR, {
+  warnings: [],
+  dashboardUrl: "",
+  metrics: null,
+  projectName: null,
 });
 
 const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
@@ -69,24 +94,16 @@ it("check multiple report status and set global quality gate for build propertie
   jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTaskOk);
   jest.spyOn(TaskReport, "createTaskReportsFromFiles").mockResolvedValue(taskReportArray);
 
-  // Mock converting the Task into an html report
-  const returnedAnalysisOk = new Analysis(
-    { status: "OK", conditions: [] },
-    EndpointType.SonarCloud,
-    [],
-    "",
-    null,
-    null,
-  );
-
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
-  jest.spyOn(Analysis, "getAnalysis").mockResolvedValue(returnedAnalysisOk);
-  jest.spyOn(Analysis, "getAnalysis").mockResolvedValue(returnedAnalysisOk);
+  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
 
   jest.spyOn(Metrics, "getAllMetrics").mockResolvedValue(METRICS);
 
-  jest.spyOn(returnedAnalysisOk, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
+  jest.spyOn(ANALYSIS_OK, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
 
   jest.spyOn(tl, "getInput").mockImplementation(() => "100");
   jest.spyOn(tl, "debug");
@@ -138,33 +155,18 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(TaskReport, "createTaskReportsFromFiles").mockResolvedValue(taskReportArray);
 
-  // Mock converting the Task into an html report
-  const returnedAnalysisOk = new Analysis(
-    { status: "OK", conditions: [] },
-    EndpointType.SonarCloud,
-    [],
-    "",
-    null,
-    null,
-  );
-
-  const returnedAnalysisError = new Analysis(
-    { status: "ERROR", conditions: [] },
-    EndpointType.SonarCloud,
-    [],
-    "",
-    null,
-    null,
-  );
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
-  jest.spyOn(Analysis, "getAnalysis").mockResolvedValueOnce(returnedAnalysisOk);
-  jest.spyOn(Analysis, "getAnalysis").mockResolvedValueOnce(returnedAnalysisError);
-  jest.spyOn(Analysis, "getAnalysis").mockResolvedValueOnce(returnedAnalysisOk);
+  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_ERROR);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_ERROR);
+  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
 
   jest.spyOn(Metrics, "getAllMetrics").mockResolvedValue(METRICS);
 
-  jest.spyOn(returnedAnalysisOk, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
+  jest.spyOn(ANALYSIS_OK, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
 
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => "anything...");
   jest.spyOn(tl, "getVariable").mockImplementation(() => SC_ENDPOINT.toJson());
@@ -191,6 +193,7 @@ it("get report string should return undefined if ceTask times out", async () => 
   jest.spyOn(Task, "waitForTaskCompletion").mockImplementation(() => {
     throw new TimeOutReachedError();
   });
+  jest.spyOn(sqUtils, "fetchProjectStatus");
   jest.spyOn(Analysis, "getAnalysis");
   jest.spyOn(tl, "warning").mockImplementation(() => null);
 
@@ -198,10 +201,11 @@ it("get report string should return undefined if ceTask times out", async () => 
 
   expect(result).toBeUndefined();
   expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
-  expect(tl.warning).toBeCalledWith(
+  expect(tl.warning).toHaveBeenCalledWith(
     "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result.",
   );
-  expect(Analysis.getAnalysis).not.toBeCalled();
+  expect(fetchProjectStatus).not.toHaveBeenCalled();
+  expect(Analysis.getAnalysis).not.toHaveBeenCalled();
 });
 
 it("get report string should fail for non-timeout errors", async () => {
@@ -231,29 +235,15 @@ it("get report string for single report", async () => {
     warnings: [],
   });
   jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
-  // Mock converting the Task into an html report
-  const returnedAnalysis = new Analysis(
-    { status: "", conditions: [] },
-    EndpointType.SonarCloud,
-    [],
-    "",
-    null,
-    null,
-  );
-  jest.spyOn(Analysis, "getAnalysis").mockResolvedValue(returnedAnalysis);
-  jest.spyOn(returnedAnalysis, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
+
+  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(ANALYSIS_OK, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
   expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
-  expect(Analysis.getAnalysis).toBeCalledWith({
-    analysisId: "123",
-    dashboardUrl: "http://dashboardurl1",
-    endpoint: SQ_ENDPOINT,
-    metrics: { metrics: [] },
-    projectName: "componentName",
-    warnings: [],
-  });
+  expect(fetchProjectStatus).toHaveBeenCalledWith(SQ_ENDPOINT, "123");
 
   expect(result).toBe("dummy html");
 });
@@ -317,14 +307,14 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
 
   expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
   expect(publishSummaryMock.mock.calls[0][1]).toBe(EndpointType.SonarCloud);
-  expect(tl.setResult).not.toBeCalledWith(tl.TaskResult.Failed);
+  expect(tl.setResult).not.toHaveBeenCalledWith(tl.TaskResult.Failed);
 
-  expect(serverUtils.publishBuildSummary).toBeCalledWith("\r\n", EndpointType.SonarCloud);
+  expect(serverUtils.publishBuildSummary).toHaveBeenCalledWith("\r\n", EndpointType.SonarCloud);
 
-  expect(tl.warning).toBeCalledWith(
+  expect(tl.warning).toHaveBeenCalledWith(
     "Task '111' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
   );
-  expect(tl.warning).toBeCalledWith(
+  expect(tl.warning).toHaveBeenCalledWith(
     "Task '222' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
   );
 });
