@@ -1,26 +1,21 @@
-SonarQube/SonarCloud Azure Pipelines Extension
-========================================
+# SonarQube/SonarCloud Azure Pipelines Extension
 
 [![Build Status](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_apis/build/status%2FSonarSource.sonar-scanner-vsts?branchName=master)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/latest?definitionId=126&branchName=master)
 
 Sonar's [Clean Code solutions](https://www.sonarsource.com/solutions/clean-code/?utm_medium=referral&utm_source=github&utm_campaign=clean-code&utm_content=sonar-scanner-vsts) help developers deliver high-quality, efficient code standards that benefit the entire team or organization.
 
-Marketplace
------------
+## Marketplace
 
 https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube
 https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud
 
-Have Questions or Feedback?
----------------------------
+## Have Questions or Feedback?
 
 For support questions ("How do I?", "I got this error, why?", ...), please head to the [SonarSource forum](https://community.sonarsource.com/c/help). There are chances that a question similar to yours has already been answered.
 
 Be aware that this forum is a community, so the standard pleasantries ("Hi", "Thanks", ...) are expected. And if you don't get an answer to your thread, you should sit on your hands for at least three days before bumping it. Operators are not standing by. :-)
 
-
-Contributing
-------------
+## Contributing
 
 If you would like to see a new feature, please create a new thread in the forum ["Suggest new features"](https://community.sonarsource.com/c/suggestions/features).
 
@@ -30,30 +25,27 @@ With that in mind, if you would like to submit a code contribution, please creat
 
 Make sure that you follow our [code style](https://github.com/SonarSource/sonar-developer-toolset#code-style) and all tests are passing (Travis build is executed for each pull request).
 
-
-Developer documentation
------------------------
+## Developer documentation
 
 ### How to set the environment
 
-* Install NPM (v8 or higher) / Node.js (v14 or higher)
-* `npm install -g tfx-cli`
-* `npm run install-dep-full`
+- Install NPM (v8 or higher) / Node.js (v14 or higher)
+- `npm install -g tfx-cli`
+- `npm run install-dep-full`
 
 ### Package a production build
 
-* `npm run build`
+- `npm run build`
 
 ### Package a test build
 
-* `npm run test-build -- --publisher <publisher-id>`
+- `npm run test-build -- --publisher <publisher-id>`
 
 ### Run tests
 
-* `npm test`
+- `npm test`
 
-License
--------
+## License
 
 Copyright 2017-2023 SonarSource.
 
