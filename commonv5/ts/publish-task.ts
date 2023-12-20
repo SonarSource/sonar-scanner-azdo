@@ -4,10 +4,10 @@ import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "./helpers/const
 import { getServerVersion } from "./helpers/request";
 import Analysis from "./sonarqube/Analysis";
 import Endpoint, { EndpointData, EndpointType } from "./sonarqube/Endpoint";
-import Metrics from "./sonarqube/Metrics";
 import Task, { TimeOutReachedError } from "./sonarqube/Task";
 import TaskReport from "./sonarqube/TaskReport";
-import { fetchProjectStatus } from "./sonarqube/utils";
+import { fetchMetrics, fetchProjectStatus } from "./sonarqube/utils";
+import { Metric } from "./sonarqube/types";
 
 let globalQualityGateStatus = "";
 
@@ -28,7 +28,7 @@ export default async function publishTask(_endpointType: EndpointType) {
     tl.getVariable(TaskVariables.SonarQubeEndpoint),
   );
   const endpoint = new Endpoint(endpointData.type, endpointData.data);
-  const metrics = await Metrics.getAllMetrics(endpoint);
+  const metrics = await fetchMetrics(endpoint);
 
   const timeoutSec = timeoutInSeconds();
   const serverVersion = await getServerVersion(endpoint);
@@ -61,7 +61,7 @@ function timeoutInSeconds(): number {
 
 export async function getReportForTask(
   taskReport: TaskReport,
-  metrics: Metrics,
+  metrics: Metric[],
   endpoint: Endpoint,
   timeoutSec: number,
 ): Promise<string> {
