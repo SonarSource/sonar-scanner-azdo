@@ -11,8 +11,8 @@ import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Task, { TimeOutReachedError } from "../sonarqube/Task";
 import TaskReport from "../sonarqube/TaskReport";
 import { Metric, ProjectStatus } from "../sonarqube/types";
-import * as sqUtils from "../sonarqube/utils";
-import { fetchProjectStatus } from "../sonarqube/utils";
+import * as api from "../helpers/api";
+import { fetchProjectStatus } from "../helpers/api";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -30,7 +30,7 @@ const PROJECT_STATUS_OK: ProjectStatus = {
   conditions: [],
   status: "OK",
 };
-const ANALYSIS_OK = new Analysis(EndpointType.SonarCloud, PROJECT_STATUS_OK, {
+const ANALYSIS_OK = new Analysis(PROJECT_STATUS_OK, {
   warnings: [],
   dashboardUrl: "",
   metrics: null,
@@ -41,7 +41,7 @@ const PROJECT_STATUS_ERROR: ProjectStatus = {
   conditions: [],
   status: "ERROR",
 };
-const ANALYSIS_ERROR = new Analysis(EndpointType.SonarCloud, PROJECT_STATUS_ERROR, {
+const ANALYSIS_ERROR = new Analysis(PROJECT_STATUS_ERROR, {
   warnings: [],
   dashboardUrl: "",
   metrics: null,
@@ -95,12 +95,12 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
-  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
+  jest.spyOn(api, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
   jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
-  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
+  jest.spyOn(api, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
   jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
 
-  jest.spyOn(sqUtils, "fetchMetrics").mockResolvedValue(METRICS);
+  jest.spyOn(api, "fetchMetrics").mockResolvedValue(METRICS);
 
   jest.spyOn(ANALYSIS_OK, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
 
@@ -156,14 +156,14 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
-  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
+  jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
   jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
-  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_ERROR);
+  jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_ERROR);
   jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_ERROR);
-  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
+  jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
   jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
 
-  jest.spyOn(sqUtils, "fetchMetrics").mockResolvedValue(METRICS);
+  jest.spyOn(api, "fetchMetrics").mockResolvedValue(METRICS);
 
   jest.spyOn(ANALYSIS_OK, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
 
@@ -192,7 +192,7 @@ it("get report string should return undefined if ceTask times out", async () => 
   jest.spyOn(Task, "waitForTaskCompletion").mockImplementation(() => {
     throw new TimeOutReachedError();
   });
-  jest.spyOn(sqUtils, "fetchProjectStatus");
+  jest.spyOn(api, "fetchProjectStatus");
   jest.spyOn(Analysis, "getAnalysis");
   jest.spyOn(tl, "warning").mockImplementation(() => null);
 
@@ -235,7 +235,7 @@ it("get report string for single report", async () => {
   });
   jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
 
-  jest.spyOn(sqUtils, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
+  jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
   jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
   jest.spyOn(ANALYSIS_OK, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
 
@@ -293,7 +293,7 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
     .spyOn(serverUtils, "publishBuildSummary")
     .mockImplementation(() => null);
 
-  jest.spyOn(sqUtils, "fetchMetrics").mockResolvedValue(METRICS);
+  jest.spyOn(api, "fetchMetrics").mockResolvedValue(METRICS);
 
   jest.spyOn(apiUtils, "addBuildProperty").mockImplementation(
     () =>

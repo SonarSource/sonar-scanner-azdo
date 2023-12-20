@@ -1,5 +1,19 @@
 const HOURS_IN_DAY = 8;
 
+const FORMATTERS: { [type: string]: Formatter } = {
+  INT: intFormatter,
+  SHORT_INT: shortIntFormatter,
+  FLOAT: floatFormatter,
+  PERCENT: percentFormatter,
+  WORK_DUR: durationFormatter,
+  SHORT_WORK_DUR: shortDurationFormatter,
+  RATING: ratingFormatter,
+  LEVEL: levelFormatter,
+  LEVEL_ICON: levelIconFormatter,
+  MILLISEC: millisecondsFormatter,
+  COMPARATOR: comparatorFormatter,
+};
+
 interface Formatter {
   (value: string | number, options?: any): string;
 }
@@ -22,18 +36,6 @@ function useFormatter(
 }
 
 function getFormatter(type: string): Formatter {
-  const FORMATTERS: { [type: string]: Formatter } = {
-    INT: intFormatter,
-    SHORT_INT: shortIntFormatter,
-    FLOAT: floatFormatter,
-    PERCENT: percentFormatter,
-    WORK_DUR: durationFormatter,
-    SHORT_WORK_DUR: shortDurationFormatter,
-    RATING: ratingFormatter,
-    LEVEL: levelFormatter,
-    MILLISEC: millisecondsFormatter,
-    COMPARATOR: comparatorFormatter,
-  };
   return FORMATTERS[type] || noFormatter;
 }
 
@@ -94,13 +96,23 @@ function ratingFormatter(value: string | number): string {
 
 function levelFormatter(value: string): string {
   const l10nKeys = {
-    ERROR: "Failed",
-    WARN: "Warning",
-    OK: "Passed",
-    NONE: "None",
+    ERROR: "failed",
+    WARN: "warning",
+    OK: "passed",
+    NONE: "none",
   };
   const result = l10nKeys[value.toUpperCase()];
   return result ? result : value;
+}
+
+function levelIconFormatter(value: string): string {
+  const emojis = {
+    ERROR: "❌",
+    WARN: "⚠",
+    OK: "✅",
+    NONE: "",
+  };
+  return emojis[value.toUpperCase()] ?? value;
 }
 
 function comparatorFormatter(value: string): string {

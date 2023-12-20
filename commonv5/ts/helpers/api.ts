@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { get } from "../helpers/request";
-import Endpoint from "./Endpoint";
-import { Metric, MetricsResponse, ProjectStatus } from "./types";
+import { get } from "./request";
+import Endpoint from "../sonarqube/Endpoint";
+import { Metric, MetricsResponse, ProjectStatus } from "../sonarqube/types";
 
 export async function fetchProjectStatus(
   endpoint: Endpoint,
