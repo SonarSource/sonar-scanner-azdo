@@ -1,9 +1,7 @@
 import Analysis from "../Analysis";
-import Endpoint, { EndpointType } from "../Endpoint";
 import { AnalysisResult, Metric } from "../types";
 
 const MOCKED_METRICS: Metric[] = [{ key: "bugs", name: "Bugs", type: "INT" }];
-const MOCKED_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
 const MOCKED_PROJECT_STATUS_ERROR = {
   status: "ERROR",
   conditions: [
@@ -17,7 +15,7 @@ const MOCKED_PROJECT_STATUS_ERROR = {
   ],
 };
 const MOCKED_PROJECT_STATUS_SUCCESS = {
-  status: "SUCCESS",
+  status: "OK",
   conditions: [],
 };
 const MOCKED_ANALYSIS_RESULT: AnalysisResult = {
@@ -34,29 +32,21 @@ jest.mock("azure-pipelines-task-lib/task", () => ({
 }));
 
 it("should generate an analysis status with error", () => {
-  const analysis = new Analysis(
-    MOCKED_ENDPOINT.type,
-    MOCKED_PROJECT_STATUS_ERROR,
-    MOCKED_ANALYSIS_RESULT,
-  );
+  const analysis = new Analysis(MOCKED_PROJECT_STATUS_ERROR, MOCKED_ANALYSIS_RESULT);
 
   expect(analysis.getFailedConditions()).toHaveLength(1);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
 it("should generate a green analysis status", () => {
-  const analysis = new Analysis(
-    MOCKED_ENDPOINT.type,
-    MOCKED_PROJECT_STATUS_SUCCESS,
-    MOCKED_ANALYSIS_RESULT,
-  );
+  const analysis = new Analysis(MOCKED_PROJECT_STATUS_SUCCESS, MOCKED_ANALYSIS_RESULT);
 
   expect(analysis.getFailedConditions()).toHaveLength(0);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
 it("should not fail when metrics are missing", () => {
-  const analysis = new Analysis(MOCKED_ENDPOINT.type, MOCKED_PROJECT_STATUS_ERROR, {
+  const analysis = new Analysis(MOCKED_PROJECT_STATUS_ERROR, {
     ...MOCKED_ANALYSIS_RESULT,
     dashboardUrl: undefined,
     metrics: undefined,
@@ -67,23 +57,10 @@ it("should not fail when metrics are missing", () => {
 });
 
 it("should display the project name", () => {
-  const analysis = new Analysis(MOCKED_ENDPOINT.type, MOCKED_PROJECT_STATUS_ERROR, {
+  const analysis = new Analysis(MOCKED_PROJECT_STATUS_ERROR, {
     ...MOCKED_ANALYSIS_RESULT,
     projectName: "project_name",
   });
 
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
-});
-
-it("should display Java 11 warning", () => {
-  const analysis = new Analysis(MOCKED_ENDPOINT.type, MOCKED_PROJECT_STATUS_ERROR, {
-    ...MOCKED_ANALYSIS_RESULT,
-    warnings: [
-      "The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.",
-    ],
-  });
-
-  expect(analysis.getHtmlWarnings()).toContain(
-    "The version of Java (1.8.0_221) you have used to run this analysis is deprecated and we will stop accepting it from October 2020. Please update to at least Java 11.",
-  );
 });

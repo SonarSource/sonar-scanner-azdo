@@ -1,170 +1,125 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`should display the project name 1`] = `
-"<div style="color: #3E4357;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      <span>project_name Quality Gate</span>
-      <span style="background-color: #D92D20;
-  padding: 4px 8px;
-  margin: 0px 4px;
-  color: #fff;
-  letter-spacing: -0.12px;
-  line-height: normal;
-  font-weight: 500;
-  font-size: 12px;">
-        Failed
-      </span>
-    </div><div style="background: #EBECF0;
-  height: 1px;
-  margin: 16px 0px;"></div><ul style="color: #3E4357;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      <li style="list-style: none; margin-top: 13px;">
-        <span>Bugs</span>
-        <span style="background-color: #D92D20;
-  padding: 4px 8px;
-  margin: 0px 4px;
-  color: #fff;
-  letter-spacing: -0.12px;
-  line-height: normal;
-  font-weight: 500;
-  font-size: 12px;">
-          1</span>
-        <span>(required &le; 0)</span>
-      </li>
-    </ul><div style="margin-top: 16px;">
-      <a href="https://dashboard.url" style="color: #5D6CD0;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      Detailed SonarQube report
-      <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
-      </a>
-    </div>"
+"<div style="font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    line-height: normal;
+    font-weight: 400;
+    color: rgb(29, 33, 47);
+    padding-bottom: 1px;"><div style="font-size: 21px;
+    font-weight: 600;"><span>❌</span><span style="
+        height: 100%;
+        padding-top: 4px;
+        margin-left: 4px;
+      ">Quality Gate failed (project_name)</span></div><div style="background: #EBECF0;
+    height: 1px;
+    margin: 16px 0px;"></div><div style="margin-top: 24px;"><div style="margin-bottom: 12px;">Failed Conditions</div><ul
+    style="
+      padding: 0;
+      margin: 0;
+    "
+  ><li
+      style="
+        list-style: none;
+        align-items: center;
+        margin-top: 8px;
+      "
+    ><span style="width: 24px">❌</span>
+<span style="margin-left: 4px">1 Bugs</span>
+<span class="margin-left: 12px">(required &le; 0)</span></li></ul></div><div style="margin-top: 24px;
+      padding-left: 28px;"><a
+    style="
+      color: rgb(9, 105, 218);
+      text-decoration: none;
+      border-bottom: 1px solid rgb(9, 105, 218);
+      font-weight: 500;
+      width: fit-content; 
+    "
+    href="https://dashboard.url"
+  >See analysis details on SonarQube</a></div></div>"
 `;
 
 exports[`should generate a green analysis status 1`] = `
-"<div style="color: #3E4357;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      <span>Quality Gate</span>
-      <span style="background-color: #b4b4b4;
-  padding: 4px 8px;
-  margin: 0px 4px;
-  color: #fff;
-  letter-spacing: -0.12px;
-  line-height: normal;
-  font-weight: 500;
-  font-size: 12px;">
-        SUCCESS
-      </span>
-    </div><div style="background: #EBECF0;
-  height: 1px;
-  margin: 16px 0px;"></div><div style="margin-top: 16px;">
-      <a href="https://dashboard.url" style="color: #5D6CD0;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      Detailed SonarQube report
-      <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
-      </a>
-    </div>"
+"<div style="font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    line-height: normal;
+    font-weight: 400;
+    color: rgb(29, 33, 47);
+    padding-bottom: 1px;"><div style="font-size: 21px;
+    font-weight: 600;"><span>✅</span><span style="
+        height: 100%;
+        padding-top: 4px;
+        margin-left: 4px;
+      ">Quality Gate passed </span></div><div style="background: #EBECF0;
+    height: 1px;
+    margin: 16px 0px;"></div><div style="margin-top: 24px;
+      padding-left: 28px;"><a
+    style="
+      color: rgb(9, 105, 218);
+      text-decoration: none;
+      border-bottom: 1px solid rgb(9, 105, 218);
+      font-weight: 500;
+      width: fit-content; 
+    "
+    href="https://dashboard.url"
+  >See analysis details on SonarQube</a></div></div>"
 `;
 
 exports[`should generate an analysis status with error 1`] = `
-"<div style="color: #3E4357;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      <span>Quality Gate</span>
-      <span style="background-color: #D92D20;
-  padding: 4px 8px;
-  margin: 0px 4px;
-  color: #fff;
-  letter-spacing: -0.12px;
-  line-height: normal;
-  font-weight: 500;
-  font-size: 12px;">
-        Failed
-      </span>
-    </div><div style="background: #EBECF0;
-  height: 1px;
-  margin: 16px 0px;"></div><ul style="color: #3E4357;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      <li style="list-style: none; margin-top: 13px;">
-        <span>Bugs</span>
-        <span style="background-color: #D92D20;
-  padding: 4px 8px;
-  margin: 0px 4px;
-  color: #fff;
-  letter-spacing: -0.12px;
-  line-height: normal;
-  font-weight: 500;
-  font-size: 12px;">
-          1</span>
-        <span>(required &le; 0)</span>
-      </li>
-    </ul><div style="margin-top: 16px;">
-      <a href="https://dashboard.url" style="color: #5D6CD0;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      Detailed SonarQube report
-      <span class="bowtie-icon bowtie-navigate-external" style="color: #5D6CD0; font-size: 20px; vertical-align: middle;"></span>
-      </a>
-    </div>"
+"<div style="font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    line-height: normal;
+    font-weight: 400;
+    color: rgb(29, 33, 47);
+    padding-bottom: 1px;"><div style="font-size: 21px;
+    font-weight: 600;"><span>❌</span><span style="
+        height: 100%;
+        padding-top: 4px;
+        margin-left: 4px;
+      ">Quality Gate failed </span></div><div style="background: #EBECF0;
+    height: 1px;
+    margin: 16px 0px;"></div><div style="margin-top: 24px;"><div style="margin-bottom: 12px;">Failed Conditions</div><ul
+    style="
+      padding: 0;
+      margin: 0;
+    "
+  ><li
+      style="
+        list-style: none;
+        align-items: center;
+        margin-top: 8px;
+      "
+    ><span style="width: 24px">❌</span>
+<span style="margin-left: 4px">1 Bugs</span>
+<span class="margin-left: 12px">(required &le; 0)</span></li></ul></div><div style="margin-top: 24px;
+      padding-left: 28px;"><a
+    style="
+      color: rgb(9, 105, 218);
+      text-decoration: none;
+      border-bottom: 1px solid rgb(9, 105, 218);
+      font-weight: 500;
+      width: fit-content; 
+    "
+    href="https://dashboard.url"
+  >See analysis details on SonarQube</a></div></div>"
 `;
 
 exports[`should not fail when metrics are missing 1`] = `
-"<div style="color: #3E4357;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.14px;">
-      <span>Quality Gate</span>
-      <span style="background-color: #D92D20;
-  padding: 4px 8px;
-  margin: 0px 4px;
-  color: #fff;
-  letter-spacing: -0.12px;
-  line-height: normal;
-  font-weight: 500;
-  font-size: 12px;">
-        Failed
-      </span>
-    </div><div style="background: #EBECF0;
-  height: 1px;
-  margin: 16px 0px;"></div>"
+"<div style="font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    line-height: normal;
+    font-weight: 400;
+    color: rgb(29, 33, 47);
+    padding-bottom: 1px;"><div style="font-size: 21px;
+    font-weight: 600;"><span>❌</span><span style="
+        height: 100%;
+        padding-top: 4px;
+        margin-left: 4px;
+      ">Quality Gate failed </span></div><div style="background: #EBECF0;
+    height: 1px;
+    margin: 16px 0px;"></div></div>"
 `;
