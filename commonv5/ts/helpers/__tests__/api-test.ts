@@ -65,6 +65,22 @@ describe("fetchProjectStatus", () => {
     expect(projectStatus.conditions).toHaveLength(1);
     expect(projectStatus.conditions).toEqual(MOCKED_CONDITIONS);
   });
+
+  it("should fail if the project status fails to load", () => {
+    jest.mocked(get).mockRejectedValueOnce(new Error("API Couldn't be reached"));
+
+    expect(() => fetchProjectStatus(MOCKED_ENDPOINT, "analysisId")).rejects.toThrow(
+      "Could not fetch analysis for ID 'analysisId'",
+    );
+  });
+
+  it("should fail if the project status fails to load with non-standard error", () => {
+    jest.mocked(get).mockRejectedValueOnce("API Couldn't be reached");
+
+    expect(() => fetchProjectStatus(MOCKED_ENDPOINT, "analysisId")).rejects.toThrow(
+      "Could not fetch analysis for ID 'analysisId'",
+    );
+  });
 });
 
 describe("fetchMetrics", () => {
@@ -121,6 +137,13 @@ describe("fetchMetrics", () => {
 
   it("should fail if the first metric page fails to load", () => {
     jest.mocked(get).mockRejectedValueOnce(new Error("API Couldn't be reached"));
+    jest.spyOn(tl, "error");
+
+    expect(() => fetchMetrics(MOCKED_ENDPOINT)).rejects.toThrow("Could not fetch metrics");
+  });
+
+  it("should fail if the first metric page fails to load with non-standard error", () => {
+    jest.mocked(get).mockRejectedValueOnce("API Couldn't be reached");
     jest.spyOn(tl, "error");
 
     expect(() => fetchMetrics(MOCKED_ENDPOINT)).rejects.toThrow("Could not fetch metrics");
