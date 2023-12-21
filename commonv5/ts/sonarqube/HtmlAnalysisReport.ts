@@ -71,6 +71,39 @@ export default class HtmlAnalysisReport {
     return rows.length > 0 ? htmlSectionDiv("Failed Conditions", htmlMetricList(rows)) : "";
   }
 
+  private getHtmlMeasureListItem(icon: string, metricKey: string) {
+    const condition = this.projectStatus.conditions.find((c) => c.metricKey === metricKey);
+    const metric = this.result.metrics.find((m) => m.key === metricKey);
+    if (!condition || !metric) {
+      return "";
+    }
+
+    return htmlMetricListItem(
+      icon,
+      `${formatMeasure(condition.actualValue, metric.type)} ${metric.name}`,
+    );
+  }
+
+  private getHtmlQualityGateDetailPassedSection() {
+    const issuesItems = [
+      this.getHtmlMeasureListItem("✅", "new_violations"),
+      this.getHtmlMeasureListItem("🔧", "pullrequest_addressed_issues"),
+      this.getHtmlMeasureListItem("💤", "new_accepted_issues"),
+    ].filter((item) => item.length > 0);
+    const issuesSection =
+      issuesItems.length > 0 ? htmlSectionDiv("Issues", htmlMetricList(issuesItems)) : "";
+
+    const measuresItems = [
+      this.getHtmlMeasureListItem("✅", "new_security_hotspots"),
+      this.getHtmlMeasureListItem("✅", "new_coverage"),
+      this.getHtmlMeasureListItem("✅", "new_duplicated_lines_density"),
+    ].filter((item) => item.length > 0);
+    const measuresSection =
+      measuresItems.length > 0 ? htmlSectionDiv("Measures", htmlMetricList(measuresItems)) : "";
+
+    return issuesSection + measuresSection;
+  }
+
   private getHtmlQualityGateDetailSection() {
     if (!this.result.metrics) {
       return "";
@@ -79,7 +112,7 @@ export default class HtmlAnalysisReport {
     if (["WARN", "ERROR"].includes(this.projectStatus.status)) {
       return this.getHtmlQualityGateDetailFailedSection();
     } else {
-      return "";
+      return this.getHtmlQualityGateDetailPassedSection();
     }
   }
 
