@@ -12,12 +12,15 @@ import {
 import { formatMeasure } from "../helpers/measures";
 import { AnalysisResult, ProjectStatus } from "./types";
 
-export default class Analysis {
+export default class HtmlAnalysisReport {
   private readonly projectStatus: ProjectStatus;
   private readonly result: AnalysisResult;
 
-  public static getAnalysis(projectStatus: ProjectStatus, result: AnalysisResult): Analysis {
-    return new Analysis(projectStatus, result);
+  public static getInstance(
+    projectStatus: ProjectStatus,
+    result: AnalysisResult,
+  ): HtmlAnalysisReport {
+    return new HtmlAnalysisReport(projectStatus, result);
   }
 
   constructor(projectStatus: ProjectStatus, result: AnalysisResult) {
