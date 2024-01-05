@@ -20,6 +20,11 @@ it("should run scanner", async () => {
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
 
+  //SONARQUBE_SCANNER_PARAMS
+  jest
+    .spyOn(tl, "getVariable")
+    .mockReturnValueOnce('{"sonar.metadata": "/home/user/metadata.txt"}');
+
   //JAVA_HOME
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("/home/path/to/java");
 

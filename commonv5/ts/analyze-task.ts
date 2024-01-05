@@ -1,6 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import JavaVersionResolver from "./helpers/java-version-resolver";
-import { sanitizeVariable } from "./helpers/utils";
+import { sanitizeScannerParams, stringifyScannerParams } from "./helpers/utils";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "./helpers/constants";
 
@@ -17,15 +17,19 @@ export default async function analyzeTask(
     return;
   }
 
+  // Run scanner
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable(TaskVariables.SonarQubeScannerMode)];
   Scanner.setIsSonarCloud(isSonarCloud);
   JavaVersionResolver.setJavaVersion(jdkVersionSource);
   const scanner = Scanner.getAnalyzeScanner(rootPath, scannerMode);
-  const sqScannerParams = tl.getVariable(TaskVariables.SonarQubeScannerParams);
+  const sqScannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarQubeScannerParams));
   await scanner.runAnalysis();
+
+  // Sanitize scanner params (SSF-194)
   tl.setVariable(
     TaskVariables.SonarQubeScannerParams,
-    sanitizeVariable(JSON.stringify(sqScannerParams)),
+    stringifyScannerParams(sanitizeScannerParams(sqScannerParams)),
   );
+
   JavaVersionResolver.revertJavaHomeToOriginal();
 }
