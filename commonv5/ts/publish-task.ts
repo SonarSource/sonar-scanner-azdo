@@ -1,13 +1,18 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { fetchMetrics, fetchProjectStatus } from "./helpers/api";
+import { fetchComponentMeasures, fetchMetrics, fetchProjectStatus } from "./helpers/api";
 import { fillBuildProperty, publishBuildSummary } from "./helpers/azdo-server-utils";
-import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "./helpers/constants";
+import {
+  SQ_BRANCH_MEASURES,
+  SQ_PULLREQUEST_MEASURES,
+  TASK_MISSING_VARIABLE_ERROR_HINT,
+  TaskVariables,
+} from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
 import Endpoint, { EndpointData, EndpointType } from "./sonarqube/Endpoint";
 import HtmlAnalysisReport from "./sonarqube/HtmlAnalysisReport";
 import Task, { TimeOutReachedError } from "./sonarqube/Task";
 import TaskReport from "./sonarqube/TaskReport";
-import { Metric } from "./sonarqube/types";
+import { Measure, Metric } from "./sonarqube/types";
 
 let globalQualityGateStatus = "";
 
@@ -59,6 +64,51 @@ function timeoutInSeconds(): number {
   return Number.parseInt(tl.getInput("pollingTimeoutSec", true), 10);
 }
 
+async function fetchRelevantMeasures(
+  endpoint: Endpoint,
+  componentKey: string,
+  metrics: Metric[],
+): Promise<Measure[]> {
+  // Do not fetch measures for SonarCloud
+  if (endpoint.type === EndpointType.SonarCloud) {
+    return [];
+  }
+
+  // Are we in a PR, non-main branch or main branch?
+  const scannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarQubeScannerParams));
+  const branch = scannerParams["sonar.branch.name"] ?? null;
+  const pullRequest = scannerParams["sonar.pullrequest.key"] ?? null;
+
+  const relevantMetrics = pullRequest ? SQ_PULLREQUEST_MEASURES : SQ_BRANCH_MEASURES;
+
+  // Get only the metrics that are available on the server
+  const availableMetrics = relevantMetrics.filter((metric) =>
+    metrics.some((m) => m.key === metric),
+  );
+
+  if (availableMetrics.length === 0) {
+    return [];
+  }
+
+  try {
+    const data = {
+      component: componentKey,
+      metricKeys: availableMetrics.join(","),
+    };
+    if (pullRequest) {
+      data["pullRequest"] = pullRequest;
+    } else if (branch) {
+      data["branch"] = branch;
+    }
+    return await fetchComponentMeasures(endpoint, data);
+  } catch (error) {
+    tl.debug(
+      `Unable to get measures. It is expected if you are not using a user token but instead a global or project analysis token.`,
+    );
+    return [];
+  }
+}
+
 export async function getReportForTask(
   taskReport: TaskReport,
   metrics: Metric[],
@@ -68,7 +118,8 @@ export async function getReportForTask(
   try {
     const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
     const projectStatus = await fetchProjectStatus(endpoint, task.analysisId);
-    const analysis = HtmlAnalysisReport.getInstance(projectStatus, {
+    const measures = await fetchRelevantMeasures(endpoint, task.componentKey, metrics);
+    const analysis = HtmlAnalysisReport.getInstance(projectStatus, measures, {
       dashboardUrl: taskReport.dashboardUrl,
       metrics,
       projectName: task.componentName,
