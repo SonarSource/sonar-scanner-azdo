@@ -67,8 +67,15 @@ export const htmlMetricListItem = (icon: string, text: string, requiredContent?:
   `.trim();
 };
 
-export const htmlQualityGateHeader = (projectStatus: ProjectStatus, projectName?: string) =>
-  htmlDiv(
+export const htmlQualityGateHeader = (projectStatus: ProjectStatus, projectName?: string) => {
+  let qgTitle: string;
+  if (projectStatus.status !== "none") {
+    qgTitle = `Quality Gate ${formatMeasure(projectStatus.status, "LEVEL")}`;
+  } else {
+    qgTitle = "No Quality Gate Status";
+  }
+  qgTitle += projectName ? ` (${projectName})` : "";
+  return htmlDiv(
     `font-size: 21px;
     font-weight: 600;`,
     [
@@ -77,8 +84,7 @@ export const htmlQualityGateHeader = (projectStatus: ProjectStatus, projectName?
         height: 100%;
         padding-top: 4px;
         margin-left: 4px;
-      ">Quality Gate ${formatMeasure(projectStatus.status, "LEVEL")} ${
-        projectName ? `(${projectName})` : ""
-      }</span>`,
+      ">${qgTitle}</span>`,
     ].join(""),
   );
+};
