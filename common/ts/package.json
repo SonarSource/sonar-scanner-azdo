@@ -9,7 +9,6 @@
     "azure-pipelines-task-lib": "4.7.0",
     "fs-extra": "5.0.0",
     "guid-typescript": "1.0.9",
-    "hpagent": "^1.2.0",
     "node-fetch": "2.7.0",
     "semver": "5.7.1"
   },

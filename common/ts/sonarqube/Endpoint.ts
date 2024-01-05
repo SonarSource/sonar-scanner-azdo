@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { HttpProxyAgent, HttpsProxyAgent } from "hpagent";
 import { RequestInit } from "node-fetch";
-import { URL } from "url";
+import url from "url";
+import { HttpProxyAgent, HttpsProxyAgent } from "../helpers/proxy-agent";
 import { getProxyFromURI } from "../helpers/proxyFromEnv";
 import { PROP_NAMES } from "../helpers/utils";
 
@@ -24,7 +24,12 @@ export default class Endpoint {
   constructor(
     public type: EndpointType,
     private readonly data: EndpointData,
-  ) {}
+  ) {
+    // Remove trailing slash at the end of the base url, if any
+    if (this.data) {
+      this.data.url = this.data?.url.replace(/\/$/, "");
+    }
+  }
 
   public get auth() {
     if (!this.data.token && this.data.password && this.data.password.length > 0) {
@@ -57,8 +62,8 @@ export default class Endpoint {
     // We ignore proxy set by agent proxy configuration, we need to discuss whether we want to itroduce it
     // Currently users may pass environment variables (HTTP_PROXY,HTTPS_proxy etc.) to the task or agent to use proxy
     // as a workaround
-    const proxyUrl = getProxyFromURI(new URL(endpointUrl))
-      ? getProxyFromURI(new URL(endpointUrl))
+    const proxyUrl = getProxyFromURI(url.parse(endpointUrl))
+      ? getProxyFromURI(url.parse(endpointUrl))
       : undefined;
     if (proxyUrl) {
       tl.debug("Using proxy agent from environment: " + proxyUrl);
