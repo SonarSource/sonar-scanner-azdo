@@ -146,7 +146,7 @@ export class ScannerCLI extends Scanner {
     if (this.isDebug()) {
       scannerRunner.arg("-X");
     }
-    await scannerRunner.exec();
+    await scannerRunner.execAsync();
   }
 
   public static getScanner(rootPath: string) {
@@ -217,7 +217,7 @@ export class ScannerMSBuild extends Scanner {
     if (this.isDebug()) {
       scannerRunner.arg("/d:sonar.verbose=true");
     }
-    await scannerRunner.exec();
+    await scannerRunner.execAsync();
   }
 
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
@@ -255,7 +255,7 @@ export class ScannerMSBuild extends Scanner {
     scannerRunner.arg("end");
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
-    await scannerRunner.exec();
+    await scannerRunner.execAsync();
   }
 
   public static getScanner(rootPath: string) {
