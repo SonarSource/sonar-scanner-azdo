@@ -8,7 +8,7 @@ import {
   TaskVariables,
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
-import { toCleanJSON } from "./helpers/utils";
+import { stringifyScannerParams } from "./helpers/utils";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import TaskReport from "./sonarqube/TaskReport";
@@ -52,7 +52,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
   tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
 
-  const jsonParams = toCleanJSON({
+  const jsonParams = stringifyScannerParams({
     ...endpoint.toSonarProps(serverVersion),
     ...scanner.toSonarProps(),
     ...props,
