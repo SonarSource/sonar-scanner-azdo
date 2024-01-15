@@ -110,5 +110,12 @@
   },
   "dependencies": {
     "azure-pipelines-task-lib": "4.7.0"
+  },
+  "overrides": {
+    "azure-pipelines-task-lib": {
+      "nodejs-file-downloader": {
+        "follow-redirects": "1.15.5"
+      }
+    }
   }
 }
