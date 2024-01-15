@@ -6,7 +6,7 @@
   "license": "LGPL-3.0",
   "dependencies": {
     "azure-devops-node-api": "^12.1.0",
-    "azure-pipelines-task-lib": "^4.4.0",
+    "azure-pipelines-task-lib": "4.7.0",
     "fs-extra": "5.0.0",
     "guid-typescript": "1.0.9",
     "hpagent": "^1.2.0",
@@ -15,5 +15,12 @@
   },
   "engines": {
     "node": ">=6"
+  },
+  "overrides": {
+    "azure-pipelines-task-lib": {
+      "nodejs-file-downloader": {
+        "follow-redirects": "1.15.5"
+      }
+    }
   }
 }
