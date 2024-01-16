@@ -1,5 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { get } from "../helpers/request";
+import { fetchWithRetry } from "../helpers/api";
+import { waitFor } from "../helpers/utils";
 import Endpoint, { EndpointType } from "./Endpoint";
 
 interface ITask {
@@ -36,11 +37,11 @@ export default class Task {
     }
   }
 
-  public static waitForTaskCompletion(
+  public static async waitForTaskCompletion(
     endpoint: Endpoint,
     taskId: string,
     tries: number,
-    delay = 1000,
+    delay: number,
   ): Promise<Task> {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
     let query = {};
@@ -49,38 +50,40 @@ export default class Task {
     } else {
       query = { id: taskId, additionalFields: "warnings" };
     }
-    return get(endpoint, `/api/ce/task`, true, query).then(
-      ({ task }: { task: ITask }) => {
-        tl.debug(`[SQ] Task status:` + task.status);
-        if (tries <= 0) {
-          throw new TimeOutReachedError();
-        }
-        const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : "";
-        switch (task.status.toUpperCase()) {
-          case "CANCELED":
-          case "FAILED":
-            throw new Error(`[SQ] Task failed with status ${task.status}${errorInfo}`);
-          case "SUCCESS":
-            tl.debug(`[SQ] Task complete: ${JSON.stringify(task)}`);
-            return new Task(task);
-          default:
-            return new Promise<Task>((resolve, reject) =>
-              setTimeout(() => {
-                Task.waitForTaskCompletion(endpoint, taskId, tries, delay).then(resolve, reject);
-                tries--;
-              }, delay),
-            );
-        }
-      },
-      (err) => {
-        if (err && err.message) {
-          tl.error(err.message);
-        } else if (err) {
-          tl.error(JSON.stringify(err));
-        }
+
+    let attempts = 0;
+    while (attempts < tries) {
+      // Fetch task status
+      let task: ITask;
+
+      try {
+        ({ task } = (await fetchWithRetry(endpoint, `/api/ce/task`, true, query)) as {
+          task: ITask;
+        });
+      } catch (error) {
+        tl.error(JSON.stringify(error?.message ?? error ?? "Unknown error"));
         throw new Error(`[SQ] Could not fetch task for ID '${taskId}'`);
-      },
-    );
+      }
+
+      const status = task.status.toUpperCase();
+
+      tl.debug(`[SQ] Task status:` + status);
+      if (status === "CANCELED" || status === "FAILED") {
+        const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : "";
+        throw new Error(`[SQ] Task failed with status ${task.status}${errorInfo}`);
+      }
+      if (status === "SUCCESS") {
+        tl.debug(`[SQ] Task complete: ${JSON.stringify(task)}`);
+        return new Task(task);
+      }
+      // Task did not complete yet, we wait and retry
+      await waitFor(delay);
+      attempts++;
+    }
+
+    // If we are here, it means we timed out
+    tl.debug(`[SQ] Reached timeout while waiting for task to complete`);
+    throw new TimeOutReachedError();
   }
 }
 

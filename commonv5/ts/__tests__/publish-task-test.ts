@@ -220,8 +220,13 @@ it("get report string should return undefined if ceTask times out", async () => 
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
-  expect(result).toBeUndefined();
-  expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
+  expect(result).toBe("");
+  expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(
+    SQ_ENDPOINT,
+    TASK_REPORT.ceTaskId,
+    999,
+    1000,
+  );
   expect(tl.warning).toHaveBeenCalledWith(
     "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result.",
   );
@@ -265,7 +270,12 @@ it("get report string for single report", async () => {
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
-  expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
+  expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(
+    SQ_ENDPOINT,
+    TASK_REPORT.ceTaskId,
+    999,
+    1000,
+  );
   expect(fetchProjectStatus).toHaveBeenCalledWith(SQ_ENDPOINT, "123");
 
   expect(result).toBe("dummy html");

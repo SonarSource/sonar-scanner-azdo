@@ -3,6 +3,10 @@ import { PROP_NAMES } from "./constants";
 
 type ScannerParams = { [key: string]: string | undefined };
 
+export function waitFor(timeout: number) {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+}
+
 export function stringifyScannerParams(scannerParams: ScannerParams) {
   return JSON.stringify(
     scannerParams,

@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import * as semver from "semver";
 import Endpoint from "../sonarqube/Endpoint";
 
-interface RequestData {
+export interface RequestData {
   [x: string]: any;
 }
 
