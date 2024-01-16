@@ -116,7 +116,7 @@ export async function getReportForTask(
   timeoutSec: number,
 ): Promise<string> {
   try {
-    const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec);
+    const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec, 1000);
     const projectStatus = await fetchProjectStatus(endpoint, task.analysisId);
     const measures = await fetchRelevantMeasures(endpoint, task.componentKey, metrics);
     const analysis = HtmlAnalysisReport.getInstance(projectStatus, measures, {
@@ -140,6 +140,7 @@ export async function getReportForTask(
       tl.warning(
         `Task '${taskReport.ceTaskId}' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`,
       );
+      return "";
     } else {
       throw e;
     }

@@ -1,8 +1,8 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { get } from "../request";
 import Endpoint, { EndpointType } from "../../sonarqube/Endpoint";
 import { Metric, MetricsResponse } from "../../sonarqube/types";
-import { fetchMetrics, fetchProjectStatus } from "../api";
+import { RETRY_DELAY, fetchMetrics, fetchProjectStatus, fetchWithRetry } from "../api";
+import { get } from "../request";
 
 const MOCKED_CONDITIONS = [
   {
@@ -43,8 +43,43 @@ jest.mock("../../helpers/request", () => ({
   get: jest.fn(),
 }));
 
-beforeEach(() => {
-  (get as jest.Mock<any>).mockClear();
+describe("fetchWithRetry", () => {
+  beforeEach(() => {
+    (get as jest.Mock<any>).mockClear();
+  });
+
+  it(
+    "should not fail after up to 2 attempts",
+    async () => {
+      for (let i = 0; i < 2; i++) {
+        jest.mocked(get).mockRejectedValueOnce(new Error("foo"));
+      }
+      jest.mocked(get).mockResolvedValueOnce("bar");
+
+      const result = await fetchWithRetry(MOCKED_ENDPOINT, "/api", false);
+      expect(result).toBe("bar");
+      expect(get).toHaveBeenCalledTimes(3);
+    },
+    RETRY_DELAY * 3,
+  );
+
+  it(
+    "should fail after 3 failing requests",
+    async () => {
+      for (let i = 0; i < 3; i++) {
+        jest.mocked(get).mockRejectedValueOnce(new Error("foo"));
+      }
+
+      expect.assertions(2);
+      try {
+        await fetchWithRetry(MOCKED_ENDPOINT, "/api", false);
+      } catch (error) {
+        expect(get).toHaveBeenCalledTimes(3);
+        expect(error.message).toBe("[SQ] API GET '/api' failed, max attempts reached");
+      }
+    },
+    RETRY_DELAY * 4,
+  );
 });
 
 describe("fetchProjectStatus", () => {
@@ -84,6 +119,10 @@ describe("fetchProjectStatus", () => {
 });
 
 describe("fetchMetrics", () => {
+  beforeEach(() => {
+    (get as jest.Mock<any>).mockClear();
+  });
+
   it("should correctly fetch metrics", async () => {
     jest.mocked(get).mockResolvedValueOnce({
       metrics: MOCKED_METRICS,

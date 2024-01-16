@@ -7,7 +7,30 @@ import {
   MetricsResponse,
   ProjectStatus,
 } from "../sonarqube/types";
-import { get } from "./request";
+import { RequestData, get } from "./request";
+import { waitFor } from "./utils";
+
+export const RETRY_MAX_ATTEMPTS = 3;
+export const RETRY_DELAY = 2000;
+
+export async function fetchWithRetry<T>(
+  endpoint: Endpoint,
+  path: string,
+  isJson: boolean,
+  query?: RequestData,
+): Promise<T | string> {
+  let attempts = 0;
+  while (attempts < RETRY_MAX_ATTEMPTS) {
+    try {
+      return await get<T>(endpoint, path, isJson, query);
+    } catch (error) {
+      attempts++;
+      tl.debug(`[SQ] API GET '${path}' failed (attempt ${attempts}/${RETRY_MAX_ATTEMPTS})`);
+      await waitFor(RETRY_DELAY);
+    }
+  }
+  throw new Error(`[SQ] API GET '${path}' failed, max attempts reached`);
+}
 
 export async function fetchProjectStatus(
   endpoint: Endpoint,
