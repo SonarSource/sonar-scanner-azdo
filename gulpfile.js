@@ -702,7 +702,9 @@ gulp.task("sonarqube-analysis:sonarqube", (done) => {
   } else if (process.env.CIRRUS_PR !== "false") {
     runSonnarQubeScanner(done, {
       "sonar.analysis.prNumber": process.env.CIRRUS_PR,
-      "sonar.branch.name": process.env.CIRRUS_BRANCH,
+      "sonar.pullrequest.key": process.env.CIRRUS_PR,
+      "sonar.pullrequest.branch": process.env.CIRRUS_BRANCH,
+      "sonar.pullrequest.base": process.env.CIRRUS_BASE,
       "sonar.analysis.sha1": process.env.CIRRUS_BASE_SHA,
       "sonar.projectVersion": projectVersion,
     });
@@ -723,7 +725,9 @@ gulp.task("sonarqube-analysis:sonarcloud", (done) => {
   } else if (process.env.CIRRUS_PR !== "false") {
     runSonnarQubeScannerForSonarCloud(done, {
       "sonar.analysis.prNumber": process.env.CIRRUS_PR,
-      "sonar.branch.name": process.env.CIRRUS_BRANCH,
+      "sonar.pullrequest.key": process.env.CIRRUS_PR,
+      "sonar.pullrequest.branch": process.env.CIRRUS_BRANCH,
+      "sonar.pullrequest.base": process.env.CIRRUS_BASE,
       "sonar.analysis.sha1": process.env.CIRRUS_BASE_SHA,
       "sonar.projectVersion": projectVersion,
     });
