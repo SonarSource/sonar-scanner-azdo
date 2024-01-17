@@ -52,6 +52,7 @@ build_task:
     - npm install
     - npm run install-dep-full
   script:
+    - git fetch
     - source cirrus-env BUILD
     - npm run validate-ci
     - npm run sonarqube
@@ -78,7 +79,7 @@ promote_task:
 mend_scan_task:
   depends_on:
     - build
-  only_if:  $CIRRUS_BRANCH == "master"
+  only_if: $CIRRUS_BRANCH == "master"
   timeout_in: 30m
   eks_container:
     <<: *CONTAINER_TEMPLATE

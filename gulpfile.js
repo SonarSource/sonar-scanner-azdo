@@ -519,11 +519,11 @@ gulp.task("build:test", gulp.series("clean", "copy", "test", "tfx:test"));
  * =========================
  */
 gulp.task("deploy:vsix:sonarqube", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && process.env.CIRRUS_PR === "false") {
+  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
     gutil.log("Not on master nor PR, skip deploy:vsix");
     return gutil.noop;
   }
-  if (process.env.CIRRUS_PR === "true" && process.env.DEPLOY_PULL_REQUEST === "false") {
+  if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
     gutil.log("On PR, but artifacts should not be deployed, skip deploy:vsix");
     return gutil.noop;
   }
@@ -575,11 +575,11 @@ gulp.task("deploy:vsix:sonarqube", () => {
 });
 
 gulp.task("deploy:vsix:sonarcloud", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && process.env.CIRRUS_PR === "false") {
+  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
     gutil.log("Not on master nor PR, skip deploy:vsix");
     return gutil.noop;
   }
-  if (process.env.CIRRUS_PR === "true" && process.env.DEPLOY_PULL_REQUEST === "false") {
+  if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
     gutil.log("On PR, but artifacts should not be deployed, skip deploy:vsix");
     return gutil.noop;
   }
@@ -634,11 +634,11 @@ gulp.task("deploy:vsix:sonarcloud", () => {
 });
 
 gulp.task("deploy:buildinfo", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && process.env.CIRRUS_PR === "false") {
+  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
     gutil.log("Not on master nor PR, skip deploy:buildinfo");
     return gutil.noop;
   }
-  if (process.env.CIRRUS_PR === "true" && process.env.DEPLOY_PULL_REQUEST === "false") {
+  if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
     gutil.log("On PR, but artifacts should not be deployed, skip deploy:buildinfo");
     return gutil.noop;
   }
@@ -694,12 +694,12 @@ gulp.task("sonarqube-analysis:sonarqube", (done) => {
   const extensionPath = path.join(paths.extensions.root, "sonarqube");
   const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
   const projectVersion = vssExtension.version;
-  if (process.env.CIRRUS_BRANCH === "master" && process.env.CIRRUS_PR === "false") {
+  if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
     runSonnarQubeScanner(done, {
       "sonar.analysis.sha1": process.env.CIRRUS_CHANGE_IN_REPO,
       "sonar.projectVersion": projectVersion,
     });
-  } else if (process.env.CIRRUS_PR !== "false") {
+  } else if (process.env.CIRRUS_PR) {
     runSonnarQubeScanner(done, {
       "sonar.analysis.prNumber": process.env.CIRRUS_PR,
       "sonar.pullrequest.key": process.env.CIRRUS_PR,
@@ -717,12 +717,12 @@ gulp.task("sonarqube-analysis:sonarcloud", (done) => {
   const extensionPath = path.join(paths.extensions.root, "sonarcloud");
   const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
   const projectVersion = vssExtension.version;
-  if (process.env.CIRRUS_BRANCH === "master" && process.env.CIRRUS_PR === "false") {
+  if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
     runSonnarQubeScannerForSonarCloud(done, {
       "sonar.analysis.sha1": process.env.CIRRUS_CHANGE_IN_REPO,
       "sonar.projectVersion": projectVersion,
     });
-  } else if (process.env.CIRRUS_PR !== "false") {
+  } else if (process.env.CIRRUS_PR) {
     runSonnarQubeScannerForSonarCloud(done, {
       "sonar.analysis.prNumber": process.env.CIRRUS_PR,
       "sonar.pullrequest.key": process.env.CIRRUS_PR,
@@ -770,7 +770,7 @@ gulp.task("promote", (cb) => {
 });
 
 gulp.task("burgr:sonarcloud", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && process.env.CIRRUS_PR === "false") {
+  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
     gutil.log("Not on master nor PR, skip burgr");
     return gutil.noop;
   }
@@ -807,7 +807,7 @@ gulp.task("burgr:sonarcloud", () => {
 });
 
 gulp.task("burgr:sonarqube", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && process.env.CIRRUS_PR === "false") {
+  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
     gutil.log("Not on master nor PR, skip burgr");
     return gutil.noop;
   }
