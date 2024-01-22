@@ -6,6 +6,7 @@ env:
   ARTIFACTORY_URL: VAULT[development/kv/data/repox data.url]
   ARTIFACTORY_DEPLOY_USERNAME: vault-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer
   ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
+  ARTIFACTORY_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
   # Possible values for ARTIFACTORY_DEPLOY_REPO: sonarsource-private-qa, sonarsource-public-qa
   ARTIFACTORY_DEPLOY_REPO: sonarsource-public-qa
   BURGR_URL: VAULT[development/kv/data/burgr data.url]
@@ -46,6 +47,7 @@ build_task:
     SONAR_HOST_URL: VAULT[development/kv/data/next data.url]
     GPG_SIGNING_KEY: VAULT[development/kv/data/sign data.key]
     GPG_SIGNING_PASSPHRASE: VAULT[development/kv/data/sign data.passphrase]
+    NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
   node_modules_cache:
     folder: node_modules
   install_script:
