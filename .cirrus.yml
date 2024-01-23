@@ -3,6 +3,10 @@
 #
 env:
   ### Shared variables
+  CIRRUS_VAULT_URL: https://vault.sonar.build:8200
+  CIRRUS_VAULT_AUTH_PATH: jwt-cirrusci
+  CIRRUS_VAULT_ROLE: cirrusci-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}
+
   ARTIFACTORY_URL: VAULT[development/kv/data/repox data.url]
   ARTIFACTORY_DEPLOY_USERNAME: vault-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer
   ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
@@ -14,9 +18,6 @@ env:
   BURGR_PASSWORD: VAULT[development/kv/data/burgr data.cirrus_password]
   ### Project variables
   DEPLOY_PULL_REQUEST: true
-  CIRRUS_VAULT_URL: https://vault.sonar.build:8200
-  CIRRUS_VAULT_AUTH_PATH: jwt-cirrusci
-  CIRRUS_VAULT_ROLE: cirrusci-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}
 
 #
 # RE-USABLE CONFIGS
@@ -54,7 +55,7 @@ build_task:
   node_modules_cache:
     folder: node_modules
   install_script:
-    - jfrog config add repox --artifactory-url "${ARTIFACTORY_URL}" --access-token "${ARTIFACTORY_ACCESS_TOKEN}"
+    - jfrog config add repox --url $ARTIFACTORY_URL --access-token $ARTIFACTORY_ACCESS_TOKEN
     - jfrog npm-config --repo-resolve npm --repo-deploy $ARTIFACTORY_DEPLOY_REPO
     - npm install
     - npm run install-dep-full
