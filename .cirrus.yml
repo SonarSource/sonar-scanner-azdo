@@ -15,6 +15,7 @@ env:
   ### Project variables
   DEPLOY_PULL_REQUEST: true
   NPM_CONFIG_//repox.jfrog.io/repox/api/npm/:_authToken: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
+  NPM_CONFIG_registry: https://repox.jfrog.io/repox/api/npm/npm
 
 #
 # RE-USABLE CONFIGS

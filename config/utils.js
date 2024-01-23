@@ -53,7 +53,7 @@ function downloadOrCopy(urlOrPath) {
 exports.downloadOrCopy = downloadOrCopy;
 
 function npmInstall(packagePath) {
-  run(`cd ${path.dirname(packagePath)} && npm install && cd ${paths.root}`);
+  run(`cd ${path.dirname(packagePath)} && npm config list && npm install && cd ${paths.root}`);
 }
 exports.npmInstall = npmInstall;
 
