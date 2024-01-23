@@ -54,6 +54,8 @@ build_task:
   node_modules_cache:
     folder: node_modules
   install_script:
+    - jfrog config add repox --artifactory-url "${ARTIFACTORY_URL}" --access-token "${ARTIFACTORY_ACCESS_TOKEN}"
+    - jfrog npm-config --repo-resolve npm --repo-deploy $ARTIFACTORY_DEPLOY_REPO
     - npm install
     - npm run install-dep-full
   script:
