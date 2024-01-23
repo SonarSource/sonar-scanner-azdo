@@ -14,7 +14,6 @@ env:
   BURGR_PASSWORD: VAULT[development/kv/data/burgr data.cirrus_password]
   ### Project variables
   DEPLOY_PULL_REQUEST: true
-  NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
 
 #
 # RE-USABLE CONFIGS
@@ -52,9 +51,9 @@ build_task:
     folder: node_modules
   install_script:
     - echo "######################################"
-    - echo ${NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken}
     - echo ${ARTIFACTORY_ACCESS_TOKEN}
-    - npm install --registry "https://repox.jfrog.io/artifactory/api/npm/npm"
+    - npm config set registry https://repox.jfrog.io/artifactory/api/npm/npmjs
+    - npm install
     - npm run install-dep-full
   script:
     - git fetch
