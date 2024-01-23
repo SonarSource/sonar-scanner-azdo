@@ -54,6 +54,7 @@ build_task:
   node_modules_cache:
     folder: node_modules
   install_script:
+    - jfrog npm-config --repo-resolve npm --repo-deploy $ARTIFACTORY_DEPLOY_REPO
     - npm install
     - npm run install-dep-full
   script:
