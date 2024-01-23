@@ -3,10 +3,6 @@
 #
 env:
   ### Shared variables
-  CIRRUS_VAULT_URL: https://vault.sonar.build:8200
-  CIRRUS_VAULT_AUTH_PATH: jwt-cirrusci
-  CIRRUS_VAULT_ROLE: cirrusci-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}
-
   ARTIFACTORY_URL: VAULT[development/kv/data/repox data.url]
   ARTIFACTORY_DEPLOY_USERNAME: vault-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer
   ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
@@ -56,10 +52,9 @@ build_task:
     folder: node_modules
   install_script:
     - echo "######################################"
-    - echo '$NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken'
-    - echo "$NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken"
+    - echo ${NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken}
     - echo ${ARTIFACTORY_ACCESS_TOKEN}
-    - npm install
+    - npm install --registry "https://repox.jfrog.io/artifactory/api/npm/npm"
     - npm run install-dep-full
   script:
     - git fetch
