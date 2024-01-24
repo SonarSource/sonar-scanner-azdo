@@ -1,8 +1,9 @@
 import Analysis from "../Analysis";
 import Endpoint, { EndpointType } from "../Endpoint";
-import { AnalysisResult, Metric } from "../types";
+import Metrics from "../Metrics";
+import { AnalysisResult } from "../types";
 
-const MOCKED_METRICS: Metric[] = [{ key: "bugs", name: "Bugs", type: "INT" }];
+const MOCKED_METRICS = new Metrics([{ key: "bugs", name: "Bugs", type: "INT" }]);
 const MOCKED_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
 const MOCKED_PROJECT_STATUS_ERROR = {
   status: "ERROR",

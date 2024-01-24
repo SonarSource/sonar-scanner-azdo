@@ -103,7 +103,7 @@ export default class Analysis {
     }
 
     const rows = failedConditions.map((condition) => {
-      const metric = this.result.metrics?.find((metric) => metric.key === condition.metricKey);
+      const metric = this.result.metrics?.getMetricByKey(condition.metricKey);
       if (!metric) {
         return null;
       }
