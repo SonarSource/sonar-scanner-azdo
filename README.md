@@ -38,7 +38,7 @@ Developer documentation
 
 * Install NPM (v8 or higher) / Node.js (v14 or higher)
 * `npm install -g tfx-cli`
-* `npm run install-dep-full`
+* `bash scripts/install.sh` (or run `scripts/install.ps1` on Windows)
 
 ### Package a production build
 
