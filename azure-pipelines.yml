@@ -11,8 +11,11 @@ pool:
 
 variables:
   - group: sonar-scanner-vsts-variables
+  - group: artifactory_access
   - name: System.debug
     value: true
+  - name: NPM_CONFIG_registry
+    value: $(ARTIFACTORY_URL)/api/npm/npm
 
 stages:
 - stage: build
@@ -23,22 +26,22 @@ stages:
     variables:
       publisher: $(SonarSourceITPublisher)
     steps:
+    
     - task: Npm@1
       displayName: 'Update npm'
+      env:
+        NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
       inputs:
         command: 'custom'
         customCommand: 'i -g npm@latest'
 
-    - task: Npm@1
-      displayName: 'Install dependencies'
+    - task: PowerShell@2
+      env:
+        NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
+      displayName: 'Install all extension dependencies'
       inputs:
-        command: 'install'
-
-    - task: Npm@1
-      displayName: 'Install all dependencies'
-      inputs:
-        command: 'custom'
-        customCommand: 'run install-dep-full'
+        filePath: 'scripts/install.ps1'
+        pwsh: true
 
     - task: Npm@1
       displayName: 'Run Validate-CI'
@@ -126,6 +129,8 @@ stages:
     steps:
     - task: TfxInstaller@3
       displayName: 'Install TFX CLI'
+      env:
+        NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
       inputs:
         version: 'v0.10.x'
     - task: UnpublishAzureDevOpsExtension@3
@@ -161,6 +166,8 @@ stages:
     steps:
       - task: TfxInstaller@3
         displayName: 'Install TFX CLI'
+        env:
+          NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
         inputs:
           version: 'v0.10.x'
       - task: DownloadBuildArtifacts@1
