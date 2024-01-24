@@ -1,8 +1,8 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { RequestData, get } from "./request";
-import Endpoint from "../sonarqube/Endpoint";
-import { Metric, MetricsResponse, ProjectStatus } from "../sonarqube/types";
-import { waitFor } from "./utils";
+import { RequestData, get } from "../helpers/request";
+import Endpoint from "./Endpoint";
+import { Metric, MetricsResponse, ProjectStatus } from "./types";
+import { waitFor } from "../helpers/utils";
 
 export const RETRY_MAX_ATTEMPTS = 3;
 export const RETRY_DELAY = 2000;

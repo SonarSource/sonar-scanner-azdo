@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { fetchWithRetry } from "../helpers/api";
 import { waitFor } from "../helpers/utils";
 import Endpoint, { EndpointType } from "./Endpoint";
+import { fetchWithRetry } from "./utils";
 
 interface ITask {
   analysisId: string;

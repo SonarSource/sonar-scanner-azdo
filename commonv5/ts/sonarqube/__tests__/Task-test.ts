@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { fetchWithRetry } from "../../helpers/api";
 import Endpoint, { EndpointType } from "../Endpoint";
 import Task, { TimeOutReachedError } from "../Task";
+import { fetchWithRetry } from "../utils";
 
 const MOCKED_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
 
@@ -10,8 +10,8 @@ jest.mock("../../helpers/request", () => ({
   get: jest.fn(),
 }));
 
-jest.mock("../../helpers/api", () => ({
-  ...jest.requireActual("../../helpers/api"),
+jest.mock("../utils", () => ({
+  ...jest.requireActual("../utils"),
   fetchWithRetry: jest.fn(),
 }));
 

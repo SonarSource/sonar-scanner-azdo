@@ -6,7 +6,7 @@ import Analysis from "./sonarqube/Analysis";
 import Endpoint, { EndpointData, EndpointType } from "./sonarqube/Endpoint";
 import Task, { TimeOutReachedError } from "./sonarqube/Task";
 import TaskReport from "./sonarqube/TaskReport";
-import { fetchMetrics, fetchProjectStatus } from "./helpers/api";
+import { fetchMetrics, fetchProjectStatus } from "./sonarqube/utils";
 import { Metric } from "./sonarqube/types";
 
 let globalQualityGateStatus = "";
@@ -68,7 +68,7 @@ export async function getReportForTask(
   try {
     const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec, 1000);
     const projectStatus = await fetchProjectStatus(endpoint, task.analysisId);
-    const analysis = Analysis.getAnalysis(projectStatus, {
+    const analysis = Analysis.getAnalysis(endpoint.type, projectStatus, {
       dashboardUrl: taskReport.dashboardUrl,
       metrics,
       projectName: task.componentName,

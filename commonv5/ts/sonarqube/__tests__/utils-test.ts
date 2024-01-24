@@ -1,8 +1,8 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import Endpoint, { EndpointType } from "../../sonarqube/Endpoint";
 import { Metric, MetricsResponse } from "../../sonarqube/types";
-import { RETRY_DELAY, fetchMetrics, fetchProjectStatus, fetchWithRetry } from "../api";
-import { get } from "../request";
+import { get } from "../../helpers/request";
+import { RETRY_DELAY, fetchMetrics, fetchProjectStatus, fetchWithRetry } from "../utils";
 
 const MOCKED_CONDITIONS = [
   {
