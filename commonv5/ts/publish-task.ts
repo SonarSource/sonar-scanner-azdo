@@ -1,12 +1,12 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { fetchMetrics, fetchProjectStatus } from "./helpers/api";
 import { fillBuildProperty, publishBuildSummary } from "./helpers/azdo-server-utils";
 import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
+import Analysis from "./sonarqube/Analysis";
 import Endpoint, { EndpointData, EndpointType } from "./sonarqube/Endpoint";
-import HtmlAnalysisReport from "./sonarqube/HtmlAnalysisReport";
 import Task, { TimeOutReachedError } from "./sonarqube/Task";
 import TaskReport from "./sonarqube/TaskReport";
+import { fetchMetrics, fetchProjectStatus } from "./helpers/api";
 import { Metric } from "./sonarqube/types";
 
 let globalQualityGateStatus = "";
@@ -68,7 +68,7 @@ export async function getReportForTask(
   try {
     const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec, 1000);
     const projectStatus = await fetchProjectStatus(endpoint, task.analysisId);
-    const analysis = HtmlAnalysisReport.getInstance(projectStatus, {
+    const analysis = Analysis.getAnalysis(projectStatus, {
       dashboardUrl: taskReport.dashboardUrl,
       metrics,
       projectName: task.componentName,

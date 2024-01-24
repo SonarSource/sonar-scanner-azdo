@@ -1,4 +1,4 @@
-import HtmlAnalysisReport from "../HtmlAnalysisReport";
+import Analysis from "../Analysis";
 import { AnalysisResult, Metric } from "../types";
 
 const MOCKED_METRICS: Metric[] = [{ key: "bugs", name: "Bugs", type: "INT" }];
@@ -32,21 +32,21 @@ jest.mock("azure-pipelines-task-lib/task", () => ({
 }));
 
 it("should generate an analysis status with error", () => {
-  const analysis = new HtmlAnalysisReport(MOCKED_PROJECT_STATUS_ERROR, MOCKED_ANALYSIS_RESULT);
+  const analysis = new Analysis(MOCKED_PROJECT_STATUS_ERROR, MOCKED_ANALYSIS_RESULT);
 
   expect(analysis.getFailedConditions()).toHaveLength(1);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
 it("should generate a green analysis status", () => {
-  const analysis = new HtmlAnalysisReport(MOCKED_PROJECT_STATUS_SUCCESS, MOCKED_ANALYSIS_RESULT);
+  const analysis = new Analysis(MOCKED_PROJECT_STATUS_SUCCESS, MOCKED_ANALYSIS_RESULT);
 
   expect(analysis.getFailedConditions()).toHaveLength(0);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
 it("should not fail when metrics are missing", () => {
-  const analysis = new HtmlAnalysisReport(MOCKED_PROJECT_STATUS_ERROR, {
+  const analysis = new Analysis(MOCKED_PROJECT_STATUS_ERROR, {
     ...MOCKED_ANALYSIS_RESULT,
     dashboardUrl: undefined,
     metrics: undefined,
@@ -57,7 +57,7 @@ it("should not fail when metrics are missing", () => {
 });
 
 it("should display the project name", () => {
-  const analysis = new HtmlAnalysisReport(MOCKED_PROJECT_STATUS_ERROR, {
+  const analysis = new Analysis(MOCKED_PROJECT_STATUS_ERROR, {
     ...MOCKED_ANALYSIS_RESULT,
     projectName: "project_name",
   });

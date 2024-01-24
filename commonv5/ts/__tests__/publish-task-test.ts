@@ -1,18 +1,18 @@
 import { InvalidApiResourceVersionError } from "azure-devops-node-api/VsoClient";
 import * as tl from "azure-pipelines-task-lib/task";
 import { SemVer } from "semver";
-import * as api from "../helpers/api";
-import { fetchProjectStatus } from "../helpers/api";
 import * as apiUtils from "../helpers/azdo-api-utils";
 import * as serverUtils from "../helpers/azdo-server-utils";
 import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "../helpers/constants";
 import * as request from "../helpers/request";
 import * as publishTask from "../publish-task";
+import Analysis from "../sonarqube/Analysis";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
-import HtmlAnalysisReport from "../sonarqube/HtmlAnalysisReport";
 import Task, { TimeOutReachedError } from "../sonarqube/Task";
 import TaskReport from "../sonarqube/TaskReport";
 import { Metric, ProjectStatus } from "../sonarqube/types";
+import * as api from "../helpers/api";
+import { fetchProjectStatus } from "../helpers/api";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -30,7 +30,7 @@ const PROJECT_STATUS_OK: ProjectStatus = {
   conditions: [],
   status: "OK",
 };
-const ANALYSIS_OK = new HtmlAnalysisReport(PROJECT_STATUS_OK, {
+const ANALYSIS_OK = new Analysis(PROJECT_STATUS_OK, {
   warnings: [],
   dashboardUrl: "",
   metrics: null,
@@ -41,7 +41,7 @@ const PROJECT_STATUS_ERROR: ProjectStatus = {
   conditions: [],
   status: "ERROR",
 };
-const ANALYSIS_ERROR = new HtmlAnalysisReport(PROJECT_STATUS_ERROR, {
+const ANALYSIS_ERROR = new Analysis(PROJECT_STATUS_ERROR, {
   warnings: [],
   dashboardUrl: "",
   metrics: null,
@@ -96,9 +96,9 @@ it("check multiple report status and set global quality gate for build propertie
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
   jest.spyOn(api, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
-  jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
   jest.spyOn(api, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
-  jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
 
   jest.spyOn(api, "fetchMetrics").mockResolvedValue(METRICS);
 
@@ -157,11 +157,11 @@ it("check multiple report status and set global quality gate for build propertie
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
   jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
-  jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
   jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_ERROR);
-  jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_ERROR);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_ERROR);
   jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
-  jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
 
   jest.spyOn(api, "fetchMetrics").mockResolvedValue(METRICS);
 
@@ -193,7 +193,7 @@ it("get report string should return undefined if ceTask times out", async () => 
     throw new TimeOutReachedError();
   });
   jest.spyOn(api, "fetchProjectStatus");
-  jest.spyOn(HtmlAnalysisReport, "getInstance");
+  jest.spyOn(Analysis, "getAnalysis");
   jest.spyOn(tl, "warning").mockImplementation(() => null);
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
@@ -209,7 +209,7 @@ it("get report string should return undefined if ceTask times out", async () => 
     "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result.",
   );
   expect(fetchProjectStatus).not.toHaveBeenCalled();
-  expect(HtmlAnalysisReport.getInstance).not.toHaveBeenCalled();
+  expect(Analysis.getAnalysis).not.toHaveBeenCalled();
 });
 
 it("get report string should fail for non-timeout errors", async () => {
@@ -217,7 +217,7 @@ it("get report string should fail for non-timeout errors", async () => {
   jest.spyOn(Task, "waitForTaskCompletion").mockImplementation(() => {
     throw new InvalidApiResourceVersionError("my error");
   });
-  jest.spyOn(HtmlAnalysisReport, "getInstance");
+  jest.spyOn(Analysis, "getAnalysis");
   jest.spyOn(tl, "warning").mockImplementation(() => null);
 
   expect.assertions(1);
@@ -241,7 +241,7 @@ it("get report string for single report", async () => {
   jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
 
   jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
-  jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(Analysis, "getAnalysis").mockReturnValueOnce(ANALYSIS_OK);
   jest.spyOn(ANALYSIS_OK, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
@@ -262,7 +262,7 @@ it("get report string should fail for non-timeout errors", async () => {
   jest.spyOn(Task, "waitForTaskCompletion").mockImplementation(() => {
     throw new InvalidApiResourceVersionError("my error");
   });
-  jest.spyOn(HtmlAnalysisReport, "getInstance");
+  jest.spyOn(Analysis, "getAnalysis");
   jest.spyOn(tl, "warning").mockImplementation(() => null);
   expect.assertions(1);
   try {
