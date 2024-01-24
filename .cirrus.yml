@@ -17,6 +17,8 @@ env:
   CIRRUS_VAULT_URL: https://vault.sonar.build:8200
   CIRRUS_VAULT_AUTH_PATH: jwt-cirrusci
   CIRRUS_VAULT_ROLE: cirrusci-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}
+  NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
+  NPM_CONFIG_registry: https://repox.jfrog.io/artifactory/api/npm/npm
 
 #
 # RE-USABLE CONFIGS
@@ -50,12 +52,9 @@ build_task:
     SONAR_HOST_URL: VAULT[development/kv/data/next data.url]
     GPG_SIGNING_KEY: VAULT[development/kv/data/sign data.key]
     GPG_SIGNING_PASSPHRASE: VAULT[development/kv/data/sign data.passphrase]
-    NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
-  node_modules_cache:
     folder: node_modules
   install_script:
-    - npm install
-    - npm run install-dep-full
+    - bash scripts/install.sh
   script:
     - git fetch
     - source cirrus-env BUILD
@@ -99,7 +98,7 @@ mend_scan_task:
     # (example of error: "Hard resetting to c968ecaf7a1942dacecd78480b3751ac74d53c33...Failed to force reset to c968ecaf7a1942dacecd78480b3751ac74d53c33: object not found!")
     CIRRUS_CLONE_DEPTH: 50
   mend_script:
-    - npm run install-dep-full
+    - bash scripts/install.sh
     - source cirrus-env BUILD # to set the environment variable BUILD_NUMBER
     - PROJECT_VERSION='NO-VERSION'
     - echo $PROJECT_VERSION
