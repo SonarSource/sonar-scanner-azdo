@@ -1,23 +1,23 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { PROP_NAMES } from "./constants";
 
-type ScannerParams = { [key: string]: string | undefined };
-
 export function waitFor(timeout: number) {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 }
 
-export function stringifyScannerParams(scannerParams: ScannerParams) {
+export function toCleanJSON(props: { [key: string]: string | undefined }) {
   return JSON.stringify(
-    scannerParams,
-    Object.keys(scannerParams).filter((key) => scannerParams[key] != null),
+    props,
+    Object.keys(props).filter((key) => props[key] != null),
   );
 }
 
-export function sanitizeScannerParams(scannerParams: ScannerParams) {
-  delete scannerParams[PROP_NAMES.LOGIN];
-  delete scannerParams[PROP_NAMES.PASSSWORD];
-  return scannerParams;
+export function sanitizeVariable(jsonPayload: string) {
+  const jsonObj = JSON.parse(jsonPayload);
+  delete jsonObj[PROP_NAMES.LOGIN];
+  delete jsonObj[PROP_NAMES.PASSSWORD];
+  jsonPayload = toCleanJSON(jsonObj);
+  return jsonPayload;
 }
 
 export function isWindows() {
