@@ -27,16 +27,10 @@ const TASK_REPORT = new TaskReport({
 });
 
 const PROJECT_STATUS_OK: ProjectStatus = {
-  conditions: [
-    {
-      metricKey: "new_coverage",
-      status: "OK",
-      actualValue: "100",
-    },
-  ],
+  conditions: [],
   status: "OK",
 };
-const ANALYSIS_OK = new HtmlAnalysisReport(PROJECT_STATUS_OK, [], {
+const ANALYSIS_OK = new HtmlAnalysisReport(PROJECT_STATUS_OK, {
   warnings: [],
   dashboardUrl: "",
   metrics: null,
@@ -47,7 +41,7 @@ const PROJECT_STATUS_ERROR: ProjectStatus = {
   conditions: [],
   status: "ERROR",
 };
-const ANALYSIS_ERROR = new HtmlAnalysisReport(PROJECT_STATUS_ERROR, [], {
+const ANALYSIS_ERROR = new HtmlAnalysisReport(PROJECT_STATUS_ERROR, {
   warnings: [],
   dashboardUrl: "",
   metrics: null,
@@ -56,23 +50,7 @@ const ANALYSIS_ERROR = new HtmlAnalysisReport(PROJECT_STATUS_ERROR, [], {
 
 const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
 const SQ_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
-const METRICS: Metric[] = [
-  {
-    key: "new_violations",
-    name: "New issues",
-    type: "INT",
-  },
-  {
-    key: "new_coverage",
-    name: "Coverage on new code",
-    type: "PERCENT",
-  },
-  {
-    key: "pull_request_fixed_issues",
-    name: "Issues fixed in this pull request",
-    type: "INT",
-  },
-];
+const METRICS: Metric[] = [];
 
 it("should fail unless SONARQUBE_SCANNER_PARAMS are supplied", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
@@ -263,10 +241,8 @@ it("get report string for single report", async () => {
   jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
 
   jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
-
   jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_OK);
   jest.spyOn(ANALYSIS_OK, "getHtmlAnalysisReport").mockImplementation(() => "dummy html");
-  jest.spyOn(tl, "getVariable").mockImplementationOnce(() => "{}");
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
@@ -349,124 +325,5 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
   );
   expect(tl.warning).toHaveBeenCalledWith(
     "Task '222' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
-  );
-});
-
-describe("it should generate passing report correctly", () => {
-  beforeEach(() => {
-    tl.setVariable(TaskVariables.SonarQubeScannerParams, "{}");
-    jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("10.4.0"));
-
-    jest.spyOn(tl, "getInput").mockImplementation(() => "1"); // set the timeout
-    jest.spyOn(tl, "setResult");
-    jest.spyOn(tl, "debug").mockImplementation(() => null);
-    jest.spyOn(tl, "warning").mockImplementation(() => null);
-
-    // Mock metrics
-    jest.spyOn(api, "fetchMetrics").mockResolvedValue(METRICS);
-
-    // Mock waiting for the ceTask to complete and return a Task
-    const returnedTask = new Task({
-      analysisId: "123",
-      componentKey: "projectKey1",
-      status: "status",
-      type: EndpointType.SonarQube,
-      componentName: "componentName",
-      warnings: [],
-    });
-
-    // Mock finding the report file to process
-    jest.spyOn(TaskReport, "createTaskReportsFromFiles").mockResolvedValue([TASK_REPORT]);
-    jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
-
-    jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue(null);
-    jest.spyOn(apiUtils, "getAuthToken").mockImplementation(() => null);
-    jest.spyOn(serverUtils, "fillBuildProperty").mockImplementation(() => null);
-    jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it("not fail when measures can not be retrieved", async () => {
-    tl.setVariable(TaskVariables.SonarQubeEndpoint, SQ_ENDPOINT.toJson());
-    jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
-
-    await publishTask.default(EndpointType.SonarQube);
-
-    expect(tl.debug).toHaveBeenCalledWith(
-      "Unable to get measures. It is expected if you are not using a user token but instead a global or project analysis token.",
-    );
-  });
-
-  it("should show available fetched measures", async () => {
-    tl.setVariable(TaskVariables.SonarQubeEndpoint, SQ_ENDPOINT.toJson());
-    jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
-    jest.spyOn(api, "fetchComponentMeasures").mockResolvedValueOnce([
-      {
-        metric: "new_violations",
-        value: "10",
-      },
-    ]);
-
-    await publishTask.default(EndpointType.SonarQube);
-
-    // spy on publishBuildSummary
-    expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
-    const buildSummary = (serverUtils.publishBuildSummary as any).mock.calls[0][0];
-    expect(buildSummary).toMatch("Quality Gate passed (componentName)");
-    expect(buildSummary).toMatch("10 new issues");
-    expect(buildSummary).toMatch("100% Coverage on new code");
-  });
-
-  it("should not fail when no measure/metric is available", async () => {
-    tl.setVariable(TaskVariables.SonarQubeEndpoint, SQ_ENDPOINT.toJson());
-    jest
-      .spyOn(api, "fetchProjectStatus")
-      .mockResolvedValueOnce({ ...PROJECT_STATUS_OK, conditions: [] });
-    jest.spyOn(api, "fetchComponentMeasures").mockResolvedValueOnce([]);
-
-    await publishTask.default(EndpointType.SonarQube);
-
-    // spy on publishBuildSummary
-    expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
-    const buildSummary = (serverUtils.publishBuildSummary as any).mock.calls[0][0];
-    expect(buildSummary).toMatch("Quality Gate passed (componentName)");
-  });
-
-  it.each([
-    [EndpointType.SonarQube, SQ_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
-    [EndpointType.SonarQube, SQ_ENDPOINT, {}, false],
-    [EndpointType.SonarQube, SQ_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
-    [EndpointType.SonarCloud, SC_ENDPOINT, { "sonar.pullrequest.key": "123" }, false],
-  ])(
-    "should show issues fixed in pull request for sonarqube",
-    async (endpointType, endpoint, scannerParams, shouldShow) => {
-      tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson());
-      tl.setVariable(TaskVariables.SonarQubeScannerParams, JSON.stringify(scannerParams));
-      jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
-      jest.spyOn(api, "fetchComponentMeasures").mockImplementation((_endpoint, { metricKeys }) => {
-        return Promise.resolve(
-          metricKeys.split(",").map((metricKey) => {
-            return {
-              metric: metricKey,
-              value: "32",
-            };
-          }),
-        );
-      });
-
-      await publishTask.default(endpointType);
-
-      // Check build summary
-      expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
-      const buildSummary = (serverUtils.publishBuildSummary as any).mock.calls[0][0];
-      if (shouldShow) {
-        expect(buildSummary).toMatch("32 fixed issues");
-      } else {
-        expect(buildSummary).not.toMatch("32 fixed issues");
-      }
-    },
   );
 });

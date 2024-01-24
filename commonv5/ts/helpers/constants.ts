@@ -38,20 +38,3 @@ export enum TaskVariables {
 }
 
 export const TASK_MISSING_VARIABLE_ERROR_HINT = `Make sure you are not mixing tasks from different major versions. If you are using a multistage pipeline, make sure the tasks are in the same stage.`;
-
-export const SQ_PULLREQUEST_MEASURES = [
-  "new_violations",
-  "pull_request_fixed_issues",
-  "new_accepted_issues",
-  "new_security_hotspots",
-  "new_coverage",
-  "new_duplicated_lines_density",
-];
-
-export const SQ_BRANCH_MEASURES = [
-  "new_violations",
-  "new_accepted_issues",
-  "new_security_hotspots",
-  "new_coverage",
-  "new_duplicated_lines_density",
-];

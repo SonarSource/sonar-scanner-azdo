@@ -40,6 +40,33 @@ exports[`should display the project name 1`] = `
   >See analysis details on SonarQube</a></div></div>"
 `;
 
+exports[`should generate a green analysis status 1`] = `
+"<div style="font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    line-height: normal;
+    font-weight: 400;
+    color: rgb(29, 33, 47);
+    padding-bottom: 1px;"><div style="font-size: 21px;
+    font-weight: 600;"><span>✅</span><span style="
+        height: 100%;
+        padding-top: 4px;
+        margin-left: 4px;
+      ">Quality Gate passed </span></div><div style="background: #EBECF0;
+    height: 1px;
+    margin: 16px 0px;"></div><div style="margin-top: 24px;
+      padding-left: 28px;"><a
+    style="
+      color: rgb(9, 105, 218);
+      text-decoration: none;
+      border-bottom: 1px solid rgb(9, 105, 218);
+      font-weight: 500;
+      width: fit-content; 
+    "
+    href="https://dashboard.url"
+  >See analysis details on SonarQube</a></div></div>"
+`;
+
 exports[`should generate an analysis status with error 1`] = `
 "<div style="font-family: Inter;
     font-size: 14px;
@@ -52,7 +79,7 @@ exports[`should generate an analysis status with error 1`] = `
         height: 100%;
         padding-top: 4px;
         margin-left: 4px;
-      ">Quality Gate failed</span></div><div style="background: #EBECF0;
+      ">Quality Gate failed </span></div><div style="background: #EBECF0;
     height: 1px;
     margin: 16px 0px;"></div><div style="margin-top: 24px;"><div style="margin-bottom: 12px;">Failed Conditions</div><ul
     style="
@@ -92,47 +119,7 @@ exports[`should not fail when metrics are missing 1`] = `
         height: 100%;
         padding-top: 4px;
         margin-left: 4px;
-      ">Quality Gate failed</span></div><div style="background: #EBECF0;
+      ">Quality Gate failed </span></div><div style="background: #EBECF0;
     height: 1px;
     margin: 16px 0px;"></div></div>"
-`;
-
-exports[`should render passing quality gate measures correctly 1`] = `
-"<div style="font-family: Inter;
-    font-size: 14px;
-    font-style: normal;
-    line-height: normal;
-    font-weight: 400;
-    color: rgb(29, 33, 47);
-    padding-bottom: 1px;"><div style="font-size: 21px;
-    font-weight: 600;"><span>✅</span><span style="
-        height: 100%;
-        padding-top: 4px;
-        margin-left: 4px;
-      ">Quality Gate passed</span></div><div style="background: #EBECF0;
-    height: 1px;
-    margin: 16px 0px;"></div><div style="margin-top: 24px;"><div style="margin-bottom: 12px;">Issues</div><ul
-    style="
-      padding: 0;
-      margin: 0;
-    "
-  ><li
-      style="
-        list-style: none;
-        align-items: center;
-        margin-top: 8px;
-      "
-    ><span style="width: 24px">✅</span>
-<span style="margin-left: 4px">1 new issues</span>
-</li></ul></div><div style="margin-top: 24px;
-      padding-left: 28px;"><a
-    style="
-      color: rgb(9, 105, 218);
-      text-decoration: none;
-      border-bottom: 1px solid rgb(9, 105, 218);
-      font-weight: 500;
-      width: fit-content; 
-    "
-    href="https://dashboard.url"
-  >See analysis details on SonarQube</a></div></div>"
 `;

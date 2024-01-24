@@ -25,10 +25,6 @@ export default class Task {
     return this.task.componentName;
   }
 
-  public get componentKey() {
-    return this.task.componentKey;
-  }
-
   public get warnings() {
     if (this.task.warnings) {
       return this.task.warnings;

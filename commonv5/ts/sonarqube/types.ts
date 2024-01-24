@@ -39,23 +39,3 @@ export type MetricsResponse = {
   ps: number;
   total: number;
 };
-
-export interface PeriodMeasure {
-  bestValue?: boolean;
-  index: number;
-  value: string;
-}
-
-export interface Measure {
-  metric: string;
-  bestValue?: boolean;
-  period?: PeriodMeasure;
-  value?: string;
-}
-
-export interface MeasureResponse {
-  component: {
-    measures: Measure[];
-  };
-  [key: string]: unknown;
-}

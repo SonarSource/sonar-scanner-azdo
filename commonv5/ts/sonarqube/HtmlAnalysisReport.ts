@@ -10,24 +10,21 @@ import {
   htmlSeparator,
 } from "../helpers/html";
 import { formatMeasure } from "../helpers/measures";
-import { AnalysisResult, Measure, ProjectStatus } from "./types";
+import { AnalysisResult, ProjectStatus } from "./types";
 
 export default class HtmlAnalysisReport {
   private readonly projectStatus: ProjectStatus;
-  private readonly measures: Measure[];
   private readonly result: AnalysisResult;
 
   public static getInstance(
     projectStatus: ProjectStatus,
-    measures: Measure[],
     result: AnalysisResult,
   ): HtmlAnalysisReport {
-    return new HtmlAnalysisReport(projectStatus, measures, result);
+    return new HtmlAnalysisReport(projectStatus, result);
   }
 
-  constructor(projectStatus: ProjectStatus, measures: Measure[], result: AnalysisResult) {
+  constructor(projectStatus: ProjectStatus, result: AnalysisResult) {
     this.projectStatus = projectStatus;
-    this.measures = measures;
     this.result = result;
   }
 
@@ -74,34 +71,32 @@ export default class HtmlAnalysisReport {
     return rows.length > 0 ? htmlSectionDiv("Failed Conditions", htmlMetricList(rows)) : "";
   }
 
-  private getHtmlMeasureListItem(icon: string, metricKey: string, metricName: string) {
+  private getHtmlMeasureListItem(icon: string, metricKey: string) {
     const condition = this.projectStatus.conditions.find((c) => c.metricKey === metricKey);
-    const measure = this.measures.find((m) => m.metric === metricKey);
     const metric = this.result.metrics.find((m) => m.key === metricKey);
-
-    // Try to get the value from the measure, then from the condition
-    const value = measure?.period?.value ?? measure?.value ?? condition?.actualValue;
-
-    if (!metric || typeof value === "undefined") {
+    if (!condition || !metric) {
       return "";
     }
 
-    return htmlMetricListItem(icon, `${formatMeasure(value, metric.type)} ${metricName}`);
+    return htmlMetricListItem(
+      icon,
+      `${formatMeasure(condition.actualValue, metric.type)} ${metric.name}`,
+    );
   }
 
   private getHtmlQualityGateDetailPassedSection() {
     const issuesItems = [
-      this.getHtmlMeasureListItem("✅", "new_violations", "new issues"),
-      this.getHtmlMeasureListItem("🔧", "pull_request_fixed_issues", "fixed issues"),
-      this.getHtmlMeasureListItem("💤", "new_accepted_issues", "accepted issues"),
+      this.getHtmlMeasureListItem("✅", "new_violations"),
+      this.getHtmlMeasureListItem("🔧", "pullrequest_addressed_issues"),
+      this.getHtmlMeasureListItem("💤", "new_accepted_issues"),
     ].filter((item) => item.length > 0);
     const issuesSection =
       issuesItems.length > 0 ? htmlSectionDiv("Issues", htmlMetricList(issuesItems)) : "";
 
     const measuresItems = [
-      this.getHtmlMeasureListItem("✅", "new_security_hotspots", "Security Hotspots"),
-      this.getHtmlMeasureListItem("✅", "new_coverage", "Coverage on new code"),
-      this.getHtmlMeasureListItem("✅", "new_duplicated_lines_density", "Duplications on new code"),
+      this.getHtmlMeasureListItem("✅", "new_security_hotspots"),
+      this.getHtmlMeasureListItem("✅", "new_coverage"),
+      this.getHtmlMeasureListItem("✅", "new_duplicated_lines_density"),
     ].filter((item) => item.length > 0);
     const measuresSection =
       measuresItems.length > 0 ? htmlSectionDiv("Measures", htmlMetricList(measuresItems)) : "";

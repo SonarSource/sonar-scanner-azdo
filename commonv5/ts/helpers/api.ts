@@ -1,13 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint from "../sonarqube/Endpoint";
-import {
-  Measure,
-  MeasureResponse,
-  Metric,
-  MetricsResponse,
-  ProjectStatus,
-} from "../sonarqube/types";
 import { RequestData, get } from "./request";
+import Endpoint from "../sonarqube/Endpoint";
+import { Metric, MetricsResponse, ProjectStatus } from "../sonarqube/types";
 import { waitFor } from "./utils";
 
 export const RETRY_MAX_ATTEMPTS = 3;
@@ -53,9 +47,6 @@ export async function fetchProjectStatus(
   }
 }
 
-/**
- * @param prev Parameter used for recursive calls. Do not use.
- */
 export async function fetchMetrics(
   endpoint: Endpoint,
   data: { f?: string; p?: number; ps?: number } = { f: "name", ps: 500 },
@@ -77,28 +68,5 @@ export async function fetchMetrics(
     }
 
     throw new Error(`Could not fetch metrics`);
-  }
-}
-
-export async function fetchComponentMeasures(
-  endpoint: Endpoint,
-  data: { component: string; branch?: string; pullRequest?: string; metricKeys: string },
-): Promise<Measure[]> {
-  try {
-    const response = (await get(
-      endpoint,
-      "/api/measures/component",
-      true,
-      data,
-    )) as MeasureResponse;
-    return response.component.measures;
-  } catch (error) {
-    if (error?.message) {
-      tl.debug("Error fetching component measures: " + error.message);
-    } else if (error) {
-      tl.debug("Error fetching component measures: " + JSON.stringify(error));
-    }
-
-    throw new Error(`Could not fetch component measures`);
   }
 }
