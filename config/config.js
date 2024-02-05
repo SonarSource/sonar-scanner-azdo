@@ -11,3 +11,53 @@ exports.scanner = {
   classicUrl: scannersLocation + classicScannerFilename,
   dotnetUrl: scannersLocation + dotnetScannerFilename,
 };
+
+/**
+ * @typedef {Array<{
+ *  extension: string,
+ *  task: string,
+ *  msBuildScanners?: boolean,
+ *  cliScanner?: boolean,
+ *  noCode?: boolean,
+ * }>}
+ */
+exports.tasks = [
+  {
+    extension: "sonarqube",
+    task: "prepare",
+    msBuildScanners: true,
+  },
+  {
+    extension: "sonarqube",
+    task: "analyze",
+    cliScanner: true,
+  },
+  {
+    extension: "sonarqube",
+    task: "publish",
+  },
+  {
+    extension: "sonarcloud",
+    task: "prepare",
+    msBuildScanners: true,
+  },
+  {
+    extension: "sonarcloud",
+    task: "analyze",
+    cliScanner: true,
+  },
+  {
+    extension: "sonarcloud",
+    task: "publish",
+  },
+  {
+    extension: "sonarcloud",
+    task: "qgstatus",
+    noCode: true,
+  },
+];
+
+exports.extensions = ["sonarqube", "sonarcloud"];
+
+exports.mainBranch = "master";
+exports.branches = ["branch-sq-4.x"];

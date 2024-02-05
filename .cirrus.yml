@@ -60,6 +60,7 @@ build_task:
     - source cirrus-env BUILD
     - npm run validate-ci
     - npm run sonarqube
+    - node scripts/full-build.js
     - npm run deploy
 
 promote_task:

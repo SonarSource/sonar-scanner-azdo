@@ -77,7 +77,7 @@ stages:
     - task: CopyFiles@2
       displayName: 'Copy artefacts to build directory'
       inputs:
-        SourceFolder: '$(Build.SourcesDirectory)/build'
+        SourceFolder: '$(Build.SourcesDirectory)/dist'
         Contents: '*.vsix'
         TargetFolder: '$(Agent.BuildDirectory)/a'
 

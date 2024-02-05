@@ -1,523 +1,255 @@
 const path = require("path");
-const fs = require("fs-extra");
-const fetch = require("node-fetch");
-const yargs = require("yargs");
-const artifactoryUpload = require("gulp-artifactory-upload");
-const decompress = require("gulp-decompress");
-const gulp = require("gulp");
-const gulpDel = require("del");
-const gulpRename = require("gulp-rename");
-const gulpReplace = require("gulp-replace");
-const gulpTs = require("gulp-typescript");
-const gutil = require("gulp-util");
 const globby = require("globby");
+const fs = require("fs");
+const gulp = require("gulp");
+const artifactoryUpload = require("gulp-artifactory-upload");
+const fetch = require("node-fetch");
+const del = require("del");
+const yargs = require("yargs");
+const { rollup } = require("rollup");
 const jeditor = require("gulp-json-editor");
-const es = require("event-stream");
-const mergeStream = require("merge-stream");
-const typescript = require("typescript");
-const needle = require("needle");
-const { paths, pathAllFiles } = require("./config/paths");
+const gutil = require("gulp-util");
+const ts = require("gulp-typescript");
+const gulpReplace = require("gulp-replace");
 const {
-  fileHashsum,
+  run,
+  downloadOrCopy,
   fullVersion,
-  getBuildInfo,
-  npmInstallTask,
+  cycloneDxPipe,
   runSonnarQubeScanner,
   runSonnarQubeScannerForSonarCloud,
-  tfxCommand,
-  copyIconsTask,
-  cycloneDxPipe,
-  downloadOrCopy,
+  getBuildInfo,
+  fileHashsum,
 } = require("./config/utils");
-const { scanner } = require("./config/config");
-// eslint-disable-next-line import/extensions
-const { gulpSign: getSignature } = require("./config/gulp-sign.js");
+const rename = require("gulp-rename");
+const merge = require("merge-stream");
+const decompress = require("gulp-decompress");
+const typescript = require("typescript");
+const { tasks, branches, scanner, extensions } = require("./config/config");
+const needle = require("needle");
+const { getSignature } = require("./config/gulp-sign");
+const {
+  paths,
+  BUILD_DIR,
+  SCANNERS_BUILD_DIR,
+  EXTENSION_BUILD_DIR,
+  DIST_DIR,
+} = require("./config/paths");
+
 // eslint-disable-next-line import/extensions
 const packageJSON = require("./package.json");
-const { string } = require("yargs");
 
-/*
- * =========================
- *  BUILD TASKS
- * =========================
- */
-gulp.task("clean", () => gulpDel([path.join(paths.build.root, "**"), "*.vsix"]));
+// TODO: Cyclone DX
 
-gulp.task("extension:copy", () =>
-  mergeStream(
-    gulp.src(
-      path.join(paths.extensions.root, "**", "@(vss-extension.json|extension-icon.png|*.md)"),
-    ),
-    gulp.src(pathAllFiles(paths.extensions.root, "**", "img")),
-    gulp.src(pathAllFiles(paths.extensions.root, "**", "icons")),
-    gulp.src(pathAllFiles(paths.extensions.root, "**", "templates")),
-  ).pipe(gulp.dest(paths.build.extensions.root)),
-);
+function readJsonSync(file) {
+  return JSON.parse(fs.readFileSync(file));
+}
 
-gulp.task("tasks:old:copy", () =>
-  gulp.src(pathAllFiles(paths.extensions.tasks.old)).pipe(gulp.dest(paths.build.extensions.root)),
-);
+const isProd = process.env.NODE_ENV === "production";
 
-gulp.task("tasks:old:common", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.common.old));
-  globby.sync(paths.extensions.tasks.old, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir))),
-    );
-  });
-  return commonPipe;
+gulp.task("clean", () => {
+  return del([path.join(DIST_DIR, "**", "*"), path.join(BUILD_DIR, "**", "*")]);
 });
 
-gulp.task("tasks:old:bundle", gulp.series("tasks:old:copy", "tasks:old:common"));
-
-gulp.task("npminstall", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.scv1, "package.json"),
-      path.join(paths.commonv5.new, "package.json"),
-    ])
-    .pipe(es.mapSync((file) => npmInstallTask(file.path))),
-);
-
-gulp.task("npminstallv4", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.v4, "package.json"),
-      path.join(paths.common.new, "package.json"),
-    ])
-    .pipe(es.mapSync((file) => npmInstallTask(file.path))),
-);
-
-gulp.task("npminstallv5", () =>
-  gulp
-    .src([path.join(paths.extensions.tasks.v5, "package.json")])
-    .pipe(es.mapSync((file) => npmInstallTask(file.path))),
-);
-
-gulp.task("tasks:sonarcloud:v1:ts", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.scv1, "**", "*.ts"),
-      "!" + path.join("**", "node_modules", "**"),
-      "!" + path.join("**", "__tests__", "**"),
-    ])
-    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    })
-    .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
-    .pipe(gulp.dest(paths.build.extensions.root)),
-);
-
-gulp.task("tasks:v4:ts", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.v4, "**", "*.ts"),
-      "!" + path.join("**", "node_modules", "**"),
-      "!" + path.join("**", "__tests__", "**"),
-    ])
-    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    })
-    .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
-    .pipe(gulp.dest(paths.build.extensions.root)),
-);
-
-gulp.task("tasks:v5:ts", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.v5, "**", "*.ts"),
-      "!" + path.join("**", "node_modules", "**"),
-      "!" + path.join("**", "__tests__", "**"),
-    ])
-    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    })
-    .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
-    .pipe(gulp.dest(paths.build.extensions.root)),
-);
-
-gulp.task("tasks:sonarcloud:v1:commonv5:ts", () => {
-  let commonPipe = gulp
-    .src([
-      path.join(paths.commonv5.new, "**", "*.ts"),
-      "!" + path.join("**", "node_modules", "**"),
-      "!" + path.join("**", "__tests__", "**"),
-    ])
-    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    });
-  globby.sync(paths.extensions.tasks.scv1, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
-      ),
-    );
-  });
-  return commonPipe;
+gulp.task("scanners:clean", () => {
+  return del([path.join(SCANNERS_BUILD_DIR, "**", "*")]);
 });
 
-gulp.task("tasks:sonarqube:v4:common:ts", () => {
-  let commonPipe = gulp
-    .src([
-      path.join(paths.common.new, "**", "*.ts"),
-      "!" + path.join("**", "node_modules", "**"),
-      "!" + path.join("**", "__tests__", "**"),
-    ])
-    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    });
-  globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
-      ),
-    );
-  });
-  return commonPipe;
-});
-
-gulp.task("tasks:v5:commonv5:ts", () => {
-  let commonPipe = gulp
-    .src([
-      path.join(paths.commonv5.new, "**", "*.ts"),
-      "!" + path.join("**", "node_modules", "**"),
-      "!" + path.join("**", "__tests__", "**"),
-    ])
-    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    });
-  globby.sync(paths.extensions.tasks.v5, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
-      ),
-    );
-  });
-  return commonPipe;
-});
-
-gulp.task("tasks:sonarcloud:v1:copy", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.scv1, "task.json"),
-      pathAllFiles(paths.extensions.tasks.scv1, "node_modules"),
-    ])
-    .pipe(gulp.dest(paths.build.extensions.root)),
-);
-
-gulp.task("tasks:v4:copy", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.v4, "task.json"),
-      pathAllFiles(paths.extensions.tasks.v4, "node_modules"),
-    ])
-    .pipe(gulp.dest(paths.build.extensions.root)),
-);
-
-gulp.task("tasks:v5:copy", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.v5, "task.json"),
-      pathAllFiles(paths.extensions.tasks.v5, "node_modules"),
-    ])
-    .pipe(gulp.dest(paths.build.extensions.root)),
-);
-
-gulp.task("tasks:v4:common:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.common.new, "node_modules"));
-  globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(
-          paths.build.extensions.root,
-          path.relative(paths.extensions.root, dir),
-          "node_modules",
-        ),
-      ),
-    );
-  });
-  return commonPipe;
-});
-
-gulp.task("tasks:sonarcloud:v1:commonv5:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
-  globby.sync(paths.extensions.tasks.scv1, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(
-          paths.build.extensions.root,
-          path.relative(paths.extensions.root, dir),
-          "node_modules",
-        ),
-      ),
-    );
-  });
-  return commonPipe;
-});
-
-gulp.task("tasks:v5:commonv5:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
-  globby.sync(paths.extensions.tasks.v5, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(
-          paths.build.extensions.root,
-          path.relative(paths.extensions.root, dir),
-          "node_modules",
-        ),
-      ),
-    );
-  });
-  return commonPipe;
-});
-
-gulp.task("tasks:cycloneDx:sonarcloud", () =>
-  cycloneDxPipe(
-    "sonarcloud",
-    packageJSON,
-    path.join(paths.extensions.root, "sonarcloud"),
-    paths.commonv5.new,
-  ),
-);
-
-gulp.task("tasks:cycloneDx:sonarqube", () =>
-  cycloneDxPipe(
-    "sonarqube",
-    path.join(paths.extensions.root, "sonarqube"),
-    paths.common.new,
-    paths.commonv5.new,
-  ),
-);
-
-gulp.task("cycloneDx", gulp.series("tasks:cycloneDx:sonarqube", "tasks:cycloneDx:sonarcloud"));
-
-gulp.task(
-  "tasks:sonarcloud:v1:bundle",
-  gulp.series(
-    "npminstall",
-    "tasks:sonarcloud:v1:ts",
-    "tasks:sonarcloud:v1:commonv5:ts",
-    "tasks:sonarcloud:v1:copy",
-    "tasks:sonarcloud:v1:commonv5:copy",
-  ),
-);
-
-gulp.task(
-  "tasks:v4:bundle",
-  gulp.series(
-    "npminstallv4",
-    "tasks:v4:ts",
-    "tasks:sonarqube:v4:common:ts",
-    "tasks:v4:copy",
-    "tasks:v4:common:copy",
-  ),
-);
-
-gulp.task(
-  "tasks:v5:bundle",
-  gulp.series(
-    "npminstallv5",
-    "tasks:v5:ts",
-    "tasks:v5:commonv5:ts",
-    "tasks:v5:copy",
-    "tasks:v5:commonv5:copy",
-  ),
-);
-
-gulp.task("tasks:copy-icons", copyIconsTask());
-
-/**
- * Prepend helpMarkDown with the version of the task for all tasks
- */
-gulp.task("tasks:document-tasks-version", () => {
-  return gulp
-    .src(path.join(paths.build.extensions.tasks, "**", "task.json"))
-    .pipe(
-      jeditor((task) => ({
-        ...task,
-        helpMarkDown:
-          `Version: ${task.version.Major}.${task.version.Minor}.${task.version.Patch}. ` +
-          task.helpMarkDown,
-      })),
-    )
-    .pipe(gulp.dest(paths.build.extensions.root));
-});
-
-/**
- * Download scanners
- */
-gulp.task("scanner:download", () => {
+gulp.task("scanners:download", () => {
   const classicDownload = downloadOrCopy(scanner.classicUrl)
     .pipe(decompress())
-    .pipe(gulp.dest(paths.build.classicScanner));
+    .pipe(gulp.dest("build/scanners/classic-sonar-scanner-msbuild"));
 
   const dotnetDownload = downloadOrCopy(scanner.dotnetUrl)
     .pipe(decompress())
-    .pipe(gulp.dest(paths.build.dotnetScanner));
+    .pipe(gulp.dest("build/scanners/dotnet-sonar-scanner-msbuild"));
 
-  return mergeStream(classicDownload, dotnetDownload);
+  return merge(classicDownload, dotnetDownload);
 });
 
-/**
- * Extract all scanners to the different places in the extensions where they are needed.
- */
-gulp.task("scanner:extract-scanners", () => {
-  // Extract Windows scanner for MSBuild
-  const scannerFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, "prepare", "old", "SonarQubeScannerMsBuild"),
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v4",
-      "classic-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v5",
-      "classic-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarcloudTasks,
-      "prepare",
-      "v1",
-      "classic-sonar-scanner-msbuild",
-    ),
-  ];
-  let scannerPipe = gulp.src(pathAllFiles(paths.build.classicScanner));
-  scannerFolders.forEach((dir) => {
-    scannerPipe = scannerPipe.pipe(gulp.dest(dir));
-  });
+gulp.task("scanners", gulp.series("scanners:clean", "scanners:download"));
 
-  // Extract dotnet for MSBuild
-  const dotnetScannerFolders = [
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v4",
-      "dotnet-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v5",
-      "dotnet-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarcloudTasks,
-      "prepare",
-      "v1",
-      "dotnet-sonar-scanner-msbuild",
-    ),
-  ];
-  let dotnetScannerPipe = gulp.src(pathAllFiles(paths.build.dotnetScanner));
-  dotnetScannerFolders.forEach((dir) => {
-    dotnetScannerPipe = dotnetScannerPipe.pipe(gulp.dest(dir));
-  });
+function extensionExists(extension) {
+  return fs.existsSync(`./extensions/${extension}/vss-extension.json`);
+}
 
-  // Extract CLI scanner to 'analyze' tasks
-  const cliFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, "scanner-cli", "old", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarqubeTasks, "analyze", "v4", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarqubeTasks, "analyze", "v5", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarcloudTasks, "analyze", "v1", "sonar-scanner"),
-  ];
-  let cliPipe = gulp.src(
-    pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`),
+function extensionTaskExists(extension, task) {
+  return fs.existsSync(`./extensions/${extension}/tasks/${task}/task.json`);
+}
+
+function getExtensionTaskBuildDirectory(extension, task) {
+  const { version } = JSON.parse(
+    fs.readFileSync(`./extensions/${extension}/tasks/${task}/task.json`).toString(),
   );
-  cliFolders.forEach((dir) => {
-    cliPipe = cliPipe.pipe(gulp.dest(dir));
-  });
+  const taskVersionString = `${version.Major}.${version.Minor}.${version.Patch}`;
+  return `build/tasks/${extension}/tasks/${task}/v${taskVersionString}`;
+}
 
-  return mergeStream(scannerPipe, dotnetScannerPipe, cliPipe);
+gulp.task("tasks:prepare", () => {
+  function tasksPrepare({ extension, task, msBuildScanners, cliScanner, noCode }) {
+    if (!extensionTaskExists(extension, task)) {
+      return [];
+    }
+
+    const taskDir = getExtensionTaskBuildDirectory(extension, task);
+
+    const streams = [
+      gulp.src(`extensions/${extension}/tasks/${task}/task.json`).pipe(gulp.dest(taskDir)),
+      gulp
+        .src(
+          `extensions/${extension}/tasks_icons/${isProd ? "task_icon.png" : "task_icon.test.png"}`,
+        )
+        .pipe(rename("icon.png"))
+        .pipe(gulp.dest(taskDir)),
+    ];
+
+    if (!noCode) {
+      // Add node_modules
+      streams.push(
+        gulp.src(`src/node_modules/**/*`).pipe(gulp.dest(path.join(taskDir, "node_modules"))),
+      );
+
+      // If this task needs the MSBuild scanners
+      if (msBuildScanners) {
+        streams.push(gulp.src("build/scanners/**/*").pipe(gulp.dest(taskDir)));
+      }
+
+      // If this task needs the CLI scanner
+      if (cliScanner) {
+        streams.push(
+          gulp
+            .src(
+              `build/scanners/classic-sonar-scanner-msbuild/sonar-scanner-${scanner.cliVersion}/**/*`,
+            )
+            .pipe(gulp.dest(path.join(taskDir, "sonar-scanner"))),
+        );
+      }
+    }
+
+    return streams;
+  }
+
+  return merge(...tasks.map(tasksPrepare));
 });
 
-gulp.task(
-  "copy",
-  gulp.series(
-    "extension:copy",
-    "tasks:old:bundle",
-    "tasks:sonarcloud:v1:bundle",
-    "tasks:v4:bundle",
-    "tasks:v5:bundle",
-    "tasks:copy-icons",
-    "tasks:document-tasks-version",
-    "scanner:download",
-    "scanner:extract-scanners",
-  ),
-);
+gulp.task("tasks:build", () => {
+  function tasksBuild({ extension, task, noCode }) {
+    if (!extensionTaskExists(extension, task)) {
+      return [];
+    }
 
-gulp.task("tfx", (done) => {
-  globby
-    .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
-    .forEach((extension) => tfxCommand(extension, packageJSON));
+    if (noCode) {
+      return [];
+    }
+
+    const taskDir = getExtensionTaskBuildDirectory(extension, task);
+
+    return gulp
+      .src([
+        `extensions/${extension}/tasks/${task}/${task}.ts`,
+        `src/**/*.ts`,
+        "!" + path.join("**", "node_modules", "**"),
+        "!" + path.join("**", "__tests__", "**"),
+      ])
+      .pipe(ts.createProject("./tsconfig.json", { typescript })())
+      .once("error", () => {
+        this.once("finish", () => process.exit(1));
+      })
+      .pipe(gulpReplace("../../../../src", "./"))
+      .pipe(gulp.dest(taskDir));
+  }
+
+  return merge(...tasks.map(tasksBuild));
+});
+
+gulp.task("tasks", gulp.series("tasks:prepare", "tasks:build"));
+
+gulp.task("extension:prepare", (done) => {
+  const outDir = "build/extensions";
+
+  run(`cp -r extensions ${outDir}`);
+
+  for (const extension of extensions) {
+    if (!extensionExists(extension)) {
+      continue;
+    }
+
+    run(`rm -rf ${outDir}/${extension}/tasks`); // Drop default 'tasks' folder
+  }
   done();
 });
 
-gulp.task("build", gulp.series("clean", "copy", "tfx", "cycloneDx"));
+gulp.task("extension:patch-test", () => {
+  if (isProd) {
+    return Promise.resolve();
+  }
 
-/*
- * =========================
- *  TEST TASKS
- * =========================
- */
-gulp.task("tfx:test", (done) => {
-  globby
-    .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
-    .forEach((extension) =>
-      tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "foo")),
+  const replaceTestFiles = gulp
+    .src(["build/extensions/**/*.test.png"])
+    .pipe(
+      rename((path) => {
+        path.basename = path.basename.replace(".test", "");
+      }),
+    )
+    .pipe(gulp.dest("build/extensions"));
+
+  const hotixVssExtension = gulp
+    .src("build/extensions/*/vss-extension.json")
+    .pipe(
+      jeditor((json) => ({
+        ...json,
+        name: "[Test] " + json.name,
+        public: false,
+        branding: {
+          color: "#ff0000",
+          theme: "dark",
+        },
+      })),
+    )
+    .pipe(gulp.dest(EXTENSION_BUILD_DIR));
+
+  return merge(replaceTestFiles, hotixVssExtension);
+});
+
+gulp.task("extension:build", (done) => {
+  const vsixDir = __dirname + "/dist";
+  const publisher = isProd ? null : yargs.argv.publisher || "foo";
+
+  for (const extension of extensions) {
+    if (!extensionExists(extension)) {
+      continue;
+    }
+    const vssExtension = readJsonSync(
+      path.join(EXTENSION_BUILD_DIR, extension, "vss-extension.json"),
     );
+    const version = fullVersion(vssExtension.version);
+    const vsixFileName = `sonar-scanner-vsts-${version}-${extension}.vsix`;
+
+    run(`cp -r build/tasks/${extension}/tasks ${EXTENSION_BUILD_DIR}/${extension}/tasks`);
+    run(
+      `tfx extension create --output-path "${vsixDir}/${vsixFileName}" ${
+        publisher ? `--publisher ${publisher}` : ""
+      }`,
+      {
+        cwd: path.join(EXTENSION_BUILD_DIR, extension),
+      },
+    );
+  }
   done();
 });
 
-gulp.task("extension:test", () =>
-  mergeStream(
-    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false }).map((extension) =>
-      mergeStream(
-        gulp
-          .src(path.join(extension, "extension-icon.test.png"))
-          .pipe(gulpRename("extension-icon.png"))
-          .pipe(
-            gulp.dest(
-              path.join(
-                paths.build.extensions.root,
-                path.relative(paths.extensions.root, extension),
-              ),
-            ),
-          ),
-        gulp
-          .src(
-            path.join(
-              paths.build.extensions.root,
-              path.relative(paths.extensions.root, extension),
-              "vss-extension.json",
-            ),
-            { base: "./" },
-          )
-          .pipe(jeditor(fs.readJsonSync(path.join(extension, "vss-extension.test.json"))))
-          .pipe(gulp.dest("./")),
-      ),
-    ),
-  ),
-);
+gulp.task("extension", gulp.series("extension:prepare", "extension:patch-test", "extension:build"));
 
-gulp.task("tasks:copy-icons:test", copyIconsTask("task_icon.test.png"));
+gulp.task("build", gulp.series("clean", "scanners", "tasks", "extension"));
 
-gulp.task("test", gulp.series("extension:test", "tasks:copy-icons:test"));
+gulp.task("cyclonedx", () => {
+  const packageJSON = readJsonSync("package.json");
+  return merge([
+    cycloneDxPipe("sonarcloud", packageJSON, path.join("dist", "sonarcloud"), path.join("src")),
+    cycloneDxPipe("sonarqube", packageJSON, path.join("dist", "sonarqube"), path.join("src")),
+  ]);
+});
 
-gulp.task("build:test", gulp.series("clean", "copy", "test", "tfx:test"));
-
-/*
- * =========================
- *  DEPLOY TASKS
- * =========================
- */
 gulp.task("deploy:vsix:sonarqube", () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
     gutil.log("Not on master nor PR, skip deploy:vsix");
@@ -529,15 +261,13 @@ gulp.task("deploy:vsix:sonarqube", () => {
   }
   const { name } = packageJSON;
 
-  return mergeStream(
+  return merge(
     globby
-      .sync(
-        path.join(paths.build.root, "*{-sonarqube.vsix,-sonarqube-cyclonedx.json,-sonarqube*.asc}"),
-      )
+      .sync(path.join(DIST_DIR, "*{-sonarqube.vsix,-sonarqube-cyclonedx.json,-sonarqube*.asc}"))
       .map((filePath) => {
         const [sha1, md5] = fileHashsum(filePath);
-        const extensionPath = path.join(paths.build.extensions.root, "sonarqube");
-        const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+        const extensionPath = path.join(EXTENSION_BUILD_DIR, "sonarqube");
+        const vssExtension = readJsonSync(path.join(extensionPath, "vss-extension.json"));
         const packageVersion = fullVersion(vssExtension.version);
         return gulp
           .src(filePath)
@@ -585,17 +315,12 @@ gulp.task("deploy:vsix:sonarcloud", () => {
   }
   const { name } = packageJSON;
 
-  return mergeStream(
+  return merge(
     globby
-      .sync(
-        path.join(
-          paths.build.root,
-          "*{-sonarcloud.vsix,-sonarcloud-cyclonedx.json,-sonarcloud*.asc}",
-        ),
-      )
+      .sync(path.join(DIST_DIR, "*{-sonarcloud.vsix,-sonarcloud-cyclonedx.json,-sonarcloud*.asc}"))
       .map((filePath) => {
-        const extensionPath = path.join(paths.build.extensions.root, "sonarcloud");
-        const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+        const extensionPath = path.join(EXTENSION_BUILD_DIR, "sonarcloud");
+        const vssExtension = readJsonSync(path.join(extensionPath, "vss-extension.json"));
         const packageVersion = fullVersion(vssExtension.version);
         const [sha1, md5] = fileHashsum(filePath);
         return gulp
@@ -643,10 +368,10 @@ gulp.task("deploy:buildinfo", () => {
     return gutil.noop;
   }
 
-  const sqExtensionPath = path.join(paths.build.extensions.root, "sonarqube");
-  const sqVssExtension = fs.readJsonSync(path.join(sqExtensionPath, "vss-extension.json"));
-  const scExtensionPath = path.join(paths.build.extensions.root, "sonarcloud");
-  const scVssExtension = fs.readJsonSync(path.join(scExtensionPath, "vss-extension.json"));
+  const sqExtensionPath = path.join(EXTENSION_BUILD_DIR, "sonarqube");
+  const sqVssExtension = readJsonSync(path.join(sqExtensionPath, "vss-extension.json"));
+  const scExtensionPath = path.join(EXTENSION_BUILD_DIR, "sonarcloud");
+  const scVssExtension = readJsonSync(path.join(scExtensionPath, "vss-extension.json"));
   const buildInfo = getBuildInfo(packageJSON, sqVssExtension, scVssExtension);
   console.log("deploy build info", buildInfo);
   return fetch(process.env.ARTIFACTORY_URL + "/api/build", {
@@ -663,36 +388,24 @@ gulp.task("deploy:buildinfo", () => {
 
 gulp.task("sign", () => {
   return gulp
-    .src(path.join(paths.build.root, "*{.vsix,-cyclonedx.json}"))
+    .src(path.join("dist", "*{.vsix,-cyclonedx.json}"))
     .pipe(
       getSignature({
         privateKeyArmored: process.env.GPG_SIGNING_KEY,
         passphrase: process.env.GPG_SIGNING_PASSPHRASE,
       }),
     )
-    .pipe(gulp.dest(paths.build.root));
+    .pipe(gulp.dest("dist"));
 });
 
 gulp.task(
   "deploy",
-  gulp.series(
-    "build",
-    "sign",
-    "deploy:buildinfo",
-    "deploy:vsix:sonarqube",
-    "deploy:vsix:sonarcloud",
-  ),
+  gulp.series("sign", "deploy:buildinfo", "deploy:vsix:sonarqube", "deploy:vsix:sonarcloud"),
 );
-
-/*
- * =========================
- *  MISC TASKS
- * =========================
- */
 
 gulp.task("sonarqube-analysis:sonarqube", (done) => {
   const extensionPath = path.join(paths.extensions.root, "sonarqube");
-  const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+  const vssExtension = readJsonSync(path.join(extensionPath, "vss-extension.json"));
   const projectVersion = vssExtension.version;
   if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
     runSonnarQubeScanner(done, {
@@ -715,7 +428,7 @@ gulp.task("sonarqube-analysis:sonarqube", (done) => {
 
 gulp.task("sonarqube-analysis:sonarcloud", (done) => {
   const extensionPath = path.join(paths.extensions.root, "sonarcloud");
-  const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+  const vssExtension = readJsonSync(path.join(extensionPath, "vss-extension.json"));
   const projectVersion = vssExtension.version;
   if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
     runSonnarQubeScannerForSonarCloud(done, {
@@ -760,7 +473,7 @@ gulp.task("promote", (cb) => {
     },
   )
     .then((resp) => {
-      if (resp.statusCode != 200) {
+      if (resp.statusCode !== 200) {
         cb(new Error(resp.statusMessage + "\n" + JSON.stringify(resp.body, null, 2)));
       }
     })
@@ -775,8 +488,9 @@ gulp.task("burgr:sonarcloud", () => {
     return gutil.noop;
   }
 
-  const extensionPath = path.join(paths.extensions.root, "sonarcloud");
-  const manifestFile = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+  const manifestFile = readJsonSync(
+    path.join(paths.extensions.root, "sonarcloud", "vss-extension.json"),
+  );
   const extensionVersion = manifestFile.version;
   const packageVersion = fullVersion(extensionVersion);
 
@@ -812,8 +526,9 @@ gulp.task("burgr:sonarqube", () => {
     return gutil.noop;
   }
 
-  const extensionPath = path.join(paths.extensions.root, "sonarqube");
-  const manifestFile = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+  const manifestFile = readJsonSync(
+    path.join(paths.extensions.root, "sonarqube", "vss-extension.json"),
+  );
   const extensionVersion = manifestFile.version;
   const packageVersion = fullVersion(extensionVersion);
 
