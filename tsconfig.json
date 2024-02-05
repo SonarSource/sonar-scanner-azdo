@@ -13,8 +13,7 @@
     "baseUrl": "."
   },
   "include": [
-    "./common/ts/**/*.ts",
-    "./commonv5/ts/**/*.ts",
+    "./src/**/*.ts",
     "./extensions/**/*.ts"
   ]
 }

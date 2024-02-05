@@ -11,3 +11,47 @@ exports.scanner = {
   classicUrl: scannersLocation + classicScannerFilename,
   dotnetUrl: scannersLocation + dotnetScannerFilename,
 };
+
+/**
+ * @typedef {Array<{
+ *  extension: string,
+ *  task: string,
+ *  msBuildScanners?: boolean,
+ *  cliScanner?: boolean
+ * }>}
+ */
+exports.tasks = [
+  {
+    extension: "sonarqube",
+    task: "prepare",
+    msBuildScanners: true,
+  },
+  {
+    extension: "sonarqube",
+    task: "analyze",
+    cliScanner: true,
+  },
+  {
+    extension: "sonarqube",
+    task: "publish",
+  },
+  {
+    extension: "sonarcloud",
+    task: "prepare",
+    msBuildScanners: true,
+  },
+  {
+    extension: "sonarcloud",
+    task: "analyze",
+    cliScanner: true,
+  },
+  {
+    extension: "sonarcloud",
+    task: "publish",
+  },
+];
+
+exports.branches = [
+  "feature/br/vsts-342-rewrite-build-process",
+  "feature/br/vsts-342-rewrite-build-process-sq-4",
+];

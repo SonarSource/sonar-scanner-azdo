@@ -5,6 +5,7 @@
   "license": "LGPL-3.0",
   "devDependencies": {
     "@cyclonedx/bom": "^3.8.0",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/fs-extra": "9.0.13",
     "@types/jest": "29.5.8",
     "@types/jest-when": "2.7.3",
@@ -41,6 +42,8 @@
     "node-fetch": "^2.7.0",
     "openpgp": "5.10.1",
     "prettier": "3.0.3",
+    "rollup": "^4.9.6",
+    "rollup-plugin-esbuild": "^6.1.1",
     "semver": "5.5.0",
     "sonarqube-scanner": "3.3.0",
     "stream": "^0.0.2",
@@ -54,6 +57,7 @@
   },
   "scripts": {
     "build": "gulp build",
+    "test-build": "gulp build:test",
     "clean": "gulp clean",
     "deploy": "gulp deploy",
     "promote": "gulp promote",
@@ -63,7 +67,6 @@
     "format-check": "prettier --list-different \"{commonv5,common,extensions}/**/*.{js,ts}\"",
     "lint": "eslint --ext js,ts --quiet \"{commonv5,common,extensions}/**/*.{js,ts}\"",
     "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"{commonv5,common,extensions}/**/*.{js,ts}\"",
-    "test-build": "gulp build:test",
     "test": "jest",
     "test-ci": "jest --coverage",
     "ts-check": "tsc --noEmit",
