@@ -1,5 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { fillBuildProperty, publishBuildSummary } from "./helpers/azdo-server-utils";
+import { DEPRECATION_MESSAGE } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
 import Analysis from "./sonarqube/Analysis";
 import Endpoint, { EndpointData, EndpointType } from "./sonarqube/Endpoint";
@@ -18,6 +19,8 @@ export default async function publishTask(endpointType: EndpointType) {
     );
     return;
   }
+
+  tl.warning(DEPRECATION_MESSAGE);
 
   const endpointData: { type: EndpointType; data: EndpointData } = JSON.parse(
     tl.getVariable("SONARQUBE_ENDPOINT"),

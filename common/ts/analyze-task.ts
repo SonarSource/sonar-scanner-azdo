@@ -1,4 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { DEPRECATION_MESSAGE } from "./helpers/constants";
 import JavaVersionResolver from "./helpers/java-version-resolver";
 import { PROP_NAMES, sanitizeVariable } from "./helpers/utils";
 import { EndpointData, EndpointType } from "./sonarqube/Endpoint";
@@ -17,6 +18,9 @@ export default async function analyzeTask(
       "[SQ] The 'Prepare Analysis Configuration' task was not executed prior to this task",
     );
   }
+
+  tl.warning(DEPRECATION_MESSAGE);
+
   Scanner.setIsSonarCloud(isSonarCloud);
   JavaVersionResolver.setJavaHomeToIfAvailable(JAVA_11_PATH_ENV_NAME);
   const scanner = Scanner.getAnalyzeScanner(rootPath, scannerMode);
