@@ -1,4 +1,4 @@
-import { URL } from "url";
+import { UrlWithStringQuery } from "url";
 
 function formatHostname(hostname: string) {
   // canonicalize the hostname, so that 'oogle.com' won't match 'google.com'
@@ -16,7 +16,7 @@ function parseNoProxyZone(zone: string) {
   return { hostname: zoneHost, port: zonePort, hasPort };
 }
 
-function uriInNoProxy(url: URL, noProxy: string) {
+function uriInNoProxy(url: UrlWithStringQuery, noProxy: string) {
   const port = url.port || (url.protocol === "https:" ? "443" : "80");
   const hostname = formatHostname(url.hostname);
   const noProxyList = noProxy.split(",");
@@ -35,7 +35,7 @@ function uriInNoProxy(url: URL, noProxy: string) {
   });
 }
 
-export function getProxyFromURI(url: URL) {
+export function getProxyFromURI(url: UrlWithStringQuery) {
   // Decide the proper request proxy to use based on the request URI object and the
   // environmental constiables (NO_PROXY, HTTP_PROXY, etc.)
   // respect NO_PROXY environment constiables (see: https://lynx.invisible-island.net/lynx2.8.7/breakout/lynx_help/keystrokes/environments.html)

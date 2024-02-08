@@ -11,15 +11,20 @@ export async function get(
   endpoint: Endpoint,
   path: string,
   isJson: boolean,
-  query?: RequestData,
+  query: RequestData = {},
 ): Promise<any> {
   tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
 
   try {
-    const hasQuery = query && Object.keys(query).length > 0;
-    const fullUrl =
-      endpoint.url + path + (hasQuery ? "?" + new URLSearchParams(query).toString() : "");
-    const response = await fetch(fullUrl, endpoint.toFetchOptions(fullUrl));
+    let url = endpoint.url + path;
+
+    Object.keys(query).forEach((key, i) => {
+      url += i === 0 ? "?" : "&";
+      url += `${key}=${query[key]}`;
+    });
+
+    const response = await fetch(url, endpoint.toFetchOptions(url));
+
     if (isJson) {
       return await response.json();
     } else {

@@ -3,6 +3,7 @@ import { Guid } from "guid-typescript";
 import * as path from "path";
 import * as semver from "semver";
 import * as azdoApiUtils from "./helpers/azdo-api-utils";
+import { DEPRECATION_MESSAGE } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
 import { toCleanJSON } from "./helpers/utils";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
@@ -21,6 +22,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
       "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud",
     );
   }
+
+  tl.warning(DEPRECATION_MESSAGE);
 
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
