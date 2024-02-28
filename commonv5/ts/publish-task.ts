@@ -69,11 +69,6 @@ async function fetchRelevantMeasures(
   componentKey: string,
   metrics: Metric[],
 ): Promise<Measure[]> {
-  // Do not fetch measures for SonarCloud
-  if (endpoint.type === EndpointType.SonarCloud) {
-    return [];
-  }
-
   // Are we in a PR, non-main branch or main branch?
   const scannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarQubeScannerParams));
   const branch = scannerParams["sonar.branch.name"] ?? null;
@@ -119,7 +114,7 @@ export async function getReportForTask(
     const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec, 1000);
     const projectStatus = await fetchProjectStatus(endpoint, task.analysisId);
     const measures = await fetchRelevantMeasures(endpoint, task.componentKey, metrics);
-    const analysis = HtmlAnalysisReport.getInstance(projectStatus, measures, {
+    const analysis = HtmlAnalysisReport.getInstance(endpoint.type, projectStatus, measures, {
       dashboardUrl: taskReport.dashboardUrl,
       metrics,
       projectName: task.componentName,

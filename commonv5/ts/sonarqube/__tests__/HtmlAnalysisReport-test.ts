@@ -1,3 +1,4 @@
+import { EndpointType } from "../Endpoint";
 import HtmlAnalysisReport from "../HtmlAnalysisReport";
 import { AnalysisResult, Metric } from "../types";
 
@@ -40,14 +41,14 @@ jest.mock("azure-pipelines-task-lib/task", () => ({
 }));
 
 it("should generate an analysis status with error", () => {
-  const analysis = new HtmlAnalysisReport(MOCKED_PROJECT_STATUS_ERROR, [], MOCKED_ANALYSIS_RESULT);
+  const analysis = new HtmlAnalysisReport(EndpointType.SonarQube, MOCKED_PROJECT_STATUS_ERROR, [], MOCKED_ANALYSIS_RESULT);
 
   expect(analysis.getFailedConditions()).toHaveLength(1);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
 it("should not fail when metrics are missing", () => {
-  const analysis = new HtmlAnalysisReport(MOCKED_PROJECT_STATUS_ERROR, [], {
+  const analysis = new HtmlAnalysisReport(EndpointType.SonarQube, MOCKED_PROJECT_STATUS_ERROR, [], {
     ...MOCKED_ANALYSIS_RESULT,
     dashboardUrl: undefined,
     metrics: undefined,
@@ -57,35 +58,44 @@ it("should not fail when metrics are missing", () => {
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
-it("should render passing quality gate measures correctly", () => {
-  const analysis = new HtmlAnalysisReport(
-    MOCKED_PROJECT_STATUS_SUCCESS,
-    [
-      {
-        metric: "new_violations",
-        value: "1",
-      },
-      {
-        metric: "pull_request_fixed_issues",
-        period: {
-          value: "2",
-          index: 1,
+it.each([
+  [EndpointType.SonarQube],
+  [EndpointType.SonarCloud],
+])(
+  "should render passing quality gate measures correctly",
+  async (endpointType) => {
+    const analysis = new HtmlAnalysisReport(
+      endpointType, 
+      MOCKED_PROJECT_STATUS_SUCCESS,
+      [
+        {
+          metric: "new_violations",
+          value: "1",
         },
-      },
-      {
-        metric: "new_coverage",
-        value: "23",
-      },
-    ],
-    MOCKED_ANALYSIS_RESULT,
-  );
+        {
+          metric: "pull_request_fixed_issues",
+          period: {
+            value: "2",
+            index: 1,
+          },
+        },
+        {
+          metric: "new_coverage",
+          value: "23",
+        },
+      ],
+      MOCKED_ANALYSIS_RESULT,
+    );
+  
+    expect(analysis.getFailedConditions()).toHaveLength(0);
+    expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
+  },
+);
 
-  expect(analysis.getFailedConditions()).toHaveLength(0);
-  expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
-});
+
 
 it("should display the project name", () => {
-  const analysis = new HtmlAnalysisReport(MOCKED_PROJECT_STATUS_ERROR, [], {
+  const analysis = new HtmlAnalysisReport(EndpointType.SonarQube, MOCKED_PROJECT_STATUS_ERROR, [], {
     ...MOCKED_ANALYSIS_RESULT,
     projectName: "project_name",
   });
