@@ -41,7 +41,12 @@ jest.mock("azure-pipelines-task-lib/task", () => ({
 }));
 
 it("should generate an analysis status with error", () => {
-  const analysis = new HtmlAnalysisReport(EndpointType.SonarQube, MOCKED_PROJECT_STATUS_ERROR, [], MOCKED_ANALYSIS_RESULT);
+  const analysis = new HtmlAnalysisReport(
+    EndpointType.SonarQube,
+    MOCKED_PROJECT_STATUS_ERROR,
+    [],
+    MOCKED_ANALYSIS_RESULT,
+  );
 
   expect(analysis.getFailedConditions()).toHaveLength(1);
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
@@ -58,14 +63,11 @@ it("should not fail when metrics are missing", () => {
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
-it.each([
-  [EndpointType.SonarQube],
-  [EndpointType.SonarCloud],
-])(
+it.each([[EndpointType.SonarQube], [EndpointType.SonarCloud]])(
   "should render passing quality gate measures correctly",
-  async (endpointType) => {
+  (endpointType) => {
     const analysis = new HtmlAnalysisReport(
-      endpointType, 
+      endpointType,
       MOCKED_PROJECT_STATUS_SUCCESS,
       [
         {
@@ -86,13 +88,11 @@ it.each([
       ],
       MOCKED_ANALYSIS_RESULT,
     );
-  
+
     expect(analysis.getFailedConditions()).toHaveLength(0);
     expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
   },
 );
-
-
 
 it("should display the project name", () => {
   const analysis = new HtmlAnalysisReport(EndpointType.SonarQube, MOCKED_PROJECT_STATUS_ERROR, [], {

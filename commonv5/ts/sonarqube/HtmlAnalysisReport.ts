@@ -20,7 +20,7 @@ export default class HtmlAnalysisReport {
   private readonly endpointType: EndpointType;
 
   public static getInstance(
-    endpointType : EndpointType,
+    endpointType: EndpointType,
     projectStatus: ProjectStatus,
     measures: Measure[],
     result: AnalysisResult,
@@ -28,7 +28,12 @@ export default class HtmlAnalysisReport {
     return new HtmlAnalysisReport(endpointType, projectStatus, measures, result);
   }
 
-  constructor(endpointType : EndpointType, projectStatus: ProjectStatus, measures: Measure[], result: AnalysisResult) {
+  constructor(
+    endpointType: EndpointType,
+    projectStatus: ProjectStatus,
+    measures: Measure[],
+    result: AnalysisResult,
+  ) {
     this.projectStatus = projectStatus;
     this.measures = measures;
     this.result = result;
@@ -86,7 +91,11 @@ export default class HtmlAnalysisReport {
     // Try to get the value from the measure, then from the condition
     // There is difference in API response between SonarCloud and SonarQube
     // SonarCloud is using periods when SonarQube is using period
-    const value =  measure?.periods?.[0]?.value ?? measure?.period?.value ?? measure?.value ?? condition?.actualValue;
+    const value =
+      measure?.periods?.[0]?.value ??
+      measure?.period?.value ??
+      measure?.value ??
+      condition?.actualValue;
 
     if (!metric || typeof value === "undefined") {
       return "";
