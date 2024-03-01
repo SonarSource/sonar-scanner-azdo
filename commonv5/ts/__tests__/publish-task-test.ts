@@ -36,7 +36,7 @@ const PROJECT_STATUS_OK: ProjectStatus = {
   ],
   status: "OK",
 };
-const ANALYSIS_OK = new HtmlAnalysisReport(PROJECT_STATUS_OK, [], {
+const ANALYSIS_OK = new HtmlAnalysisReport(EndpointType.SonarQube, PROJECT_STATUS_OK, [], {
   warnings: [],
   dashboardUrl: "",
   metrics: null,
@@ -47,7 +47,7 @@ const PROJECT_STATUS_ERROR: ProjectStatus = {
   conditions: [],
   status: "ERROR",
 };
-const ANALYSIS_ERROR = new HtmlAnalysisReport(PROJECT_STATUS_ERROR, [], {
+const ANALYSIS_ERROR = new HtmlAnalysisReport(EndpointType.SonarQube, PROJECT_STATUS_ERROR, [], {
   warnings: [],
   dashboardUrl: "",
   metrics: null,
@@ -416,7 +416,7 @@ describe("it should generate passing report correctly", () => {
     expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
     const buildSummary = (serverUtils.publishBuildSummary as any).mock.calls[0][0];
     expect(buildSummary).toMatch("Quality Gate passed (componentName)");
-    expect(buildSummary).toMatch("10 new issues");
+    expect(buildSummary).toMatch("10 New issues");
     expect(buildSummary).toMatch("100% Coverage on new code");
   });
 
@@ -439,9 +439,11 @@ describe("it should generate passing report correctly", () => {
     [EndpointType.SonarQube, SQ_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
     [EndpointType.SonarQube, SQ_ENDPOINT, {}, false],
     [EndpointType.SonarQube, SQ_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
-    [EndpointType.SonarCloud, SC_ENDPOINT, { "sonar.pullrequest.key": "123" }, false],
+    [EndpointType.SonarCloud, SC_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
+    [EndpointType.SonarCloud, SC_ENDPOINT, {}, false],
+    [EndpointType.SonarCloud, SC_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
   ])(
-    "should show issues fixed in pull request for sonarqube",
+    "should show issues fixed in pull request",
     async (endpointType, endpoint, scannerParams, shouldShow) => {
       tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson());
       tl.setVariable(TaskVariables.SonarQubeScannerParams, JSON.stringify(scannerParams));
@@ -463,9 +465,9 @@ describe("it should generate passing report correctly", () => {
       expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
       const buildSummary = (serverUtils.publishBuildSummary as any).mock.calls[0][0];
       if (shouldShow) {
-        expect(buildSummary).toMatch("32 fixed issues");
+        expect(buildSummary).toMatch("32 Fixed issues");
       } else {
-        expect(buildSummary).not.toMatch("32 fixed issues");
+        expect(buildSummary).not.toMatch("32 Fixed issues");
       }
     },
   );

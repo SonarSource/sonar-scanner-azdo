@@ -50,6 +50,7 @@ export interface Measure {
   metric: string;
   bestValue?: boolean;
   period?: PeriodMeasure;
+  periods?: PeriodMeasure[];
   value?: string;
 }
 

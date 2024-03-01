@@ -11,24 +11,33 @@ import {
 } from "../helpers/html";
 import { formatMeasure } from "../helpers/measures";
 import { AnalysisResult, Measure, ProjectStatus } from "./types";
+import { EndpointType } from "common/ts/sonarqube/Endpoint";
 
 export default class HtmlAnalysisReport {
   private readonly projectStatus: ProjectStatus;
   private readonly measures: Measure[];
   private readonly result: AnalysisResult;
+  private readonly endpointType: EndpointType;
 
   public static getInstance(
+    endpointType: EndpointType,
     projectStatus: ProjectStatus,
     measures: Measure[],
     result: AnalysisResult,
   ): HtmlAnalysisReport {
-    return new HtmlAnalysisReport(projectStatus, measures, result);
+    return new HtmlAnalysisReport(endpointType, projectStatus, measures, result);
   }
 
-  constructor(projectStatus: ProjectStatus, measures: Measure[], result: AnalysisResult) {
+  constructor(
+    endpointType: EndpointType,
+    projectStatus: ProjectStatus,
+    measures: Measure[],
+    result: AnalysisResult,
+  ) {
     this.projectStatus = projectStatus;
     this.measures = measures;
     this.result = result;
+    this.endpointType = endpointType;
   }
 
   public getFailedConditions() {
@@ -80,7 +89,13 @@ export default class HtmlAnalysisReport {
     const metric = this.result.metrics.find((m) => m.key === metricKey);
 
     // Try to get the value from the measure, then from the condition
-    const value = measure?.period?.value ?? measure?.value ?? condition?.actualValue;
+    // There is difference in API response between SonarCloud and SonarQube
+    // SonarCloud is using periods when SonarQube is using period
+    const value =
+      measure?.periods?.[0]?.value ??
+      measure?.period?.value ??
+      measure?.value ??
+      condition?.actualValue;
 
     if (!metric || typeof value === "undefined") {
       return "";
@@ -91,9 +106,9 @@ export default class HtmlAnalysisReport {
 
   private getHtmlQualityGateDetailPassedSection() {
     const issuesItems = [
-      this.getHtmlMeasureListItem("✅", "new_violations", "new issues"),
-      this.getHtmlMeasureListItem("🔧", "pull_request_fixed_issues", "fixed issues"),
-      this.getHtmlMeasureListItem("💤", "new_accepted_issues", "accepted issues"),
+      this.getHtmlMeasureListItem("✅", "new_violations", "New issues"),
+      this.getHtmlMeasureListItem("🔧", "pull_request_fixed_issues", "Fixed issues"),
+      this.getHtmlMeasureListItem("💤", "new_accepted_issues", "Accepted issues"),
     ].filter((item) => item.length > 0);
     const issuesSection =
       issuesItems.length > 0 ? htmlSectionDiv("Issues", htmlMetricList(issuesItems)) : "";
@@ -129,7 +144,7 @@ export default class HtmlAnalysisReport {
     return htmlDiv(
       `margin-top: 24px;
       padding-left: 28px;`,
-      htmlLink("", this.result.dashboardUrl, "See analysis details on SonarQube"),
+      htmlLink("", this.result.dashboardUrl, `See analysis details on ${this.endpointType}`),
     );
   }
 }
