@@ -1,3 +1,5 @@
+import * as semver from "semver";
+
 export const PROP_NAMES = {
   HOST_URL: "sonar.host.url",
   TOKEN: "sonar.token",
@@ -10,6 +12,12 @@ export const PROP_NAMES = {
   PROJECTSOURCES: "sonar.sources",
   PROJECTSETTINGS: "project.settings",
 };
+
+export enum JdkVersionSource {
+  JavaHome = "JAVA_HOME",
+  JavaHome11 = "JAVA_HOME_11_X64",
+  JavaHome17 = "JAVA_HOME_17_X64",
+}
 
 export enum AzureProvider {
   TfsGit = "TfsGit",
@@ -55,3 +63,8 @@ export const SQ_BRANCH_MEASURES = [
   "new_coverage",
   "new_duplicated_lines_density",
 ];
+
+/**
+ * First SQ version that drops support for Java 11
+ */
+export const SQ_VERSION_DROPPING_JAVA_11 = semver.coerce("10.4");

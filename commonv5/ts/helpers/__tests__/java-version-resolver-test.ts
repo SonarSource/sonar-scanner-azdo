@@ -1,61 +1,72 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { EndpointType } from "../../sonarqube/Endpoint";
+import { JdkVersionSource, TaskVariables } from "../constants";
 import JavaVersionResolver from "../java-version-resolver";
-import { TaskVariables } from "../constants";
+
+const MOCKED_JAVA_VARIABLES = {
+  [JdkVersionSource.JavaHome]: "/opt/bin/java/bin",
+  [JdkVersionSource.JavaHome11]: "/opt/bin/java11/bin",
+  [JdkVersionSource.JavaHome17]: "/opt/bin/java17/bin",
+};
 
 beforeEach(() => {
-  jest.restoreAllMocks();
+  jest.spyOn(tl, "getVariable").mockImplementation((name) => MOCKED_JAVA_VARIABLES[name]);
+  jest.spyOn(tl, "setVariable");
+  jest.spyOn(tl, "warning");
 });
 
-describe("setJavaVersion", () => {
-  it("java_home set in task configuration, should do nothing", () => {
-    const expectedJavaPath = "/opt/bin/java/bin";
-    const jdkSource = "JAVA_HOME";
-    jest.spyOn(tl, "getInput").mockReturnValueOnce(jdkSource);
+describe("JavaVersionResolver", () => {
+  it.each([
+    [EndpointType.SonarQube, "9.9.0"],
+    [EndpointType.SonarQube, "10.4.0"],
+    [EndpointType.SonarCloud, "8.0.0"],
+  ])("should not have an effect if chosing JAVA_HOME", (endpointType, serverVersion) => {
+    JavaVersionResolver.setJavaVersion(JdkVersionSource.JavaHome, endpointType, serverVersion);
 
-    jest.spyOn(tl, "getVariable").mockReturnValueOnce(expectedJavaPath); // JAVA_HOME
+    // Should not have changed the JAVA_HOME
+    expect(tl.setVariable).not.toHaveBeenCalled();
 
-    JavaVersionResolver.setJavaVersion(jdkSource);
-
-    const actualJavaHome = tl.getVariable(TaskVariables.JavaHome);
-
-    expect(actualJavaHome).toBe(expectedJavaPath);
+    // Revert action has no effect as well
+    JavaVersionResolver.revertJavaHomeToOriginal();
+    expect(tl.setVariable).not.toHaveBeenCalled();
   });
 
-  it("JAVA_HOME_11_X64 set in task configuration, should switch to it", () => {
-    const java11Path = "/opt/bin/java11/bin";
+  it.each([
+    [EndpointType.SonarQube, undefined, JdkVersionSource.JavaHome11, "/opt/bin/java11/bin"],
+    [EndpointType.SonarQube, "9.9.0", JdkVersionSource.JavaHome11, "/opt/bin/java11/bin"],
+    [EndpointType.SonarQube, "9.9.0", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
+    [EndpointType.SonarQube, "10.4", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
+    [EndpointType.SonarCloud, "8.0.0", JdkVersionSource.JavaHome11, "/opt/bin/java11/bin"],
+    [EndpointType.SonarCloud, "8.0.0", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
+  ])(
+    "should use specified java version if specified and it exists (%s, %s, %s, %s)",
+    (endpointType, serverVersion, jdkVersion, path) => {
+      JavaVersionResolver.setJavaVersion(jdkVersion, endpointType, serverVersion);
 
-    const jdkSource = "JAVA_HOME_11_X64";
-    jest.spyOn(tl, "getInput").mockReturnValueOnce(jdkSource);
+      expect(tl.setVariable).toHaveBeenLastCalledWith(TaskVariables.JavaHome, path);
 
-    jest.spyOn(tl, "getVariable").mockReturnValueOnce(java11Path); // JAVA_HOME_11_X64
+      JavaVersionResolver.revertJavaHomeToOriginal();
+      expect(tl.setVariable).toHaveBeenLastCalledWith(TaskVariables.JavaHome, "/opt/bin/java/bin");
+    },
+  );
 
-    JavaVersionResolver.setJavaVersion(jdkSource);
+  it.each([
+    [EndpointType.SonarQube, "10.4.0"],
+    [EndpointType.SonarQube, "10.5.0"],
+  ])(
+    `should use JAVA_HOME if the server does not support the specified Java 11 (%s, %s)`,
+    (endpoint, version) => {
+      jest.spyOn(tl, "setVariable").mockReset();
 
-    const actualJavaHome = tl.getVariable(TaskVariables.JavaHome);
+      JavaVersionResolver.setJavaVersion(JdkVersionSource.JavaHome11, endpoint, version);
 
-    expect(actualJavaHome).toBe(java11Path);
-  });
-});
+      expect(tl.setVariable).not.toHaveBeenCalled();
 
-describe("lookupVariable", () => {
-  it("java_home_11_x64 variable found, returning it", () => {
-    const javaHome11X64Value = "/opt/bin/java11/bin";
-    const jdkSource = "JAVA_HOME_11_X64";
+      // Expect a warning to be logged at the task level
+      expect(tl.warning).toHaveBeenCalled();
 
-    jest.spyOn(tl, "getVariable").mockReturnValueOnce(javaHome11X64Value); // JAVA_HOME_11_X64
-
-    const actualJavaPath = JavaVersionResolver.lookupVariable(jdkSource);
-
-    expect(actualJavaPath).toBe(javaHome11X64Value);
-  });
-
-  it("variable wanted not found, returning undefined", () => {
-    const jdkSource = "JAVA_HOME_11_X64";
-
-    jest.spyOn(tl, "getVariable").mockReturnValueOnce(undefined); // JAVA_HOME_11_X64
-
-    const actualJavaPath = JavaVersionResolver.lookupVariable(jdkSource);
-
-    expect(actualJavaPath).toBe(undefined);
-  });
+      JavaVersionResolver.revertJavaHomeToOriginal();
+      expect(tl.setVariable).not.toHaveBeenCalled();
+    },
+  );
 });

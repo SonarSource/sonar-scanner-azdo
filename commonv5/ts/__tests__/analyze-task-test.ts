@@ -1,13 +1,13 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import analyzeTask from "../../ts/analyze-task";
+import { JdkVersionSource, TASK_MISSING_VARIABLE_ERROR_HINT } from "../helpers/constants";
 import Scanner, { ScannerCLI, ScannerMode } from "../sonarqube/Scanner";
-import { TASK_MISSING_VARIABLE_ERROR_HINT } from "../helpers/constants";
 
 it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
   jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
-  await analyzeTask(__dirname, "JAVA_HOME");
+  await analyzeTask(__dirname, JdkVersionSource.JavaHome);
 
   expect(tl.setResult).toHaveBeenCalledWith(
     tl.TaskResult.Failed,
@@ -16,6 +16,9 @@ it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
 });
 
 it("should run scanner", async () => {
+  //SONARQUBE_SERVER_VERSION
+  jest.spyOn(tl, "getVariable").mockReturnValueOnce("9.9.0.213");
+
   //SONARQUBE_SCANNER_MODE
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
@@ -49,7 +52,7 @@ it("should run scanner", async () => {
 
   jest.spyOn(scanner, "runAnalysis").mockImplementation(() => null);
 
-  await analyzeTask(__dirname, "JAVA_HOME");
+  await analyzeTask(__dirname, JdkVersionSource.JavaHome);
 
   expect(Scanner.getAnalyzeScanner).toHaveBeenCalledWith(__dirname, ScannerMode.CLI);
 
