@@ -17,6 +17,7 @@ export enum JdkVersionSource {
   JavaHome = "JAVA_HOME",
   JavaHome11 = "JAVA_HOME_11_X64",
   JavaHome17 = "JAVA_HOME_17_X64",
+  JavaHome21 = "JAVA_HOME_21_X64",
 }
 
 export enum AzureProvider {
