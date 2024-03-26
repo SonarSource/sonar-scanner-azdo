@@ -7,6 +7,7 @@ const MOCKED_JAVA_VARIABLES = {
   [JdkVersionSource.JavaHome]: "/opt/bin/java/bin",
   [JdkVersionSource.JavaHome11]: "/opt/bin/java11/bin",
   [JdkVersionSource.JavaHome17]: "/opt/bin/java17/bin",
+  [JdkVersionSource.JavaHome21]: "/opt/bin/java21/bin",
 };
 
 beforeEach(() => {
@@ -36,8 +37,10 @@ describe("JavaVersionResolver", () => {
     [EndpointType.SonarQube, "9.9.0", JdkVersionSource.JavaHome11, "/opt/bin/java11/bin"],
     [EndpointType.SonarQube, "9.9.0", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
     [EndpointType.SonarQube, "10.4", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
+    [EndpointType.SonarQube, "10.4", JdkVersionSource.JavaHome21, "/opt/bin/java21/bin"],
     [EndpointType.SonarCloud, "8.0.0", JdkVersionSource.JavaHome11, "/opt/bin/java11/bin"],
     [EndpointType.SonarCloud, "8.0.0", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
+    [EndpointType.SonarCloud, "8.0.0", JdkVersionSource.JavaHome21, "/opt/bin/java21/bin"],
   ])(
     "should use specified java version if specified and it exists (%s, %s, %s, %s)",
     (endpointType, serverVersion, jdkVersion, path) => {
