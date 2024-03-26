@@ -9,7 +9,7 @@
   "author": "sonarsource",
   "version": {
     "Major": 1,
-    "Minor": 44,
+    "Minor": 45,
     "Patch": 0
   },
   "minimumAgentVersion": "2.144.0",
