@@ -46,8 +46,10 @@ export default class Scanner {
       case ScannerMode.Other:
         return Scanner.getScanner(rootPath);
       case ScannerMode.MSBuild:
+        // use optional msbuild version here
         return ScannerMSBuild.getScanner(rootPath);
       case ScannerMode.CLI:
+        // use optional scanner-cli version here
         return ScannerCLI.getScanner(rootPath);
       default:
         throw new Error(`[SQ] Unknown scanner mode: ${mode}`);
@@ -135,7 +137,17 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    let scannerCliScript = tl.resolve(this.rootPath, "sonar-scanner", "bin", "sonar-scanner");
+    // TODO: instead of relying on bundled version, lets download it before this task
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
+    const scannerMode: ScannerMode =
+      ScannerMode[tl.getVariable(TaskVariables.SonarQubeScannerMode)];
+    const cliVersion = tl.getVariable(TaskVariables.SonarQubeCliVersion);
+    const msBuildVersion = tl.getVariable(TaskVariables.SonarQubeMsBuildVersion);
+
+    const scannerVersion = scannerMode === ScannerMode.CLI ? cliVersion : msBuildVersion;
+    const basePath = scannerLocation ?? this.rootPath;
+    const scannerPath = scannerLocation ? `sonar-scanner-${scannerVersion}` : "sonar-scanner";
+    let scannerCliScript = tl.resolve(basePath, scannerPath, "bin", "sonar-scanner");
 
     if (isWindows()) {
       scannerCliScript += ".bat";
@@ -195,6 +207,7 @@ export class ScannerMSBuild extends Scanner {
   public async runPrepare() {
     let scannerRunner: ToolRunner;
 
+    // use downloaded scanner path here
     if (isWindows()) {
       const scannerExePath = this.findFrameworkScannerPath();
       tl.debug(`Using classic scanner at ${scannerExePath}`);
@@ -242,11 +255,26 @@ export class ScannerMSBuild extends Scanner {
   }
 
   private findFrameworkScannerPath(): string {
-    return tl.resolve(this.rootPath, "classic-sonar-scanner-msbuild", "SonarScanner.MSBuild.exe");
+    // is there a downloaded version?
+
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
+    const basePath = scannerLocation ?? this.rootPath;
+    const pathSegments = [basePath, "SonarScanner.MSBuild.exe"];
+    if (!scannerLocation) {
+      pathSegments.splice(1, 0, "classic-sonar-scanner-msbuild");
+    }
+    return tl.resolve(...pathSegments);
   }
 
   private findDotnetScannerPath(): string {
-    return tl.resolve(this.rootPath, "dotnet-sonar-scanner-msbuild", "SonarScanner.MSBuild.dll");
+    // is there a downloaded version?
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
+    const basePath = scannerLocation ?? this.rootPath;
+    const pathSegments = [basePath, "SonarScanner.MSBuild.dll"];
+    if (!scannerLocation) {
+      pathSegments.splice(1, 0, "dotnet-sonar-scanner-msbuild");
+    }
+    return tl.resolve(...pathSegments);
   }
 
   public async runAnalysis() {

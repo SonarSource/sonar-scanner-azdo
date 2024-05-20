@@ -5,14 +5,12 @@
   "description": "Prepare SonarCloud analysis configuration",
   "helpMarkDown": "[More Information](https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarcloud-extension-for-azure-devops/)",
   "category": "Build",
-  "visibility": [
-    "Build"
-  ],
+  "visibility": ["Build"],
   "author": "sonarsource",
   "version": {
     "Major": 1,
     "Minor": 41,
-    "Patch": 0
+    "Patch": 5
   },
   "minimumAgentVersion": "2.144.0",
   "instanceNameFormat": "Prepare analysis on SonarCloud",
@@ -53,6 +51,24 @@
         "Other": "Integrate with Maven or Gradle",
         "CLI": "Use standalone scanner"
       }
+    },
+    {
+      "name": "msBuildVersion",
+      "type": "string",
+      "label": "MSBuild Version",
+      "defaultValue": "",
+      "required": false,
+      "visibleRule": "scannerMode = MSBuild",
+      "helpMarkDown": "Specify the version of MSBuild to use."
+    },
+    {
+      "name": "cliVersion",
+      "type": "string",
+      "label": "CLI Version",
+      "defaultValue": "",
+      "required": false,
+      "visibleRule": "scannerMode = CLI",
+      "helpMarkDown": "Specify the version of CLI to use."
     },
     {
       "name": "configMode",

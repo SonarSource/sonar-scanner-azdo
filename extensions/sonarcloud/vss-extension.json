@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarcloud",
   "name": "SonarCloud",
-  "version": "1.46.0",
+  "version": "1.46.5",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
@@ -55,7 +55,7 @@
     "type": "git",
     "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
   },
-  "baseUri": "https://sonarcloud.io/",
+  "baseUri": "https://localhost:44300",
   "files": [
     {
       "path": "tasks"

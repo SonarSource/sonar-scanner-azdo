@@ -38,6 +38,9 @@ export enum AzureBuildVariables {
 export enum TaskVariables {
   SonarQubeServerVersion = "SONARQUBE_SERVER_VERSION",
   SonarQubeScannerMode = "SONARQUBE_SCANNER_MODE",
+  SonarQubeMsBuildVersion = "SONARQUBE_MSBUILD_VERSION",
+  SonarQubeCliVersion = "SONARQUBE_CLI_VERSION",
+  SonarQubeScannerLocation = "SONARQUBE_SCANNER_LOCATION",
   SonarQubeScannerParams = "SONARQUBE_SCANNER_PARAMS",
   SonarQubeScannerReportTaskFile = "SONARQUBE_SCANNER_REPORTTASKFILE",
   SonarQubeEndpoint = "SONARQUBE_ENDPOINT",

@@ -32,8 +32,13 @@ export default async function analyzeTask(
 
   // Run scanner
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable(TaskVariables.SonarQubeScannerMode)];
+  const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
   const scanner = Scanner.getAnalyzeScanner(rootPath, scannerMode);
   const sqScannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarQubeScannerParams));
+
+  // first download scanner, pass location into runAnalysis
+  tl.debug(`[LUCAS] Running analysis with ${scannerMode} scanner`);
+  tl.debug(`[LUCAS] scanner location: ${scannerLocation}`);
   await scanner.runAnalysis();
 
   // Sanitize scanner params (SSF-194)

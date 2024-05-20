@@ -1,4 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import * as toolLib from "azure-pipelines-tool-lib/tool";
 import * as semver from "semver";
 import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
 import {
@@ -15,6 +16,8 @@ import TaskReport from "./sonarqube/TaskReport";
 
 export default async function prepareTask(endpoint: Endpoint, rootPath: string) {
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
+  const msBuildVersion: string = tl.getInput("msBuildVersion");
+  const cliVersion: string = tl.getInput("cliVersion");
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
 
@@ -38,6 +41,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   tl.setVariable(TaskVariables.SonarQubeServerVersion, serverVersion.format());
   tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
+  tl.setVariable(TaskVariables.SonarQubeMsBuildVersion, msBuildVersion);
+  tl.setVariable(TaskVariables.SonarQubeCliVersion, cliVersion);
   tl.setVariable(
     TaskVariables.SonarQubeScannerReportTaskFile,
     props["sonar.scanner.metadataFilePath"],
@@ -60,7 +65,32 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   tl.setVariable(TaskVariables.SonarQubeScannerParams, jsonParams);
 
+  // Only do this if a version is explicitly set
+  if (cliVersion || msBuildVersion) {
+    const scannerPath = await downloadScanner(cliVersion, msBuildVersion);
+
+    tl.setVariable(TaskVariables.SonarQubeScannerLocation, scannerPath);
+  }
+  // we need to pass in the downloaded paths here
   await scanner.runPrepare();
+}
+
+async function downloadScanner(cliVersion: string, msBuildVersion: string) {
+  const cliVersionFileUrl = `https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${cliVersion}.zip`;
+  const msBuildFileUrl = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/${msBuildVersion}/sonar-scanner-${msBuildVersion}-net.zip`;
+
+  const fileUrl = cliVersion ? cliVersionFileUrl : msBuildFileUrl;
+
+  tl.debug(`Downloading scanner from ${fileUrl}`);
+  const downloadPath = await toolLib.downloadTool(fileUrl);
+  tl.debug(`Downloaded: ${fileUrl} file to ${downloadPath}`);
+
+  tl.debug(`Extracting ${downloadPath}`);
+  const unzipPath = await toolLib.extractZip(downloadPath);
+  tl.debug(`Unzipped file to ${unzipPath}`);
+  // `downloadPath` now contains the path to the downloaded file
+
+  return unzipPath;
 }
 
 export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
