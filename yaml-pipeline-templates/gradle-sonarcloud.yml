@@ -1,44 +1,43 @@
 # Gradle
 # Build your Java project and run tests with Gradle using a Gradle wrapper script.
-# Add steps that analyze code, save build artifacts, deploy, and more:
+# Add steps that analyze code, save build artifacts, upload, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- master
+  - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: "ubuntu-latest"
 
 steps:
+  - task: SonarCloudPrepare@1
+    displayName: "Prepare analysis configuration"
+    inputs:
+      SonarCloud: "SC"
+      organization: "myorga"
+      scannerMode: "Other"
+      extraProperties: |
+        # Additional properties that will be passed to the scanner, 
+        # Put one key=value per line, example:
+        # sonar.exclusions=**/*.bin
+        sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/summary.xml
 
-- task: SonarCloudPrepare@1
-  displayName: 'Prepare analysis configuration'
-  inputs:
-    SonarCloud: 'SC'
-    organization: 'myorga'
-    scannerMode: 'Other'
-    extraProperties: |
-      # Additional properties that will be passed to the scanner, 
-      # Put one key=value per line, example:
-      # sonar.exclusions=**/*.bin
-      sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/summary.xml
+  - task: Gradle@2
+    displayName: "Execute Gradle build"
+    inputs:
+      gradleWrapperFile: "gradlew"
+      tasks: "build"
+      publishJUnitResults: true
+      testResultsFiles: "**/TEST-*.xml"
+      codeCoverageToolOption: "JaCoCo"
+      javaHomeOption: "JDKVersion"
+      jdkVersionOption: "1.8"
+      gradleOptions: "-Xmx3072m"
+      sonarQubeRunAnalysis: true
+      sqGradlePluginVersionChoice: "specify"
+      sonarQubeGradlePluginVersion: "2.8"
 
-- task: Gradle@2
-  displayName: 'Execute Gradle build'
-  inputs:
-    gradleWrapperFile: 'gradlew'
-    tasks: 'build'
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
-    codeCoverageToolOption: 'JaCoCo'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    gradleOptions: '-Xmx3072m'
-    sonarQubeRunAnalysis: true
-    sqGradlePluginVersionChoice: 'specify'
-    sonarQubeGradlePluginVersion: '2.8'
-
-- task: SonarCloudPublish@1
-  displayName: 'Publish results on build summary'
-  inputs:
-    pollingTimeoutSec: '300'
+  - task: SonarCloudPublish@1
+    displayName: "Publish results on build summary"
+    inputs:
+      pollingTimeoutSec: "300"

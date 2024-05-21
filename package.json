@@ -3,6 +3,26 @@
   "version": "0.0.2-SNAPSHOT",
   "repository": "SonarSource/sonar-scanner-vsts",
   "license": "LGPL-3.0",
+  "scripts": {
+    "build": "MODE=production gulp",
+    "test-build": "gulp",
+    "clean": "gulp clean",
+    "upload": "gulp upload",
+    "promote": "gulp promote",
+    "burgr": "gulp burgr:sonarcloud && gulp burgr:sonarqube",
+    "sonarqube": "gulp sonarqube:scan",
+    "format": "prettier --write --list-different \"src/**/*.{js,ts}\"",
+    "format-check": "prettier --list-different \"src/**/*.{js,ts}\"",
+    "lint": "eslint --ext js,ts --quiet \"src/**/*.{js,ts}\"",
+    "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"src/**/*.{js,ts}\"",
+    "test": "npm test --prefix src/common/latest && npm test --prefix src/common/sonarqube-v4",
+    "test-ci": "npm run test-ci --prefix src/common/latest && npm run test-ci --prefix src/common/sonarqube-v4",
+    "ts-check": "gulp build:typescript",
+    "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test",
+    "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci",
+    "cyclonedx-run": "cyclonedx-node",
+    "cyclonedx": "gulp cyclonedx"
+  },
   "devDependencies": {
     "@cyclonedx/bom": "^3.8.0",
     "@types/fs-extra": "9.0.13",
@@ -43,7 +63,7 @@
     "openpgp": "5.10.1",
     "prettier": "3.0.3",
     "semver": "5.5.0",
-    "sonarqube-scanner": "3.3.0",
+    "sonarqube-scanner": "3.5.0",
     "stream": "^0.0.2",
     "tfx-cli": "0.16.0",
     "through2": "^4.0.2",
@@ -53,66 +73,8 @@
     "vinyl": "^2.2.1",
     "yargs": "17.7.0"
   },
-  "scripts": {
-    "build": "gulp build",
-    "clean": "gulp clean",
-    "deploy": "gulp deploy",
-    "promote": "gulp promote",
-    "burgr": "gulp burgr:sonarcloud && gulp burgr:sonarqube",
-    "sonarqube": "gulp sonarqube-analysis:sonarqube && gulp sonarqube-analysis:sonarcloud",
-    "format": "prettier --write --list-different \"{commonv5,common,extensions}/**/*.{js,ts}\"",
-    "format-check": "prettier --list-different \"{commonv5,common,extensions}/**/*.{js,ts}\"",
-    "lint": "eslint --ext js,ts --quiet \"{commonv5,common,extensions}/**/*.{js,ts}\"",
-    "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"{commonv5,common,extensions}/**/*.{js,ts}\"",
-    "test-build": "gulp build:test",
-    "test": "jest",
-    "test-ci": "jest --coverage",
-    "ts-check": "tsc --noEmit",
-    "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test",
-    "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci",
-    "cyclonedx-run": "cyclonedx-node",
-    "cyclonedx": "gulp cycloneDx"
-  },
   "engines": {
     "node": ">=6",
     "npm": ">=8"
-  },
-  "jest": {
-    "clearMocks": true,
-    "collectCoverageFrom": [
-      "common/**/*.ts",
-      "commonv5/**/*.ts"
-    ],
-    "coverageDirectory": "coverage",
-    "coverageReporters": [
-      "lcovonly",
-      "text"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules",
-      "<rootDir>/config",
-      "<rootDir>/build"
-    ],
-    "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
-    "testEnvironmentOptions": {
-      "url": "http://localhost/"
-    },
-    "transform": {
-      ".(ts)$": "ts-jest"
-    }
-  },
-  "dependencies": {
-    "azure-pipelines-task-lib": "4.7.0"
-  },
-  "overrides": {
-    "azure-pipelines-task-lib": {
-      "nodejs-file-downloader": {
-        "follow-redirects": "1.15.6"
-      }
-    }
   }
 }

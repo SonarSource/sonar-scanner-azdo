@@ -1,5 +1,6 @@
 # build
-build/
+/build
+dist
 **/bin
 **/obj
 **/.vs

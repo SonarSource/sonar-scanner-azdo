@@ -59,8 +59,9 @@ build_task:
     - git fetch
     - source cirrus-env BUILD
     - npm run validate-ci
+    - npm run build
     - npm run sonarqube
-    - npm run deploy
+    - npm run upload
 
 promote_task:
   depends_on:
@@ -74,7 +75,7 @@ promote_task:
   node_modules_cache:
     folder: node_modules
   install_script:
-    - npm install
+    - bash scripts/install.sh
   script:
     - source cirrus-env PROMOTE
     - npm run promote
