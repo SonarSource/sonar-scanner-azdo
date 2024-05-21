@@ -1,46 +1,47 @@
-const path = require('path');
-const fs = require('fs-extra');
+const path = require("path");
+const fs = require("fs-extra");
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
-
 function resolveRelativePath(relativePath) {
   return path.resolve(appDirectory, relativePath);
 }
 exports.resolveRelativePath = resolveRelativePath;
 
-exports.pathAllFiles = function(...paths) {
-  return path.join(...paths, '**', '*');
-};
+// /src
+exports.SOURCE_DIR = path.join(appDirectory, "src");
 
-const buildPath = resolveRelativePath('build');
-const commonPath = resolveRelativePath('common');
-const commonv5Path = resolveRelativePath('commonv5');
-const extensionsPath = resolveRelativePath('extensions');
+// /build
+exports.BUILD_DIR = path.join(appDirectory, "build");
 
-exports.paths = {
-  root: appDirectory,
-  build: {
-    root: buildPath,
-    extensions: {
-      root: path.join(buildPath, 'extensions'),
-      tasks: path.join(buildPath, 'extensions', '**', 'tasks'),
-      sonarqubeTasks: path.join(buildPath, 'extensions', 'sonarqube', 'tasks'),
-      sonarcloudTasks: path.join(buildPath, 'extensions', 'sonarcloud', 'tasks')
-    },
-    classicScanner: path.join(buildPath, 'tmp', 'classic-sonar-scanner-msbuild'),
-    dotnetScanner: path.join(buildPath, 'tmp', 'dotnet-sonar-scanner-msbuild')
-  },
-  common: path.join(commonPath, 'ts'),
-  commonv5: path.join(commonv5Path, 'ts'),
-  extensions: {
-    root: extensionsPath,
-    tasks: {
-      root: path.join(extensionsPath, '**', 'tasks'),
-      scv1: path.join(extensionsPath, '**', 'tasks', '**', 'v1'),
-      v4: path.join(extensionsPath, '**', 'tasks', '**', 'v4'),
-      v5: path.join(extensionsPath, '**', 'tasks', '**', 'v5')
-    }
-  }
-};
+// /build/ts
+exports.BUILD_TS_DIR = path.join(appDirectory, "build", "ts");
+
+// /build/extension
+exports.BUILD_EXTENSION_DIR = path.join(appDirectory, "build", "extensions");
+
+// /build/scanner
+exports.BUILD_SCANNER_DIR = path.join(appDirectory, "build", "scanner");
+
+// /build/scanner/classic-sonar-scanner-msbuild
+exports.BUILD_SCANNER_CLI_DIR = path.join(
+  appDirectory,
+  "build",
+  "scanner",
+  "classic-sonar-scanner-msbuild",
+);
+
+// /build/scanner/dotnet-sonar-scanner-msbuild
+exports.BUILD_SCANNER_MSBUILD_DIR = path.join(
+  appDirectory,
+  "build",
+  "scanner",
+  "dotnet-sonar-scanner-msbuild",
+);
+
+// /dist
+exports.DIST_DIR = path.join(appDirectory, "dist");
+
+exports.BUILD_SCANNER_CLI_DIRNAME = "classic-sonar-scanner-msbuild";
+exports.BUILD_SCANNER_MSBUILD_DIRNAME = "dotnet-sonar-scanner-msbuild";
