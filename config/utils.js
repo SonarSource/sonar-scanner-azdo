@@ -193,7 +193,7 @@ exports.runSonnarQubeScanner = function (callback, options = {}) {
     "sonar.projectName": "Azure DevOps extension for SonarQube",
     "sonar.exclusions":
       "build/**, extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**," +
-      "**/temp-find-method.ts, **/package-lock.json, gulpfile.js",
+      "**/temp-find-method.ts, **/package-lock.json, gulpfile.js, **/jest.config.js",
   };
   runSonarQubeScannerImpl(callback, customOptions, options);
 };
@@ -204,7 +204,7 @@ exports.runSonnarQubeScannerForSonarCloud = function (callback, options = {}) {
     "sonar.projectName": "Azure DevOps extension for SonarCloud",
     "sonar.exclusions":
       "build/**, extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, " +
-      "**/temp-find-method.ts, **/package-lock.json, gulpfile.js",
+      "**/temp-find-method.ts, **/package-lock.json, gulpfile.js, **/jest.config.js",
   };
   runSonarQubeScannerImpl(callback, customOptions, options);
 };
