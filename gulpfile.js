@@ -142,7 +142,6 @@ gulp.task("build:download-scanners", () => {
  */
 gulp.task("build:copy", () => {
   const tasks = globby.sync(["build/ts/extensions/*/tasks/*/v*/*.js"]);
-
   const streams = [];
 
   for (const task of tasks) {
@@ -192,11 +191,20 @@ gulp.task("build:copy", () => {
 
     // Get the config.js file for the task to know what scanner to use
     const configJs = path.join(BUILD_TS_DIR, "common", commonPath, "config.js");
+
+    console.log("configJs", configJs);
     // eslint-disable-next-line import/no-dynamic-require
     const { scanner } = require(configJs);
 
     // Copy Scanner CLI
-    if (taskNeedsCliScanner(taskName)) {
+    const versionRequiresBundledScanners = ["sonarcloud@v1", "sonarqube@v4", "sonarqube@v5"];
+    const currentExtensionVersion = `${extension}@${version}`;
+    console.log(currentExtensionVersion + ":" + taskName);
+    if (
+      taskNeedsCliScanner(taskName) &&
+      versionRequiresBundledScanners.includes(currentExtensionVersion)
+    ) {
+      console.log("Copying scanner CLI");
       streams.push(
         gulp
           .src(
@@ -213,7 +221,11 @@ gulp.task("build:copy", () => {
     }
 
     // Copy Scanner MSBuild
-    if (taskNeedsMsBuildScanner(taskName)) {
+    if (
+      taskNeedsMsBuildScanner(taskName) &&
+      versionRequiresBundledScanners.includes(currentExtensionVersion)
+    ) {
+      console.log("Copying scanner MSBuild");
       streams.push(
         gulp
           .src(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion, "**/*"))
@@ -278,7 +290,6 @@ gulp.task(
     "build:install-dependencies",
     "build:copy-extension",
     "build:typescript",
-    "build:download-scanners",
     "build:copy",
     "extension:patch-test",
   ),
@@ -533,7 +544,7 @@ gulp.task("promote", (done) => {
     },
   )
     .then((resp) => {
-      if (resp.statusCode != 200) {
+      if (resp.statusCode !== 200) {
         done(new Error(resp.statusMessage + "\n" + JSON.stringify(resp.body, null, 2)));
       }
     })

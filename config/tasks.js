@@ -30,10 +30,10 @@ exports.getTaskExtension = function (taskName) {
  */
 exports.getTaskCommonFolder = function (taskName, version) {
   const extension = exports.getTaskExtension(taskName);
-  if (extension === "sonarcloud" && version === "v1") {
+  if (extension === "sonarcloud" && version === "v2") {
     return "latest";
   }
-  if (extension === "sonarqube" && version === "v5") {
+  if (extension === "sonarqube" && version === "v6") {
     return "latest";
   }
   return `${extension}-${version}`;
