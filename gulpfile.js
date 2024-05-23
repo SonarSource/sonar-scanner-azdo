@@ -167,6 +167,7 @@ gulp.task("build:download-scanners", () => {
  */
 gulp.task("build:copy", () => {
   const tasks = globby.sync(["build/ts/extensions/*/tasks/*/v*/*.js"]);
+
   const streams = [];
 
   for (const task of tasks) {
@@ -205,7 +206,6 @@ gulp.task("build:copy", () => {
 
     // Get the config.js file for the task to know what scanner to use
     const configJs = path.join(BUILD_TS_DIR, "common", commonPath, "config.js");
-
     // eslint-disable-next-line import/no-dynamic-require
     const { scanner } = require(configJs);
 
