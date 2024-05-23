@@ -1,4 +1,5 @@
 import * as tl from "azure-pipelines-task-lib";
+import path from "path";
 import {
   JdkVersionSource,
   TASK_MISSING_VARIABLE_ERROR_HINT,
@@ -11,7 +12,7 @@ import { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 
 export const analyzeTask: TaskJob = async (endpointType: EndpointType) => {
-  const rootPath = __dirname;
+  const rootPath = path.join(__dirname, "..");
   const jdkVersionSource = tl.getInput("jdkversion", true) as JdkVersionSource;
 
   if (typeof tl.getVariable(TaskVariables.SonarQubeScannerMode) === "undefined") {

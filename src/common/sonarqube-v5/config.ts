@@ -6,6 +6,7 @@ const classicScannerFilename = `sonar-scanner-msbuild-${msBuildVersion}-net46.zi
 const dotnetScannerFilename = `sonar-scanner-msbuild-${msBuildVersion}-netcoreapp3.0.zip`;
 
 exports.scanner = {
+  embedScanners: true,
   msBuildVersion,
   cliVersion,
   classicUrl: scannersLocation + classicScannerFilename,
