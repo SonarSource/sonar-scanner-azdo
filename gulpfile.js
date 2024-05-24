@@ -14,6 +14,7 @@ const typescript = require("typescript");
 const decompress = require("gulp-decompress");
 const needle = require("needle");
 const del = require("del");
+const esbuild = require("esbuild");
 const {
   SOURCE_DIR,
   BUILD_TS_DIR,
@@ -106,6 +107,29 @@ gulp.task("build:typescript", () => {
 });
 
 /**
+ * Bundle tasks
+ */
+gulp.task("build:bundle", async () => {
+  const tasks = globby.sync(["src/extensions/*/tasks/*/v*/*.ts"]);
+  for (const task of tasks) {
+    const [extension, , taskName, version] = task.split(path.sep).slice(-5);
+    const commonFolder = getTaskCommonFolder(taskName, version);
+    const outFilePath = task.replace(/^src/, BUILD_DIR).replace(/\.ts$/, ".js");
+
+    // eslint-disable-next-line import/no-dynamic-require
+    const esbuildConfig = require(
+      path.join(SOURCE_DIR, "common", commonFolder, "esbuild.config.js"),
+    );
+
+    await esbuild.build({
+      ...esbuildConfig,
+      entryPoints: [task],
+      outfile: outFilePath,
+    });
+  }
+});
+
+/**
  * Build all scanners needed by tasks
  */
 gulp.task("build:download-scanners", () => {
@@ -153,26 +177,6 @@ gulp.task("build:copy", () => {
 
     // Where to copy the task code
     const outPath = path.join(BUILD_EXTENSION_DIR, extension, "tasks", taskName, version);
-
-    // Copy task entry point
-    const copyTaskStream = gulp
-      .src(task)
-      // Fix relative import path to the common folder
-      .pipe(gulpReplace(/..\/..\/..\/..\/..\/common\/.+"/, './common/"'))
-      .pipe(gulp.dest(outPath));
-    streams.push(copyTaskStream);
-
-    // Copy common files
-    const copyCommonStream = gulp
-      .src(path.join(BUILD_TS_DIR, "common", commonPath, "**/*"))
-      .pipe(gulp.dest(path.join(outPath, "common")));
-    streams.push(copyCommonStream);
-
-    // Copy node_modules
-    const copyNodeModulesStream = gulp
-      .src(path.join(SOURCE_DIR, "common", commonPath, "node_modules", "**/*"))
-      .pipe(gulp.dest(path.join(outPath, "node_modules")));
-    streams.push(copyNodeModulesStream);
 
     // Copy task icon
     streams.push(
@@ -278,6 +282,7 @@ gulp.task(
     "build:install-dependencies",
     "build:copy-extension",
     "build:typescript",
+    "build:bundle",
     "build:download-scanners",
     "build:copy",
     "extension:patch-test",
