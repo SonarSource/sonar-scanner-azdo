@@ -1,5 +1,6 @@
 const path = require("path");
 const gulp = require("gulp");
+const gulpFile = require("gulp-file");
 const fs = require("fs-extra");
 const yargs = require("yargs");
 const gulpReplace = require("gulp-replace");
@@ -110,11 +111,11 @@ gulp.task("build:typescript", () => {
  * Bundle tasks
  */
 gulp.task("build:bundle", async () => {
-  const tasks = globby.sync(["src/extensions/*/tasks/*/v*/*.ts"]);
+  const tasks = globby.sync(path.join(SOURCE_DIR, "extensions", "*", "tasks", "*", "v*", "*.ts"));
   for (const task of tasks) {
     const [extension, , taskName, version] = task.split(path.sep).slice(-5);
     const commonFolder = getTaskCommonFolder(taskName, version);
-    const outFilePath = task.replace(/^src/, BUILD_DIR).replace(/\.ts$/, ".js");
+    const outFilePath = task.replace(SOURCE_DIR, BUILD_DIR).replace(/\.ts$/, ".js");
 
     // eslint-disable-next-line import/no-dynamic-require
     const esbuildConfig = require(
@@ -175,8 +176,17 @@ gulp.task("build:copy", () => {
     const version = path.basename(path.dirname(task));
     const commonPath = getTaskCommonFolder(taskName, version); // What common files to copy (latest vs legacy?)
 
-    // Where to copy the task code
+    // Where to copy the task files
     const outPath = path.join(BUILD_EXTENSION_DIR, extension, "tasks", taskName, version);
+
+    /**
+     * Hotfix for shelljs dependency
+     * @see https://github.com/microsoft/azure-pipelines-task-lib/issues/942#issuecomment-1904939900
+     */
+    const createShellJsDummyFile = gulpFile("index.js", "", { src: true }).pipe(
+      gulp.dest(path.join(outPath, "node_modules", "shelljs")),
+    );
+    streams.push(createShellJsDummyFile);
 
     // Copy task icon
     streams.push(

@@ -4,4 +4,5 @@ module.exports = {
   format: "cjs",
   target: "node8",
   minify: true,
+  external: ["shelljs"],
 };
