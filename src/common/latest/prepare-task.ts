@@ -1,6 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as semver from "semver";
 import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
+
 import {
   AzureBuildVariables,
   AzureProvider,
@@ -8,16 +9,19 @@ import {
   TaskVariables,
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
-import { stringifyScannerParams } from "./helpers/utils";
+import { isWindows, stringifyScannerParams } from "./helpers/utils";
 import { TaskJob } from "./run";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import TaskReport from "./sonarqube/TaskReport";
+import { scanner as scannerConfig } from "./config";
 
 export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
   const rootPath = __dirname;
 
+  const msBuildVersion: string = tl.getInput("msBuildVersion");
+  const cliVersion: string = tl.getInput("cliVersion");
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
@@ -47,6 +51,8 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
     props["sonar.scanner.metadataFilePath"],
   );
   tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
+  tl.setVariable(TaskVariables.SonarQubeMsBuildVersion, msBuildVersion);
+  tl.setVariable(TaskVariables.SonarQubeCliVersion, cliVersion);
 
   tl.getDelimitedInput("extraProperties", "\n")
     .filter((keyValue) => !keyValue.startsWith("#"))
@@ -64,8 +70,36 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
 
   tl.setVariable(TaskVariables.SonarQubeScannerParams, jsonParams);
 
+  // always download the scanner, uses default versions if not explicitly overriden
+  const scannerPath = await downloadScanner(cliVersion, msBuildVersion);
+
+  tl.setVariable(TaskVariables.SonarQubeScannerLocation, scannerPath);
+
+  // we need to pass in the downloaded paths here
   await scanner.runPrepare();
 };
+
+async function downloadScanner(cliVersion?: string, msBuildVersion?: string) {
+  tl.debug(
+    `[TODO] override scanner cliVersion: ${cliVersion} or MSBuildVersion: ${msBuildVersion}`,
+  );
+  // TODO: works to download latest, but ignores override
+  const scannerMode = tl.getVariable(TaskVariables.SonarQubeScannerMode);
+  const msBuildFileUrl = isWindows() ? scannerConfig.classicUrl : scannerConfig.dotnetUrl;
+
+  const fileUrl = scannerMode === ScannerMode.CLI ? scannerConfig.cliUrl : msBuildFileUrl;
+
+  tl.debug(`Downloading scanner from ${fileUrl}`);
+  const downloadPath = await toolLib.downloadTool(fileUrl);
+  tl.debug(`Downloaded: ${fileUrl} file to ${downloadPath}`);
+
+  tl.debug(`Extracting ${downloadPath}`);
+  const unzipPath = await toolLib.extractZip(downloadPath);
+  tl.debug(`Unzipped file to ${unzipPath}`);
+  // `downloadPath` now contains the path to the downloaded file
+
+  return unzipPath;
+}
 
 export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
   if (endpoint.type === EndpointType.SonarCloud) {

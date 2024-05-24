@@ -135,7 +135,16 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    let scannerCliScript = tl.resolve(this.rootPath, "sonar-scanner", "bin", "sonar-scanner");
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
+    const scannerMode: ScannerMode =
+      ScannerMode[tl.getVariable(TaskVariables.SonarQubeScannerMode)];
+    const cliVersion = tl.getVariable(TaskVariables.SonarQubeCliVersion);
+    const msBuildVersion = tl.getVariable(TaskVariables.SonarQubeMsBuildVersion);
+
+    const scannerVersion = scannerMode === ScannerMode.CLI ? cliVersion : msBuildVersion;
+    const basePath = scannerLocation ?? this.rootPath;
+    const scannerPath = scannerLocation ? `sonar-scanner-${scannerVersion}` : "sonar-scanner";
+    let scannerCliScript = tl.resolve(basePath, scannerPath, "bin", "sonar-scanner");
 
     if (isWindows()) {
       scannerCliScript += ".bat";
@@ -242,11 +251,23 @@ export class ScannerMSBuild extends Scanner {
   }
 
   private findFrameworkScannerPath(): string {
-    return tl.resolve(this.rootPath, "classic-sonar-scanner-msbuild", "SonarScanner.MSBuild.exe");
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
+    const basePath = scannerLocation ?? this.rootPath;
+    const pathSegments = [basePath, "SonarScanner.MSBuild.exe"];
+    if (!scannerLocation) {
+      pathSegments.splice(1, 0, "classic-sonar-scanner-msbuild");
+    }
+    return tl.resolve(...pathSegments);
   }
 
   private findDotnetScannerPath(): string {
-    return tl.resolve(this.rootPath, "dotnet-sonar-scanner-msbuild", "SonarScanner.MSBuild.dll");
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
+    const basePath = scannerLocation ?? this.rootPath;
+    const pathSegments = [basePath, "SonarScanner.MSBuild.dll"];
+    if (!scannerLocation) {
+      pathSegments.splice(1, 0, "dotnet-sonar-scanner-msbuild");
+    }
+    return tl.resolve(...pathSegments);
   }
 
   public async runAnalysis() {

@@ -43,6 +43,9 @@ export enum TaskVariables {
   SonarQubeEndpoint = "SONARQUBE_ENDPOINT",
   SonarQubeScannerMSBuildExe = "SONARQUBE_SCANNER_MSBUILD_EXE",
   SonarQubeScannerMSBuildDll = "SONARQUBE_SCANNER_MSBUILD_DLL",
+  SonarQubeMsBuildVersion = "SONARQUBE_MSBUILD_VERSION",
+  SonarQubeCliVersion = "SONARQUBE_CLI_VERSION",
+  SonarQubeScannerLocation = "SONARQUBE_SCANNER_LOCATION",
   JavaHome = "JAVA_HOME",
 }
 
