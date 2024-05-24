@@ -1,5 +1,4 @@
 import * as tl from "azure-pipelines-task-lib";
-import path from "path";
 import * as semver from "semver";
 import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
 import {
@@ -17,7 +16,7 @@ import TaskReport from "./sonarqube/TaskReport";
 
 export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
-  const rootPath = path.join(__dirname, "..");
+  const rootPath = __dirname;
 
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
