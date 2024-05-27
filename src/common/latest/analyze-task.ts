@@ -15,6 +15,8 @@ export const analyzeTask: TaskJob = async (endpointType: EndpointType) => {
   const rootPath = path.join(__dirname, "..");
   const jdkVersionSource = tl.getInput("jdkversion", true) as JdkVersionSource;
 
+  tl.warning("DEBUG --> this warning should be shown (UPDATED) (UPDATED)");
+
   if (typeof tl.getVariable(TaskVariables.SonarQubeScannerMode) === "undefined") {
     tl.setResult(
       tl.TaskResult.Failed,
