@@ -8,8 +8,8 @@
   "visibility": ["Build"],
   "author": "sonarsource",
   "version": {
-    "Major": 5,
-    "Minor": 20,
+    "Major": 6,
+    "Minor": 0,
     "Patch": 0
   },
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
