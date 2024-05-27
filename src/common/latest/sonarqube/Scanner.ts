@@ -11,6 +11,8 @@ export enum ScannerMode {
   Other = "Other",
 }
 
+const SCANNER_EMBED_FOLDER = "sonar-scanner";
+
 export default class Scanner {
   constructor(
     public rootPath: string,
@@ -143,8 +145,8 @@ export class ScannerCLI extends Scanner {
 
     const scannerVersion = scannerMode === ScannerMode.CLI ? cliVersion : msBuildVersion;
     const basePath = scannerLocation ?? this.rootPath;
-    const scannerPath = scannerLocation ? `sonar-scanner-${scannerVersion}` : "sonar-scanner";
-    let scannerCliScript = tl.resolve(basePath, scannerPath, "bin", "sonar-scanner");
+    const scannerPath = scannerLocation ? `sonar-scanner-${scannerVersion}` : SCANNER_EMBED_FOLDER;
+    let scannerCliScript = tl.resolve(basePath, scannerPath, "bin", SCANNER_EMBED_FOLDER);
 
     if (isWindows()) {
       scannerCliScript += ".bat";
@@ -234,7 +236,12 @@ export class ScannerMSBuild extends Scanner {
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
     const scannerCliShellScripts = tl.findMatch(
       scannerExecutablePath,
-      path.join(path.dirname(scannerExecutablePath), "sonar-scanner-*", "bin", "sonar-scanner"),
+      path.join(
+        path.dirname(scannerExecutablePath),
+        "sonar-scanner-*",
+        "bin",
+        SCANNER_EMBED_FOLDER,
+      ),
     )[0];
     await fs.chmod(scannerCliShellScripts, "777");
   }
