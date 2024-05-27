@@ -80,14 +80,17 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
 };
 
 async function downloadScanner(cliVersion?: string, msBuildVersion?: string) {
-  tl.debug(
-    `[TODO] override scanner cliVersion: ${cliVersion} or MSBuildVersion: ${msBuildVersion}`,
-  );
-  // TODO: works to download latest, but ignores override
   const scannerMode = tl.getVariable(TaskVariables.SonarQubeScannerMode);
   const msBuildFileUrl = isWindows() ? scannerConfig.classicUrl : scannerConfig.dotnetUrl;
 
-  const fileUrl = scannerMode === ScannerMode.CLI ? scannerConfig.cliUrl : msBuildFileUrl;
+  let fileUrl = scannerMode === ScannerMode.CLI ? scannerConfig.cliUrl : msBuildFileUrl;
+
+  // Override the default URL if a version differs from the default
+  if (cliVersion !== scannerConfig.cliVersion) {
+    fileUrl = scannerConfig.cliUrlTemplate(cliVersion);
+  } else if (msBuildVersion !== scannerConfig.msBuildVersion) {
+    fileUrl = scannerConfig.msBuildUrlTemplate(msBuildVersion, isWindows());
+  }
 
   tl.debug(`Downloading scanner from ${fileUrl}`);
   const downloadPath = await toolLib.downloadTool(fileUrl);

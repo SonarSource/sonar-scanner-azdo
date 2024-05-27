@@ -13,6 +13,8 @@ export const PROP_NAMES = {
   PROJECTSETTINGS: "project.settings",
 };
 
+export const SCANNER_CLI_FOLDER = "sonar-scanner";
+
 export enum JdkVersionSource {
   JavaHome = "JAVA_HOME",
   JavaHome11 = "JAVA_HOME_11_X64",

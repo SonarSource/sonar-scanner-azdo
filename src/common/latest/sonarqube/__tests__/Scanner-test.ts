@@ -72,7 +72,7 @@ describe("Scanner", () => {
     });
     it("should reference the downloaded scanner location for windows", () => {
       jest.spyOn(tl, "getPlatform").mockReturnValue(tl.Platform.Windows);
-      jest.spyOn(tl, "which").mockReturnValue("/path/to/dotnet");
+      jest.spyOn(tl, "which").mockReturnValue(MOCK_DOTNET_PATH);
       jest.spyOn(tl, "findMatch").mockImplementation((...paths) => {
         const [scannerExecutablePath, fullPath] = paths;
         expect(scannerExecutablePath).toBe("/path/to/temp/directory/SonarScanner.MSBuild.exe");
