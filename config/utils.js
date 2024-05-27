@@ -76,7 +76,7 @@ exports.tfxCommand = function (extensionPath, packageJSON, params = "") {
   run(
     `"${resolveRelativePath(
       path.join("node_modules", ".bin", "tfx"),
-    )}" extension create --output-path "../../${packageJSON.name}-${getFullVersion(
+    )}" extension create --output-path "../../${packageJSON.name}-${getVersionWithCirrusBuildNumber(
       vssExtension.version,
     )}-${vssExtension.id}.vsix" ${params}`,
     {
@@ -85,19 +85,16 @@ exports.tfxCommand = function (extensionPath, packageJSON, params = "") {
   );
 };
 
-function getFullVersion(version) {
-  console.log("incoming version : " + version);
-  const buildNumber = process.env.BUILD_NUMBER; //cirrus
-  const buildNumberAzdo = process.env.BUILD_BUILDID; //azure pipelines
+function getVersionWithCirrusBuildNumber(version) {
+  const buildNumber = process.env.BUILD_NUMBER; // Cirrus CI build number
+  console.log(`Incoming version: ${version} with build number ${buildNumber}`);
   if (buildNumber) {
     return `${version}.${buildNumber}`;
-  } else if (buildNumberAzdo && version.indexOf(`.${buildNumberAzdo}`) == -1) {
-    return `${version}.${buildNumberAzdo}`;
   } else {
     return version;
   }
 }
-exports.getFullVersion = getFullVersion;
+exports.getVersionWithCirrusBuildNumber = getVersionWithCirrusBuildNumber;
 
 function fileHashsum(filePath) {
   const fileContent = fs.readFileSync(filePath);
@@ -110,14 +107,14 @@ function fileHashsum(filePath) {
 exports.fileHashsum = fileHashsum;
 
 exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionManifest) {
-  const sqPackageVersion = getFullVersion(sqExtensionManifest.version);
+  const sqPackageVersion = getVersionWithCirrusBuildNumber(sqExtensionManifest.version);
   const sqVsixPaths = globby.sync(path.join(DIST_DIR, `*-sonarqube.vsix`));
   const sqAdditionalPaths = globby.sync(
     path.join(DIST_DIR, `*{-sonarqube-cyclonedx.json,-sonarqube*.asc}`),
   );
   const sqQualifierMatch = new RegExp(`${sqPackageVersion}-(.+)\.vsix$`);
 
-  const scPackageVersion = getFullVersion(scExtensionManifest.version);
+  const scPackageVersion = getVersionWithCirrusBuildNumber(scExtensionManifest.version);
   const scVsixPaths = globby.sync(path.join(DIST_DIR, `*-sonarcloud.vsix`));
   const scAdditionalPaths = globby.sync(
     path.join(DIST_DIR, `*{-sonarcloud-cyclonedx.json,-sonarcloud*.asc}`),
