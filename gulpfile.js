@@ -35,7 +35,7 @@ const {
   tfxCommand,
   cycloneDxPipe,
   downloadOrCopy,
-  getFullVersion,
+  getVersionWithCirrusBuildNumber,
   run,
 } = require("./config/utils");
 const { string } = require("yargs");
@@ -312,7 +312,7 @@ gulp.task("extension:build", (done) => {
     // eslint-disable-next-line import/no-dynamic-require
     const { version } = require(vssExtension);
     const extension = path.basename(path.dirname(vssExtension));
-    const fullVersion = getFullVersion(version);
+    const fullVersion = getVersionWithCirrusBuildNumber(version);
     const vsixFileName = `sonar-scanner-vsts-${fullVersion}-${extension}.vsix`;
     const outPath = path.join(DIST_DIR, vsixFileName);
     const cwd = path.join(BUILD_EXTENSION_DIR, extension);
@@ -361,6 +361,96 @@ gulp.task("sonarqube:scan", async () => {
   }
 });
 
+/** CI ********************************************************************************************/
+
+// Replace each vss-extension.json version with the current build number
+gulp.task("ci:azure:hotfix-extensions-version", () => {
+  const buildNumber = process.env.BUILD_BUILDID;
+
+  if (!buildNumber) {
+    throw new Error("Missing build number");
+  }
+
+  const vssExtensions = globby.sync([
+    path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json"),
+  ]);
+
+  return mergeStream(
+    vssExtensions.map((vssExtension) =>
+      gulp
+        .src(vssExtension)
+        .pipe(
+          gulpJsonEditor((json) => ({
+            ...json,
+            version: `${json.version}.${buildNumber}`,
+          })),
+        )
+        .pipe(gulp.dest(path.dirname(vssExtension))),
+    ),
+  );
+});
+
+gulp.task("ci:azure:hotfix-tasks-version", () => {
+  const buildNumber = process.env.BUILD_BUILDID;
+
+  if (!buildNumber) {
+    throw new Error("Missing build number");
+  }
+
+  const tasks = globby.sync(["src/extensions/*/tasks/*/v*/*.json"]);
+
+  return mergeStream(
+    tasks.map((task) =>
+      gulp
+        .src(task)
+        .pipe(
+          gulpJsonEditor((json) => ({
+            ...json,
+            version: {
+              ...json.version,
+              Patch: parseInt(buildNumber, 10),
+            },
+          })),
+        )
+        .pipe(gulp.dest(path.dirname(task))),
+    ),
+  );
+});
+
+gulp.task("ci:azure:get-extensions-version", (done) => {
+  if (!process.env.BUILD_SOURCESDIRECTORY) {
+    throw new Error("Missing BUILD_SOURCESDIRECTORY");
+  }
+
+  function run(extension, extensionPrefix) {
+    const vssExtension = path.join(
+      process.env.BUILD_SOURCESDIRECTORY,
+      "build",
+      "extensions",
+      extension,
+      "vss-extension.json",
+    );
+    const { version } = fs.readJsonSync(vssExtension);
+
+    const extensionManifest = path.join(
+      process.env.BUILD_SOURCESDIRECTORY,
+      "build",
+      "extensions",
+      extension,
+      "vss-extension.json",
+    );
+    console.log(`Fetched ext version ${version} for ${extension}`);
+    console.log(`##vso[task.setvariable variable=${extensionPrefix}_EXT_NAME]${extensionManifest}`);
+    console.log(
+      `##vso[task.setvariable variable=${extensionPrefix}_VERSION;isOutput=true]${version}`,
+    );
+  }
+
+  run("sonarqube", "SQ");
+  run("sonarcloud", "SC");
+  done();
+});
+
 /** DEPLOY ****************************************************************************************/
 
 gulp.task("upload:sign", () => {
@@ -399,7 +489,7 @@ gulp.task("upload:vsix:sonarqube", () => {
         const [sha1, md5] = fileHashsum(filePath);
         const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarqube");
         const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-        const packageVersion = getFullVersion(vssExtension.version);
+        const packageVersion = getVersionWithCirrusBuildNumber(vssExtension.version);
         return gulp
           .src(filePath)
           .pipe(
@@ -452,7 +542,7 @@ gulp.task("upload:vsix:sonarcloud", () => {
       .map((filePath) => {
         const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarcloud");
         const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-        const packageVersion = getFullVersion(vssExtension.version);
+        const packageVersion = getVersionWithCirrusBuildNumber(vssExtension.version);
         const [sha1, md5] = fileHashsum(filePath);
         return gulp
           .src(filePath)
@@ -566,7 +656,7 @@ gulp.task("burgr:sonarcloud", () => {
   const extensionPath = path.join(SOURCE_DIR, "extensions", "sonarcloud");
   const manifestFile = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
   const extensionVersion = manifestFile.version;
-  const packageVersion = getFullVersion(extensionVersion);
+  const packageVersion = getVersionWithCirrusBuildNumber(extensionVersion);
 
   const url = `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/sonarcloud/${packageVersion}/sonar-scanner-vsts-${packageVersion}-sonarcloud.vsix`;
 
@@ -603,7 +693,7 @@ gulp.task("burgr:sonarqube", () => {
   const extensionPath = path.join(SOURCE_DIR, "extensions", "sonarqube");
   const manifestFile = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
   const extensionVersion = manifestFile.version;
-  const packageVersion = getFullVersion(extensionVersion);
+  const packageVersion = getVersionWithCirrusBuildNumber(extensionVersion);
 
   const url = `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/sonarqube/${packageVersion}/sonar-scanner-vsts-${packageVersion}-sonarqube.vsix`;
 
