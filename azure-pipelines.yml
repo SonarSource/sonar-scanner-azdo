@@ -34,13 +34,12 @@ stages:
               command: "custom"
               customCommand: "i -g npm@latest"
 
-          - task: PowerShell@2
+          - task: Bash@3
+            displayName: "Install all extension dependencies"
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
-            displayName: "Install all extension dependencies"
             inputs:
-              filePath: "scripts/install.ps1"
-              pwsh: true
+              filePath: "scripts/install.sh"
 
           - task: Npm@1
             displayName: "Run Validate-CI"
@@ -48,22 +47,13 @@ stages:
               command: "custom"
               customCommand: "run validate-ci"
 
-          - task: PowerShell@2
+          - task: Bash@3
             displayName: "Append build id in version in manifests"
-            name: replace
             inputs:
               targetType: "inline"
               script: |
-                # Write your PowerShell commands here.
-
-                . (Join-Path "azp" "helpers.ps1")
-
-                $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/src/extensions/sonarqube/vss-extension.json"
-                Replace-Version $sqExtensionManifest
-
-                $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/src/extensions/sonarcloud/vss-extension.json"
-                Replace-Version $scExtensionManifest
-              pwsh: true
+                npx gulp ci:azure:hotfix-extensions-version
+                npx gulp ci:azure:hotfix-tasks-version
 
           - task: Npm@1
             displayName: "Create test extension"
@@ -78,37 +68,14 @@ stages:
               Contents: "*.vsix"
               TargetFolder: "$(Agent.BuildDirectory)/a"
 
-          - task: PowerShell@2
+          - task: Bash@3
             displayName: "Fetch extensions versions and rename vsix"
             name: versions
             inputs:
               targetType: "inline"
               script: |
-                # Write your PowerShell commands here.
+                npx gulp ci:azure:get-extensions-version
 
-                . (Join-Path "azp" "helpers.ps1")
-
-                $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarqube/vss-extension.json"
-
-                $version = Get-ExtensionVersion $sqExtensionManifest
-
-                Write-Host "Fetched ext version ${version} for SonarQube"
-
-                $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarqube.vsix"
-
-                Write-Host "##vso[task.setvariable variable=SQ_EXT_NAME]$extensionNewName"
-                Write-Host "##vso[task.setvariable variable=SQ_VERSION;isOutput=true]$version"
-
-                $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarcloud/vss-extension.json"
-                $version = Get-ExtensionVersion $scExtensionManifest
-
-                Write-Host "Fetched ext version ${version} for SonarCloud"
-
-                $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarcloud.vsix"
-
-                Write-Host "##vso[task.setvariable variable=SC_EXT_NAME]$extensionNewName"
-                Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$version"
-              pwsh: true
           - task: PublishBuildArtifacts@1
             displayName: "Publish artifacts on the build"
             inputs:
