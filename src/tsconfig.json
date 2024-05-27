@@ -1,19 +1,19 @@
 {
   "compilerOptions": {
     "target": "ES5",
-    "module": "commonjs", 
-    "lib": [ "es2017", "DOM" ],    
-    "noUnusedLocals": true,  
+    "module": "commonjs",
+    "lib": ["es2017", "DOM"],
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
-    "moduleResolution": "node" ,
+    "moduleResolution": "node",
     "rootDir": "./",
     "baseUrl": ".",
     "outDir": "../build/ts"
   },
   "include": [
     "common/latest/**/*.ts",
-    "extensions/sonarcloud/tasks/*/v1/**/*.ts",
-    "extensions/sonarqube/tasks/*/v5/**/*.ts"
+    "extensions/sonarcloud/tasks/*/v2/**/*.ts",
+    "extensions/sonarqube/tasks/*/v6/**/*.ts"
   ]
 }

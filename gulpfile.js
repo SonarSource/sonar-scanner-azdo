@@ -196,7 +196,7 @@ gulp.task("build:copy", () => {
     const { scanner } = require(configJs);
 
     // Copy Scanner CLI
-    if (taskNeedsCliScanner(taskName)) {
+    if (taskNeedsCliScanner(taskName) && scanner.embedScanners) {
       streams.push(
         gulp
           .src(
@@ -213,7 +213,7 @@ gulp.task("build:copy", () => {
     }
 
     // Copy Scanner MSBuild
-    if (taskNeedsMsBuildScanner(taskName)) {
+    if (taskNeedsMsBuildScanner(taskName) && scanner.embedScanners) {
       streams.push(
         gulp
           .src(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion, "**/*"))
@@ -533,7 +533,7 @@ gulp.task("promote", (done) => {
     },
   )
     .then((resp) => {
-      if (resp.statusCode != 200) {
+      if (resp.statusCode !== 200) {
         done(new Error(resp.statusMessage + "\n" + JSON.stringify(resp.body, null, 2)));
       }
     })
