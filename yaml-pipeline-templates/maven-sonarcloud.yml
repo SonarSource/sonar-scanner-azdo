@@ -30,7 +30,7 @@ steps:
       # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
       # object model to provide smart defaults for most of the standard analysis parameters.
       # You can however override this by setting wanted properties in this extraProperties space.
-      # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/#header-4
+      # Read more about this : https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/
 
 - task: Maven@3
   displayName: 'Execute Maven goal'
