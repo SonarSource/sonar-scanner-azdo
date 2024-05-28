@@ -3,7 +3,7 @@
   "name": "SonarQubePrepare",
   "friendlyName": "Prepare Analysis Configuration",
   "description": "Prepare SonarQube analysis configuration",
-  "helpMarkDown": "[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+  "helpMarkDown": "[More Information](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/)",
   "category": "Build",
   "visibility": ["Build"],
   "author": "sonarsource",
@@ -62,7 +62,7 @@
       "defaultValue": "sonar-project.properties",
       "label": "Settings File",
       "required": false,
-      "helpMarkDown": "More information is available [here](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+      "helpMarkDown": "More information is available [here](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/)",
       "visibleRule": "scannerMode = CLI && configMode = file"
     },
     {
@@ -134,7 +134,7 @@
         "resizable": "true",
         "rows": "5"
       },
-      "helpMarkDown": "[Additional properties](https://redirect.sonarsource.com/doc/analysis-parameters.html) to be passed to the scanner. Specify each key=value pair on a new line.",
+      "helpMarkDown": "[Additional properties](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/analysis-parameters/) to be passed to the scanner. Specify each key=value pair on a new line.",
       "groupName": "advanced"
     }
   ],

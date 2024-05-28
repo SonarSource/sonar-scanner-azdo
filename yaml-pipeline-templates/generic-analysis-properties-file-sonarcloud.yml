@@ -28,7 +28,7 @@ steps:
     scannerMode: 'CLI'
     configMode: 'file'
     # This sonar-project.properties file is usually placed at the root level of the repository. However, you can define your own path. 
-    # Read more about this file and its expected format : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
+    # Read more about this file and its expected format : https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner/
     configFile: 'sonar-project.properties' 
     # Additional properties that will be passed to the scanner,
     # Put one key=value per line, example:
