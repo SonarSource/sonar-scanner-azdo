@@ -9,6 +9,8 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+lockBehavior: sequential
+
 variables:
   - group: sonar-scanner-vsts-variables
   - group: artifactory_access
