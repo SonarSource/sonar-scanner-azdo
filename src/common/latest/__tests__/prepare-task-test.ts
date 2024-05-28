@@ -94,7 +94,7 @@ describe("downloading the scanner", () => {
     );
     expect(toolLib.extractZip).toHaveBeenCalledWith("path/to/zip-scanner");
     expect(tl.setVariable).toHaveBeenCalledWith(
-      TaskVariables.SonarQubeScannerLocation,
+      TaskVariables.SonarScannerLocation,
       "path/to/unzip-scanner",
     );
 
@@ -116,7 +116,7 @@ describe("downloading the scanner", () => {
     );
     expect(toolLib.extractZip).toHaveBeenCalledWith("path/to/zip-scanner");
     expect(tl.setVariable).toHaveBeenCalledWith(
-      TaskVariables.SonarQubeScannerLocation,
+      TaskVariables.SonarScannerLocation,
       "path/to/unzip-scanner",
     );
   });
@@ -142,7 +142,7 @@ describe("downloading the scanner", () => {
     );
     expect(toolLib.extractZip).toHaveBeenCalledWith("path/to/zip-scanner");
     expect(tl.setVariable).toHaveBeenCalledWith(
-      TaskVariables.SonarQubeScannerLocation,
+      TaskVariables.SonarScannerLocation,
       "path/to/unzip-scanner",
     );
   });
@@ -167,7 +167,7 @@ describe("downloading the scanner", () => {
     );
     expect(toolLib.extractZip).toHaveBeenCalledWith("path/to/zip-scanner");
     expect(tl.setVariable).toHaveBeenCalledWith(
-      TaskVariables.SonarQubeScannerLocation,
+      TaskVariables.SonarScannerLocation,
       "path/to/unzip-scanner",
     );
   });
@@ -191,7 +191,7 @@ describe("downloading the scanner", () => {
     );
     expect(toolLib.extractZip).toHaveBeenCalledWith("path/to/zip-scanner");
     expect(tl.setVariable).toHaveBeenCalledWith(
-      TaskVariables.SonarQubeScannerLocation,
+      TaskVariables.SonarScannerLocation,
       "path/to/unzip-scanner",
     );
   });

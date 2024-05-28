@@ -135,8 +135,8 @@ export class ScannerCLI extends Scanner {
   }
 
   public async runAnalysis() {
-    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
-    const cliVersion = tl.getVariable(TaskVariables.SonarQubeCliVersion);
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarScannerLocation);
+    const cliVersion = tl.getVariable(TaskVariables.SonarCliVersion);
     // Always use the downloaded scanner (no fallback)
     const scannerPath = `sonar-scanner-${cliVersion}`;
     let scannerCliScript = tl.resolve(scannerLocation, scannerPath, "bin", SCANNER_CLI_FOLDER);
@@ -202,12 +202,12 @@ export class ScannerMSBuild extends Scanner {
     if (isWindows()) {
       const scannerExePath = this.findFrameworkScannerPath();
       tl.debug(`Using classic scanner at ${scannerExePath}`);
-      tl.setVariable(TaskVariables.SonarQubeScannerMSBuildExe, scannerExePath);
+      tl.setVariable(TaskVariables.SonarScannerMSBuildExe, scannerExePath);
       scannerRunner = this.getScannerRunner(scannerExePath, true);
     } else {
       const scannerDllPath = this.findDotnetScannerPath();
       tl.debug(`Using dotnet scanner at ${scannerDllPath}`);
-      tl.setVariable(TaskVariables.SonarQubeScannerMSBuildDll, scannerDllPath);
+      tl.setVariable(TaskVariables.SonarScannerMSBuildDll, scannerDllPath);
       scannerRunner = this.getScannerRunner(scannerDllPath, false);
 
       // Need to set executable flag on the embedded scanner CLI
@@ -246,21 +246,21 @@ export class ScannerMSBuild extends Scanner {
   }
 
   private findFrameworkScannerPath(): string {
-    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarScannerLocation);
     const pathSegments = [scannerLocation, "SonarScanner.MSBuild.exe"];
     return tl.resolve(...pathSegments);
   }
 
   private findDotnetScannerPath(): string {
-    const scannerLocation: string = tl.getVariable(TaskVariables.SonarQubeScannerLocation);
+    const scannerLocation: string = tl.getVariable(TaskVariables.SonarScannerLocation);
     const pathSegments = [scannerLocation, "SonarScanner.MSBuild.dll"];
     return tl.resolve(...pathSegments);
   }
 
   public async runAnalysis() {
     const scannerRunner = isWindows()
-      ? this.getScannerRunner(tl.getVariable(TaskVariables.SonarQubeScannerMSBuildExe), true)
-      : this.getScannerRunner(tl.getVariable(TaskVariables.SonarQubeScannerMSBuildDll), false);
+      ? this.getScannerRunner(tl.getVariable(TaskVariables.SonarScannerMSBuildExe), true)
+      : this.getScannerRunner(tl.getVariable(TaskVariables.SonarScannerMSBuildDll), false);
 
     scannerRunner.arg("end");
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);

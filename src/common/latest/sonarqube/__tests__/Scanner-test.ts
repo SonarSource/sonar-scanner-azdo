@@ -32,11 +32,11 @@ describe("Scanner", () => {
       jest.spyOn(tl, "getPlatform").mockReturnValue(tl.Platform.Windows);
       jest.spyOn(tl, "tool").mockImplementation(() => MOCKTOOLRUNNER);
       jest.spyOn(tl, "getVariable").mockImplementation((variable) => {
-        if (variable === TaskVariables.SonarQubeScannerLocation) {
+        if (variable === TaskVariables.SonarScannerLocation) {
           return "/path/to/temp/directory";
-        } else if (variable === TaskVariables.SonarQubeCliVersion) {
+        } else if (variable === TaskVariables.SonarCliVersion) {
           return MOCK_CLI_VERSION;
-        } else if (TaskVariables.SonarQubeScannerMode) {
+        } else if (TaskVariables.SonarScannerMode) {
           return "CLI";
         } else return undefined;
       });
@@ -61,11 +61,11 @@ describe("Scanner", () => {
     beforeEach(() => {
       jest.spyOn(tl, "tool").mockImplementation(() => MOCKTOOLRUNNER);
       jest.spyOn(tl, "getVariable").mockImplementation((variable) => {
-        if (variable === TaskVariables.SonarQubeScannerLocation) {
+        if (variable === TaskVariables.SonarScannerLocation) {
           return "/path/to/temp/directory";
-        } else if (variable === TaskVariables.SonarQubeMsBuildVersion) {
+        } else if (variable === TaskVariables.SonarMsBuildVersion) {
           return MOCK_MSBUILD_VERSION;
-        } else if (TaskVariables.SonarQubeScannerMode) {
+        } else if (TaskVariables.SonarScannerMode) {
           return "MSBuild";
         } else return undefined;
       });
@@ -102,11 +102,11 @@ describe("Scanner", () => {
         return ["/path/to/temp/directory/sonar-scanner-1.33.7/bin/sonar-scanner"];
       });
       jest.spyOn(tl, "getVariable").mockImplementation((variable) => {
-        if (variable === TaskVariables.SonarQubeScannerLocation) {
+        if (variable === TaskVariables.SonarScannerLocation) {
           return "/path/to/temp/directory";
-        } else if (variable === TaskVariables.SonarQubeMsBuildVersion) {
+        } else if (variable === TaskVariables.SonarMsBuildVersion) {
           return MOCK_MSBUILD_VERSION;
-        } else if (TaskVariables.SonarQubeScannerMode) {
+        } else if (TaskVariables.SonarScannerMode) {
           return "MSBuild";
         } else return undefined;
       });

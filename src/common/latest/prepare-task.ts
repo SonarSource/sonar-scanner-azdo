@@ -44,23 +44,20 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
     ...parseScannerExtraProperties(),
   };
 
-  tl.setVariable(TaskVariables.SonarQubeServerVersion, serverVersion.format());
-  tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
-  tl.setVariable(
-    TaskVariables.SonarQubeScannerReportTaskFile,
-    props["sonar.scanner.metadataFilePath"],
-  );
-  tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
-  tl.setVariable(TaskVariables.SonarQubeMsBuildVersion, msBuildVersion);
-  tl.setVariable(TaskVariables.SonarQubeCliVersion, cliVersion);
+  tl.setVariable(TaskVariables.SonarServerVersion, serverVersion.format());
+  tl.setVariable(TaskVariables.SonarScannerMode, scannerMode);
+  tl.setVariable(TaskVariables.SonarScannerReportTaskFile, props["sonar.scanner.metadataFilePath"]);
+  tl.setVariable(TaskVariables.SonarEndpoint, endpoint.toJson(), true);
+  tl.setVariable(TaskVariables.SonarMsBuildVersion, msBuildVersion);
+  tl.setVariable(TaskVariables.SonarCliVersion, cliVersion);
 
   tl.getDelimitedInput("extraProperties", "\n")
     .filter((keyValue) => !keyValue.startsWith("#"))
     .map((keyValue) => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 
-  tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
-  tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
+  tl.setVariable(TaskVariables.SonarScannerMode, scannerMode);
+  tl.setVariable(TaskVariables.SonarEndpoint, endpoint.toJson(), true);
 
   const jsonParams = stringifyScannerParams({
     ...endpoint.toSonarProps(serverVersion),
@@ -68,19 +65,19 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
     ...props,
   });
 
-  tl.setVariable(TaskVariables.SonarQubeScannerParams, jsonParams);
+  tl.setVariable(TaskVariables.SonarScannerParams, jsonParams);
 
   // always download the scanner, uses default versions if not explicitly overriden
   const scannerPath = await downloadScanner(cliVersion, msBuildVersion);
 
-  tl.setVariable(TaskVariables.SonarQubeScannerLocation, scannerPath);
+  tl.setVariable(TaskVariables.SonarScannerLocation, scannerPath);
 
   // we need to pass in the downloaded paths here
   await scanner.runPrepare();
 };
 
 async function downloadScanner(cliVersion?: string, msBuildVersion?: string) {
-  const scannerMode = tl.getVariable(TaskVariables.SonarQubeScannerMode);
+  const scannerMode = tl.getVariable(TaskVariables.SonarScannerMode);
   const msBuildFileUrl = isWindows() ? scannerConfig.classicUrl : scannerConfig.dotnetUrl;
 
   let fileUrl = scannerMode === ScannerMode.CLI ? scannerConfig.cliUrl : msBuildFileUrl;

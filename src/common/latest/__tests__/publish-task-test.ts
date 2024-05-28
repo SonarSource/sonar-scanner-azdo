@@ -74,13 +74,13 @@ const METRICS: Metric[] = [
   },
 ];
 
-it("should fail unless SONARQUBE_SCANNER_PARAMS are supplied", async () => {
+it("should fail unless SONAR_SCANNER_PARAMS are supplied", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
   jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
   await publish.publishTask(EndpointType.SonarCloud);
 
-  expect(tl.getVariable).toHaveBeenCalledWith(TaskVariables.SonarQubeScannerParams);
+  expect(tl.getVariable).toHaveBeenCalledWith(TaskVariables.SonarScannerParams);
   expect(tl.setResult).toHaveBeenCalledWith(
     tl.TaskResult.Failed,
     `Variables are missing. Please make sure that you are running the Prepare and Analyze tasks before running the Publish task.\n${TASK_MISSING_VARIABLE_ERROR_HINT}`,
@@ -312,8 +312,8 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
 
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
-  tl.setVariable(TaskVariables.SonarQubeScannerParams, "anything...");
-  tl.setVariable(TaskVariables.SonarQubeEndpoint, SC_ENDPOINT.toJson());
+  tl.setVariable(TaskVariables.SonarScannerParams, "anything...");
+  tl.setVariable(TaskVariables.SonarEndpoint, SC_ENDPOINT.toJson());
 
   // Mock finding two report files to process
   jest
@@ -354,7 +354,7 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
 
 describe("it should generate passing report correctly", () => {
   beforeEach(() => {
-    tl.setVariable(TaskVariables.SonarQubeScannerParams, "{}");
+    tl.setVariable(TaskVariables.SonarScannerParams, "{}");
     jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("10.4.0"));
 
     jest.spyOn(tl, "getInput").mockImplementation(() => "1"); // set the timeout
@@ -390,7 +390,7 @@ describe("it should generate passing report correctly", () => {
   });
 
   it("not fail when measures can not be retrieved", async () => {
-    tl.setVariable(TaskVariables.SonarQubeEndpoint, SQ_ENDPOINT.toJson());
+    tl.setVariable(TaskVariables.SonarEndpoint, SQ_ENDPOINT.toJson());
     jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
 
     await publish.publishTask(EndpointType.SonarQube);
@@ -401,7 +401,7 @@ describe("it should generate passing report correctly", () => {
   });
 
   it("should show available fetched measures", async () => {
-    tl.setVariable(TaskVariables.SonarQubeEndpoint, SQ_ENDPOINT.toJson());
+    tl.setVariable(TaskVariables.SonarEndpoint, SQ_ENDPOINT.toJson());
     jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
     jest.spyOn(api, "fetchComponentMeasures").mockResolvedValueOnce([
       {
@@ -421,7 +421,7 @@ describe("it should generate passing report correctly", () => {
   });
 
   it("should not fail when no measure/metric is available", async () => {
-    tl.setVariable(TaskVariables.SonarQubeEndpoint, SQ_ENDPOINT.toJson());
+    tl.setVariable(TaskVariables.SonarEndpoint, SQ_ENDPOINT.toJson());
     jest
       .spyOn(api, "fetchProjectStatus")
       .mockResolvedValueOnce({ ...PROJECT_STATUS_OK, conditions: [] });
@@ -445,8 +445,8 @@ describe("it should generate passing report correctly", () => {
   ])(
     "should show issues fixed in pull request",
     async (endpointType, endpoint, scannerParams, shouldShow) => {
-      tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson());
-      tl.setVariable(TaskVariables.SonarQubeScannerParams, JSON.stringify(scannerParams));
+      tl.setVariable(TaskVariables.SonarEndpoint, endpoint.toJson());
+      tl.setVariable(TaskVariables.SonarScannerParams, JSON.stringify(scannerParams));
       jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
       jest.spyOn(api, "fetchComponentMeasures").mockImplementation((_endpoint, { metricKeys }) => {
         return Promise.resolve(

@@ -38,16 +38,16 @@ export enum AzureBuildVariables {
 }
 
 export enum TaskVariables {
-  SonarQubeServerVersion = "SONARQUBE_SERVER_VERSION",
-  SonarQubeScannerMode = "SONARQUBE_SCANNER_MODE",
-  SonarQubeScannerParams = "SONARQUBE_SCANNER_PARAMS",
-  SonarQubeScannerReportTaskFile = "SONARQUBE_SCANNER_REPORTTASKFILE",
-  SonarQubeEndpoint = "SONARQUBE_ENDPOINT",
-  SonarQubeScannerMSBuildExe = "SONARQUBE_SCANNER_MSBUILD_EXE",
-  SonarQubeScannerMSBuildDll = "SONARQUBE_SCANNER_MSBUILD_DLL",
-  SonarQubeMsBuildVersion = "SONARQUBE_MSBUILD_VERSION",
-  SonarQubeCliVersion = "SONARQUBE_CLI_VERSION",
-  SonarQubeScannerLocation = "SONARQUBE_SCANNER_LOCATION",
+  SonarServerVersion = "SONAR_SERVER_VERSION",
+  SonarScannerMode = "SONAR_SCANNER_MODE",
+  SonarScannerParams = "SONAR_SCANNER_PARAMS",
+  SonarScannerReportTaskFile = "SONAR_SCANNER_REPORTTASKFILE",
+  SonarEndpoint = "SONAR_ENDPOINT",
+  SonarScannerMSBuildExe = "SONAR_SCANNER_MSBUILD_EXE",
+  SonarScannerMSBuildDll = "SONAR_SCANNER_MSBUILD_DLL",
+  SonarMsBuildVersion = "SONAR_MSBUILD_VERSION",
+  SonarCliVersion = "SONAR_CLI_VERSION",
+  SonarScannerLocation = "SONAR_SCANNER_LOCATION",
   JavaHome = "JAVA_HOME",
 }
 
