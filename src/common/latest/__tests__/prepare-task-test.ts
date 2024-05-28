@@ -195,4 +195,28 @@ describe("downloading the scanner", () => {
       "path/to/unzip-scanner",
     );
   });
+
+  it("should give the user a useful message when the version is not found", async () => {
+    const errorResponse = "HTTP status code 404";
+
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.msBuildVersion); // MSBuild Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "5.0.0.1"); // CLI Version
+    jest.spyOn(toolLib, "downloadTool").mockRejectedValue(new Error(errorResponse));
+    jest.spyOn(tl, "setResult");
+
+    const scanner = new ScannerCLI(__dirname, { projectSettings: "scanner.properties" });
+
+    jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => scanner);
+
+    await prept.prepareTask(EndpointType.SonarQube);
+
+    expect(Scanner.getPrepareScanner).toHaveBeenCalled();
+
+    expect(tl.setResult).toHaveBeenCalledWith(
+      tl.TaskResult.Failed,
+      "The scanner version you are trying to download does not exist. Please check the version and try again.",
+    );
+  });
 });

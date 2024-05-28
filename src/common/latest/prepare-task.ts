@@ -92,16 +92,27 @@ async function downloadScanner(cliVersion?: string, msBuildVersion?: string) {
     fileUrl = scannerConfig.msBuildUrlTemplate(msBuildVersion, isWindows());
   }
 
-  tl.debug(`Downloading scanner from ${fileUrl}`);
-  const downloadPath = await toolLib.downloadTool(fileUrl);
-  tl.debug(`Downloaded: ${fileUrl} file to ${downloadPath}`);
+  try {
+    tl.debug(`Downloading scanner from ${fileUrl}`);
+    const downloadPath = await toolLib.downloadTool(fileUrl);
+    tl.debug(`Downloaded: ${fileUrl} file to ${downloadPath}`);
 
-  tl.debug(`Extracting ${downloadPath}`);
-  const unzipPath = await toolLib.extractZip(downloadPath);
-  tl.debug(`Unzipped file to ${unzipPath}`);
-  // `downloadPath` now contains the path to the downloaded file
+    tl.debug(`Extracting ${downloadPath}`);
+    const unzipPath = await toolLib.extractZip(downloadPath);
+    tl.debug(`Unzipped file to ${unzipPath}`);
+    // `downloadPath` now contains the path to the downloaded file
 
-  return unzipPath;
+    return unzipPath;
+  } catch (error) {
+    if (error.message.includes("404")) {
+      tl.setResult(
+        tl.TaskResult.Failed,
+        "The scanner version you are trying to download does not exist. Please check the version and try again.",
+      );
+    } else {
+      tl.setResult(tl.TaskResult.Failed, error.message);
+    }
+  }
 }
 
 export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
