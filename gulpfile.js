@@ -139,24 +139,25 @@ gulp.task("build:download-scanners", () => {
   for (const configJs of configJss) {
     // eslint-disable-next-line import/no-dynamic-require
     const { scanner } = require(configJs);
-
-    streams.push(
-      downloadOrCopy(scanner.classicUrl)
-        .pipe(decompress())
-        .pipe(
-          gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion)),
-        ),
-    );
-
-    streams.push(
-      downloadOrCopy(scanner.dotnetUrl)
-        .pipe(decompress())
-        .pipe(
-          gulp.dest(
-            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_MSBUILD_DIRNAME, scanner.msBuildVersion),
+    if (scanner.embedScanners) {
+      streams.push(
+        downloadOrCopy(scanner.classicUrl)
+          .pipe(decompress())
+          .pipe(
+            gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion)),
           ),
-        ),
-    );
+      );
+
+      streams.push(
+        downloadOrCopy(scanner.dotnetUrl)
+          .pipe(decompress())
+          .pipe(
+            gulp.dest(
+              path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_MSBUILD_DIRNAME, scanner.msBuildVersion),
+            ),
+          ),
+      );
+    }
   }
 
   return mergeStream(streams);

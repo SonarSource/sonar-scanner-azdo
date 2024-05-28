@@ -10,14 +10,14 @@ beforeEach(() => {
 it("should not return null password", () => {
   jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
 
-  const enpoint = new Endpoint(EndpointType.SonarQube, {
+  const endpoint = new Endpoint(EndpointType.SonarQube, {
     url: "http://foo",
     token: undefined,
     username: "token123",
     password: undefined,
     organization: undefined,
   });
-  expect(enpoint.auth).toEqual({ username: "token123", password: "" });
+  expect(endpoint.auth).toEqual({ username: "token123", password: "" });
 });
 
 // VSTS-250

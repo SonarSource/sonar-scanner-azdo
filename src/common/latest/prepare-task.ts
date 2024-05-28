@@ -1,6 +1,8 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import * as toolLib from "azure-pipelines-tool-lib/tool";
 import * as semver from "semver";
 import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
+
 import {
   AzureBuildVariables,
   AzureProvider,
@@ -8,16 +10,19 @@ import {
   TaskVariables,
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
-import { stringifyScannerParams } from "./helpers/utils";
+import { isWindows, stringifyScannerParams } from "./helpers/utils";
 import { TaskJob } from "./run";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import TaskReport from "./sonarqube/TaskReport";
+import { scanner as scannerConfig } from "./config";
 
 export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
   const rootPath = __dirname;
 
+  const msBuildVersion: string = tl.getInput("msBuildVersion");
+  const cliVersion: string = tl.getInput("cliVersion");
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
@@ -40,21 +45,20 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
     ...parseScannerExtraProperties(),
   };
 
-  tl.setVariable(TaskVariables.SonarQubeServerVersion, serverVersion.format());
-  tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
-  tl.setVariable(
-    TaskVariables.SonarQubeScannerReportTaskFile,
-    props["sonar.scanner.metadataFilePath"],
-  );
-  tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
+  tl.setVariable(TaskVariables.SonarServerVersion, serverVersion.format());
+  tl.setVariable(TaskVariables.SonarScannerMode, scannerMode);
+  tl.setVariable(TaskVariables.SonarScannerReportTaskFile, props["sonar.scanner.metadataFilePath"]);
+  tl.setVariable(TaskVariables.SonarEndpoint, endpoint.toJson(), true);
+  tl.setVariable(TaskVariables.SonarMsBuildVersion, msBuildVersion);
+  tl.setVariable(TaskVariables.SonarCliVersion, cliVersion);
 
   tl.getDelimitedInput("extraProperties", "\n")
     .filter((keyValue) => !keyValue.startsWith("#"))
     .map((keyValue) => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 
-  tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
-  tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
+  tl.setVariable(TaskVariables.SonarScannerMode, scannerMode);
+  tl.setVariable(TaskVariables.SonarEndpoint, endpoint.toJson(), true);
 
   const jsonParams = stringifyScannerParams({
     ...endpoint.toSonarProps(serverVersion),
@@ -62,10 +66,51 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
     ...props,
   });
 
-  tl.setVariable(TaskVariables.SonarQubeScannerParams, jsonParams);
+  tl.setVariable(TaskVariables.SonarScannerParams, jsonParams);
+
+  const scannerPath = await downloadScanner(cliVersion, msBuildVersion);
+
+  tl.setVariable(TaskVariables.SonarScannerLocation, scannerPath);
 
   await scanner.runPrepare();
 };
+
+async function downloadScanner(cliVersion: string, msBuildVersion: string) {
+  const scannerMode = tl.getVariable(TaskVariables.SonarScannerMode);
+
+  let fileUrl;
+  // Override the default URL if a version differs from the default
+  if (scannerMode === ScannerMode.CLI) {
+    fileUrl = scannerConfig.cliUrlTemplate(cliVersion);
+  } else if (scannerMode === ScannerMode.MSBuild) {
+    fileUrl = scannerConfig.msBuildUrlTemplate(msBuildVersion, isWindows());
+  } else {
+    // scannerMode is OTHER
+    // we can ignore the download and continue
+    return;
+  }
+
+  try {
+    tl.debug(`Downloading scanner from ${fileUrl}`);
+    const downloadPath = await toolLib.downloadTool(fileUrl);
+    tl.debug(`Downloaded: ${fileUrl} file to ${downloadPath}`);
+
+    tl.debug(`Extracting ${downloadPath}`);
+    const unzipPath = await toolLib.extractZip(downloadPath);
+    tl.debug(`Unzipped file to ${unzipPath}`);
+
+    return unzipPath;
+  } catch (error) {
+    if (error.message.includes("404")) {
+      tl.setResult(
+        tl.TaskResult.Failed,
+        "The scanner version you are trying to download does not exist. Please check the version and try again.",
+      );
+    } else {
+      tl.setResult(tl.TaskResult.Failed, error.message);
+    }
+  }
+}
 
 export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
   if (endpoint.type === EndpointType.SonarCloud) {

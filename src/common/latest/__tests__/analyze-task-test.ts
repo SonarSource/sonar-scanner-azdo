@@ -4,7 +4,7 @@ import { JdkVersionSource, TASK_MISSING_VARIABLE_ERROR_HINT } from "../helpers/c
 import { EndpointType } from "../sonarqube";
 import Scanner, { ScannerCLI } from "../sonarqube/Scanner";
 
-it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
+it("should not have SONAR_SCANNER_MODE property filled", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
   jest.spyOn(tl, "setResult").mockImplementation(() => null);
   jest.spyOn(tl, "getInput").mockImplementation(() => JdkVersionSource.JavaHome);
@@ -18,14 +18,14 @@ it("should not have SONARQUBE_SCANNER_MODE property filled", async () => {
 });
 
 it("should run scanner", async () => {
-  //SONARQUBE_SERVER_VERSION
+  //SONAR_SERVER_VERSION
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("9.9.0.213");
 
-  //SONARQUBE_SCANNER_MODE
+  //SONAR_SCANNER_MODE
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
   jest.spyOn(tl, "getVariable").mockReturnValueOnce("CLI");
 
-  //SONARQUBE_SCANNER_PARAMS
+  //SONAR_SCANNER_PARAMS
   jest
     .spyOn(tl, "getVariable")
     .mockReturnValueOnce('{"sonar.metadata": "/home/user/metadata.txt"}');
@@ -40,12 +40,12 @@ it("should run scanner", async () => {
 
   jest.spyOn(Scanner, "getAnalyzeScanner").mockImplementation(() => scanner);
 
-  //SONARQUBE_SCANNER_PARAMS
+  //SONAR_SCANNER_PARAMS
   jest
     .spyOn(tl, "getVariable")
     .mockReturnValueOnce('{"sonar.metadata": "/home/user/metadata.txt"}');
 
-  //SONARQUBE_ENDPOINT
+  //SONAR_ENDPOINT
   jest
     .spyOn(tl, "getVariable")
     .mockReturnValueOnce(
