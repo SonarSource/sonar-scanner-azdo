@@ -1,3 +1,3 @@
-import { EndpointType, publishTask, runTask } from "../../../../../common/sonarqube-v5";
+import { EndpointType, publishTask, runTask } from "../../../../../common/sonarcloud-v1";
 
 runTask(publishTask, "Publish", EndpointType.SonarCloud);
