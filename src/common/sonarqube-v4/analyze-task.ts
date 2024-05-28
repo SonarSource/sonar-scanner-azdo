@@ -1,5 +1,4 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import path from "path";
 import { DEPRECATION_MESSAGE } from "./helpers/constants";
 import JavaVersionResolver from "./helpers/java-version-resolver";
 import { PROP_NAMES, sanitizeVariable } from "./helpers/utils";
@@ -10,7 +9,7 @@ import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 const JAVA_11_PATH_ENV_NAME = "JAVA_HOME_11_X64";
 
 export const analyzeTask: TaskJob = async (endpointType: EndpointType) => {
-  const rootPath = path.join(__dirname, "..");
+  const rootPath = __dirname;
 
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable("SONARQUBE_SCANNER_MODE")];
   if (!scannerMode) {
