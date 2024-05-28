@@ -1,4 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import * as toolLib from "azure-pipelines-tool-lib/tool";
 import * as semver from "semver";
 import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
 
@@ -67,12 +68,10 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
 
   tl.setVariable(TaskVariables.SonarScannerParams, jsonParams);
 
-  // always download the scanner, uses default versions if not explicitly overriden
   const scannerPath = await downloadScanner(cliVersion, msBuildVersion);
 
   tl.setVariable(TaskVariables.SonarScannerLocation, scannerPath);
 
-  // we need to pass in the downloaded paths here
   await scanner.runPrepare();
 };
 
@@ -85,6 +84,10 @@ async function downloadScanner(cliVersion: string, msBuildVersion: string) {
     fileUrl = scannerConfig.cliUrlTemplate(cliVersion);
   } else if (scannerMode === ScannerMode.MSBuild) {
     fileUrl = scannerConfig.msBuildUrlTemplate(msBuildVersion, isWindows());
+  } else {
+    // scannerMode is OTHER
+    // we can ignore the download and continue
+    return;
   }
 
   try {
@@ -95,7 +98,6 @@ async function downloadScanner(cliVersion: string, msBuildVersion: string) {
     tl.debug(`Extracting ${downloadPath}`);
     const unzipPath = await toolLib.extractZip(downloadPath);
     tl.debug(`Unzipped file to ${unzipPath}`);
-    // `downloadPath` now contains the path to the downloaded file
 
     return unzipPath;
   } catch (error) {

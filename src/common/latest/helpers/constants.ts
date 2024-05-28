@@ -40,7 +40,7 @@ export enum AzureBuildVariables {
 export enum TaskVariables {
   SonarServerVersion = "SONAR_SERVER_VERSION",
   SonarScannerMode = "SONAR_SCANNER_MODE",
-  SonarScannerParams = "SONAR_SCANNER_PARAMS",
+  SonarScannerParams = "SONAR_SCANNER_JSON_PARAMS",
   SonarScannerReportTaskFile = "SONAR_SCANNER_REPORTTASKFILE",
   SonarEndpoint = "SONAR_ENDPOINT",
   SonarScannerMSBuildExe = "SONAR_SCANNER_MSBUILD_EXE",

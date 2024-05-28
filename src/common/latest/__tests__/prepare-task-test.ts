@@ -222,4 +222,22 @@ describe("downloading the scanner", () => {
       "The scanner version you are trying to download does not exist. Please check the version and try again.",
     );
   });
+
+  it("should not download a scanner for Grade/Maven (OTHER)", async () => {
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "6.0.0.1"); // MSBuild Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "5.0.0.1"); // CLI Version
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => ScannerMode.Other); // Other Mode
+
+    const scanner = new Scanner(__dirname, ScannerMode.Other);
+
+    jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => scanner);
+
+    await prept.prepareTask(EndpointType.SonarQube);
+
+    expect(Scanner.getPrepareScanner).toHaveBeenCalled();
+    expect(toolLib.downloadTool).not.toHaveBeenCalled();
+    expect(toolLib.extractZip).not.toHaveBeenCalled();
+  });
 });
