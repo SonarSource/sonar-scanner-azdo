@@ -14,7 +14,7 @@ export const analyzeTask: TaskJob = async (endpointType: EndpointType) => {
   const rootPath = __dirname;
   const jdkVersionSource = tl.getInput("jdkversion", true) as JdkVersionSource;
 
-  if (typeof tl.getVariable(TaskVariables.SonarQubeScannerMode) === "undefined") {
+  if (typeof tl.getVariable(TaskVariables.SonarScannerMode) === "undefined") {
     tl.setResult(
       tl.TaskResult.Failed,
       `Variables are missing. Please make sure that you are running the Prepare task before running the Analyze task.\n${TASK_MISSING_VARIABLE_ERROR_HINT}`,
@@ -23,18 +23,18 @@ export const analyzeTask: TaskJob = async (endpointType: EndpointType) => {
   }
 
   Scanner.setIsSonarCloud(endpointType === EndpointType.SonarCloud);
-  const serverVersion = tl.getVariable(TaskVariables.SonarQubeServerVersion);
+  const serverVersion = tl.getVariable(TaskVariables.SonarServerVersion);
   JavaVersionResolver.setJavaVersion(jdkVersionSource, endpointType, serverVersion);
 
   // Run scanner
-  const scannerMode: ScannerMode = ScannerMode[tl.getVariable(TaskVariables.SonarQubeScannerMode)];
+  const scannerMode: ScannerMode = ScannerMode[tl.getVariable(TaskVariables.SonarScannerMode)];
   const scanner = Scanner.getAnalyzeScanner(rootPath, scannerMode);
-  const sqScannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarQubeScannerParams));
+  const sqScannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarScannerParams));
   await scanner.runAnalysis();
 
   // Sanitize scanner params (SSF-194)
   tl.setVariable(
-    TaskVariables.SonarQubeScannerParams,
+    TaskVariables.SonarScannerParams,
     stringifyScannerParams(sanitizeScannerParams(sqScannerParams)),
   );
 

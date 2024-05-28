@@ -106,7 +106,7 @@ it.each([
   expect(reportFiles[1]).toBe("path2");
 
   expect(tl.getVariable).toHaveBeenCalledTimes(2);
-  expect(tl.getVariable).toHaveBeenCalledWith(TaskVariables.SonarQubeScannerReportTaskFile);
+  expect(tl.getVariable).toHaveBeenCalledWith(TaskVariables.SonarScannerReportTaskFile);
 
   // Calculate the expected path to take account of different
   // path separators in Windows/non-Windows
