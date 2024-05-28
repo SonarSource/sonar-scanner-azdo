@@ -1,11 +1,19 @@
 #!/bin/bash
 
+# Get the root directory of the Git repository
 GIT_ROOT=$(git rev-parse --show-toplevel)
 
-cd $GIT_ROOT && npm install
+COMMON_DIR="$GIT_ROOT/src/common"
 
-cd $GIT_ROOT/src/common/latest/ && npm install
-cd $GIT_ROOT/src/common/sonarqube-v4/ && npm install
-cd $GIT_ROOT/src/common/sonarqube-v5/ && npm install
-cd $GIT_ROOT/src/common/sonarcloud-v1/ && npm install
+# Change directory to the root of the repository
+cd "$GIT_ROOT" || exit
 
+# Install dependencies at the root level
+npm install
+
+# Iterate through each folder in the common directory
+for folder in "$COMMON_DIR"/*; do
+    if [ -d "$folder" ]; then
+        cd "$folder" && npm install || exit
+    fi
+done
