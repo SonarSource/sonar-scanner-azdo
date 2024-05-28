@@ -8,7 +8,7 @@
     "theme": "dark"
   },
   "publisher": "sonarsource",
-  "homepage": "https://www.sonarqube.org/",
+  "homepage": "https://www.sonarsource.com",
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services.Cloud"
@@ -43,16 +43,16 @@
   },
   "links": {
     "home": {
-      "uri": "https://www.sonarqube.org/"
+      "uri": "https://www.sonarsource.com"
     },
     "getstarted": {
-      "uri": "http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html"
+      "uri": "https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/"
     },
     "support": {
       "uri": "https://community.sonarsource.com/"
     },
     "privacypolicy": {
-      "uri": "https://www.sonarqube.org/privacy/"
+      "uri": "https://www.sonarsource.com/company/privacy/"
     }
   },
   "CustomerQnASupport": {

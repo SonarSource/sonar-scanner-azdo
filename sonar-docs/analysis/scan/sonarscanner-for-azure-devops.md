@@ -176,7 +176,7 @@ Once all this is done, you can trigger a build.
 
 ## Branch and Pull Request analysis
 <!-- sonarqube -->
-_Branch and Pull Request analysis are available as part of [Developer Edition](https://redirect.sonarsource.com/editions/developer.html) and [above](https://www.sonarsource.com/plans-and-pricing/)_
+_Branch and Pull Request analysis are available as part of [Developer Edition](https://www.sonarsource.com/plans-and-pricing/developer/) and [above](https://www.sonarsource.com/plans-and-pricing/)_
 <!-- /sonarqube -->
 
 ### Branches

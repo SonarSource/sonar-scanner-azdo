@@ -3,7 +3,7 @@
   "name": "SonarQubeAnalyze",
   "friendlyName": "Run Code Analysis",
   "description": "Run scanner and upload the results to the SonarQube server.",
-  "helpMarkDown": "This task is not needed for Maven and Gradle projects since the scanner should be run as part of the build.\n\n[More Information](http://redirect.sonarsource.com/doc/install-configure-scanner-tfs-ts.html)",
+  "helpMarkDown": "This task is not needed for Maven and Gradle projects since the scanner should be run as part of the build.\n\n[More Information](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/)",
   "category": "Build",
   "visibility": ["Build"],
   "author": "sonarsource",
