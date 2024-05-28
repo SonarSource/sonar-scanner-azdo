@@ -48,7 +48,7 @@ it("should run scanner", async () => {
   await analyze.analyzeTask(EndpointType.SonarQube);
 
   expect(Scanner.getAnalyzeScanner).toHaveBeenCalledWith(
-    path.join(__dirname, "..", ".."),
+    path.join(__dirname, ".."),
     ScannerMode.CLI,
   );
 

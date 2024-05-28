@@ -15,7 +15,7 @@ const REPO_NAME_VAR = "Build.Repository.Name";
 
 export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
-  const rootPath = path.join(__dirname, "..");
+  const rootPath = __dirname;
 
   if (
     endpoint.type === EndpointType.SonarQube &&
