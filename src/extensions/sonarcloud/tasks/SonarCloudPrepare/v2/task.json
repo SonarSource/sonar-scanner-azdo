@@ -57,7 +57,7 @@
       "type": "string",
       "label": "MSBuild Version",
       "defaultValue": "6.2.0.85879",
-      "required": false,
+      "required": true,
       "visibleRule": "scannerMode = MSBuild",
       "helpMarkDown": "Specify the version of MSBuild to use. Versions can be located [here](https://github.com/SonarSource/sonar-scanner-msbuild/tags)."
     },
@@ -66,7 +66,7 @@
       "type": "string",
       "label": "CLI Version",
       "defaultValue": "5.0.1.3006",
-      "required": false,
+      "required": true,
       "visibleRule": "scannerMode = CLI",
       "helpMarkDown": "Specify the version of CLI to use.  Versions can be located [here](https://github.com/SonarSource/sonar-scanner-cli/tags)."
     },

@@ -76,16 +76,14 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   await scanner.runPrepare();
 };
 
-async function downloadScanner(cliVersion?: string, msBuildVersion?: string) {
+async function downloadScanner(cliVersion: string, msBuildVersion: string) {
   const scannerMode = tl.getVariable(TaskVariables.SonarScannerMode);
-  const msBuildFileUrl = isWindows() ? scannerConfig.classicUrl : scannerConfig.dotnetUrl;
 
-  let fileUrl = scannerMode === ScannerMode.CLI ? scannerConfig.cliUrl : msBuildFileUrl;
-
+  let fileUrl;
   // Override the default URL if a version differs from the default
-  if (cliVersion !== scannerConfig.cliVersion) {
+  if (scannerMode === ScannerMode.CLI) {
     fileUrl = scannerConfig.cliUrlTemplate(cliVersion);
-  } else if (msBuildVersion !== scannerConfig.msBuildVersion) {
+  } else if (scannerMode === ScannerMode.MSBuild) {
     fileUrl = scannerConfig.msBuildUrlTemplate(msBuildVersion, isWindows());
   }
 

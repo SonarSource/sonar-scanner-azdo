@@ -1,5 +1,6 @@
-const msBuildVersion = "6.2.0.85879";
-const cliVersion = "5.0.1.3006"; // Has to be the same version as the one embedded in the Scanner for MSBuild
+// Default Scanner versions are defined as `msBuildVersion` and `cliVersion` in
+// [sonarcloud](../../extensions/sonarcloud/tasks/SonarCloudPrepare/v2/task.json)
+// [sonarqube](../../extensions/sonarqube/tasks/SonarQubePrepare/v6/task.json)
 
 // MSBUILD scanner location
 const scannersLocation = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/`;
@@ -19,21 +20,12 @@ function getCliScannerFilename(cliVersion: string) {
 }
 
 export const scanner = {
-  msBuildVersion,
-  cliVersion,
-
-  cliUrl: `${cliUrl}${getCliScannerFilename(cliVersion)}`,
-
-  msBuildUrlTemplate: (msBuildVersion, isWindows) => {
+  msBuildUrlTemplate: (msBuildVersion: string, isWindows: boolean) => {
     const filename = isWindows
       ? getMsBuildClassicFilename(msBuildVersion)
       : getMsBuildDotnetFilename(msBuildVersion);
     return `${scannersLocation}${msBuildVersion}/${filename}`;
   },
 
-  cliUrlTemplate: (cliVersion) => `${cliUrl}${getCliScannerFilename(cliVersion)}`,
-
-  classicUrl: `${scannersLocation}${msBuildVersion}/${getMsBuildClassicFilename(msBuildVersion)}`,
-
-  dotnetUrl: `${scannersLocation}${msBuildVersion}/${getMsBuildDotnetFilename(msBuildVersion)}`,
+  cliUrlTemplate: (cliVersion: string) => `${cliUrl}${getCliScannerFilename(cliVersion)}`,
 };

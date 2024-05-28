@@ -9,7 +9,6 @@ import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import TaskReport from "../sonarqube/TaskReport";
 import Scanner, { ScannerCLI, ScannerMode, ScannerMSBuild } from "../sonarqube/Scanner";
 import { JdkVersionSource, TaskVariables } from "../helpers/constants";
-import { scanner as scannerConfig } from "../config";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -79,8 +78,8 @@ describe("downloading the scanner", () => {
     //JAVA_HOME
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
-    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.msBuildVersion); // MSBuildVersion Default
-    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.cliVersion); // CliVersion Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "6.0.0.1"); // MSBuildVersion Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "5.0.0.1"); // CliVersion Default
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => ScannerMode.CLI); // CLI Mode
     const scannerCLI = new ScannerCLI(__dirname, { projectSettings: "scanner.properties" });
 
@@ -90,7 +89,7 @@ describe("downloading the scanner", () => {
 
     expect(Scanner.getPrepareScanner).toHaveBeenCalled();
     expect(toolLib.downloadTool).toHaveBeenCalledWith(
-      `https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${scannerConfig.cliVersion}.zip`,
+      "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.0.1.zip",
     );
     expect(toolLib.extractZip).toHaveBeenCalledWith("path/to/zip-scanner");
     expect(tl.setVariable).toHaveBeenCalledWith(
@@ -100,8 +99,8 @@ describe("downloading the scanner", () => {
 
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
-    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.msBuildVersion); // MSBuildVersion Default
-    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.cliVersion); // CliVersion Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "6.0.0.1"); // MSBuildVersion Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "5.0.0.1"); // CliVersion Default
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => ScannerMode.MSBuild); // MSBuild Mode
     jest.spyOn(ScannerMSBuild.prototype, "runPrepare").mockImplementation(() => Promise.resolve());
 
@@ -112,7 +111,7 @@ describe("downloading the scanner", () => {
 
     expect(Scanner.getPrepareScanner).toHaveBeenCalled();
     expect(toolLib.downloadTool).toHaveBeenCalledWith(
-      `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/${scannerConfig.msBuildVersion}/sonar-scanner-${scannerConfig.msBuildVersion}-net.zip`,
+      `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/6.0.0.1/sonar-scanner-6.0.0.1-net.zip`,
     );
     expect(toolLib.extractZip).toHaveBeenCalledWith("path/to/zip-scanner");
     expect(tl.setVariable).toHaveBeenCalledWith(
@@ -126,7 +125,8 @@ describe("downloading the scanner", () => {
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "6.0.0.1"); // MSBuildVersion
-    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.cliVersion); // CliVersion Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "5.0.0.1"); // CliVersion Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => ScannerMode.MSBuild); // MSBuild Mode
     jest.spyOn(tl, "getPlatform").mockReturnValue(tl.Platform.Linux);
     const scanner = new ScannerMSBuild(__dirname, {});
 
@@ -151,7 +151,8 @@ describe("downloading the scanner", () => {
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "6.0.0.1"); // MSBuildVersion
-    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.cliVersion); // CliVersion Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "5.0.0.1"); // CliVersion Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => ScannerMode.MSBuild); // MSBuild Mode
     //windows
     jest.spyOn(tl, "getPlatform").mockReturnValue(tl.Platform.Windows);
     const scannerWindows = new ScannerMSBuild(__dirname, {});
@@ -176,8 +177,9 @@ describe("downloading the scanner", () => {
     //JAVA_HOME
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
-    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.msBuildVersion); // MSBuild Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "6.0.0.1"); // MSBuild Default
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "5.0.0.1"); // CLI Version
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => ScannerMode.CLI); // CLI Mode
 
     const scanner = new ScannerCLI(__dirname, { projectSettings: "scanner.properties" });
 
@@ -201,10 +203,11 @@ describe("downloading the scanner", () => {
 
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
-    jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerConfig.msBuildVersion); // MSBuild Default
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => "6.0.0.1"); // MSBuild Default
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "5.0.0.1"); // CLI Version
+    jest.spyOn(tl, "getInput").mockImplementationOnce(() => ScannerMode.CLI); // CLI Mode
     jest.spyOn(toolLib, "downloadTool").mockRejectedValue(new Error(errorResponse));
-    jest.spyOn(tl, "setResult");
+    jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
     const scanner = new ScannerCLI(__dirname, { projectSettings: "scanner.properties" });
 
