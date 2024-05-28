@@ -417,6 +417,8 @@ gulp.task("ci:azure:hotfix-tasks-version", () => {
   );
 });
 
+// Dummy change to trigger QA
+
 gulp.task("ci:azure:get-extensions-version", (done) => {
   if (!process.env.BUILD_SOURCESDIRECTORY) {
     throw new Error("Missing BUILD_SOURCESDIRECTORY");
