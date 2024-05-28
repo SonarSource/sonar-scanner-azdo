@@ -18,10 +18,9 @@ import { Measure, Metric } from "./sonarqube/types";
 let globalQualityGateStatus = "";
 
 export const publishTask: TaskJob = async (_endpointType: EndpointType) => {
-  const missingVariables = [
-    TaskVariables.SonarQubeScannerParams,
-    TaskVariables.SonarQubeEndpoint,
-  ].filter((variable) => typeof tl.getVariable(variable) === "undefined");
+  const missingVariables = [TaskVariables.SonarScannerParams, TaskVariables.SonarEndpoint].filter(
+    (variable) => typeof tl.getVariable(variable) === "undefined",
+  );
   if (missingVariables.length > 0) {
     tl.setResult(
       tl.TaskResult.Failed,
@@ -31,7 +30,7 @@ export const publishTask: TaskJob = async (_endpointType: EndpointType) => {
   }
 
   const endpointData: { type: EndpointType; data: EndpointData } = JSON.parse(
-    tl.getVariable(TaskVariables.SonarQubeEndpoint),
+    tl.getVariable(TaskVariables.SonarEndpoint),
   );
   const endpoint = new Endpoint(endpointData.type, endpointData.data);
   const metrics = await fetchMetrics(endpoint);
@@ -71,7 +70,7 @@ async function fetchRelevantMeasures(
   metrics: Metric[],
 ): Promise<Measure[]> {
   // Are we in a PR, non-main branch or main branch?
-  const scannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarQubeScannerParams));
+  const scannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarScannerParams));
   const branch = scannerParams["sonar.branch.name"] ?? null;
   const pullRequest = scannerParams["sonar.pullrequest.key"] ?? null;
 

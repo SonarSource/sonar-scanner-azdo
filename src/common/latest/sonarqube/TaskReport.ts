@@ -75,8 +75,8 @@ export default class TaskReport {
       );
       taskReportGlob = path.join("**", REPORT_TASK_NAME);
       taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.BuildDirectory"), taskReportGlob);
-    } else if (tl.getVariable(TaskVariables.SonarQubeScannerReportTaskFile)) {
-      taskReportGlob = tl.getVariable(TaskVariables.SonarQubeScannerReportTaskFile);
+    } else if (tl.getVariable(TaskVariables.SonarScannerReportTaskFile)) {
+      taskReportGlob = tl.getVariable(TaskVariables.SonarScannerReportTaskFile);
       taskReportGlobResult = tl.find(taskReportGlob);
     } else {
       taskReportGlob = TaskReport.getDefaultPathGlob();
