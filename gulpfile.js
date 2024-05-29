@@ -189,6 +189,23 @@ gulp.task("build:copy", () => {
     );
     streams.push(createShellJsDummyFile);
 
+    /**
+     * We have to bundle the translation file from for azure-pipelines-tool-lib, otherwise the task will fail
+     * We do not put an empty file otherwise warnings are displayed in the job logs
+     * @see https://github.com/microsoft/azure-pipelines-tool-lib/issues/240
+     */
+    const copyLibJson = gulp
+      .src(path.join(SOURCE_DIR, "common", commonPath, "azure-pipelines-tool-lib.json"), { allowEmpty: true })
+      .pipe(gulpRename("lib.json"))
+      .pipe(gulp.dest(outPath));
+    streams.push(copyLibJson);
+
+    // Copy common package.json into root task directory
+    const copyPackageJson = gulp
+      .src(path.join(SOURCE_DIR, "common", commonPath, "package.json"))
+      .pipe(gulp.dest(outPath));
+    streams.push(copyPackageJson);
+
     // Copy task icon
     streams.push(
       gulp
