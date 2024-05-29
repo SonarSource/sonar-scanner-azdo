@@ -6,7 +6,8 @@ env:
   ARTIFACTORY_URL: VAULT[development/kv/data/repox data.url]
   ARTIFACTORY_DEPLOY_USERNAME: vault-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer
   ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
-  ARTIFACTORY_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
+  ARTIFACTORY_PRIVATE_USERNAME: vault-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader
+  ARTIFACTORY_PRIVATE_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
   # Possible values for ARTIFACTORY_DEPLOY_REPO: sonarsource-private-qa, sonarsource-public-qa
   ARTIFACTORY_DEPLOY_REPO: sonarsource-public-qa
   BURGR_URL: VAULT[development/kv/data/burgr data.url]
@@ -19,6 +20,7 @@ env:
   CIRRUS_VAULT_ROLE: cirrusci-${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}
   NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
   NPM_CONFIG_registry: https://repox.jfrog.io/artifactory/api/npm/npm
+  SONAR_SCANNER_NPM_VERSION: 4.0.0-2145
 
 #
 # RE-USABLE CONFIGS
@@ -55,6 +57,9 @@ build_task:
     folder: node_modules
   install_script:
     - bash scripts/install.sh
+    # Override sonarqube-scanner with dogfood version
+    # TODO: Drop this once we release NPM Scanner v4
+    - npm install --no-save "https://$ARTIFACTORY_PRIVATE_USERNAME:$ARTIFACTORY_PRIVATE_PASSWORD@repox.jfrog.io/artifactory/sonarsource-npm-public-dev/sonarqube-scanner/-/sonarqube-scanner-$SONAR_SCANNER_NPM_VERSION.tgz"
   script:
     - git fetch
     - source cirrus-env BUILD
