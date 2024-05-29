@@ -12,7 +12,7 @@
     "Minor": 0,
     "Patch": 0
   },
-  "minimumAgentVersion": "2.144.0",
+  "minimumAgentVersion": "3.218.0",
   "inputs": [
     {
       "name": "pollingTimeoutSec",
@@ -25,7 +25,7 @@
   ],
   "dataSourceBindings": [],
   "execution": {
-    "Node10": {
+    "Node16": {
       "target": "SonarCloudPublish.js"
     }
   }
