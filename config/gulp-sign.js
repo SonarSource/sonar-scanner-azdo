@@ -2,7 +2,6 @@ const openpgp = require("openpgp");
 const through = require("through2");
 const Vinyl = require("vinyl");
 const Stream = require("stream");
-const path = require("path");
 
 exports.getSignature = (opts = {}) => {
   function transform(file, encoding, callback) {

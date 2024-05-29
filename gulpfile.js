@@ -3,7 +3,6 @@ const gulp = require("gulp");
 const gulpFile = require("gulp-file");
 const fs = require("fs-extra");
 const yargs = require("yargs");
-const gulpReplace = require("gulp-replace");
 const gulpJsonEditor = require("gulp-json-editor");
 const gulpRename = require("gulp-rename");
 const gulpArtifactoryUpload = require("gulp-artifactory-upload");
@@ -38,7 +37,6 @@ const {
   getVersionWithCirrusBuildNumber,
   run,
 } = require("./config/utils");
-const { string } = require("yargs");
 const {
   getTaskExtension,
   getTaskCommonFolder,
@@ -350,22 +348,14 @@ gulp.task("default", gulp.series("clean", "build", "extension"));
 /** SONAR *****************************************************************************************/
 
 gulp.task("sonarqube:scan", async () => {
-  const extensionVssPaths = globby.sync([
-    path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json"),
-  ]);
-
-  const promises = [];
-
-  for (const extensionVssPath of extensionVssPaths) {
-    const { version } = fs.readJsonSync(extensionVssPath);
-
-    await new Promise((resolve) => {
+  function run(impl) {
+    return new Promise((resolve) => {
       if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
-        runSonnarQubeScanner(resolve, {
+        impl(resolve, {
           "sonar.analysis.sha1": process.env.CIRRUS_CHANGE_IN_REPO,
         });
       } else if (process.env.CIRRUS_PR) {
-        runSonnarQubeScanner(resolve, {
+        impl(resolve, {
           "sonar.analysis.prNumber": process.env.CIRRUS_PR,
           "sonar.pullrequest.key": process.env.CIRRUS_PR,
           "sonar.pullrequest.branch": process.env.CIRRUS_BRANCH,
@@ -377,6 +367,9 @@ gulp.task("sonarqube:scan", async () => {
       }
     });
   }
+  
+  await run(runSonnarQubeScanner);
+  await run(runSonnarQubeScannerForSonarCloud);
 });
 
 /** CI ********************************************************************************************/
@@ -486,7 +479,7 @@ gulp.task("upload:sign", () => {
 gulp.task("upload:cyclonedx", () => {
   const commonPaths = globby.sync([path.join(SOURCE_DIR, "common", "*", "package.json")]);
 
-  return cycloneDxPipe(packageJSON, ...commonPaths.map((commonPath) => path.dirname(commonPath)));
+  return cycloneDxPipe(...commonPaths.map((commonPath) => path.dirname(commonPath)));
 });
 
 gulp.task("upload:vsix:sonarqube", () => {
@@ -629,7 +622,7 @@ gulp.task("upload:buildinfo", () => {
 
 gulp.task(
   "upload",
-  gulp.series("upload:sign", "upload:buildinfo", "upload:vsix:sonarqube", "upload:vsix:sonarcloud"),
+  gulp.series("upload:sign", "upload:buildinfo", "upload:cyclonedx", "upload:vsix:sonarqube", "upload:vsix:sonarcloud"),
 );
 
 gulp.task("promote", (done) => {

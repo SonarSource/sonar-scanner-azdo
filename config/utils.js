@@ -61,12 +61,6 @@ exports.npmInstall = npmInstall;
 exports.npmInstallTask = function (packagePath) {
   const packageJson = fs.readJsonSync(packagePath);
   if (packageJson) {
-    if (packageJson.devDependencies && Object.keys(packageJson.devDependencies).length > 0) {
-      fail(
-        "Task package.json should not contain dev dependencies. Offending package.json: " +
-          packagePath,
-      );
-    }
     npmInstall(packagePath);
   }
 };
@@ -220,7 +214,6 @@ function runSonarQubeScannerImpl(callback, customOptions, options = {}) {
       .sync([path.join("src", "common", "*", "coverage", "lcov.info")])
       .join(","),
   };
-  console.log(">>> SQ SCAN >>>", commonOptions);
   sonarqubeScanner(
     {
       serverUrl: process.env.SONAR_HOST_URL || process.env.SONAR_HOST_URL_EXTERNAL_PR,
@@ -235,7 +228,7 @@ function runSonarQubeScannerImpl(callback, customOptions, options = {}) {
   );
 }
 
-function cycloneDxPipe(packageJSON, ...commonPaths) {
+function cycloneDxPipe(...commonPaths) {
   return mergeStream(
     commonPaths.map((commonPath) =>
       gulp.src(path.join(commonPath, "package.json"), {
