@@ -193,7 +193,9 @@ gulp.task("build:copy", () => {
      * @see https://github.com/microsoft/azure-pipelines-tool-lib/issues/240
      */
     const copyLibJson = gulp
-      .src(path.join(SOURCE_DIR, "common", commonPath, "azure-pipelines-tool-lib.json"), { allowEmpty: true })
+      .src(path.join(SOURCE_DIR, "common", commonPath, "azure-pipelines-tool-lib.json"), {
+        allowEmpty: true,
+      })
       .pipe(gulpRename("lib.json"))
       .pipe(gulp.dest(outPath));
     streams.push(copyLibJson);
@@ -367,7 +369,7 @@ gulp.task("sonarqube:scan", async () => {
       }
     });
   }
-  
+
   await run(runSonnarQubeScanner);
   await run(runSonnarQubeScannerForSonarCloud);
 });
@@ -495,7 +497,12 @@ gulp.task("upload:vsix:sonarqube", () => {
 
   return mergeStream(
     globby
-      .sync(path.join(DIST_DIR, "*{-sonarqube.vsix,-sonarqube-cyclonedx.json,-sonarqube*.asc}"))
+      .sync(
+        path.join(
+          DIST_DIR,
+          "*{-sonarqube.vsix,cyclonedx-sonarqube-*.json,cyclonedx-latest.json,-sonarqube*.asc}",
+        ),
+      )
       .map((filePath) => {
         const [sha1, md5] = fileHashsum(filePath);
         const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarqube");
@@ -549,7 +556,12 @@ gulp.task("upload:vsix:sonarcloud", () => {
 
   return mergeStream(
     globby
-      .sync(path.join(DIST_DIR, "*{-sonarcloud.vsix,-sonarcloud-cyclonedx.json,-sonarcloud*.asc}"))
+      .sync(
+        path.join(
+          DIST_DIR,
+          "*{-sonarcloud.vsix,cyclonedx-sonarcloud-*.json,cyclonedx-latest.json,-sonarcloud*.asc}",
+        ),
+      )
       .map((filePath) => {
         const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarcloud");
         const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
@@ -622,7 +634,13 @@ gulp.task("upload:buildinfo", () => {
 
 gulp.task(
   "upload",
-  gulp.series("upload:sign", "upload:buildinfo", "upload:cyclonedx", "upload:vsix:sonarqube", "upload:vsix:sonarcloud"),
+  gulp.series(
+    "upload:sign",
+    "upload:cyclonedx",
+    "upload:buildinfo",
+    "upload:vsix:sonarqube",
+    "upload:vsix:sonarcloud",
+  ),
 );
 
 gulp.task("promote", (done) => {

@@ -104,14 +104,14 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
   const sqPackageVersion = getVersionWithCirrusBuildNumber(sqExtensionManifest.version);
   const sqVsixPaths = globby.sync(path.join(DIST_DIR, `*-sonarqube.vsix`));
   const sqAdditionalPaths = globby.sync(
-    path.join(DIST_DIR, `*{-sonarqube-cyclonedx.json,-sonarqube*.asc}`),
+    path.join(DIST_DIR, `*{cyclonedx-sonarqube-*.json,cyclonedx-latest.json,-sonarqube*.asc}`),
   );
   const sqQualifierMatch = new RegExp(`${sqPackageVersion}-(.+)\.vsix$`);
 
   const scPackageVersion = getVersionWithCirrusBuildNumber(scExtensionManifest.version);
   const scVsixPaths = globby.sync(path.join(DIST_DIR, `*-sonarcloud.vsix`));
   const scAdditionalPaths = globby.sync(
-    path.join(DIST_DIR, `*{-sonarcloud-cyclonedx.json,-sonarcloud*.asc}`),
+    path.join(DIST_DIR, `*{cyclonedx-sonarcloud-*.json,cyclonedx-latest.json,-sonarcloud*.asc}`),
   );
   const scQualifierMatch = new RegExp(`${scPackageVersion}-(.+)\.vsix$`);
   return {
