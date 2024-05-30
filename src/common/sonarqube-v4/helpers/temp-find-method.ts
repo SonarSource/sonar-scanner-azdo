@@ -5,7 +5,7 @@
 /* eslint-disable complexity */
 /* eslint-disable no-underscore-dangle */
 /*Can be deleted once https://www.npmjs.com/package/azure-pipelines-task-lib v3.1.0 will be release */
-import im from "azure-pipelines-task-lib/internal";
+import * as im from "azure-pipelines-task-lib/internal";
 import * as tl from "azure-pipelines-task-lib/task";
 import fs from "fs";
 import minimatch from "minimatch";

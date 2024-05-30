@@ -13,7 +13,7 @@
     "Patch": 1
   },
   "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
-  "minimumAgentVersion": "1.95.1",
+  "minimumAgentVersion": "2.144.0",
   "instanceNameFormat": "Prepare analysis on SonarQube",
   "groups": [
     {
@@ -139,7 +139,7 @@
     }
   ],
   "execution": {
-    "Node": {
+    "Node10": {
       "target": "SonarQubePrepare.js"
     }
   }
