@@ -2,7 +2,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import { writeFileSync } from "fs";
 import * as path from "path";
 import * as semver from "semver";
-import { fileSync } from "tmp"; // eslint-disable-line import/no-extraneous-dependencies
+import { fileSync } from "tmp";
 import * as tempFindMethods from "../../helpers/temp-find-method";
 import Endpoint, { EndpointType } from "../Endpoint";
 import TaskReport from "../TaskReport";

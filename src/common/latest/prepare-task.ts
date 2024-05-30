@@ -3,6 +3,7 @@ import * as toolLib from "azure-pipelines-tool-lib/tool";
 import * as semver from "semver";
 import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
 
+import { scanner as scannerConfig } from "./config";
 import {
   AzureBuildVariables,
   AzureProvider,
@@ -15,7 +16,6 @@ import { TaskJob } from "./run";
 import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import TaskReport from "./sonarqube/TaskReport";
-import { scanner as scannerConfig } from "./config";
 
 export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
