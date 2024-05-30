@@ -183,7 +183,7 @@ exports.runSonnarQubeScanner = function (callback, options = {}) {
     "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts",
     "sonar.projectName": "Azure DevOps extension for SonarQube",
     "sonar.exclusions":
-      "build/**, extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**," +
+      "build/**, src/extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**," +
       "**/temp-find-method.ts, **/package-lock.json, gulpfile.js, **/jest.config.js, **/esbuild.config.js",
   };
   runSonarQubeScannerImpl(callback, customOptions, options);
@@ -194,7 +194,7 @@ exports.runSonnarQubeScannerForSonarCloud = function (callback, options = {}) {
     "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts-sonarcloud",
     "sonar.projectName": "Azure DevOps extension for SonarCloud",
     "sonar.exclusions":
-      "build/**, extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, " +
+      "build/**, src/extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, " +
       "**/temp-find-method.ts, **/package-lock.json, gulpfile.js, **/jest.config.js, **/esbuild.config.js",
   };
   runSonarQubeScannerImpl(callback, customOptions, options);
