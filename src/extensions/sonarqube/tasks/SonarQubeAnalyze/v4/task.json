@@ -13,11 +13,11 @@
     "Patch": 1
   },
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
-  "minimumAgentVersion": "2.119.1",
+  "minimumAgentVersion": "2.144.0",
   "demands": ["java"],
   "inputs": [],
   "execution": {
-    "Node": {
+    "Node10": {
       "target": "SonarQubeAnalyze.js"
     }
   }

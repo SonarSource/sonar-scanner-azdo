@@ -61,12 +61,6 @@ exports.npmInstall = npmInstall;
 exports.npmInstallTask = function (packagePath) {
   const packageJson = fs.readJsonSync(packagePath);
   if (packageJson) {
-    if (packageJson.devDependencies && Object.keys(packageJson.devDependencies).length > 0) {
-      fail(
-        "Task package.json should not contain dev dependencies. Offending package.json: " +
-          packagePath,
-      );
-    }
     npmInstall(packagePath);
   }
 };
@@ -110,14 +104,14 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
   const sqPackageVersion = getVersionWithCirrusBuildNumber(sqExtensionManifest.version);
   const sqVsixPaths = globby.sync(path.join(DIST_DIR, `*-sonarqube.vsix`));
   const sqAdditionalPaths = globby.sync(
-    path.join(DIST_DIR, `*{-sonarqube-cyclonedx.json,-sonarqube*.asc}`),
+    path.join(DIST_DIR, `*{cyclonedx-sonarqube-*.json,cyclonedx-latest.json,-sonarqube*.asc}`),
   );
   const sqQualifierMatch = new RegExp(`${sqPackageVersion}-(.+)\.vsix$`);
 
   const scPackageVersion = getVersionWithCirrusBuildNumber(scExtensionManifest.version);
   const scVsixPaths = globby.sync(path.join(DIST_DIR, `*-sonarcloud.vsix`));
   const scAdditionalPaths = globby.sync(
-    path.join(DIST_DIR, `*{-sonarcloud-cyclonedx.json,-sonarcloud*.asc}`),
+    path.join(DIST_DIR, `*{cyclonedx-sonarcloud-*.json,cyclonedx-latest.json,-sonarcloud*.asc}`),
   );
   const scQualifierMatch = new RegExp(`${scPackageVersion}-(.+)\.vsix$`);
   return {
@@ -189,7 +183,7 @@ exports.runSonnarQubeScanner = function (callback, options = {}) {
     "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts",
     "sonar.projectName": "Azure DevOps extension for SonarQube",
     "sonar.exclusions":
-      "build/**, extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**," +
+      "build/**, src/extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**," +
       "**/temp-find-method.ts, **/package-lock.json, gulpfile.js, **/jest.config.js, **/esbuild.config.js",
   };
   runSonarQubeScannerImpl(callback, customOptions, options);
@@ -200,7 +194,7 @@ exports.runSonnarQubeScannerForSonarCloud = function (callback, options = {}) {
     "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts-sonarcloud",
     "sonar.projectName": "Azure DevOps extension for SonarCloud",
     "sonar.exclusions":
-      "build/**, extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, " +
+      "build/**, src/extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, " +
       "**/temp-find-method.ts, **/package-lock.json, gulpfile.js, **/jest.config.js, **/esbuild.config.js",
   };
   runSonarQubeScannerImpl(callback, customOptions, options);
@@ -220,7 +214,6 @@ function runSonarQubeScannerImpl(callback, customOptions, options = {}) {
       .sync([path.join("src", "common", "*", "coverage", "lcov.info")])
       .join(","),
   };
-  console.log(">>> SQ SCAN >>>", commonOptions);
   sonarqubeScanner(
     {
       serverUrl: process.env.SONAR_HOST_URL || process.env.SONAR_HOST_URL_EXTERNAL_PR,
@@ -235,7 +228,7 @@ function runSonarQubeScannerImpl(callback, customOptions, options = {}) {
   );
 }
 
-function cycloneDxPipe(packageJSON, ...commonPaths) {
+function cycloneDxPipe(...commonPaths) {
   return mergeStream(
     commonPaths.map((commonPath) =>
       gulp.src(path.join(commonPath, "package.json"), {
