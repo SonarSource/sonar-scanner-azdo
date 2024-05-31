@@ -21,9 +21,9 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
   const rootPath = __dirname;
 
-  const msBuildVersion: string = tl.getInput("msBuildVersion");
-  const cliVersion: string = tl.getInput("cliVersion");
-  const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
+  const msBuildVersion = tl.getInput("msBuildVersion") ?? scannerConfig.msBuildVersion;
+  const cliVersion = tl.getInput("cliVersion") ?? scannerConfig.cliVersion;
+  const scannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
 
