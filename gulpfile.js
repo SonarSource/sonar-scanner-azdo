@@ -320,7 +320,7 @@ gulp.task(
 /** EXTENSION *************************************************************************************/
 
 gulp.task("extension:build", (done) => {
-  const publisher = isProd ? null : yargs.argv.publisher ?? "sonarsource";
+  const publisher = isProd ? "sonarsource" : yargs.argv.publisher ?? "foo";
 
   const vssExtensions = globby.sync([
     path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json"),
