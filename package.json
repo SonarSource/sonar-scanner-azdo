@@ -4,7 +4,7 @@
   "repository": "SonarSource/sonar-scanner-vsts",
   "license": "LGPL-3.0",
   "scripts": {
-    "build": "MODE=production gulp",
+    "build": "BUILD_MODE=production gulp",
     "test-build": "gulp",
     "clean": "gulp clean",
     "upload": "gulp upload",

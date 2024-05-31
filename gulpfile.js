@@ -47,7 +47,7 @@ const { getSignature } = require("./config/gulp-sign");
 
 const packageJSON = fs.readJsonSync("package.json");
 
-const isProd = process.env.NODE_ENV === "production";
+const isProd = process.env.BUILD_MODE === "production";
 
 /**
  * Delete all files in the build directory
