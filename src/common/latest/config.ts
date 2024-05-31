@@ -1,6 +1,6 @@
-// Default Scanner versions are defined as `msBuildVersion` and `cliVersion` in
-// [sonarcloud](../../extensions/sonarcloud/tasks/SonarCloudPrepare/v2/task.json)
-// [sonarqube](../../extensions/sonarqube/tasks/SonarQubePrepare/v6/task.json)
+// When the user does not specify a specific version, these willl be the default versions used.
+const msBuildVersion = "6.2.0.85879";
+const cliVersion = "5.0.1.3006";
 
 // MSBUILD scanner location
 const scannersLocation = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/`;
@@ -20,6 +20,9 @@ function getCliScannerFilename(cliVersion: string) {
 }
 
 export const scanner = {
+  msBuildVersion,
+  cliVersion,
+
   msBuildUrlTemplate: (msBuildVersion: string, isWindows: boolean) => {
     const filename = isWindows
       ? getMsBuildClassicFilename(msBuildVersion)

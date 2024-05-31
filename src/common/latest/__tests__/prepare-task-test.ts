@@ -3,12 +3,13 @@ import * as toolLib from "azure-pipelines-tool-lib/tool";
 import { Guid } from "guid-typescript";
 import * as path from "path";
 import { SemVer } from "semver";
+import { scanner } from "../config";
+import { JdkVersionSource, TaskVariables } from "../helpers/constants";
 import * as request from "../helpers/request";
 import * as prept from "../prepare-task";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
+import Scanner, { ScannerCLI, ScannerMSBuild, ScannerMode } from "../sonarqube/Scanner";
 import TaskReport from "../sonarqube/TaskReport";
-import Scanner, { ScannerCLI, ScannerMode, ScannerMSBuild } from "../sonarqube/Scanner";
-import { JdkVersionSource, TaskVariables } from "../helpers/constants";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -74,7 +75,63 @@ describe("downloading the scanner", () => {
     jest.spyOn(tl, "setVariable");
   });
 
-  it("should download the default version of the scanner", async () => {
+  it.each([
+    [
+      ScannerMode.CLI,
+      "6.0.0.1",
+      "5.0.0.1",
+      "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.0.1.zip",
+    ],
+    [
+      ScannerMode.CLI,
+      "6.0.0.1",
+      undefined,
+      `https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${scanner.cliVersion}.zip`,
+    ],
+    [
+      ScannerMode.MSBuild,
+      "6.0.0.1",
+      "5.0.0.1",
+      `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/6.0.0.1/sonar-scanner-6.0.0.1-net.zip`,
+    ],
+    [
+      ScannerMode.MSBuild,
+      undefined,
+      "5.0.0.1",
+      `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/6.2.0.85879/sonar-scanner-${scanner.msBuildVersion}-net.zip`,
+    ],
+  ])(
+    "should download the correct version of the %s scanner",
+    async (scannerMode, msBuildVersion, cliVersion, url) => {
+      //JAVA_HOME
+      jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
+      jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
+      jest.spyOn(tl, "getInput").mockImplementationOnce(() => msBuildVersion);
+      jest.spyOn(tl, "getInput").mockImplementationOnce(() => cliVersion);
+      jest.spyOn(tl, "getInput").mockImplementationOnce(() => scannerMode);
+
+      const mockedScanner =
+        scannerMode === ScannerMode.CLI
+          ? new ScannerCLI(__dirname, { projectSettings: "scanner.properties" })
+          : new ScannerMSBuild(__dirname, {});
+      jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => mockedScanner);
+      jest
+        .spyOn(ScannerMSBuild.prototype, "runPrepare")
+        .mockImplementation(() => Promise.resolve());
+
+      await prept.prepareTask(EndpointType.SonarQube);
+
+      expect(Scanner.getPrepareScanner).toHaveBeenCalled();
+      expect(toolLib.downloadTool).toHaveBeenCalledWith(url);
+      expect(toolLib.extractZip).toHaveBeenCalledWith("path/to/zip-scanner");
+      expect(tl.setVariable).toHaveBeenCalledWith(
+        TaskVariables.SonarScannerLocation,
+        "path/to/unzip-scanner",
+      );
+    },
+  );
+
+  it("should download the specified version of the scanner", async () => {
     //JAVA_HOME
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => JdkVersionSource.JavaHome);
     jest.spyOn(tl, "getInput").mockImplementationOnce(() => "mock-organization");
