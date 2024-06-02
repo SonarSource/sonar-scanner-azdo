@@ -29,13 +29,11 @@ const {
   fileHashsum,
   getBuildInfo,
   npmInstallTask,
-  runSonnarQubeScanner,
-  runSonnarQubeScannerForSonarCloud,
-  tfxCommand,
   cycloneDxPipe,
   downloadOrCopy,
   getVersionWithCirrusBuildNumber,
   run,
+  runSonarQubeScanner,
 } = require("./config/utils");
 const {
   getTaskExtension,
@@ -350,28 +348,36 @@ gulp.task("default", gulp.series("clean", "build", "extension"));
 /** SONAR *****************************************************************************************/
 
 gulp.task("sonarqube:scan", async () => {
-  function run(impl) {
+  function run(extension) {
     return new Promise((resolve) => {
       if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
-        impl(resolve, {
-          "sonar.analysis.sha1": process.env.CIRRUS_CHANGE_IN_REPO,
-        });
+        runSonarQubeScanner(
+          extension,
+          {
+            "sonar.analysis.sha1": process.env.CIRRUS_CHANGE_IN_REPO,
+          },
+          resolve,
+        );
       } else if (process.env.CIRRUS_PR) {
-        impl(resolve, {
-          "sonar.analysis.prNumber": process.env.CIRRUS_PR,
-          "sonar.pullrequest.key": process.env.CIRRUS_PR,
-          "sonar.pullrequest.branch": process.env.CIRRUS_BRANCH,
-          "sonar.pullrequest.base": process.env.CIRRUS_BASE,
-          "sonar.analysis.sha1": process.env.CIRRUS_BASE_SHA,
-        });
+        runSonarQubeScanner(
+          extension,
+          {
+            "sonar.analysis.prNumber": process.env.CIRRUS_PR,
+            "sonar.pullrequest.key": process.env.CIRRUS_PR,
+            "sonar.pullrequest.branch": process.env.CIRRUS_BRANCH,
+            "sonar.pullrequest.base": process.env.CIRRUS_BASE,
+            "sonar.analysis.sha1": process.env.CIRRUS_BASE_SHA,
+          },
+          resolve,
+        );
       } else {
         resolve();
       }
     });
   }
 
-  await run(runSonnarQubeScanner);
-  await run(runSonnarQubeScannerForSonarCloud);
+  await run("sonarqube");
+  await run("sonarcloud");
 });
 
 /** CI ********************************************************************************************/

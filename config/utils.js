@@ -178,30 +178,43 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
   };
 };
 
-exports.runSonnarQubeScanner = function (callback, options = {}) {
-  const customOptions = {
-    "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts",
-    "sonar.projectName": "Azure DevOps extension for SonarQube",
-    "sonar.exclusions":
-      "build/**, src/extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**," +
-      "**/temp-find-method.ts, **/package-lock.json, gulpfile.js, **/jest.config.js, **/esbuild.config.js",
-  };
-  runSonarQubeScannerImpl(callback, customOptions, options);
-};
+exports.runSonarQubeScanner = function (extension, customOptions, callback) {
+  const baseExclusions = [
+    "build/**",
+    "coverage/**",
+    "**/node_modules/**",
+    "**/__tests__/**",
+    "**/temp-find-method.ts",
+    "**/package-lock.json",
+    "gulpfile.js",
+    "**/jest.config.js",
+    "**/esbuild.config.js",
+  ];
 
-exports.runSonnarQubeScannerForSonarCloud = function (callback, options = {}) {
-  const customOptions = {
-    "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts-sonarcloud",
-    "sonar.projectName": "Azure DevOps extension for SonarCloud",
-    "sonar.exclusions":
-      "build/**, src/extensions/sonarqube/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**, " +
-      "**/temp-find-method.ts, **/package-lock.json, gulpfile.js, **/jest.config.js, **/esbuild.config.js",
-  };
-  runSonarQubeScannerImpl(callback, customOptions, options);
-};
+  const baseOptions = {
+    sonarqube: {
+      "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts",
+      "sonar.projectName": "Azure DevOps extension for SonarQube",
+      "sonar.exclusions": baseExclusions.concat(["src/extensions/sonarcloud/**"]).join(","),
+    },
+    sonarcloud: {
+      "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts-sonarcloud",
+      "sonar.projectName": "Azure DevOps extension for SonarCloud",
+      "sonar.exclusions": baseExclusions.concat(["src/extensions/sonarqube/**"]).join(","),
+    },
+  }[extension];
 
-function runSonarQubeScannerImpl(callback, customOptions, options = {}) {
-  const commonOptions = {
+  if (!baseOptions) {
+    throw new Error(`Unknown extension: ${extension}`);
+  }
+
+  const vssExtension = fs.readJsonSync(
+    path.join(SOURCE_DIR, "extensions", extension, "vss-extension.json"),
+  );
+
+  const options = {
+    ...baseOptions,
+    "sonar.projectVersion": vssExtension.version,
     "sonar.coverage.exclusions":
       "gulpfile.js, build/**, config/**, coverage/**, extensions/**, scripts/**, **/__tests__/**, **/temp-find-method.ts",
     "sonar.tests": ".",
@@ -213,20 +226,18 @@ function runSonarQubeScannerImpl(callback, customOptions, options = {}) {
     "sonar.javascript.lcov.reportPaths": globby
       .sync([path.join("src", "common", "*", "coverage", "lcov.info")])
       .join(","),
+    ...customOptions,
   };
+
   sonarqubeScanner(
     {
       serverUrl: process.env.SONAR_HOST_URL || process.env.SONAR_HOST_URL_EXTERNAL_PR,
       token: process.env.SONAR_TOKEN || process.env.SONAR_TOKEN_EXTERNAL_PR,
-      options: {
-        ...customOptions,
-        ...commonOptions,
-        ...options,
-      },
+      options,
     },
     callback,
   );
-}
+};
 
 function cycloneDxPipe(...commonPaths) {
   return mergeStream(
