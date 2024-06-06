@@ -2,6 +2,7 @@ import * as tl from "azure-pipelines-task-lib";
 import { fetchComponentMeasures, fetchMetrics, fetchProjectStatus } from "./helpers/api";
 import { fillBuildProperty, publishBuildSummary } from "./helpers/azdo-server-utils";
 import {
+  DEPRECATION_MESSAGE,
   SQ_BRANCH_MEASURES,
   SQ_PULLREQUEST_MEASURES,
   TASK_MISSING_VARIABLE_ERROR_HINT,
@@ -18,6 +19,7 @@ import { Measure, Metric } from "./sonarqube/types";
 let globalQualityGateStatus = "";
 
 export const publishTask: TaskJob = async (_endpointType: EndpointType) => {
+  tl.warning(DEPRECATION_MESSAGE);
   const missingVariables = [
     TaskVariables.SonarQubeScannerParams,
     TaskVariables.SonarQubeEndpoint,

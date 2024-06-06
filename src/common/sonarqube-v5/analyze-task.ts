@@ -1,5 +1,6 @@
 import * as tl from "azure-pipelines-task-lib";
 import {
+  DEPRECATION_MESSAGE,
   JdkVersionSource,
   TASK_MISSING_VARIABLE_ERROR_HINT,
   TaskVariables,
@@ -13,6 +14,8 @@ import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 export const analyzeTask: TaskJob = async (endpointType: EndpointType) => {
   const rootPath = __dirname;
   const jdkVersionSource = tl.getInput("jdkversion", true) as JdkVersionSource;
+
+  tl.warning(DEPRECATION_MESSAGE);
 
   if (typeof tl.getVariable(TaskVariables.SonarQubeScannerMode) === "undefined") {
     tl.setResult(

@@ -10,8 +10,10 @@
   "version": {
     "Major": 1,
     "Minor": 16,
-    "Patch": 0
+    "Patch": 1
   },
+  "deprecated": true,
+  "deprecationMessage": "This task is deprecated. Please upgrade to the latest version. For more information, refer to https://docs.sonarsource.com/sonarcloud/advanced-setup/ci-based-analysis/sonarcloud-extension-for-azure-devops/",
   "minimumAgentVersion": "2.144.0",
   "inputs": [
     {

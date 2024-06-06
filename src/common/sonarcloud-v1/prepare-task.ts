@@ -5,6 +5,7 @@ import {
   AzureBuildVariables,
   AzureProvider,
   DEFAULT_BRANCH_REF,
+  DEPRECATION_MESSAGE,
   TaskVariables,
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
@@ -17,6 +18,8 @@ import TaskReport from "./sonarqube/TaskReport";
 export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
   const rootPath = __dirname;
+
+  tl.warning(DEPRECATION_MESSAGE);
 
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);

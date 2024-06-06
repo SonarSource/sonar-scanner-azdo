@@ -5,6 +5,7 @@ import {
   AzureBuildVariables,
   AzureProvider,
   DEFAULT_BRANCH_REF,
+  DEPRECATION_MESSAGE,
   TaskVariables,
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
@@ -19,6 +20,9 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const rootPath = __dirname;
 
   const scannerMode: ScannerMode = ScannerMode[tl.getInput("scannerMode")];
+
+  tl.warning(DEPRECATION_MESSAGE);
+
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
 
