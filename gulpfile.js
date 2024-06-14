@@ -329,7 +329,7 @@ gulp.task("extension:build", (done) => {
     const { version } = require(vssExtension);
     const extension = path.basename(path.dirname(vssExtension));
     const fullVersion = getVersionWithCirrusBuildNumber(version);
-    const vsixFileName = `sonar-scanner-vsts-${fullVersion}-${extension}.vsix`;
+    const vsixFileName = `sonar-scanner-azdo-${fullVersion}-${extension}.vsix`;
     const outPath = path.join(DIST_DIR, vsixFileName);
     const cwd = path.join(BUILD_EXTENSION_DIR, extension);
 
@@ -522,7 +522,7 @@ gulp.task("upload:vsix:sonarqube", () => {
                 process.env.ARTIFACTORY_URL +
                 "/" +
                 process.env.ARTIFACTORY_DEPLOY_REPO +
-                "/org/sonarsource/scanner/vsts/" +
+                "/org/sonarsource/scanner/azdo/" +
                 name +
                 "/" +
                 "sonarqube" +
@@ -581,7 +581,7 @@ gulp.task("upload:vsix:sonarcloud", () => {
                 process.env.ARTIFACTORY_URL +
                 "/" +
                 process.env.ARTIFACTORY_DEPLOY_REPO +
-                "/org/sonarsource/scanner/vsts/" +
+                "/org/sonarsource/scanner/azdo/" +
                 name +
                 "/" +
                 "sonarcloud" +

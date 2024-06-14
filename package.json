@@ -1,7 +1,7 @@
 {
-  "name": "sonar-scanner-vsts",
+  "name": "sonar-scanner-azdo",
   "version": "0.0.2-SNAPSHOT",
-  "repository": "SonarSource/sonar-scanner-vsts",
+  "repository": "SonarSource/sonar-scanner-azdo",
   "license": "LGPL-3.0",
   "scripts": {
     "build": "BUILD_MODE=production gulp",

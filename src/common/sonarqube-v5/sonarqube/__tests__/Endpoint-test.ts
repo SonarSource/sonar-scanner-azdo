@@ -6,7 +6,7 @@ beforeEach(() => {
   jest.restoreAllMocks();
 });
 
-// VSTS-134
+// SONARAZDO-134
 it("should not return null password", () => {
   jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
 
@@ -20,7 +20,7 @@ it("should not return null password", () => {
   expect(enpoint.auth).toEqual({ username: "token123", password: "" });
 });
 
-// VSTS-250
+// SONARAZDO-250
 it("On SonarCloud password is always null", () => {
   jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://sonarcloud.io");
@@ -35,7 +35,7 @@ it("On SonarCloud password is always null", () => {
   expect(result.auth.password).toEqual("");
 });
 
-// VSTS-250
+// SONARAZDO-250
 it("On SonarQube password is empty should not be intepreted", () => {
   jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://localhost:9000");
@@ -49,7 +49,7 @@ it("On SonarQube password is empty should not be intepreted", () => {
   expect(result.auth.password).toEqual("");
 });
 
-// VSTS-250
+// SONARAZDO-250
 it("On SonarQube password is not empty should be intepreted", () => {
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://localhost:9000");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
@@ -62,7 +62,7 @@ it("On SonarQube password is not empty should be intepreted", () => {
   expect(result.auth.password).toEqual("P@ssword");
 });
 
-// VSTS-302
+// SONARAZDO-302
 it("For SonarQube version >= 10.0.0 token field is used instead of login", () => {
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://localhost:9000");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
@@ -73,7 +73,7 @@ it("For SonarQube version >= 10.0.0 token field is used instead of login", () =>
   expect(result.toSonarProps("10.0.0")).not.toContain(PROP_NAMES.LOGIN);
 });
 
-// VSTS-302
+// SONARAZDO-302
 it("For SonarQube version < 10.0.0 login is used", () => {
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://localhost:9000");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
@@ -84,7 +84,7 @@ it("For SonarQube version < 10.0.0 login is used", () => {
   expect(result.toSonarProps("9.9.1")[PROP_NAMES.LOGIN]).toBe("tokenvalue");
 });
 
-// VSTS-302 + VSTS-310
+// SONARAZDO-302 + SONARAZDO-310
 it("On SonarCloud token field is used instead of login", () => {
   jest.spyOn(tl, "getEndpointUrl").mockImplementation(() => "https://sonarcloud.io");
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("tokenvalue");

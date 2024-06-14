@@ -2,10 +2,10 @@
 # Installs NodeJS, which is needed for building.
 #
 # Build from the basedir:
-#   docker build -f cirrus/Dockerfile -t sonar-scanner-vsts-build cirrus
+#   docker build -f cirrus/Dockerfile -t sonar-scanner-azdo-build cirrus
 #
 # Verify the content of the image by running a shell session in it:
-#   docker run -it sonar-scanner-vsts-build
+#   docker run -it sonar-scanner-azdo-build
 #
 # CirrusCI builds the image when needed. No need to manually upload it to
 # AWS Registry. See section "eks_container" of .cirrus.yml

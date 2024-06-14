@@ -10,7 +10,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  - group: sonar-scanner-vsts-variables
+  - group: sonar-scanner-azdo-variables
   - group: artifactory_access
   - name: System.debug
     value: true
@@ -147,7 +147,7 @@ stages:
               connectTo: "VsTeam"
               connectedServiceName: "AzDo Extension - Marketplace - IntegrationTests"
               fileType: "vsix"
-              vsixFile: "$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion)-sonarcloud.vsix"
+              vsixFile: "$(System.ArtifactsDirectory)/extensions/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
               extensionName: "[Test] SonarCloud ITs"
               updateTasksVersion: false
               updateTasksId: false

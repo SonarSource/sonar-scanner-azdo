@@ -27,7 +27,7 @@ export default class JavaVersionResolver {
     }
 
     /**
-     * Ignore Java 11 setting it the SQ server doesn't support it @see VSTS-355
+     * Ignore Java 11 setting it the SQ server doesn't support it @see SONARAZDO-355
      */
     const ignoreJava11 =
       serverVersion &&

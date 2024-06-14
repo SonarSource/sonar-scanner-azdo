@@ -1,4 +1,4 @@
-sonar-scanner-vsts
+sonar-scanner-azdo
 Copyright (C) 2017-2020 SonarSource SA
 mailto:info AT sonarsource DOT com
 

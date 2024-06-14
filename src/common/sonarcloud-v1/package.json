@@ -1,5 +1,5 @@
 {
-  "name": "sonar-scanner-vsts-common-sonarcloud-v1",
+  "name": "sonar-scanner-azdo-common-sonarcloud-v1",
   "private": true,
   "version": "0.0.1",
   "author": "SonarSource",

@@ -53,7 +53,7 @@
   },
   "repository": {
     "type": "git",
-    "uri": "https://github.com/SonarSource/sonar-scanner-vsts"
+    "uri": "https://github.com/SonarSource/sonar-scanner-azdo"
   },
   "baseUri": "https://sonarcloud.io/",
   "files": [
