@@ -9,7 +9,6 @@
     "clean": "gulp clean",
     "upload": "gulp upload",
     "promote": "gulp promote",
-    "burgr": "gulp burgr:sonarcloud && gulp burgr:sonarqube",
     "sonarqube": "gulp sonarqube:scan",
     "format": "prettier --write --list-different \"src/**/*.{js,ts}\"",
     "format-check": "prettier --list-different \"src/**/*.{js,ts}\"",
