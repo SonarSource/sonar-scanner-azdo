@@ -9,9 +9,6 @@ env:
   ARTIFACTORY_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
   # Possible values for ARTIFACTORY_DEPLOY_REPO: sonarsource-private-qa, sonarsource-public-qa
   ARTIFACTORY_DEPLOY_REPO: sonarsource-public-qa
-  BURGR_URL: VAULT[development/kv/data/burgr data.url]
-  BURGR_USERNAME: VAULT[development/kv/data/burgr data.cirrus_username]
-  BURGR_PASSWORD: VAULT[development/kv/data/burgr data.cirrus_password]
   ### Project variables
   DEPLOY_PULL_REQUEST: true
   CIRRUS_VAULT_URL: https://vault.sonar.build:8200
@@ -79,7 +76,6 @@ promote_task:
   script:
     - source cirrus-env PROMOTE
     - npm run promote
-    - npm run burgr
 
 mend_scan_task:
   depends_on:
