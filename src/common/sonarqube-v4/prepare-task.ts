@@ -112,7 +112,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
       isDefaultBranch = currentBranch === "trunk";
     }
     if (!isDefaultBranch) {
-      // VSTS-165 don't use Build.SourceBranchName
+      // SONARAZDO-165 don't use Build.SourceBranchName
       props["sonar.branch.name"] = branchName(tl.getVariable("Build.SourceBranch"));
     }
   }

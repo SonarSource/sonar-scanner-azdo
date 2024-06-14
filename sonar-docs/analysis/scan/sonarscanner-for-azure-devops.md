@@ -5,7 +5,7 @@ url: /analysis/scan/sonarscanner-for-azure-devops/
 
 
 [[info]]
-| By [SonarSource](https://www.sonarsource.com/) - GNU LGPL 3 - [Issue Tracker](https://jira.sonarsource.com/browse/VSTS) - [Source](https://github.com/SonarSource/sonar-scanner-vsts)  
+| By [SonarSource](https://www.sonarsource.com/) - GNU LGPL 3 - [Issue Tracker](https://jira.sonarsource.com/browse/SONARAZDO) - [Source](https://github.com/SonarSource/sonar-scanner-azdo)  
 | **SonarScanner for Azure DevOps**
 
 <!-- sonarcloud -->

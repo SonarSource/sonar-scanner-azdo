@@ -10,7 +10,7 @@ To get started in a few minutes, you can:
 - Follow the SonarCloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn].
 - Benefit from embedded templates for common analyses:
   - **Classic** build pipelines templates integrated while creating a new pipeline
-  - **YAML** build pipeline templates available in our Sourcecode: https://github.com/SonarSource/sonar-scanner-vsts/tree/master/yaml-pipeline-templates
+  - **YAML** build pipeline templates available in our Sourcecode: https://github.com/SonarSource/sonar-scanner-azdo/tree/master/yaml-pipeline-templates
 - Benefit from a bunch of sample projects (using different build technologies), analyzed on SonarCloud, with their **YAML** pipelines files (See the SonarCloud badge on the README.md file for a link to SonarCloud project)
   - [.NET Framework](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-framework-project)
   - [.NET Core](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-core-project)

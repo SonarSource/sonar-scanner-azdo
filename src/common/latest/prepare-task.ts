@@ -201,7 +201,7 @@ async function isDefaultBranch() {
 }
 
 /**
- * We compute the branch name from the full ref, @see VSTS-165 Don't use Build.SourceBranchName
+ * We compute the branch name from the full ref, @see SONARAZDO-165 Don't use Build.SourceBranchName
  */
 function getBranchNameFromRef(fullName: string) {
   return fullName.replace(/^refs\/heads\//, "");
