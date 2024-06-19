@@ -193,12 +193,12 @@ exports.runSonarQubeScanner = function (extension, customOptions, callback) {
 
   const baseOptions = {
     sonarqube: {
-      "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts",
+      "sonar.projectKey": "sonar-scanner-azdo-sq",
       "sonar.projectName": "Azure DevOps extension for SonarQube",
       "sonar.exclusions": baseExclusions.concat(["src/extensions/sonarcloud/**"]).join(","),
     },
     sonarcloud: {
-      "sonar.projectKey": "org.sonarsource.scanner.vsts:sonar-scanner-vsts-sonarcloud",
+      "sonar.projectKey": "sonar-scanner-azdo-sc",
       "sonar.projectName": "Azure DevOps extension for SonarCloud",
       "sonar.exclusions": baseExclusions.concat(["src/extensions/sonarqube/**"]).join(","),
     },
