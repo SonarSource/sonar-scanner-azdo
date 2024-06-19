@@ -124,12 +124,12 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
     vcsUrl: `https://github.com/${process.env.CIRRUS_REPO_FULL_NAME}.git`,
     modules: [
       {
-        id: `org.sonarsource.scanner.vsts:${packageJson.name}-sonarqube:${sqPackageVersion}`,
+        id: `org.sonarsource.scanner.azdo:${packageJson.name}-sonarqube:${sqPackageVersion}`,
         properties: {
           artifactsToDownload: sqVsixPaths
             .map(
               (filePath) =>
-                `org.sonarsource.scanner.vsts:${packageJson.name}-sonarqube:vsix:${
+                `org.sonarsource.scanner.azdo:${packageJson.name}-sonarqube:vsix:${
                   filePath.match(sqQualifierMatch)[1]
                 }`,
             )
@@ -146,12 +146,12 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
         }),
       },
       {
-        id: `org.sonarsource.scanner.vsts:${packageJson.name}-sonarcloud:${scPackageVersion}`,
+        id: `org.sonarsource.scanner.azdo:${packageJson.name}-sonarcloud:${scPackageVersion}`,
         properties: {
           artifactsToDownload: scVsixPaths
             .map(
               (filePath) =>
-                `org.sonarsource.scanner.vsts:${packageJson.name}-sonarcloud:vsix:${
+                `org.sonarsource.scanner.azdo:${packageJson.name}-sonarcloud:vsix:${
                   filePath.match(scQualifierMatch)[1]
                 }`,
             )
