@@ -214,6 +214,7 @@ exports.runSonarQubeScanner = function (extension, customOptions, callback) {
 
   const options = {
     ...baseOptions,
+    "sonar.sources": "src",
     "sonar.projectVersion": vssExtension.version,
     "sonar.coverage.exclusions":
       "gulpfile.js, build/**, config/**, coverage/**, extensions/**, scripts/**, **/__tests__/**, **/temp-find-method.ts",
