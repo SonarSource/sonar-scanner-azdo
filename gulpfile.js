@@ -135,25 +135,23 @@ gulp.task("build:download-scanners", () => {
   for (const configJs of configJss) {
     // eslint-disable-next-line import/no-dynamic-require
     const { scanner } = require(configJs);
-    if (scanner.embedScanners) {
-      streams.push(
-        downloadOrCopy(scanner.classicUrl)
-          .pipe(decompress())
-          .pipe(
-            gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion)),
-          ),
-      );
+    streams.push(
+      downloadOrCopy(scanner.classicUrl)
+        .pipe(decompress())
+        .pipe(
+          gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion)),
+        ),
+    );
 
-      streams.push(
-        downloadOrCopy(scanner.dotnetUrl)
-          .pipe(decompress())
-          .pipe(
-            gulp.dest(
-              path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_MSBUILD_DIRNAME, scanner.msBuildVersion),
-            ),
+    streams.push(
+      downloadOrCopy(scanner.dotnetUrl)
+        .pipe(decompress())
+        .pipe(
+          gulp.dest(
+            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_MSBUILD_DIRNAME, scanner.msBuildVersion),
           ),
-      );
-    }
+        ),
+    );
   }
 
   return mergeStream(streams);
@@ -226,7 +224,7 @@ gulp.task("build:copy", () => {
     const { scanner } = require(configJs);
 
     // Copy Scanner CLI
-    if (taskNeedsCliScanner(taskName) && scanner.embedScanners) {
+    if (taskNeedsCliScanner(taskName)) {
       streams.push(
         gulp
           .src(
@@ -243,7 +241,7 @@ gulp.task("build:copy", () => {
     }
 
     // Copy Scanner MSBuild
-    if (taskNeedsMsBuildScanner(taskName) && scanner.embedScanners) {
+    if (taskNeedsMsBuildScanner(taskName)) {
       streams.push(
         gulp
           .src(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion, "**/*"))
@@ -681,4 +679,3 @@ gulp.task("promote", (done) => {
       done(new Error(err));
     });
 });
-

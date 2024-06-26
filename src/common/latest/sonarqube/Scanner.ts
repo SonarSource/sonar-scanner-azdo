@@ -1,8 +1,10 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { ToolRunner } from "azure-pipelines-task-lib/toolrunner";
+import * as toolLib from "azure-pipelines-tool-lib/tool";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { PROP_NAMES, SCANNER_CLI_FOLDER, TaskVariables } from "../helpers/constants";
+import { scanner as scannerConfig } from "../config";
+import { PROP_NAMES, SCANNER_CLI_NAME, TaskVariables } from "../helpers/constants";
 import { isWindows } from "../helpers/utils";
 
 export enum ScannerMode {
@@ -27,7 +29,30 @@ export default class Scanner {
   public static getIsSonarCloud(): boolean {
     return this.isSonarCloud;
   }
-  //MMF-2035
+
+  static async downloadScanner(fileUrl: string) {
+    try {
+      tl.debug(`Downloading scanner from ${fileUrl}`);
+      const downloadPath = await toolLib.downloadTool(fileUrl);
+      tl.debug(`Downloaded: ${fileUrl} file to ${downloadPath}`);
+
+      tl.debug(`Extracting ${downloadPath}`);
+      const unzipPath = await toolLib.extractZip(downloadPath);
+      tl.debug(`Unzipped file to ${unzipPath}`);
+
+      return unzipPath;
+    } catch (error) {
+      if (error.message.includes("404")) {
+        tl.setResult(
+          tl.TaskResult.Failed,
+          "The scanner version you are trying to download does not exist. Please check the version and try again.",
+        );
+      } else {
+        tl.setResult(tl.TaskResult.Failed, error.message);
+      }
+      throw error;
+    }
+  }
 
   public toSonarProps() {
     return {};
@@ -71,7 +96,7 @@ export default class Scanner {
     }
   }
 
-  logIssueOnBuildSummaryForStdErr(tool) {
+  logIssueOnBuildSummaryForStdErr(tool: ToolRunner) {
     tool.on("stderr", (data) => {
       if (data == null) {
         return;
@@ -87,7 +112,7 @@ export default class Scanner {
   }
 
   //Temporary warning message for Java version (MMF-2035)
-  logIssueAsWarningForStdOut(tool) {
+  logIssueAsWarningForStdOut(tool: ToolRunner) {
     tool.on("stdout", (data) => {
       if (data == null) {
         return;
@@ -134,19 +159,45 @@ export class ScannerCLI extends Scanner {
     };
   }
 
-  public async runAnalysis() {
-    const scannerLocation: string = tl.getVariable(TaskVariables.SonarScannerLocation);
-    const cliVersion = tl.getVariable(TaskVariables.SonarCliVersion);
-    // Always use the downloaded scanner (no fallback)
-    const scannerPath = `sonar-scanner-${cliVersion}`;
-    let scannerCliScript = tl.resolve(scannerLocation, scannerPath, "bin", SCANNER_CLI_FOLDER);
-
-    if (isWindows()) {
-      scannerCliScript += ".bat";
-    } else {
-      await fs.chmod(scannerCliScript, "777");
+  /**
+   * When using the CLI scanner, the prepare task does not run anything.
+   * Instead, it downloads the SonarScanner CLI if not using the embedded one.
+   */
+  public async runPrepare() {
+    const cliVersion = tl.getInput("cliVersion");
+    if (!cliVersion) {
+      // Delete variable (Needed if there are multiple sonar scans in the same pipeline)
+      tl.setVariable(TaskVariables.SonarScannerLocation, "");
+      return;
     }
-    const scannerRunner = tl.tool(scannerCliScript);
+
+    const downloadUrl = scannerConfig.cliUrlTemplate(cliVersion);
+    const scannerArchivePath = await Scanner.downloadScanner(downloadUrl);
+    const scannerPath = tl.resolve(
+      scannerArchivePath,
+      `sonar-scanner-${cliVersion}`,
+      "bin",
+      isWindows() ? `${SCANNER_CLI_NAME}.bat` : SCANNER_CLI_NAME,
+    );
+    tl.setVariable(TaskVariables.SonarScannerLocation, scannerPath);
+  }
+
+  public async runAnalysis() {
+    const scannerPath =
+      tl.getVariable(TaskVariables.SonarScannerLocation) ||
+      tl.resolve(
+        this.rootPath,
+        "sonar-scanner",
+        "bin",
+        isWindows() ? `${SCANNER_CLI_NAME}.bat` : SCANNER_CLI_NAME,
+      );
+    tl.debug(`Using scanner at ${scannerPath}`);
+
+    // Hotfix permissions on UNIX
+    if (!isWindows()) {
+      await fs.chmod(scannerPath, "777");
+    }
+    const scannerRunner = tl.tool(scannerPath);
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
     if (this.isDebug()) {
@@ -197,22 +248,38 @@ export class ScannerMSBuild extends Scanner {
   }
 
   public async runPrepare() {
-    let scannerRunner: ToolRunner;
+    // Assume that windws <=> using .NET Framework, but that may not be the case in the future
+    //  as .NET Core is now supported on Windows
+    const useNetFramework = isWindows();
 
-    if (isWindows()) {
-      const scannerExePath = this.findFrameworkScannerPath();
-      tl.debug(`Using classic scanner at ${scannerExePath}`);
-      tl.setVariable(TaskVariables.SonarScannerMSBuildExe, scannerExePath);
-      scannerRunner = this.getScannerRunner(scannerExePath, true);
+    const msBuildVersion = tl.getInput("msBuildVersion");
+    let scannerPath: string | undefined;
+    if (msBuildVersion) {
+      // Download the specified scanner version
+      const downloadUrl = scannerConfig.msBuildUrlTemplate(msBuildVersion, useNetFramework);
+      const scannerArchivePath = await Scanner.downloadScanner(downloadUrl);
+      scannerPath = tl.resolve(
+        scannerArchivePath,
+        useNetFramework ? "SonarScanner.MSBuild.exe" : "SonarScanner.MSBuild.dll",
+      );
+      tl.setVariable(TaskVariables.SonarScannerLocation, scannerPath);
     } else {
-      const scannerDllPath = this.findDotnetScannerPath();
-      tl.debug(`Using dotnet scanner at ${scannerDllPath}`);
-      tl.setVariable(TaskVariables.SonarScannerMSBuildDll, scannerDllPath);
-      scannerRunner = this.getScannerRunner(scannerDllPath, false);
-
-      // Need to set executable flag on the embedded scanner CLI
-      await this.makeShellScriptExecutable(scannerDllPath);
+      // If msbuild version is not set, use embedded scanner
+      scannerPath = useNetFramework
+        ? tl.resolve(this.rootPath, "classic-sonar-scanner-msbuild", "SonarScanner.MSBuild.exe")
+        : tl.resolve(this.rootPath, "dotnet-sonar-scanner-msbuild", "SonarScanner.MSBuild.dll");
     }
+    tl.setVariable(TaskVariables.SonarScannerLocation, scannerPath);
+
+    tl.debug(`Using ${useNetFramework ? ".NET framework" : ".NET core"} scanner at ${scannerPath}`);
+    tl.setVariable(
+      useNetFramework ? TaskVariables.SonarScannerMSBuildExe : TaskVariables.SonarScannerMSBuildDll,
+      scannerPath,
+    );
+
+    const scannerRunner = this.getScannerRunner(scannerPath, useNetFramework);
+    // Need to set executable flag on the embedded scanner CLI
+    await this.makeShellScriptExecutable(scannerPath);
     scannerRunner.arg("begin");
     scannerRunner.arg("/k:" + this.data.projectKey);
     if (this.data.organization) {
@@ -227,14 +294,21 @@ export class ScannerMSBuild extends Scanner {
   }
 
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
+    if (isWindows()) {
+      return;
+    }
+
     const scannerCliShellScripts = tl.findMatch(
       scannerExecutablePath,
-      path.join(path.dirname(scannerExecutablePath), "sonar-scanner-*", "bin", SCANNER_CLI_FOLDER),
+      path.join(path.dirname(scannerExecutablePath), "sonar-scanner-*", "bin", SCANNER_CLI_NAME),
     )[0];
+
     await fs.chmod(scannerCliShellScripts, "777");
   }
 
   private getScannerRunner(scannerPath: string, isExeScanner: boolean) {
+    tl.debug(`Using scanner at ${scannerPath}`);
+
     if (isExeScanner) {
       return tl.tool(scannerPath);
     }
@@ -245,23 +319,18 @@ export class ScannerMSBuild extends Scanner {
     return scannerRunner;
   }
 
-  private findFrameworkScannerPath(): string {
-    const scannerLocation: string = tl.getVariable(TaskVariables.SonarScannerLocation);
-    const pathSegments = [scannerLocation, "SonarScanner.MSBuild.exe"];
-    return tl.resolve(...pathSegments);
-  }
-
-  private findDotnetScannerPath(): string {
-    const scannerLocation: string = tl.getVariable(TaskVariables.SonarScannerLocation);
-    const pathSegments = [scannerLocation, "SonarScanner.MSBuild.dll"];
-    return tl.resolve(...pathSegments);
-  }
-
   public async runAnalysis() {
-    const scannerRunner = isWindows()
-      ? this.getScannerRunner(tl.getVariable(TaskVariables.SonarScannerMSBuildExe), true)
-      : this.getScannerRunner(tl.getVariable(TaskVariables.SonarScannerMSBuildDll), false);
+    // Assume that windws <=> using .NET Framework
+    const useNetFramework = isWindows();
 
+    const scannerRunner = this.getScannerRunner(
+      tl.getVariable(
+        useNetFramework
+          ? TaskVariables.SonarScannerMSBuildExe
+          : TaskVariables.SonarScannerMSBuildDll,
+      ),
+      useNetFramework,
+    );
     scannerRunner.arg("end");
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);

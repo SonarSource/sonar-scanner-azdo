@@ -1,124 +1,285 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { ScannerCLI, ScannerMSBuild } from "../Scanner";
 import { TaskVariables } from "../../helpers/constants";
+import { AzureTaskLibMock } from "../../mocks/AzureTaskLibMock";
+import { AzureToolLibMock } from "../../mocks/AzureToolLibMock";
+import Scanner, { ScannerCLI, ScannerMSBuild, ScannerMode } from "../Scanner";
+
+jest.mock("fs-extra", () => ({
+  ...jest.requireActual("fs-extra"),
+  chmod: jest.fn(),
+}));
+
+jest.mock("azure-pipelines-task-lib/task");
+
+const azureTaskLibMock = new AzureTaskLibMock();
+const azureToolLibMock = new AzureToolLibMock();
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  azureTaskLibMock.reset();
+  azureToolLibMock.reset();
+});
 
 const MOCK_ROOT_PATH = "/path/to/project";
-const MOCK_CLI_VERSION = "1.33.7";
-const MOCK_MSBUILD_VERSION = "1.1.1";
-const MOCK_DOTNET_PATH = "/path/to/dotnet";
-const MOCKTOOLRUNNER = {
-  ...jest.requireActual("azure-pipelines-task-lib/toolrunner").ToolRunner,
-  arg: jest.fn().mockReturnThis(),
-  line: jest.fn().mockReturnThis(),
-  execAsync: jest.fn().mockResolvedValue(0),
-  on: jest.fn().mockImplementation(() => {}),
-};
-
-jest.mock("fs", () => ({
-  ...jest.requireActual("fs"), // This will keep the original implementations of other fs methods
-  chmod: jest.fn(), // This will replace chmod with a mock function
-}));
 
 afterAll(() => {
   jest.restoreAllMocks();
 });
 
 describe("Scanner", () => {
-  beforeEach(() => {
-    jest.spyOn(tl, "resolve").mockImplementation((...paths) => paths.join("/"));
-  });
   describe("ScannerCLI", () => {
-    it("should reference the downloaded scanner location for windows", () => {
-      jest.spyOn(tl, "getPlatform").mockReturnValue(tl.Platform.Windows);
-      jest.spyOn(tl, "tool").mockImplementation(() => MOCKTOOLRUNNER);
-      jest.spyOn(tl, "getVariable").mockImplementation((variable) => {
-        if (variable === TaskVariables.SonarScannerLocation) {
-          return "/path/to/temp/directory";
-        } else if (variable === TaskVariables.SonarCliVersion) {
-          return MOCK_CLI_VERSION;
-        } else if (TaskVariables.SonarScannerMode) {
-          return "CLI";
-        } else return undefined;
+    describe("instantiation", () => {
+      it("should be instantiated properly in file config mode", () => {
+        azureTaskLibMock.setInputs({
+          configMode: "file",
+          configFile: "/path/to/sonar-project.properties",
+        });
+
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
+        expect(scanner).toBeInstanceOf(ScannerCLI);
+        expect(scanner.toSonarProps()).toEqual({
+          "project.settings": "/path/to/sonar-project.properties",
+        });
       });
 
-      const scanner = new ScannerCLI(MOCK_ROOT_PATH, {});
+      it.each(["manual", undefined])(
+        "should be instantiated properly in %s config mode",
+        (configMode) => {
+          azureTaskLibMock.setInputs({
+            configMode,
+            cliProjectKey: "projectKey",
+            cliProjectName: "projectName",
+            cliProjectVersion: "projectVersion",
+            cliSources: ".",
+          });
 
-      scanner.runAnalysis();
+          const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
+          expect(scanner).toBeInstanceOf(ScannerCLI);
+          expect(scanner.toSonarProps()).toEqual({
+            "sonar.projectKey": "projectKey",
+            "sonar.projectName": "projectName",
+            "sonar.projectVersion": "projectVersion",
+            "sonar.sources": ".",
+          });
+        },
+      );
+    });
 
-      expect(tl.resolve).toHaveBeenCalledWith(
-        "/path/to/temp/directory",
-        "sonar-scanner-1.33.7",
-        "bin",
-        "sonar-scanner",
-      );
-      expect(tl.tool).toHaveBeenCalledWith(
-        "/path/to/temp/directory/sonar-scanner-1.33.7/bin/sonar-scanner.bat",
-      );
+    describe("prepare", () => {
+      it("should download scanner when needed (windows)", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Windows);
+        azureTaskLibMock.setInputs({
+          cliVersion: "1.22.333",
+        });
+
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
+        await scanner.runPrepare();
+
+        expect(tl.setVariable).toHaveBeenLastCalledWith(
+          TaskVariables.SonarScannerLocation,
+          "/some-path/to/extracted/sonar-scanner-1.22.333/bin/sonar-scanner.bat",
+        );
+      });
+
+      it("should download scanner when needed (unix)", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+        azureTaskLibMock.setInputs({
+          cliVersion: "1.22.333",
+        });
+
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
+        await scanner.runPrepare();
+
+        expect(tl.setVariable).toHaveBeenLastCalledWith(
+          TaskVariables.SonarScannerLocation,
+          "/some-path/to/extracted/sonar-scanner-1.22.333/bin/sonar-scanner",
+        );
+      });
+
+      it("should not download scanner when not overriden by user", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
+        await scanner.runPrepare();
+        expect(tl.setVariable).toHaveBeenLastCalledWith(TaskVariables.SonarScannerLocation, "");
+      });
+    });
+
+    describe("analyze", () => {
+      it("should run downloaded scanner", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Windows);
+        azureTaskLibMock.setVariables({
+          [TaskVariables.SonarScannerLocation]: "/path/to/temp/directory/bin/sonar-scanner.bat",
+          [TaskVariables.SonarScannerMode]: ScannerMode.CLI,
+        });
+
+        const scanner = new ScannerCLI(MOCK_ROOT_PATH, {});
+        await scanner.runAnalysis();
+
+        expect(tl.tool).toHaveBeenCalledWith("/path/to/temp/directory/bin/sonar-scanner.bat");
+      });
+
+      it("should run embedded scanner", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+
+        const scanner = new ScannerCLI(MOCK_ROOT_PATH, {});
+        await scanner.runAnalysis();
+
+        expect(tl.tool).toHaveBeenCalledWith(MOCK_ROOT_PATH + "/sonar-scanner/bin/sonar-scanner");
+        const tool = azureTaskLibMock.getLastToolRunner();
+        expect(tool.execAsync).toHaveBeenCalled();
+        expect(tool.arg).not.toHaveBeenCalledWith("-X");
+      });
+
+      it("should run with debug mode", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+        azureTaskLibMock.setVariables({
+          "system.debug": "true",
+        });
+
+        const scanner = new ScannerCLI(MOCK_ROOT_PATH, {});
+        await scanner.runAnalysis();
+
+        const tool = azureTaskLibMock.getLastToolRunner();
+        expect(tool.execAsync).toHaveBeenCalled();
+        expect(tool.arg).toHaveBeenCalledWith("-X");
+      });
     });
   });
 
   describe("ScannerMSBuild", () => {
-    beforeEach(() => {
-      jest.spyOn(tl, "tool").mockImplementation(() => MOCKTOOLRUNNER);
-      jest.spyOn(tl, "getVariable").mockImplementation((variable) => {
-        if (variable === TaskVariables.SonarScannerLocation) {
-          return "/path/to/temp/directory";
-        } else if (variable === TaskVariables.SonarMsBuildVersion) {
-          return MOCK_MSBUILD_VERSION;
-        } else if (TaskVariables.SonarScannerMode) {
-          return "MSBuild";
-        } else return undefined;
+    describe("instantiation", () => {
+      it("should be instantiated properly", () => {
+        azureTaskLibMock.setInputs({
+          projectKey: "projectKey",
+          projectName: "projectName",
+          projectVersion: "projectVersion",
+        });
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
+        expect(scanner).toBeInstanceOf(ScannerMSBuild);
+
+        expect(scanner.toSonarProps()).toEqual({
+          "sonar.projectKey": "projectKey",
+          "sonar.projectName": "projectName",
+          "sonar.projectVersion": "projectVersion",
+        });
       });
     });
-    it("should reference the downloaded scanner location for windows", () => {
-      jest.spyOn(tl, "getPlatform").mockReturnValue(tl.Platform.Windows);
-      jest.spyOn(tl, "which").mockReturnValue(MOCK_DOTNET_PATH);
-      jest.spyOn(tl, "findMatch").mockImplementation((...paths) => {
-        const [scannerExecutablePath, fullPath] = paths;
-        expect(scannerExecutablePath).toBe("/path/to/temp/directory/SonarScanner.MSBuild.exe");
-        expect(fullPath).toBe("/path/to/temp/directory/sonar-scanner-*/bin/sonar-scanner");
 
-        return ["/path/to/temp/directory/sonar-scanner-1.33.7/bin/sonar-scanner"];
+    describe("prepare", () => {
+      it("should use downloaded scanner on windows", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Windows);
+        azureTaskLibMock.setInputs({
+          msBuildVersion: "1.22.333",
+          projectKey: "projectKey",
+          projectName: "projectName",
+        });
+        azureTaskLibMock.setVariables({
+          [TaskVariables.SonarScannerMode]: ScannerMode.MSBuild,
+        });
+
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
+        await scanner.runPrepare();
+
+        expect(tl.tool).toHaveBeenCalledWith("/some-path/to/extracted/SonarScanner.MSBuild.exe");
+        const toolRunner = azureTaskLibMock.getLastToolRunner();
+        expect(toolRunner.arg).toHaveBeenCalledWith("begin");
+        expect(toolRunner.arg).toHaveBeenCalledWith("/k:projectKey");
       });
 
-      const scanner = new ScannerMSBuild(MOCK_ROOT_PATH, {});
+      it("should use downloaded scanner on unix", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+        azureTaskLibMock.setInputs({
+          msBuildVersion: "1.22.333",
+          projectKey: "projectKey",
+          projectName: "projectName",
+          organization: "my-org",
+        });
 
-      scanner.runPrepare();
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
+        await scanner.runPrepare();
 
-      expect(tl.tool).toHaveBeenCalledWith("/path/to/temp/directory/SonarScanner.MSBuild.exe");
+        expect(tl.tool).toHaveBeenCalledWith("/bin/dotnet");
+        const toolRunner = azureTaskLibMock.getLastToolRunner();
+        expect(toolRunner.arg).toHaveBeenCalledWith(
+          "/some-path/to/extracted/SonarScanner.MSBuild.dll",
+        );
+        expect(toolRunner.arg).toHaveBeenCalledWith("begin");
+        expect(toolRunner.arg).toHaveBeenCalledWith("/k:projectKey");
+        expect(toolRunner.arg).toHaveBeenCalledWith("/o:my-org");
+      });
+
+      it("should use the embedded framework scanner when not overriden by user", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Windows);
+        azureTaskLibMock.setInputs({
+          projectKey: "projectKey",
+          projectName: "projectName",
+        });
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
+        await scanner.runPrepare();
+
+        expect(tl.tool).toHaveBeenCalledWith(
+          MOCK_ROOT_PATH + "/classic-sonar-scanner-msbuild/SonarScanner.MSBuild.exe",
+        );
+      });
+
+      it("should use the embedded dotnet scanner when not overriden by user", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+        azureTaskLibMock.setInputs({
+          projectKey: "projectKey",
+          projectName: "projectName",
+        });
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
+        await scanner.runPrepare();
+
+        expect(tl.tool).toHaveBeenCalledWith("/bin/dotnet");
+        const toolRunner = azureTaskLibMock.getLastToolRunner();
+        expect(toolRunner.arg).toHaveBeenCalledWith(
+          MOCK_ROOT_PATH + "/dotnet-sonar-scanner-msbuild/SonarScanner.MSBuild.dll",
+        );
+      });
     });
 
-    it("should reference the downloaded scanner location for unix", () => {
-      jest.spyOn(tl, "getPlatform").mockReturnValue(tl.Platform.Linux);
-      jest.spyOn(tl, "resolve").mockImplementation((...paths) => paths.join("/"));
-      jest.spyOn(tl, "tool").mockImplementation(() => MOCKTOOLRUNNER);
-      jest.spyOn(tl, "which").mockReturnValue(MOCK_DOTNET_PATH);
+    describe("analyze", () => {
+      it("should run framework scanner", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Windows);
+        azureTaskLibMock.setInputs({
+          projectKey: "projectKey",
+          projectName: "projectName",
+        });
+        azureTaskLibMock.setVariables({
+          [TaskVariables.SonarScannerMSBuildExe]:
+            "/some-path/to/extracted/SonarScanner.MSBuild.exe",
+        });
 
-      jest.spyOn(tl, "findMatch").mockImplementation((...paths) => {
-        const [scannerExecutablePath, fullPath] = paths;
-        expect(scannerExecutablePath).toBe("/path/to/temp/directory/SonarScanner.MSBuild.dll");
-        expect(fullPath).toBe("/path/to/temp/directory/sonar-scanner-*/bin/sonar-scanner");
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
+        await scanner.runAnalysis();
 
-        return ["/path/to/temp/directory/sonar-scanner-1.33.7/bin/sonar-scanner"];
-      });
-      jest.spyOn(tl, "getVariable").mockImplementation((variable) => {
-        if (variable === TaskVariables.SonarScannerLocation) {
-          return "/path/to/temp/directory";
-        } else if (variable === TaskVariables.SonarMsBuildVersion) {
-          return MOCK_MSBUILD_VERSION;
-        } else if (TaskVariables.SonarScannerMode) {
-          return "MSBuild";
-        } else return undefined;
+        expect(tl.tool).toHaveBeenCalledWith("/some-path/to/extracted/SonarScanner.MSBuild.exe");
+        const toolRunner = azureTaskLibMock.getLastToolRunner();
+        expect(toolRunner.arg).toHaveBeenCalledWith("end");
       });
 
-      const scanner = new ScannerMSBuild(MOCK_ROOT_PATH, {});
+      it("should run dotnet scanner", async () => {
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+        azureTaskLibMock.setInputs({
+          projectKey: "projectKey",
+          projectName: "projectName",
+        });
+        azureTaskLibMock.setVariables({
+          [TaskVariables.SonarScannerMSBuildDll]:
+            "/some-path/to/extracted/SonarScanner.MSBuild.dll",
+        });
 
-      scanner.runPrepare();
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
+        await scanner.runAnalysis();
 
-      expect(tl.tool).toHaveBeenCalledWith(MOCK_DOTNET_PATH);
-      expect(MOCKTOOLRUNNER.arg).toHaveBeenCalledWith(
-        "/path/to/temp/directory/SonarScanner.MSBuild.dll",
-      );
+        expect(tl.tool).toHaveBeenCalledWith("/bin/dotnet");
+        const toolRunner = azureTaskLibMock.getLastToolRunner();
+        expect(toolRunner.arg).toHaveBeenCalledWith(
+          "/some-path/to/extracted/SonarScanner.MSBuild.dll",
+        );
+        expect(toolRunner.arg).toHaveBeenCalledWith("end");
+      });
     });
   });
 });

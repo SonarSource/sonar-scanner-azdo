@@ -13,7 +13,7 @@ export const PROP_NAMES = {
   PROJECTSETTINGS: "project.settings",
 };
 
-export const SCANNER_CLI_FOLDER = "sonar-scanner";
+export const SCANNER_CLI_NAME = "sonar-scanner";
 
 export enum JdkVersionSource {
   JavaHome = "JAVA_HOME",
@@ -45,7 +45,6 @@ export enum TaskVariables {
   SonarEndpoint = "SONAR_ENDPOINT",
   SonarScannerMSBuildExe = "SONAR_SCANNER_MSBUILD_EXE",
   SonarScannerMSBuildDll = "SONAR_SCANNER_MSBUILD_DLL",
-  SonarMsBuildVersion = "SONAR_MSBUILD_VERSION",
   SonarCliVersion = "SONAR_CLI_VERSION",
   SonarScannerLocation = "SONAR_SCANNER_LOCATION",
   JavaHome = "JAVA_HOME",
