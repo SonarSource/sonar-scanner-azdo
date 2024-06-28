@@ -43,5 +43,6 @@ exports.BUILD_SCANNER_MSBUILD_DIR = path.join(
 // /dist
 exports.DIST_DIR = path.join(appDirectory, "dist");
 
-exports.BUILD_SCANNER_CLI_DIRNAME = "classic-sonar-scanner-msbuild";
-exports.BUILD_SCANNER_MSBUILD_DIRNAME = "dotnet-sonar-scanner-msbuild";
+exports.BUILD_SCANNER_NET_FRAMEWORK_DIRNAME = "classic-sonar-scanner-msbuild";
+exports.BUILD_SCANNER_NET_DOTNET_DIRNAME = "dotnet-sonar-scanner-msbuild";
+exports.BUILD_SCANNER_CLI_DIRNAME = "sonar-scanner-cli";

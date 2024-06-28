@@ -21,7 +21,8 @@ const {
   BUILD_EXTENSION_DIR,
   BUILD_DIR,
   BUILD_SCANNER_DIR,
-  BUILD_SCANNER_MSBUILD_DIRNAME,
+  BUILD_SCANNER_NET_DOTNET_DIRNAME,
+  BUILD_SCANNER_NET_FRAMEWORK_DIRNAME,
   BUILD_SCANNER_CLI_DIRNAME,
   DIST_DIR,
 } = require("./config/paths");
@@ -139,7 +140,9 @@ gulp.task("build:download-scanners", () => {
       downloadOrCopy(scanner.classicUrl)
         .pipe(decompress())
         .pipe(
-          gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion)),
+          gulp.dest(
+            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_NET_FRAMEWORK_DIRNAME, scanner.cliVersion),
+          ),
         ),
     );
 
@@ -148,10 +151,20 @@ gulp.task("build:download-scanners", () => {
         .pipe(decompress())
         .pipe(
           gulp.dest(
-            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_MSBUILD_DIRNAME, scanner.msBuildVersion),
+            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_NET_DOTNET_DIRNAME, scanner.msBuildVersion),
           ),
         ),
     );
+
+    if (scanner.cliUrl) {
+      streams.push(
+        downloadOrCopy(scanner.cliUrl)
+          .pipe(decompress())
+          .pipe(
+            gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion)),
+          ),
+      );
+    }
   }
 
   return mergeStream(streams);
@@ -244,20 +257,27 @@ gulp.task("build:copy", () => {
     if (taskNeedsMsBuildScanner(taskName)) {
       streams.push(
         gulp
-          .src(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion, "**/*"))
-          .pipe(gulp.dest(path.join(outPath, BUILD_SCANNER_CLI_DIRNAME))),
+          .src(
+            path.join(
+              BUILD_SCANNER_DIR,
+              BUILD_SCANNER_NET_FRAMEWORK_DIRNAME,
+              scanner.cliVersion,
+              "**/*",
+            ),
+          )
+          .pipe(gulp.dest(path.join(outPath, BUILD_SCANNER_NET_FRAMEWORK_DIRNAME))),
       );
       streams.push(
         gulp
           .src(
             path.join(
               BUILD_SCANNER_DIR,
-              BUILD_SCANNER_MSBUILD_DIRNAME,
+              BUILD_SCANNER_NET_DOTNET_DIRNAME,
               scanner.msBuildVersion,
               "**/*",
             ),
           )
-          .pipe(gulp.dest(path.join(outPath, BUILD_SCANNER_MSBUILD_DIRNAME))),
+          .pipe(gulp.dest(path.join(outPath, BUILD_SCANNER_NET_DOTNET_DIRNAME))),
       );
     }
   }
