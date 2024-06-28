@@ -10,4 +10,5 @@ exports.scanner = {
   cliVersion,
   classicUrl: scannersLocation + classicScannerFilename,
   dotnetUrl: scannersLocation + dotnetScannerFilename,
+  cliUrl: `https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${cliVersion}.zip`,
 };
