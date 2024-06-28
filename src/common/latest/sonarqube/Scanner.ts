@@ -195,7 +195,7 @@ export class ScannerCLI extends Scanner {
 
     // Hotfix permissions on UNIX
     if (!isWindows()) {
-      await fs.chmod(scannerPath, "777");
+      await fs.chmod(scannerPath, "500");
     }
     const scannerRunner = tl.tool(scannerPath);
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
@@ -303,7 +303,7 @@ export class ScannerMSBuild extends Scanner {
       path.join(path.dirname(scannerExecutablePath), "sonar-scanner-*", "bin", SCANNER_CLI_NAME),
     )[0];
 
-    await fs.chmod(scannerCliShellScripts, "777");
+    await fs.chmod(scannerCliShellScripts, "500");
   }
 
   private getScannerRunner(scannerPath: string, isExeScanner: boolean) {
