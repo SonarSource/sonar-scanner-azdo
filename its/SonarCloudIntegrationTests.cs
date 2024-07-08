@@ -37,7 +37,6 @@ namespace AzureDevOpsExtension.IntegrationTests
     [TestFixture]
     public class SonarCloudIntegrationTests
     {
-
         private SonarCloudCallWrapper _scInstance;
         private BuildHttpClient _buildHttpClient;
 
