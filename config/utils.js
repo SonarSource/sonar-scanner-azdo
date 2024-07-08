@@ -100,23 +100,20 @@ function fileHashsum(filePath) {
 }
 exports.fileHashsum = fileHashsum;
 
-exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionManifest) {
-  const sqPackageVersion = getVersionWithCirrusBuildNumber(sqExtensionManifest.version);
-  const sqVsixPaths = globby.sync(path.join(DIST_DIR, `*-sonarqube.vsix`));
-  const sqAdditionalPaths = globby.sync(
-    path.join(DIST_DIR, `*{cyclonedx-sonarqube-*.json,cyclonedx-latest.json,-sonarqube*.asc}`),
-  );
-  const sqQualifierMatch = new RegExp(`${sqPackageVersion}-(.+)\.vsix$`);
+exports.getBuildInfo = function (type, vssData) {
+  const productAccronym = type === "sonarqube" ? "sq" : "sc";
+  const name = `sonar-scanner-azdo-${productAccronym}`;
 
-  const scPackageVersion = getVersionWithCirrusBuildNumber(scExtensionManifest.version);
-  const scVsixPaths = globby.sync(path.join(DIST_DIR, `*-sonarcloud.vsix`));
-  const scAdditionalPaths = globby.sync(
-    path.join(DIST_DIR, `*{cyclonedx-sonarcloud-*.json,cyclonedx-latest.json,-sonarcloud*.asc}`),
+  const packageVersion = getVersionWithCirrusBuildNumber(vssData.version);
+  const vsixPaths = globby.sync(path.join(DIST_DIR, `*-${type}.vsix`));
+  const additionalPaths = globby.sync(
+    path.join(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`),
   );
-  const scQualifierMatch = new RegExp(`${scPackageVersion}-(.+)\.vsix$`);
+  const qualifierMatch = new RegExp(`${packageVersion}-(.+).vsix$`);
+
   return {
     version: "1.0.1",
-    name: packageJson.name,
+    name,
     number: process.env.BUILD_NUMBER,
     started: dateformat(new Date(), "yyyy-mm-dd'T'HH:MM:ss.lo"),
     url: process.env.CI_BUILD_URL,
@@ -124,40 +121,16 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
     vcsUrl: `https://github.com/${process.env.CIRRUS_REPO_FULL_NAME}.git`,
     modules: [
       {
-        id: `org.sonarsource.scanner.azdo:${packageJson.name}-sonarqube:${sqPackageVersion}`,
+        id: `org.sonarsource.scanner.azdo:${name}:${packageVersion}`,
         properties: {
-          artifactsToDownload: sqVsixPaths
+          artifactsToDownload: vsixPaths
             .map(
               (filePath) =>
-                `org.sonarsource.scanner.azdo:${packageJson.name}-sonarqube:vsix:${
-                  filePath.match(sqQualifierMatch)[1]
-                }`,
+                `org.sonarsource.scanner.azdo:${name}:vsix:${filePath.match(qualifierMatch)[1]}`,
             )
             .join(","),
         },
-        artifacts: [...sqVsixPaths, ...sqAdditionalPaths].map((filePath) => {
-          const [sha1, md5] = fileHashsum(filePath);
-          return {
-            type: path.extname(filePath).slice(1),
-            sha1,
-            md5,
-            name: path.basename(filePath),
-          };
-        }),
-      },
-      {
-        id: `org.sonarsource.scanner.azdo:${packageJson.name}-sonarcloud:${scPackageVersion}`,
-        properties: {
-          artifactsToDownload: scVsixPaths
-            .map(
-              (filePath) =>
-                `org.sonarsource.scanner.azdo:${packageJson.name}-sonarcloud:vsix:${
-                  filePath.match(scQualifierMatch)[1]
-                }`,
-            )
-            .join(","),
-        },
-        artifacts: [...scVsixPaths, ...scAdditionalPaths].map((filePath) => {
+        artifacts: [...vsixPaths, ...additionalPaths].map((filePath) => {
           const [sha1, md5] = fileHashsum(filePath);
           return {
             type: path.extname(filePath).slice(1),
@@ -170,8 +143,7 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
     ],
     properties: {
       "java.specification.version": "1.8", // Workaround for https://jira.sonarsource.com/browse/RA-115
-      "buildInfo.env.SC_PROJECT_VERSION": scPackageVersion,
-      "buildInfo.env.SQ_PROJECT_VERSION": sqPackageVersion,
+      [`buildInfo.env.${productAccronym.toUpperCase()}_PROJECT_VERSION`]: packageVersion,
       "buildInfo.env.ARTIFACTORY_DEPLOY_REPO": process.env.ARTIFACTORY_DEPLOY_REPO,
       "buildInfo.env.TRAVIS_COMMIT": process.env.CIRRUS_CHANGE_IN_REPO,
     },

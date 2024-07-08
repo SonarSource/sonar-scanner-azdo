@@ -517,7 +517,7 @@ gulp.task("upload:vsix:sonarqube", () => {
     gulpUtil.log("On PR, but artifacts should not be deployed, skip upload:vsix");
     return gulpUtil.noop;
   }
-  const { name } = packageJSON;
+  const name = `${packageJSON.name}-sq`;
 
   return mergeStream(
     globby
@@ -576,7 +576,7 @@ gulp.task("upload:vsix:sonarcloud", () => {
     gulpUtil.log("On PR, but artifacts should not be deployed, skip upload:vsix");
     return gulpUtil.noop;
   }
-  const { name } = packageJSON;
+  const name = `${packageJSON.name}-sc`;
 
   return mergeStream(
     globby
@@ -626,34 +626,35 @@ gulp.task("upload:vsix:sonarcloud", () => {
   );
 });
 
-gulp.task("upload:buildinfo", () => {
+gulp.task("upload:buildinfo", async () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
     gulpUtil.log("Not on master nor PR, skip upload:buildinfo");
-    return gulpUtil.noop;
+    return;
   }
   if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
     gulpUtil.log("On PR, but artifacts should not be deployed, skip upload:buildinfo");
-    return gulpUtil.noop;
+    return;
   }
 
-  const sqVssExtension = fs.readJsonSync(
-    path.join(BUILD_EXTENSION_DIR, "sonarqube", "vss-extension.json"),
-  );
-  const scVssExtension = fs.readJsonSync(
-    path.join(BUILD_EXTENSION_DIR, "sonarcloud", "vss-extension.json"),
-  );
-  const buildInfo = getBuildInfo(packageJSON, sqVssExtension, scVssExtension);
-  console.log("upload build info", buildInfo);
-  return fetch(process.env.ARTIFACTORY_URL + "/api/build", {
-    method: "put",
-    body: JSON.stringify(buildInfo),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Basic ${Buffer.from(
-        `${process.env.ARTIFACTORY_DEPLOY_USERNAME}:${process.env.ARTIFACTORY_DEPLOY_PASSWORD}`,
-      ).toString("base64")}`,
-    },
-  });
+  const promises = [];
+  for (const type of ["sonarqube", "sonarcloud"]) {
+    const vssFile = fs.readJsonSync(path.join(BUILD_EXTENSION_DIR, type, "vss-extension.json"));
+    const buildInfo = getBuildInfo(type, vssFile);
+    promises.push(
+      fetch(process.env.ARTIFACTORY_URL + "/api/build", {
+        method: "put",
+        body: JSON.stringify(buildInfo),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.ARTIFACTORY_DEPLOY_USERNAME}:${process.env.ARTIFACTORY_DEPLOY_PASSWORD}`,
+          ).toString("base64")}`,
+        },
+      }),
+    );
+  }
+
+  await Promise.all(promises);
 });
 
 gulp.task(
@@ -667,35 +668,41 @@ gulp.task(
   ),
 );
 
-gulp.task("promote", (done) => {
+gulp.task("promote", async () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
     gulpUtil.log("Not on master nor PR, skip promote");
-    return gulpUtil.noop;
+    return;
   }
-  return needle(
-    "post",
-    `${process.env.ARTIFACTORY_URL}/api/build/promote/${process.env.CIRRUS_REPO_NAME}/${process.env.BUILD_NUMBER}`,
-    {
-      status: `it-passed${process.env.CIRRUS_PR ? "-pr" : ""}`,
-      sourceRepo: process.env.ARTIFACTORY_DEPLOY_REPO,
-      targetRepo: process.env.ARTIFACTORY_DEPLOY_REPO.replace(
-        "qa",
-        process.env.CIRRUS_PR ? "dev" : "builds",
-      ),
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.ARTIFACTORY_PROMOTE_ACCESS_TOKEN}`,
-      },
-      json: true,
-    },
-  )
-    .then((resp) => {
-      if (resp.statusCode !== 200) {
-        done(new Error(resp.statusMessage + "\n" + JSON.stringify(resp.body, null, 2)));
-      }
-    })
-    .catch((err) => {
-      done(new Error(err));
-    });
+
+  const promises = [];
+  for (const productAccronym of ["sq", "sc"]) {
+    const name = `${packageJSON.name}-${productAccronym}`;
+
+    promises.push(
+      needle(
+        "post",
+        `${process.env.ARTIFACTORY_URL}/api/build/promote/${name}/${process.env.BUILD_NUMBER}`,
+        {
+          status: `it-passed${process.env.CIRRUS_PR ? "-pr" : ""}`,
+          sourceRepo: process.env.ARTIFACTORY_DEPLOY_REPO,
+          targetRepo: process.env.ARTIFACTORY_DEPLOY_REPO.replace(
+            "qa",
+            process.env.CIRRUS_PR ? "dev" : "builds",
+          ),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.ARTIFACTORY_PROMOTE_ACCESS_TOKEN}`,
+          },
+          json: true,
+        },
+      ).then((response) => {
+        if (response.statusCode !== 200) {
+          throw new Error(`Failed to promote ${name} to ${process.env.BUILD_NUMBER}`);
+        }
+      }),
+    );
+  }
+
+  await Promise.all(promises);
 });
