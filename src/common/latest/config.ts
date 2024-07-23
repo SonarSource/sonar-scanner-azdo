@@ -1,5 +1,5 @@
 // When the user does not specify a specific version, these willl be the default versions used.
-const msBuildVersion = "6.2.0.85879";
+const msBuildVersion = "7.1.1.96069";
 const cliVersion = "6.1.0.4477";
 
 // MSBUILD scanner location
