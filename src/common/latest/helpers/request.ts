@@ -20,10 +20,15 @@ export async function get<T>(
     `[SQ] API GET: '${path}' with full URL "${fullUrl}" and query "${JSON.stringify(query)}"`,
   );
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, Endpoint.REQUEST_TIMEOUT);
+
   try {
-    const response = await fetch(fullUrl, endpoint.toFetchOptions(fullUrl));
+    const response = await fetch(fullUrl, endpoint.toFetchOptions(fullUrl, controller.signal));
     if (isJson) {
-      return await response.json();
+      return (await response.json()) as T;
     } else {
       return await response.text();
     }
@@ -34,6 +39,8 @@ export async function get<T>(
       tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`);
     }
     throw new Error(`[SQ] API GET '${path}' failed, error is ${error.message}`);
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
