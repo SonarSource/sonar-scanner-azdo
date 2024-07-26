@@ -6,8 +6,6 @@ import { URL } from "url";
 import { PROP_NAMES } from "../helpers/constants";
 import { getProxyFromURI } from "../helpers/proxyFromEnv";
 
-const REQUEST_TIMEOUT = 60000;
-
 export enum EndpointType {
   SonarCloud = "SonarCloud",
   SonarQube = "SonarQube",
@@ -22,6 +20,8 @@ export interface EndpointData {
 }
 
 export default class Endpoint {
+  static readonly REQUEST_TIMEOUT: number = 60e3;
+
   public type: EndpointType;
 
   private readonly data: EndpointData;
@@ -48,10 +48,10 @@ export default class Endpoint {
     return { username: this.data.token || this.data.username, password: "" };
   }
 
-  toFetchOptions(endpointUrl: string): Partial<RequestInit> {
+  toFetchOptions(endpointUrl: string, signal?: AbortSignal): Partial<RequestInit> {
     const options: Partial<RequestInit> = {
       method: "get",
-      timeout: REQUEST_TIMEOUT,
+      signal,
     };
 
     // Add HTTP auth from this.auth
