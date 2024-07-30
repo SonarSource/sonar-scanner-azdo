@@ -12,6 +12,8 @@
     "Minor": 3,
     "Patch": 2
   },
+  "deprecated": true,
+  "deprecationMessage": "This task is deprecated. Please upgrade to the latest version. For more information, refer to https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/",
   "minimumAgentVersion": "3.218.0",
   "inputs": [
     {
