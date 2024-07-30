@@ -12,6 +12,8 @@
     "Minor": 3,
     "Patch": 2
   },
+  "deprecated": true,
+  "deprecationMessage": "This task is deprecated. Please upgrade to the latest version. For more information, refer to https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/",
   "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
   "minimumAgentVersion": "3.218.0",
   "instanceNameFormat": "Prepare analysis on SonarQube",
