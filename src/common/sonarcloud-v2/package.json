@@ -1,0 +1,37 @@
+{
+  "name": "sonar-scanner-azdo-common-latest",
+  "private": true,
+  "version": "0.0.1",
+  "author": "SonarSource",
+  "license": "LGPL-3.0",
+  "scripts": {
+    "test": "jest",
+    "test-ci": "jest --coverage"
+  },
+  "dependencies": {
+    "azure-devops-node-api": "12.1.0",
+    "azure-pipelines-task-lib": "4.7.0",
+    "azure-pipelines-tool-lib": "2.0.7",
+    "fs-extra": "11.1.1",
+    "guid-typescript": "1.0.9",
+    "hpagent": "1.2.0",
+    "node-fetch": "2.7.0",
+    "semver": "5.7.1"
+  },
+  "overrides": {
+    "azure-pipelines-task-lib": {
+      "nodejs-file-downloader": {
+        "follow-redirects": "1.15.6"
+      }
+    }
+  },
+  "engines": {
+    "node": ">=6"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "2.6.11",
+    "@types/semver": "7.5.8",
+    "@types/tmp": "0.2.6",
+    "tmp": "0.2.1"
+  }
+}
