@@ -109,7 +109,6 @@ exports.getBuildInfo = function (type, vssData) {
   const additionalPaths = globby.sync(
     path.join(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`),
   );
-  const qualifierMatch = new RegExp(`${packageVersion}-(.+).vsix$`);
 
   return {
     version: "1.0.1",
@@ -124,10 +123,7 @@ exports.getBuildInfo = function (type, vssData) {
         id: `org.sonarsource.scanner.azdo:${name}:${packageVersion}`,
         properties: {
           artifactsToDownload: vsixPaths
-            .map(
-              (filePath) =>
-                `org.sonarsource.scanner.azdo:${name}:vsix:${filePath.match(qualifierMatch)[1]}`,
-            )
+            .map(() => `org.sonarsource.scanner.azdo.${name}`)
             .join(","),
         },
         artifacts: [...vsixPaths, ...additionalPaths].map((filePath) => {
