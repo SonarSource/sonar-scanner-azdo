@@ -14,7 +14,7 @@
     "fs-extra": "5.0.0",
     "guid-typescript": "1.0.9",
     "node-fetch": "2.7.0",
-    "semver": "5.7.1"
+    "semver": "7.6.3"
   },
   "overrides": {
     "azure-pipelines-task-lib": {
