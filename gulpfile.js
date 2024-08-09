@@ -9,7 +9,7 @@ const gulpArtifactoryUpload = require("gulp-artifactory-upload");
 const ts = require("gulp-typescript");
 const gulpUtil = require("gulp-util");
 const globby = require("globby");
-const mergeStream = require("merge-stream");
+const orderedStreams = require("ordered-read-streams");
 const typescript = require("typescript");
 const decompress = require("gulp-decompress");
 const needle = require("needle");
@@ -89,17 +89,10 @@ gulp.task("build:typescript", () => {
   const tscPaths = globby.sync(["src/tsconfig*.json"]);
 
   // Build each tsconfig
-  return mergeStream(
+  return orderedStreams(
     tscPaths.map((tscPath) => {
       const tsProject = ts.createProject(tscPath, { typescript });
-
-      return tsProject
-        .src()
-        .pipe(tsProject())
-        .js.pipe(gulp.dest("build/ts"))
-        .once("error", () => {
-          this.once("finish", () => process.exit(1));
-        });
+      return tsProject.src().pipe(tsProject()).js.pipe(gulp.dest("build/ts"));
     }),
   );
 });
@@ -167,7 +160,7 @@ gulp.task("build:download-scanners", () => {
     }
   }
 
-  return mergeStream(streams);
+  return orderedStreams(streams);
 });
 
 /**
@@ -282,7 +275,7 @@ gulp.task("build:copy", () => {
     }
   }
 
-  return mergeStream(streams);
+  return orderedStreams(streams);
 });
 
 /**
@@ -317,7 +310,7 @@ gulp.task("extension:patch-test", () => {
     )
     .pipe(gulp.dest(BUILD_EXTENSION_DIR));
 
-  return mergeStream(replaceTestFiles, hotixVssExtension);
+  return orderedStreams([replaceTestFiles, hotixVssExtension]);
 });
 
 gulp.task(
@@ -336,7 +329,7 @@ gulp.task(
 /** EXTENSION *************************************************************************************/
 
 gulp.task("extension:build", (done) => {
-  const publisher = isProd ? "sonarsource" : yargs.argv.publisher ?? "foo";
+  const publisher = isProd ? "sonarsource" : (yargs.argv.publisher ?? "foo");
 
   const vssExtensions = globby.sync([
     path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json"),
@@ -412,7 +405,7 @@ gulp.task("ci:azure:hotfix-extensions-version", () => {
     path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json"),
   ]);
 
-  return mergeStream(
+  return orderedStreams(
     vssExtensions.map((vssExtension) =>
       gulp
         .src(vssExtension)
@@ -436,7 +429,7 @@ gulp.task("ci:azure:hotfix-tasks-version", () => {
 
   const tasks = globby.sync(["src/extensions/*/tasks/*/v*/*.json"]);
 
-  return mergeStream(
+  return orderedStreams(
     tasks.map((task) =>
       gulp
         .src(task)
@@ -519,7 +512,7 @@ gulp.task("upload:vsix:sonarqube", () => {
   }
   const name = `${packageJSON.name}-sq`;
 
-  return mergeStream(
+  return orderedStreams(
     globby
       .sync(
         path.join(
@@ -578,7 +571,7 @@ gulp.task("upload:vsix:sonarcloud", () => {
   }
   const name = `${packageJSON.name}-sc`;
 
-  return mergeStream(
+  return orderedStreams(
     globby
       .sync(
         path.join(
