@@ -223,7 +223,7 @@ function cycloneDxPipe(...commonPaths) {
     .pipe(
       exec((file) => {
         const flavour = file.dirname.split(path.sep).pop();
-        return `npm run cyclonedx-run -- --output ${DIST_DIR}/cyclonedx-${flavour}.json ${file.dirname}`;
+        return `npm run cyclonedx-run -- --output-file ${DIST_DIR}/cyclonedx-${flavour}.json ${file.dirname}/package.json`;
       }),
     )
     .pipe(exec.reporter());
