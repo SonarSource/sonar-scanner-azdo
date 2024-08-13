@@ -10,7 +10,6 @@ const mergeStream = require("merge-stream");
 const gulpRename = require("gulp-rename");
 const gulpDownload = require("gulp-download");
 const map = require("map-stream");
-const gulpDel = require("del");
 const globby = require("globby");
 const sonarqubeScanner = require("sonarqube-scanner").default;
 const collect = require("gulp-collect");
