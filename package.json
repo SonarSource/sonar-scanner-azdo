@@ -36,7 +36,7 @@
     "eslint-plugin-import": "2.29.1",
     "eslint-plugin-promise": "7.1.0",
     "fs-extra": "11.2.0",
-    "globby": "11.1.0",
+    "glob": "11.0.0",
     "gulp": "4.0.2",
     "gulp-artifactory-upload": "1.4.0",
     "gulp-collect": "0.1.0",
