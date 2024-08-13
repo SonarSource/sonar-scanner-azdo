@@ -10,7 +10,7 @@ const mergeStream = require("merge-stream");
 const gulpRename = require("gulp-rename");
 const gulpDownload = require("gulp-download");
 const map = require("map-stream");
-const globby = require("globby");
+const { globSync: glob } = require("glob");
 const sonarqubeScanner = require("sonarqube-scanner").default;
 const collect = require("gulp-collect");
 const Vinyl = require("vinyl");
@@ -104,8 +104,8 @@ exports.getBuildInfo = function (type, vssData) {
   const name = `sonar-scanner-azdo-${productAccronym}`;
 
   const packageVersion = getVersionWithCirrusBuildNumber(vssData.version);
-  const vsixPaths = globby.sync(path.join(DIST_DIR, `*-${type}.vsix`));
-  const additionalPaths = globby.sync(
+  const vsixPaths = glob(path.join(DIST_DIR, `*-${type}.vsix`));
+  const additionalPaths = glob(
     path.join(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`),
   );
   const qualifierMatch = new RegExp(`${packageVersion}-(.+).vsix$`);
@@ -195,9 +195,9 @@ exports.runSonarQubeScanner = function (extension, customOptions, callback) {
     "sonar.analysis.pipeline": process.env.CIRRUS_BUILD_ID,
     "sonar.analysis.repository": process.env.CIRRUS_REPO_FULL_NAME,
     "sonar.eslint.reportPaths": "eslint-report.json",
-    "sonar.javascript.lcov.reportPaths": globby
-      .sync([path.join("src", "common", "*", "coverage", "lcov.info")])
-      .join(","),
+    "sonar.javascript.lcov.reportPaths": glob([
+      path.join("src", "common", "*", "coverage", "lcov.info"),
+    ]).join(","),
     ...customOptions,
   };
 

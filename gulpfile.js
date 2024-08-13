@@ -9,8 +9,8 @@ const gulpRename = require("gulp-rename");
 const gulpArtifactoryUpload = require("gulp-artifactory-upload");
 const ts = require("gulp-typescript");
 const gulpUtil = require("gulp-util");
-const globby = require("globby");
 const mergeStream = require("merge-stream");
+const { globSync: glob } = require("glob");
 const typescript = require("typescript");
 const decompress = require("gulp-decompress");
 const needle = require("needle");
@@ -59,7 +59,7 @@ gulp.task("clean", () => rimraf([path.join(BUILD_DIR, "**"), path.join(DIST_DIR,
  * Run npm install for all common folders
  */
 gulp.task("build:install-dependencies", async () => {
-  const commonFolders = globby.sync(["src/common/*/index.ts"]);
+  const commonFolders = glob(["src/common/*/index.ts"]);
 
   for (const commonFolder of commonFolders) {
     const folder = path.dirname(commonFolder);
@@ -86,7 +86,7 @@ gulp.task("build:copy-extension", () => {
  */
 gulp.task("build:typescript", () => {
   // Get all tsconfig files in src
-  const tscPaths = globby.sync(["src/tsconfig*.json"]);
+  const tscPaths = glob(["src/tsconfig*.json"]);
 
   // Build each tsconfig
   return mergeStream(
@@ -108,7 +108,7 @@ gulp.task("build:typescript", () => {
  * Bundle tasks
  */
 gulp.task("build:bundle", async () => {
-  const tasks = globby.sync(path.join(SOURCE_DIR, "extensions", "*", "tasks", "*", "v*", "*.ts"));
+  const tasks = glob(path.join(SOURCE_DIR, "extensions", "*", "tasks", "*", "v*", "*.ts"));
   for (const task of tasks) {
     const [extension, , taskName, version] = task.split(path.sep).slice(-5);
     const commonFolder = getTaskCommonFolder(taskName, version);
@@ -131,7 +131,7 @@ gulp.task("build:bundle", async () => {
  * Build all scanners needed by tasks
  */
 gulp.task("build:download-scanners", () => {
-  const configJss = globby.sync([path.join(BUILD_TS_DIR, "common", "*", "config.js")]);
+  const configJss = glob([path.join(BUILD_TS_DIR, "common", "*", "config.js")]);
   const streams = [];
   for (const configJs of configJss) {
     // eslint-disable-next-line import/no-dynamic-require
@@ -174,7 +174,7 @@ gulp.task("build:download-scanners", () => {
  * Copy all task files to the build directory
  */
 gulp.task("build:copy", () => {
-  const tasks = globby.sync(["build/ts/extensions/*/tasks/*/v*/*.js"]);
+  const tasks = glob(["build/ts/extensions/*/tasks/*/v*/*.js"]);
 
   const streams = [];
 
@@ -336,11 +336,9 @@ gulp.task(
 /** EXTENSION *************************************************************************************/
 
 gulp.task("extension:build", (done) => {
-  const publisher = isProd ? "sonarsource" : yargs.argv.publisher ?? "foo";
+  const publisher = isProd ? "sonarsource" : (yargs.argv.publisher ?? "foo");
 
-  const vssExtensions = globby.sync([
-    path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json"),
-  ]);
+  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json")]);
 
   for (const vssExtension of vssExtensions) {
     // eslint-disable-next-line import/no-dynamic-require
@@ -408,9 +406,7 @@ gulp.task("ci:azure:hotfix-extensions-version", () => {
     throw new Error("Missing build number");
   }
 
-  const vssExtensions = globby.sync([
-    path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json"),
-  ]);
+  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json")]);
 
   return mergeStream(
     vssExtensions.map((vssExtension) =>
@@ -434,7 +430,7 @@ gulp.task("ci:azure:hotfix-tasks-version", () => {
     throw new Error("Missing build number");
   }
 
-  const tasks = globby.sync(["src/extensions/*/tasks/*/v*/*.json"]);
+  const tasks = glob(["src/extensions/*/tasks/*/v*/*.json"]);
 
   return mergeStream(
     tasks.map((task) =>
@@ -503,7 +499,7 @@ gulp.task("upload:sign", () => {
 });
 
 gulp.task("upload:cyclonedx", () => {
-  const commonPaths = globby.sync([path.join(SOURCE_DIR, "common", "*", "package.json")]);
+  const commonPaths = glob([path.join(SOURCE_DIR, "common", "*", "package.json")]);
 
   return cycloneDxPipe(...commonPaths.map((commonPath) => path.dirname(commonPath)));
 });
@@ -520,50 +516,48 @@ gulp.task("upload:vsix:sonarqube", () => {
   const name = `${packageJSON.name}-sq`;
 
   return mergeStream(
-    globby
-      .sync(
-        path.join(
-          DIST_DIR,
-          "*{-sonarqube.vsix,cyclonedx-sonarqube-*.json,cyclonedx-latest.json,-sonarqube*.asc}",
-        ),
-      )
-      .map((filePath) => {
-        const [sha1, md5] = fileHashsum(filePath);
-        const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarqube");
-        const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-        const packageVersion = getVersionWithCirrusBuildNumber(vssExtension.version);
-        return gulp
-          .src(filePath)
-          .pipe(
-            gulpArtifactoryUpload({
-              url:
-                process.env.ARTIFACTORY_URL +
-                "/" +
-                process.env.ARTIFACTORY_DEPLOY_REPO +
-                "/org/sonarsource/scanner/azdo/" +
-                name +
-                "/" +
-                "sonarqube" +
-                "/" +
-                packageVersion,
-              username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
-              password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
-              properties: {
-                "vcs.revision": process.env.CIRRUS_CHANGE_IN_REPO,
-                "vcs.branch": process.env.CIRRUS_BRANCH,
-                "build.name": name,
-                "build.number": process.env.BUILD_NUMBER,
+    glob(
+      path.join(
+        DIST_DIR,
+        "*{-sonarqube.vsix,cyclonedx-sonarqube-*.json,cyclonedx-latest.json,-sonarqube*.asc}",
+      ),
+    ).map((filePath) => {
+      const [sha1, md5] = fileHashsum(filePath);
+      const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarqube");
+      const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+      const packageVersion = getVersionWithCirrusBuildNumber(vssExtension.version);
+      return gulp
+        .src(filePath)
+        .pipe(
+          gulpArtifactoryUpload({
+            url:
+              process.env.ARTIFACTORY_URL +
+              "/" +
+              process.env.ARTIFACTORY_DEPLOY_REPO +
+              "/org/sonarsource/scanner/azdo/" +
+              name +
+              "/" +
+              "sonarqube" +
+              "/" +
+              packageVersion,
+            username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
+            password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
+            properties: {
+              "vcs.revision": process.env.CIRRUS_CHANGE_IN_REPO,
+              "vcs.branch": process.env.CIRRUS_BRANCH,
+              "build.name": name,
+              "build.number": process.env.BUILD_NUMBER,
+            },
+            request: {
+              headers: {
+                "X-Checksum-MD5": md5,
+                "X-Checksum-Sha1": sha1,
               },
-              request: {
-                headers: {
-                  "X-Checksum-MD5": md5,
-                  "X-Checksum-Sha1": sha1,
-                },
-              },
-            }),
-          )
-          .on("error", gulpUtil.log);
-      }),
+            },
+          }),
+        )
+        .on("error", gulpUtil.log);
+    }),
   );
 });
 
@@ -579,50 +573,48 @@ gulp.task("upload:vsix:sonarcloud", () => {
   const name = `${packageJSON.name}-sc`;
 
   return mergeStream(
-    globby
-      .sync(
-        path.join(
-          DIST_DIR,
-          "*{-sonarcloud.vsix,cyclonedx-sonarcloud-*.json,cyclonedx-latest.json,-sonarcloud*.asc}",
-        ),
-      )
-      .map((filePath) => {
-        const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarcloud");
-        const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-        const packageVersion = getVersionWithCirrusBuildNumber(vssExtension.version);
-        const [sha1, md5] = fileHashsum(filePath);
-        return gulp
-          .src(filePath)
-          .pipe(
-            gulpArtifactoryUpload({
-              url:
-                process.env.ARTIFACTORY_URL +
-                "/" +
-                process.env.ARTIFACTORY_DEPLOY_REPO +
-                "/org/sonarsource/scanner/azdo/" +
-                name +
-                "/" +
-                "sonarcloud" +
-                "/" +
-                packageVersion,
-              username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
-              password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
-              properties: {
-                "vcs.revision": process.env.CIRRUS_CHANGE_IN_REPO,
-                "vcs.branch": process.env.CIRRUS_BRANCH,
-                "build.name": name,
-                "build.number": process.env.BUILD_NUMBER,
+    glob(
+      path.join(
+        DIST_DIR,
+        "*{-sonarcloud.vsix,cyclonedx-sonarcloud-*.json,cyclonedx-latest.json,-sonarcloud*.asc}",
+      ),
+    ).map((filePath) => {
+      const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarcloud");
+      const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+      const packageVersion = getVersionWithCirrusBuildNumber(vssExtension.version);
+      const [sha1, md5] = fileHashsum(filePath);
+      return gulp
+        .src(filePath)
+        .pipe(
+          gulpArtifactoryUpload({
+            url:
+              process.env.ARTIFACTORY_URL +
+              "/" +
+              process.env.ARTIFACTORY_DEPLOY_REPO +
+              "/org/sonarsource/scanner/azdo/" +
+              name +
+              "/" +
+              "sonarcloud" +
+              "/" +
+              packageVersion,
+            username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
+            password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
+            properties: {
+              "vcs.revision": process.env.CIRRUS_CHANGE_IN_REPO,
+              "vcs.branch": process.env.CIRRUS_BRANCH,
+              "build.name": name,
+              "build.number": process.env.BUILD_NUMBER,
+            },
+            request: {
+              headers: {
+                "X-Checksum-MD5": md5,
+                "X-Checksum-Sha1": sha1,
               },
-              request: {
-                headers: {
-                  "X-Checksum-MD5": md5,
-                  "X-Checksum-Sha1": sha1,
-                },
-              },
-            }),
-          )
-          .on("error", gulpUtil.log);
-      }),
+            },
+          }),
+        )
+        .on("error", gulpUtil.log);
+    }),
   );
 });
 
