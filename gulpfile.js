@@ -1,3 +1,4 @@
+const { rimraf } = require("rimraf");
 const path = require("path");
 const gulp = require("gulp");
 const gulpFile = require("gulp-file");
@@ -13,7 +14,6 @@ const mergeStream = require("merge-stream");
 const typescript = require("typescript");
 const decompress = require("gulp-decompress");
 const needle = require("needle");
-const del = require("del");
 const esbuild = require("esbuild");
 const {
   SOURCE_DIR,
@@ -51,7 +51,7 @@ const isProd = process.env.BUILD_MODE === "production";
 /**
  * Delete all files in the build directory
  */
-gulp.task("clean", () => del([path.join(BUILD_DIR, "**"), path.join(DIST_DIR, "**")]));
+gulp.task("clean", () => rimraf([path.join(BUILD_DIR, "**"), path.join(DIST_DIR, "**")]));
 
 /** BUILD *****************************************************************************************/
 
