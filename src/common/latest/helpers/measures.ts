@@ -14,14 +14,12 @@ const FORMATTERS: { [type: string]: Formatter } = {
   COMPARATOR: comparatorFormatter,
 };
 
-interface Formatter {
-  (value: string | number, options?: any): string;
-}
+type Formatter = (value: string | number, options?: unknown) => string;
 
 export function formatMeasure(
   value: string | number | undefined,
   type: string,
-  options?: any,
+  options?: unknown,
 ): string {
   const formatter = getFormatter(type);
   return useFormatter(value, formatter, options);
@@ -30,7 +28,7 @@ export function formatMeasure(
 function useFormatter(
   value: string | number | undefined,
   formatter: Formatter,
-  options?: any,
+  options?: unknown,
 ): string {
   return value !== undefined && value !== "" ? formatter(value, options) : "";
 }
@@ -91,7 +89,7 @@ function ratingFormatter(value: string | number): string {
   if (typeof value === "string") {
     value = parseInt(value, 10);
   }
-  return String.fromCharCode(97 + value - 1).toUpperCase();
+  return String.fromCharCode("A".charCodeAt(0) + value - 1);
 }
 
 function levelFormatter(value: string): string {
@@ -101,8 +99,7 @@ function levelFormatter(value: string): string {
     OK: "passed",
     NONE: "none",
   };
-  const result = l10nKeys[value.toUpperCase()];
-  return result ? result : value;
+  return l10nKeys[value.toUpperCase()] ?? value;
 }
 
 function levelIconFormatter(value: string): string {
@@ -122,8 +119,7 @@ function comparatorFormatter(value: string): string {
     LT: "&ge;",
     NE: "&#8800;",
   };
-  const result = l10nKeys[value.toUpperCase()];
-  return result ? result : value;
+  return l10nKeys[value.toUpperCase()] ?? value;
 }
 
 function millisecondsFormatter(value: number): string {

@@ -58,7 +58,7 @@ export async function fetchProjectStatus(
  */
 export async function fetchMetrics(
   endpoint: Endpoint,
-  data: { f?: string; p?: number; ps?: number } = { f: "name", ps: 500 },
+  data: { f?: string; p?: string; ps?: string } = { f: "name", ps: "500" },
   prev?: MetricsResponse,
 ): Promise<Metric[]> {
   try {
@@ -68,7 +68,11 @@ export async function fetchMetrics(
     if (p * ps >= total) {
       return result;
     }
-    return fetchMetrics(endpoint, { ...data, p: p + 1 }, { ...response, metrics: result });
+    return fetchMetrics(
+      endpoint,
+      { ...data, p: (p + 1).toString() },
+      { ...response, metrics: result },
+    );
   } catch (error) {
     if (error?.message) {
       tl.error(error.message);

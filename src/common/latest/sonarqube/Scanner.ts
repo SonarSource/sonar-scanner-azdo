@@ -58,9 +58,13 @@ export default class Scanner {
     return {};
   }
 
-  public async runPrepare() {}
+  public async runPrepare() {
+    // Empty by default. Can be overridden by subclasses.
+  }
 
-  public async runAnalysis() {}
+  public async runAnalysis() {
+    // Empty by default. Can be overridden by subclasses.
+  }
 
   public static getScanner(rootPath: string) {
     return new Scanner(rootPath, ScannerMode.Other);

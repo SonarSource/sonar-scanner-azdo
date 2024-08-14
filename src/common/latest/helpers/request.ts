@@ -4,7 +4,7 @@ import * as semver from "semver";
 import Endpoint from "../sonarqube/Endpoint";
 
 export interface RequestData {
-  [x: string]: any;
+  [x: string]: string;
 }
 
 export async function get<T>(
