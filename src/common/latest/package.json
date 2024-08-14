@@ -16,6 +16,7 @@
     "guid-typescript": "1.0.9",
     "hpagent": "1.2.0",
     "node-fetch": "3.3.2",
+    "properties-file": "3.5.5",
     "semver": "7.6.3"
   },
   "overrides": {

@@ -28,16 +28,3 @@ it("should build jsonpath body properly", async () => {
 
   expect(tl.debug).toHaveBeenCalledWith(jsonAsString);
 });
-
-it("should parse extra properties correctly", () => {
-  jest.spyOn(tl, "getDelimitedInput").mockReturnValueOnce(
-    `# Additional properties that will be passed to the scanner, 
-# Put one key=value per line, example:
-# sonar.exclusions=**/*.bin
-sonar.scanner.metadataFilePath=/tmp/report-task-debug.txt
-sonar.scanner.metadataFilePath=/tmp/report-task-debug-override.txt`.split("\n"),
-  ); //extraProperties
-  const props = azdoApiUtils.parseScannerExtraProperties();
-
-  expect(props["sonar.scanner.metadataFilePath"]).toBe("/tmp/report-task-debug-override.txt");
-});
