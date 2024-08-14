@@ -12,7 +12,6 @@ const gulpDownload = require("gulp-download");
 const map = require("map-stream");
 const { globSync: glob } = require("glob");
 const sonarqubeScanner = require("sonarqube-scanner").default;
-const collect = require("gulp-collect");
 const Vinyl = require("vinyl");
 const { resolveRelativePath, SOURCE_DIR, DIST_DIR, BUILD_DIR } = require("./paths");
 

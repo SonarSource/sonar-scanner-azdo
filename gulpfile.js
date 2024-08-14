@@ -3,12 +3,12 @@ const path = require("path");
 const gulp = require("gulp");
 const gulpFile = require("gulp-file");
 const fs = require("fs-extra");
+const log = require("fancy-log");
 const yargs = require("yargs");
 const gulpJsonEditor = require("gulp-json-editor");
 const gulpRename = require("gulp-rename");
 const gulpArtifactoryUpload = require("gulp-artifactory-upload");
 const ts = require("gulp-typescript");
-const gulpUtil = require("gulp-util");
 const mergeStream = require("merge-stream");
 const { globSync: glob } = require("glob");
 const typescript = require("typescript");
@@ -506,12 +506,12 @@ gulp.task("upload:cyclonedx", () => {
 
 gulp.task("upload:vsix:sonarqube", () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
-    gulpUtil.log("Not on master nor PR, skip upload:vsix");
-    return gulpUtil.noop;
+    log("Not on master nor PR, skip upload:vsix");
+    return Promise.resolve();
   }
   if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
-    gulpUtil.log("On PR, but artifacts should not be deployed, skip upload:vsix");
-    return gulpUtil.noop;
+    log("On PR, but artifacts should not be deployed, skip upload:vsix");
+    return Promise.resolve();
   }
   const name = `${packageJSON.name}-sq`;
 
@@ -556,19 +556,19 @@ gulp.task("upload:vsix:sonarqube", () => {
             },
           }),
         )
-        .on("error", gulpUtil.log);
+        .on("error", log);
     }),
   );
 });
 
 gulp.task("upload:vsix:sonarcloud", () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
-    gulpUtil.log("Not on master nor PR, skip upload:vsix");
-    return gulpUtil.noop;
+    log("Not on master nor PR, skip upload:vsix");
+    return Promise.resolve();
   }
   if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
-    gulpUtil.log("On PR, but artifacts should not be deployed, skip upload:vsix");
-    return gulpUtil.noop;
+    log("On PR, but artifacts should not be deployed, skip upload:vsix");
+    return Promise.resolve();
   }
   const name = `${packageJSON.name}-sc`;
 
@@ -613,18 +613,18 @@ gulp.task("upload:vsix:sonarcloud", () => {
             },
           }),
         )
-        .on("error", gulpUtil.log);
+        .on("error", log);
     }),
   );
 });
 
 gulp.task("upload:buildinfo", async () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
-    gulpUtil.log("Not on master nor PR, skip upload:buildinfo");
+    log("Not on master nor PR, skip upload:buildinfo");
     return;
   }
   if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
-    gulpUtil.log("On PR, but artifacts should not be deployed, skip upload:buildinfo");
+    log("On PR, but artifacts should not be deployed, skip upload:buildinfo");
     return;
   }
 
@@ -662,7 +662,7 @@ gulp.task(
 
 gulp.task("promote", async () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
-    gulpUtil.log("Not on master nor PR, skip promote");
+    log("Not on master nor PR, skip promote");
     return;
   }
 
