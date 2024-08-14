@@ -1,5 +1,7 @@
 # SonarQube/SonarCloud Azure Pipelines Extension
 
+dummy commit
+
 [![Build Status](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_apis/build/status%2FSonarSource.sonar-scanner-azdo?branchName=master)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/latest?definitionId=126&branchName=master)
 
 Sonar's [Clean Code solutions](https://www.sonarsource.com/solutions/clean-code/?utm_medium=referral&utm_source=github&utm_campaign=clean-code&utm_content=sonar-scanner-azdo) help developers deliver high-quality, efficient code standards that benefit the entire team or organization.
