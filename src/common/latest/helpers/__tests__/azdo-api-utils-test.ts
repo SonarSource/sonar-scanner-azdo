@@ -15,7 +15,7 @@ it("should build jsonpath body properly", async () => {
   jest.spyOn(azdoApiUtils, "getWebApi").mockImplementation(() => webApi);
   jest.spyOn(tl, "debug").mockImplementation(() => null);
 
-  const jsonAsString = `[{\"op\":${Operation.Add},\"path\":\"/sonarglobalqualitygate\",\"value\":\"test\"}]`;
+  const jsonAsString = `[{"op":${Operation.Add},"path":"/sonarglobalqualitygate","value":"test"}]`;
 
   const properties: azdoApiUtils.IPropertyBag[] = [];
 
