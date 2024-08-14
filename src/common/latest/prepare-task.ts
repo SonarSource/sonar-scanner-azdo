@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { getProperties } from "properties-file";
 import * as semver from "semver";
-import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
-
+import { getWebApi } from "./helpers/azdo-api-utils";
 import {
   AzureBuildVariables,
   AzureProvider,
@@ -23,6 +23,8 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
 
+  const extraProperties = getProperties(tl.getInput("extraProperties") ?? "");
+
   let props: { [key: string]: string } = {};
 
   if (branchFeatureSupported(endpoint, serverVersion)) {
@@ -38,18 +40,13 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
 
   props = {
     ...props,
-    ...parseScannerExtraProperties(),
+    ...extraProperties,
   };
 
   tl.setVariable(TaskVariables.SonarServerVersion, serverVersion.format());
   tl.setVariable(TaskVariables.SonarScannerMode, scannerMode);
   tl.setVariable(TaskVariables.SonarScannerReportTaskFile, props["sonar.scanner.metadataFilePath"]);
   tl.setVariable(TaskVariables.SonarEndpoint, endpoint.toJson(), true);
-
-  tl.getDelimitedInput("extraProperties", "\n")
-    .filter((keyValue) => !keyValue.startsWith("#"))
-    .map((keyValue) => keyValue.split(/=(.+)/))
-    .forEach(([k, v]) => (props[k] = v));
 
   tl.setVariable(TaskVariables.SonarScannerMode, scannerMode);
   tl.setVariable(TaskVariables.SonarEndpoint, endpoint.toJson(), true);
