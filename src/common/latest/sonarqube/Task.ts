@@ -57,7 +57,7 @@ export default class Task {
       let task: ITask;
 
       try {
-        ({ task } = (await fetchWithRetry(endpoint, `/api/ce/task`, true, query)) as {
+        ({ task } = (await fetchWithRetry(endpoint, `/api/ce/task`, query)) as {
           task: ITask;
         });
       } catch (error) {

@@ -16,13 +16,12 @@ export const RETRY_DELAY = 2000;
 export async function fetchWithRetry<T>(
   endpoint: Endpoint,
   path: string,
-  isJson: boolean,
   query?: RequestData,
 ): Promise<T | string> {
   let attempts = 0;
   while (attempts < RETRY_MAX_ATTEMPTS) {
     try {
-      return await get<T>(endpoint, path, isJson, query);
+      return await get<T>(endpoint, path, query);
     } catch (error) {
       attempts++;
       tl.debug(`[SQ] API GET '${path}' failed (attempt ${attempts}/${RETRY_MAX_ATTEMPTS})`);
@@ -39,9 +38,13 @@ export async function fetchProjectStatus(
   tl.debug(`Retrieve Analysis id '${analysisId}.'`);
 
   try {
-    const { projectStatus } = (await get(endpoint, "/api/qualitygates/project_status", true, {
-      analysisId,
-    })) as { projectStatus: ProjectStatus };
+    const { projectStatus } = await get<{ projectStatus: ProjectStatus }>(
+      endpoint,
+      "/api/qualitygates/project_status",
+      {
+        analysisId,
+      },
+    );
     return projectStatus;
   } catch (error) {
     if (error?.message) {
@@ -62,7 +65,7 @@ export async function fetchMetrics(
   prev?: MetricsResponse,
 ): Promise<Metric[]> {
   try {
-    const response = (await get(endpoint, "/api/metrics/search", true, data)) as MetricsResponse;
+    const response = await get<MetricsResponse>(endpoint, "/api/metrics/search", data);
     const { metrics, p, ps, total } = response;
     const result = prev ? prev.metrics.concat(metrics) : metrics;
     if (p * ps >= total) {
@@ -89,12 +92,7 @@ export async function fetchComponentMeasures(
   data: { component: string; branch?: string; pullRequest?: string; metricKeys: string },
 ): Promise<Measure[]> {
   try {
-    const response = (await get(
-      endpoint,
-      "/api/measures/component",
-      true,
-      data,
-    )) as MeasureResponse;
+    const response = await get<MeasureResponse>(endpoint, "/api/measures/component", data);
     return response.component.measures;
   } catch (error) {
     if (error?.message) {
