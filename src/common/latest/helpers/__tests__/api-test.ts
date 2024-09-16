@@ -56,7 +56,7 @@ describe("fetchWithRetry", () => {
       }
       jest.mocked(get).mockResolvedValueOnce("bar");
 
-      const result = await fetchWithRetry(MOCKED_ENDPOINT, "/api", false);
+      const result = await fetchWithRetry(MOCKED_ENDPOINT, "/api");
       expect(result).toBe("bar");
       expect(get).toHaveBeenCalledTimes(3);
     },
@@ -72,7 +72,7 @@ describe("fetchWithRetry", () => {
 
       expect.assertions(2);
       try {
-        await fetchWithRetry(MOCKED_ENDPOINT, "/api", false);
+        await fetchWithRetry(MOCKED_ENDPOINT, "/api");
       } catch (error) {
         expect(get).toHaveBeenCalledTimes(3);
         expect(error.message).toBe("[SQ] API GET '/api' failed, max attempts reached");
@@ -93,7 +93,7 @@ describe("fetchProjectStatus", () => {
 
     const projectStatus = await fetchProjectStatus(MOCKED_ENDPOINT, "analysisId");
 
-    expect(get).toHaveBeenCalledWith(MOCKED_ENDPOINT, "/api/qualitygates/project_status", true, {
+    expect(get).toHaveBeenCalledWith(MOCKED_ENDPOINT, "/api/qualitygates/project_status", {
       analysisId: "analysisId",
     });
     expect(projectStatus.status).toBe("ERROR");
@@ -132,7 +132,7 @@ describe("fetchMetrics", () => {
     } as MetricsResponse);
 
     const metrics = await fetchMetrics(MOCKED_ENDPOINT);
-    expect(get).toHaveBeenCalledWith(MOCKED_ENDPOINT, "/api/metrics/search", true, {
+    expect(get).toHaveBeenCalledWith(MOCKED_ENDPOINT, "/api/metrics/search", {
       f: "name",
       ps: "500",
     });

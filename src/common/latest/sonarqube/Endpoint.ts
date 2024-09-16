@@ -1,8 +1,7 @@
+import { AxiosRequestConfig } from "axios";
 import * as tl from "azure-pipelines-task-lib/task";
 import { HttpProxyAgent, HttpsProxyAgent } from "hpagent";
-import { RequestInit } from "node-fetch";
 import * as semver from "semver";
-import { URL } from "url";
 import { PROP_NAMES } from "../helpers/constants";
 import { getProxyFromURI } from "../helpers/proxyFromEnv";
 
@@ -31,7 +30,7 @@ export default class Endpoint {
     this.data = data;
     // Remove trailing slash at the end of the base url, if any
     if (this.data) {
-      this.data.url = this.data?.url.replace(/\/$/, "");
+      this.data.url = this.data.url.replace(/\/$/, "");
     }
   }
 
@@ -48,24 +47,21 @@ export default class Endpoint {
     return { username: this.data.token || this.data.username, password: "" };
   }
 
-  toFetchOptions(endpointUrl: string, signal?: AbortSignal): Partial<RequestInit> {
-    const options: Partial<RequestInit> = {
-      method: "get",
-      signal,
-    };
-
-    // Add HTTP auth from this.auth
-    options.headers = {
-      Authorization:
-        "Basic " + Buffer.from(`${this.auth.username}:${this.auth.password}`).toString("base64"),
+  toAxiosOptions(): AxiosRequestConfig {
+    const options: AxiosRequestConfig = {
+      timeout: Endpoint.REQUEST_TIMEOUT,
+      auth: {
+        username: this.auth.username,
+        password: this.auth.password,
+      },
     };
 
     // Fetch proxy from environment
     // We ignore proxy set by agent proxy configuration, we need to discuss whether we want to itroduce it
     // Currently users may pass environment variables (HTTP_PROXY,HTTPS_proxy etc.) to the task or agent to use proxy
     // as a workaround
-    const proxyUrl = getProxyFromURI(new URL(endpointUrl))
-      ? getProxyFromURI(new URL(endpointUrl))
+    const proxyUrl = getProxyFromURI(new URL(this.url))
+      ? getProxyFromURI(new URL(this.url))
       : undefined;
     if (proxyUrl) {
       tl.debug("Using proxy agent from environment: " + proxyUrl);
@@ -75,8 +71,14 @@ export default class Endpoint {
 
     // When proxy is used we use HttpsProxyAgent or HttpProxyAgent to handle it.
     if (proxyUrl) {
-      const AgentClass = endpointUrl.startsWith("https://") ? HttpsProxyAgent : HttpProxyAgent;
-      options.agent = new AgentClass({ proxy: proxyUrl });
+      // We need to set proxy to false to avoid conflicts with agent proxy configuration
+      options.proxy = false;
+      const isHttps = this.url.startsWith("https://");
+      if (isHttps) {
+        options.httpsAgent = new HttpsProxyAgent({ proxy: proxyUrl });
+      } else {
+        options.httpAgent = new HttpProxyAgent({ proxy: proxyUrl });
+      }
     }
 
     return options;
