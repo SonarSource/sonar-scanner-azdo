@@ -75,7 +75,7 @@ describe("fetchWithRetry", () => {
         await fetchWithRetry(MOCKED_ENDPOINT, "/api");
       } catch (error) {
         expect(get).toHaveBeenCalledTimes(3);
-        expect(error.message).toBe("[SQ] API GET '/api' failed, max attempts reached");
+        expect(error.message).toBe("API GET '/api' failed, max attempts reached");
       }
     },
     RETRY_DELAY * 4,

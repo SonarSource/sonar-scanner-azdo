@@ -1,13 +1,16 @@
+import { WebApi } from "azure-devops-node-api";
+import { GitApi } from "azure-devops-node-api/GitApi";
 import * as tl from "azure-pipelines-task-lib/task";
 import * as toolLib from "azure-pipelines-tool-lib/tool";
 import { Guid } from "guid-typescript";
 import * as path from "path";
 import { SemVer } from "semver";
-import { JdkVersionSource } from "../helpers/constants";
+import { AzureProvider, JdkVersionSource } from "../helpers/constants";
 import * as request from "../helpers/request";
 import { AzureTaskLibMock } from "../mocks/AzureTaskLibMock";
 import { AzureToolLibMock } from "../mocks/AzureToolLibMock";
 import * as prept from "../prepare-task";
+import { runTask } from "../run";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import Scanner, { ScannerCLI, ScannerMSBuild, ScannerMode } from "../sonarqube/Scanner";
 import TaskReport from "../sonarqube/TaskReport";
@@ -29,29 +32,113 @@ beforeEach(() => {
   azureToolLibMock.reset();
 });
 
-describe("branchFeatureSupported", () => {
-  it.each([
-    [new Endpoint(EndpointType.SonarCloud, { url: "https://sonarcloud.io" }), "SC", "1.2.3", true],
-    [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "7.1.0", false],
-    [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "9.9.0", true],
-    [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "10.0.0", true],
-    [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "10.1.0", true],
-    [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "11.0.0", true],
-    [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "12.0.0", true],
-  ])(
-    "branch feature is supported for %p %p %p",
-    async (
-      endpoint: Endpoint,
-      product: string,
-      version: string,
-      expectedBranchSupported: Boolean,
-    ) => {
-      tl.debug(`${product} ${version}`);
-      jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer(version));
-      const actual = await prept.branchFeatureSupported(endpoint, version);
-      expect(actual).toBe(expectedBranchSupported);
-    },
-  );
+describe("branch and pull request", () => {
+  describe("detect branch feature", () => {
+    it.each([
+      [new Endpoint(EndpointType.SonarCloud, { url: "https://sonarcloud.io" }), "1.2.3", true],
+      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "7.1.0", false],
+      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "9.9.0", true],
+      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "10.0.0", true],
+      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "10.1.0", true],
+      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "11.0.0", true],
+      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "12.0.0", true],
+    ])(
+      "branch feature is supported for %p %p %p",
+      (endpoint: Endpoint, version: string, expectedBranchSupported: Boolean) => {
+        jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer(version));
+        const actual = prept.branchFeatureSupported(endpoint, version);
+        expect(actual).toBe(expectedBranchSupported);
+      },
+    );
+  });
+
+  describe("should populate branch and pull request properties", () => {
+    it("should not do anything for non-pull request", () => {
+      const props = {};
+      prept.populateBranchAndPrProps(props);
+      expect(props).toEqual({});
+    });
+
+    it("should set basic pull request properties if no supported provider", () => {
+      azureTaskLibMock.setVariables({
+        "System.TeamFoundationCollectionUri": "refs/heads/main",
+        "Build.Repository.Provider": "unsupported-provider",
+        "System.PullRequest.PullRequestId": "123",
+        "System.PullRequest.TargetBranch": "refs/heads/main",
+        "System.PullRequest.SourceBranch": "refs/heads/dev/br/feature",
+      });
+      const props = {};
+      prept.populateBranchAndPrProps(props);
+      expect(props).toEqual({
+        "sonar.pullrequest.key": "123",
+        "sonar.pullrequest.base": "main",
+        "sonar.pullrequest.branch": "dev/br/feature",
+        "sonar.scanner.skip": "true",
+      });
+    });
+  });
+
+  describe("default branch detection", () => {
+    it('should detect TfsGit default branch "refs/heads/main"', async () => {
+      azureTaskLibMock.setVariables({
+        "System.TeamFoundationCollectionUri": "uri",
+        "Build.Repository.Provider": AzureProvider.TfsGit,
+        "Build.SourceBranch": "refs/heads/main",
+      });
+      jest.spyOn(WebApi.prototype, "getGitApi").mockResolvedValue({
+        getRepository: jest.fn().mockReturnValue({
+          defaultBranch: "refs/heads/main",
+        }),
+      } as unknown as GitApi);
+      const props = {};
+      await prept.populateBranchAndPrProps(props);
+      expect(props).toEqual({});
+    });
+
+    it('should detect TfsGit non-default branch "refs/heads/dev"', async () => {
+      azureTaskLibMock.setVariables({
+        "System.TeamFoundationCollectionUri": "uri",
+        "Build.Repository.Provider": AzureProvider.TfsGit,
+        "Build.SourceBranch": "refs/heads/dev",
+      });
+      jest.spyOn(WebApi.prototype, "getGitApi").mockResolvedValue({
+        getRepository: jest.fn().mockReturnValue({
+          defaultBranch: "refs/heads/master",
+        }),
+      } as unknown as GitApi);
+      const props = {};
+      await prept.populateBranchAndPrProps(props);
+      expect(props).toEqual({
+        "sonar.branch.name": "dev",
+      });
+    });
+
+    it.each([
+      [AzureProvider.Git, "refs/heads/master", true],
+      [AzureProvider.Git, "refs/heads/main", false],
+      [AzureProvider.GitHub, "refs/heads/master", true],
+      [AzureProvider.GitHub, "refs/heads/main", false],
+      [AzureProvider.GitHubEnterprise, "refs/heads/master", true],
+      [AzureProvider.GitHubEnterprise, "refs/heads/main", false],
+      [AzureProvider.Bitbucket, "refs/heads/master", true],
+      [AzureProvider.Bitbucket, "refs/heads/main", false],
+    ])("should detect default branch (%s, %s, %s)", async (provider, branchName, isDefault) => {
+      azureTaskLibMock.setVariables({
+        "System.TeamFoundationCollectionUri": "refs/heads/main",
+        "Build.Repository.Provider": provider,
+        "Build.SourceBranch": branchName,
+      });
+      const props = {};
+      await prept.populateBranchAndPrProps(props);
+      expect(props).toEqual(
+        isDefault
+          ? {}
+          : {
+              "sonar.branch.name": prept.getBranchNameFromRef(branchName),
+            },
+      );
+    });
+  });
 });
 
 it("should build report task path from variables", () => {
@@ -122,7 +209,7 @@ describe("downloading the scanner", () => {
           : new ScannerMSBuild(__dirname, {});
       jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => mockedScanner);
 
-      await prept.prepareTask(EndpointType.SonarQube);
+      await runTask(prept.prepareTask, "Prepare", EndpointType.SonarQube);
 
       expect(Scanner.getPrepareScanner).toHaveBeenCalled();
       if (url) {
@@ -150,7 +237,7 @@ describe("downloading the scanner", () => {
     jest.spyOn(toolLib, "downloadTool").mockRejectedValue(new Error(errorResponse));
     jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
-    await expect(prept.prepareTask(EndpointType.SonarQube)).rejects.toThrow(errorResponse);
+    await runTask(prept.prepareTask, "Prepare", EndpointType.SonarQube);
 
     expect(tl.setResult).toHaveBeenCalledWith(
       tl.TaskResult.Failed,
@@ -169,7 +256,7 @@ describe("downloading the scanner", () => {
 
     jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => scanner);
 
-    await prept.prepareTask(EndpointType.SonarQube);
+    await runTask(prept.prepareTask, "Prepare", EndpointType.SonarQube);
 
     expect(Scanner.getPrepareScanner).toHaveBeenCalled();
     expect(toolLib.downloadTool).not.toHaveBeenCalled();

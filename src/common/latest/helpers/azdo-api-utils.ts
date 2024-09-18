@@ -5,6 +5,7 @@ import {
   Operation,
 } from "azure-devops-node-api/interfaces/common/VSSInterfaces";
 import * as tl from "azure-pipelines-task-lib/task";
+import { log, LogLevel } from "./logging";
 
 export interface IPropertyBag {
   propertyName: string;
@@ -26,7 +27,7 @@ export async function addBuildProperty(properties: IPropertyBag[]) {
     });
   });
 
-  tl.debug(JSON.stringify(patchBody));
+  log(LogLevel.DEBUG, `Adding build property: ${JSON.stringify(patchBody)}`);
 
   const customHeader = { Authorization: `Bearer ${getAuthToken()}` };
 
@@ -34,12 +35,13 @@ export async function addBuildProperty(properties: IPropertyBag[]) {
   const jsonPatchBody: JsonPatchDocument[] = patchBody;
 
   try {
-    tl.debug("Acquiring a build API object.");
+    log(LogLevel.DEBUG, "Acquiring a build API object.");
     const buildApi = await azdoWebApi.getBuildApi();
-    tl.debug("Creating a new build property with global Quality Gate Status");
+    log(LogLevel.DEBUG, "Creating a new build property with global Quality Gate Status");
     await buildApi.updateBuildProperties(customHeader, jsonPatchBody, teamProjectId, +buildId);
   } catch (exception) {
-    tl.warning(
+    log(
+      LogLevel.WARN,
       "Failed to create a build property. Not blocking unless you are using the Sonar Pre-Deployment gate in Release Pipelines. Exception : " +
         exception,
     );

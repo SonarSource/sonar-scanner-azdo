@@ -81,11 +81,11 @@ describe("request", () => {
       axiosMock.onGet(`${ENDPOINT.url}/api/server/version`, { params: { a: "b" } }).networkError();
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "GET request '/api/server/version' failed. Error message: Network Error",
+        "API GET '/api/server/version' failed. Error message: Network Error",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `GET request '/api/server/version' failed. Error message: Network Error`,
+        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: Network Error`,
       );
     });
 
@@ -95,11 +95,11 @@ describe("request", () => {
         .reply(500, "some error");
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "GET request '/api/server/version' failed. Status code was: 500",
+        "API GET '/api/server/version' failed. Status code was: 500",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `GET request '/api/server/version' failed. Status code was: 500`,
+        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Status code was: 500`,
       );
     });
 
@@ -107,11 +107,11 @@ describe("request", () => {
       axiosMock.onGet(`${ENDPOINT.url}/api/server/version`, { params: { a: "b" } }).timeout();
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "GET request '/api/server/version' failed. Error message: timeout of 60000ms exceeded",
+        "API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `GET request '/api/server/version' failed. Error message: timeout of 60000ms exceeded`,
+        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded`,
       );
     });
   });
@@ -162,12 +162,13 @@ describe("request", () => {
 
   describe("getServerVersion", () => {
     it("getServerVersion without error", async () => {
+      jest.spyOn(console, "log");
       axiosMock.onGet(`${ENDPOINT.url}/api/server/version`).reply(200, "7.9.1.48248");
 
       const semver = await getServerVersion(ENDPOINT);
       expect(semver.toString()).toEqual("7.9.1");
 
-      expect(tl.debug).toHaveBeenCalledWith(`Server version: 7.9.1.48248`);
+      expect(console.log).toHaveBeenCalledWith(`[INFO]  SonarQube: Server version: 7.9.1.48248`);
     });
   });
 });

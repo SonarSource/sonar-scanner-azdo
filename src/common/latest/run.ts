@@ -1,13 +1,16 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { log, LogLevel, setEndpointType } from "./helpers/logging";
 import { EndpointType } from "./sonarqube/Endpoint";
 
-export type TaskJob = (endpoint: EndpointType) => Promise<void>;
+export type TaskJob = (endpointType: EndpointType) => Promise<void>;
 
-export async function runTask(fun: TaskJob, taskName: string, endpoint: EndpointType) {
+export async function runTask(fun: TaskJob, taskName: string, endpointType: EndpointType) {
+  setEndpointType(endpointType);
+
   try {
-    await fun(endpoint);
+    await fun(endpointType);
   } catch (err) {
-    tl.warning(`Error while executing ${endpoint}:${taskName} task: ${err.message}`);
+    log(LogLevel.ERROR, `Error while executing task ${taskName}: ${err.message}`);
     tl.setResult(tl.TaskResult.Failed, err.message);
   }
 }

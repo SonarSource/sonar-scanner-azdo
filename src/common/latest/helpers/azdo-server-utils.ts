@@ -2,6 +2,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as azdoApiUtils from "./../helpers/azdo-api-utils";
+import { log, LogLevel } from "./logging";
 
 export function publishBuildSummary(summary: string, endpointType = "SonarQube") {
   uploadBuildSummary(saveBuildSummary(summary), `${endpointType} Analysis Report`);
@@ -10,7 +11,7 @@ export function publishBuildSummary(summary: string, endpointType = "SonarQube")
 export function saveBuildSummary(summary: string): string {
   const filePath = path.join(getStagingDirectory(), "SonarQubeBuildSummary.md");
   fs.writeFileSync(filePath, summary);
-  tl.debug(`[SQ] Summary saved at: ${filePath}`);
+  log(LogLevel.DEBUG, `Summary saved at: ${filePath}`);
   return filePath;
 }
 
@@ -21,7 +22,7 @@ export function getStagingDirectory(): string {
 }
 
 export function uploadBuildSummary(summaryPath: string, title: string): void {
-  tl.debug(`[SQ] Uploading build summary from ${summaryPath}`);
+  log(LogLevel.DEBUG, `Uploading build summary from ${summaryPath}`);
   tl.command(
     "task.addattachment",
     {

@@ -8,6 +8,7 @@ import {
   DEFAULT_BRANCH_REF,
   TaskVariables,
 } from "./helpers/constants";
+import { log, LogLevel } from "./helpers/logging";
 import { getServerVersion } from "./helpers/request";
 import { stringifyScannerParams } from "./helpers/utils";
 import { TaskJob } from "./run";
@@ -31,11 +32,12 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
     await populateBranchAndPrProps(props);
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
-    tl.debug(
+    log(
+      LogLevel.DEBUG,
       "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location.",
     );
     props["sonar.scanner.metadataFilePath"] = TaskReport.getDefaultPath();
-    tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
+    log(LogLevel.DEBUG, `Branch and PR parameters: ${JSON.stringify(props)}`);
   }
 
   props = {
@@ -103,7 +105,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     } else if (provider === AzureProvider.Bitbucket) {
       props["sonar.pullrequest.provider"] = "bitbucketcloud";
     } else {
-      tl.warning(`Unsupported PR provider '${provider}'`);
+      log(LogLevel.WARN, `Unsupported PR provider '${provider}'`);
       props["sonar.scanner.skip"] = "true";
     }
   } else if (!(await isDefaultBranch())) {
@@ -141,7 +143,8 @@ async function isDefaultBranch() {
       AzureProvider.Bitbucket,
     ].includes(provider)
   ) {
-    tl.debug(
+    log(
+      LogLevel.INFO,
       `Unable to get default branch with provider ${provider}, assuming 'master' is the default branch.`,
     );
     return currentBranch === DEFAULT_BRANCH_REF;
@@ -153,7 +156,7 @@ async function isDefaultBranch() {
 /**
  * We compute the branch name from the full ref, @see SONARAZDO-165 Don't use Build.SourceBranchName
  */
-function getBranchNameFromRef(fullName: string) {
+export function getBranchNameFromRef(fullName: string) {
   return fullName.replace(/^refs\/heads\//, "");
 }
 
@@ -168,10 +171,10 @@ export async function getDefaultBranch(collectionUrl: string): Promise<string | 
       tl.getVariable(AzureBuildVariables.BuildRepositoryName),
       tl.getVariable("System.TeamProject"),
     );
-    tl.debug(`Default branch of this repository is '${repo.defaultBranch}'`);
+    log(LogLevel.INFO, `Default branch of this repository is '${repo.defaultBranch}'`);
     return repo.defaultBranch;
   } catch (e) {
-    tl.debug("Unable to get default branch, defaulting to 'master': " + e);
+    log(LogLevel.INFO, "Unable to get default branch, defaulting to 'master': " + e);
     return DEFAULT_BRANCH_REF;
   }
 }

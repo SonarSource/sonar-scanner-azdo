@@ -1,19 +1,29 @@
 import * as vm from "azure-devops-node-api";
 import { Operation } from "azure-devops-node-api/interfaces/common/VSSInterfaces";
-import * as tl from "azure-pipelines-task-lib/task";
+import { AzureTaskLibMock } from "../../mocks/AzureTaskLibMock";
 import * as azdoApiUtils from "../azdo-api-utils";
+import { log, LogLevel } from "../logging";
+
+jest.mock("../logging");
+
+const azureTaskLibMock = new AzureTaskLibMock();
+
+beforeEach(() => {
+  jest.restoreAllMocks();
+  azureTaskLibMock.reset();
+});
 
 it("should build jsonpath body properly", async () => {
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce("https://collection-uri.com"); //System.TeamFoundationCollectionUri
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce("1234"); //System.TeamProjectId
-  jest.spyOn(tl, "getVariable").mockReturnValueOnce("4567"); //Build.BuildId
-  jest.spyOn(tl, "getEndpointAuthorization").mockReturnValue({ scheme: "oauth", parameters: {} });
+  azureTaskLibMock.setVariables({
+    "System.TeamFoundationCollectionUri": "https://collection-uri.com",
+    "System.TeamProjectId": "1234",
+    "Build.BuildId": "4567",
+  });
   jest.spyOn(azdoApiUtils, "getAuthToken").mockImplementation(() => null);
 
   const webApi = new vm.WebApi("http://vsts.net", null);
 
   jest.spyOn(azdoApiUtils, "getWebApi").mockImplementation(() => webApi);
-  jest.spyOn(tl, "debug").mockImplementation(() => null);
 
   const jsonAsString = `[{"op":${Operation.Add},"path":"/sonarglobalqualitygate","value":"test"}]`;
 
@@ -26,5 +36,5 @@ it("should build jsonpath body properly", async () => {
 
   await azdoApiUtils.addBuildProperty(properties).then(() => {});
 
-  expect(tl.debug).toHaveBeenCalledWith(jsonAsString);
+  expect(log).toHaveBeenCalledWith(LogLevel.DEBUG, `Adding build property: ${jsonAsString}`);
 });

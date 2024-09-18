@@ -7,6 +7,8 @@ import { TaskVariables } from "../../helpers/constants";
 import Endpoint, { EndpointType } from "../Endpoint";
 import TaskReport from "../TaskReport";
 
+jest.mock("../../helpers/logging");
+
 beforeEach(() => {
   jest.restoreAllMocks();
 });
