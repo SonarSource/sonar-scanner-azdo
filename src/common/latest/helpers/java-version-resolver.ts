@@ -2,6 +2,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import * as semver from "semver";
 import { EndpointType } from "../sonarqube/Endpoint";
 import { JdkVersionSource, SQ_VERSION_DROPPING_JAVA_11, TaskVariables } from "./constants";
+import { log, LogLevel } from "./logging";
 
 export default class JavaVersionResolver {
   /**
@@ -20,7 +21,8 @@ export default class JavaVersionResolver {
     serverVersion?: string,
   ) {
     if (jdkVersion === JdkVersionSource.JavaHome) {
-      tl.debug(
+      log(
+        LogLevel.DEBUG,
         `${JdkVersionSource.JavaHome} was specified in the Run Code Analysis task configuration, nothing to do.`,
       );
       return;
@@ -34,7 +36,8 @@ export default class JavaVersionResolver {
       semver.gte(semver.coerce(serverVersion), SQ_VERSION_DROPPING_JAVA_11) &&
       endpointType === EndpointType.SonarQube;
     if (ignoreJava11 && jdkVersion === JdkVersionSource.JavaHome11) {
-      tl.warning(
+      log(
+        LogLevel.WARN,
         `This task was configured to use Java 11, but the ${endpointType} server v${serverVersion} does not support it.` +
           ` Ignoring the configuration and using ${JdkVersionSource.JavaHome} instead.` +
           ` Specify jdkversion in your task definition to use Java 17 to remove this warning.`,
@@ -46,7 +49,8 @@ export default class JavaVersionResolver {
     const newJavaPath = tl.getVariable(jdkVersion);
 
     if (newJavaPath) {
-      tl.debug(
+      log(
+        LogLevel.DEBUG,
         `${jdkVersion} was found with value ${newJavaPath}, will switch to it for Sonar scanner...`,
       );
       this.javaHomeOriginalPath = tl.getVariable(TaskVariables.JavaHome);
@@ -61,7 +65,7 @@ export default class JavaVersionResolver {
    */
   public static revertJavaHomeToOriginal() {
     if (this.isJavaVersionChanged) {
-      tl.debug(`Reverting ${TaskVariables.JavaHome} to its initial path.`);
+      log(LogLevel.DEBUG, `Reverting ${TaskVariables.JavaHome} to its initial path.`);
       tl.setVariable(TaskVariables.JavaHome, this.javaHomeOriginalPath);
       this.isJavaVersionChanged = false;
     }

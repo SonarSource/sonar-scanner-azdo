@@ -1,4 +1,3 @@
-import * as tl from "azure-pipelines-task-lib/task";
 import {
   htmlDiv,
   htmlLink,
@@ -9,6 +8,7 @@ import {
   htmlSectionDiv,
   htmlSeparator,
 } from "../helpers/html";
+import { log, LogLevel } from "../helpers/logging";
 import { formatMeasure } from "../helpers/measures";
 import { EndpointType } from "./Endpoint";
 import { AnalysisResult, Measure, ProjectStatus } from "./types";
@@ -47,7 +47,7 @@ export default class HtmlAnalysisReport {
   }
 
   public getHtmlAnalysisReport() {
-    tl.debug("Generate analysis report.");
+    log(LogLevel.DEBUG, "Generate analysis report.");
 
     const html = htmlMainDiv(
       [

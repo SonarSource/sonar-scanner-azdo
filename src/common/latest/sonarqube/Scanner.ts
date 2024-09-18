@@ -5,6 +5,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import { scanner as scannerConfig } from "../config";
 import { PROP_NAMES, SCANNER_CLI_NAME, TaskVariables } from "../helpers/constants";
+import { log, LogLevel } from "../helpers/logging";
 import { isWindows } from "../helpers/utils";
 
 export enum ScannerMode {
@@ -32,13 +33,13 @@ export default class Scanner {
 
   static async downloadScanner(fileUrl: string) {
     try {
-      tl.debug(`Downloading scanner from ${fileUrl}`);
+      log(LogLevel.DEBUG, `Downloading scanner from ${fileUrl}`);
       const downloadPath = await toolLib.downloadTool(fileUrl);
-      tl.debug(`Downloaded: ${fileUrl} file to ${downloadPath}`);
+      log(LogLevel.DEBUG, `Downloaded: ${fileUrl} file to ${downloadPath}`);
 
-      tl.debug(`Extracting ${downloadPath}`);
+      log(LogLevel.DEBUG, `Extracting ${downloadPath}`);
       const unzipPath = await toolLib.extractZip(downloadPath);
-      tl.debug(`Unzipped file to ${unzipPath}`);
+      log(LogLevel.DEBUG, `Unzipped file to ${unzipPath}`);
 
       return unzipPath;
     } catch (error) {
@@ -79,15 +80,16 @@ export default class Scanner {
       case ScannerMode.CLI:
         return ScannerCLI.getScanner(rootPath);
       default:
-        throw new Error(`[SQ] Unknown scanner mode: ${mode}`);
+        throw new Error(`Unknown scanner mode: ${mode}`);
     }
   }
 
   public static getAnalyzeScanner(rootPath: string, mode: ScannerMode) {
     switch (mode) {
       case ScannerMode.Other:
-        tl.warning(
-          `[SQ] When using Maven or Gradle, don't use the analyze task but instead tick the ` +
+        log(
+          LogLevel.WARN,
+          `When using Maven or Gradle, don't use the analyze task but instead tick the ` +
             `'SonarQube' option in the Maven/Gradle task to run the scanner as part of the build.`,
         );
         return Scanner.getScanner(rootPath);
@@ -96,7 +98,7 @@ export default class Scanner {
       case ScannerMode.CLI:
         return new ScannerCLI(rootPath, {});
       default:
-        throw new Error(`[SQ] Unknown scanner mode: ${mode}`);
+        throw new Error(`Unknown scanner mode: ${mode}`);
     }
   }
 
@@ -108,7 +110,7 @@ export default class Scanner {
       data = data.toString().trim();
       if (data.indexOf("WARNING: An illegal reflective access operation has occurred") !== -1) {
         //bypass those warning showing as error because they can't be catched for now by Scanner.
-        tl.debug(data);
+        log(LogLevel.DEBUG, data);
         return;
       }
       tl.command("task.logissue", { type: "error" }, data);
@@ -195,7 +197,7 @@ export class ScannerCLI extends Scanner {
         "bin",
         isWindows() ? `${SCANNER_CLI_NAME}.bat` : SCANNER_CLI_NAME,
       );
-    tl.debug(`Using scanner at ${scannerPath}`);
+    log(LogLevel.DEBUG, `Using scanner at ${scannerPath}`);
 
     // Hotfix permissions on UNIX
     if (!isWindows()) {
@@ -275,7 +277,10 @@ export class ScannerMSBuild extends Scanner {
     }
     tl.setVariable(TaskVariables.SonarScannerLocation, scannerPath);
 
-    tl.debug(`Using ${useNetFramework ? ".NET framework" : ".NET core"} scanner at ${scannerPath}`);
+    log(
+      LogLevel.DEBUG,
+      `Using ${useNetFramework ? ".NET framework" : ".NET core"} scanner at ${scannerPath}`,
+    );
     tl.setVariable(
       useNetFramework ? TaskVariables.SonarScannerMSBuildExe : TaskVariables.SonarScannerMSBuildDll,
       scannerPath,
@@ -311,7 +316,7 @@ export class ScannerMSBuild extends Scanner {
   }
 
   private getScannerRunner(scannerPath: string, isExeScanner: boolean) {
-    tl.debug(`Using scanner at ${scannerPath}`);
+    log(LogLevel.DEBUG, `Using scanner at ${scannerPath}`);
 
     if (isExeScanner) {
       return tl.tool(scannerPath);

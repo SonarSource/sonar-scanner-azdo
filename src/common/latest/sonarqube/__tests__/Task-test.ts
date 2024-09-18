@@ -1,9 +1,12 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { fetchWithRetry } from "../../helpers/api";
+import { log, LogLevel } from "../../helpers/logging";
 import Endpoint, { EndpointType } from "../Endpoint";
-import Task, { TimeOutReachedError } from "../Task";
+import { TimeOutReachedError, waitForTaskCompletion } from "../Task";
 
 const MOCKED_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
+
+jest.mock("../../helpers/logging");
 
 jest.mock("../../helpers/request", () => ({
   ...jest.requireActual("../../helpers/request"),
@@ -20,8 +23,8 @@ it("waits for task with success", async () => {
     jest.mocked(fetchWithRetry).mockResolvedValueOnce({ task: { status: "IN_PROGRESS" } });
   }
   jest.mocked(fetchWithRetry).mockResolvedValueOnce({ task: { status: "SUCCESS" } });
-  const task = await Task.waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
-  expect(task).toEqual({ task: { status: "SUCCESS" } });
+  const task = await waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
+  expect(task).toEqual({ status: "SUCCESS" });
 });
 
 it("waits for failing task", async () => {
@@ -32,7 +35,7 @@ it("waits for failing task", async () => {
 
   expect.assertions(1);
   try {
-    await Task.waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
+    await waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
   } catch (error) {
     expect(error.message).toMatch("Task failed with status CANCELED");
   }
@@ -43,9 +46,9 @@ it("should fail if polling fails", async () => {
 
   expect.assertions(1);
   try {
-    await Task.waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
+    await waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
   } catch (error) {
-    expect(error.message).toMatch("[SQ] Could not fetch task for ID 'taskId'");
+    expect(error.message).toMatch("Could not fetch task for ID 'taskId'");
   }
 });
 
@@ -55,11 +58,12 @@ it("timeout if polling takes too long", async () => {
 
   expect.assertions(3);
   try {
-    await Task.waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
+    await waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
   } catch (error) {
     expect(error).toBeInstanceOf(TimeOutReachedError);
-    expect(tl.debug).toHaveBeenCalledWith(
-      "[SQ] Reached timeout while waiting for task to complete",
+    expect(log).toHaveBeenCalledWith(
+      LogLevel.WARN,
+      "Reached timeout while waiting for task to complete",
     );
     expect(fetchWithRetry).toHaveBeenCalledTimes(5);
   }

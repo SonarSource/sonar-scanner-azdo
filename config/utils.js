@@ -158,6 +158,7 @@ exports.runSonarQubeScanner = function (extension, customOptions, callback) {
     "**/package-lock.json",
     "gulpfile.js",
     "**/jest.config.js",
+    "**/babel.config.js",
     "**/esbuild.config.js",
   ];
 

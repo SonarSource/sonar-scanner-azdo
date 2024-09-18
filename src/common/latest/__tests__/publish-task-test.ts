@@ -1,18 +1,31 @@
 import { InvalidApiResourceVersionError } from "azure-devops-node-api/VsoClient";
 import * as tl from "azure-pipelines-task-lib/task";
+import * as fs from "fs-extra";
 import { SemVer } from "semver";
 import * as api from "../helpers/api";
 import { fetchProjectStatus } from "../helpers/api";
 import * as apiUtils from "../helpers/azdo-api-utils";
 import * as serverUtils from "../helpers/azdo-server-utils";
 import { TASK_MISSING_VARIABLE_ERROR_HINT, TaskVariables } from "../helpers/constants";
+import { log, LogLevel } from "../helpers/logging";
 import * as request from "../helpers/request";
+import { mockTask } from "../mocks/helpers";
 import * as publish from "../publish-task";
+import { runTask } from "../run";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
 import HtmlAnalysisReport from "../sonarqube/HtmlAnalysisReport";
-import Task, { TimeOutReachedError } from "../sonarqube/Task";
+import { TimeOutReachedError, waitForTaskCompletion } from "../sonarqube/Task";
 import TaskReport from "../sonarqube/TaskReport";
 import { Metric, ProjectStatus } from "../sonarqube/types";
+
+jest.mock("../helpers/logging");
+
+jest.mock("fs-extra");
+
+jest.mock("../sonarqube/Task", () => ({
+  ...jest.requireActual("../sonarqube/Task"),
+  waitForTaskCompletion: jest.fn(),
+}));
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -91,14 +104,7 @@ it("check multiple report status and set global quality gate for build propertie
   jest.spyOn(tl, "getHttpProxyConfiguration").mockImplementation(() => null);
 
   // Mock waiting for the ceTask to complete and return a Task
-  const returnedTaskOk = new Task({
-    analysisId: "123",
-    componentKey: "key",
-    status: "OK",
-    type: EndpointType.SonarCloud,
-    componentName: "componentName",
-    warnings: [],
-  });
+  const returnedTaskOk = mockTask();
 
   const taskReportArray: TaskReport[] = [];
   const taskReport = new TaskReport({
@@ -112,7 +118,7 @@ it("check multiple report status and set global quality gate for build propertie
   taskReportArray.push(taskReport);
   taskReportArray.push(taskReport);
 
-  jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTaskOk);
+  jest.mocked(waitForTaskCompletion).mockResolvedValue(returnedTaskOk);
   jest.spyOn(TaskReport, "createTaskReportsFromFiles").mockResolvedValue(taskReportArray);
 
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
@@ -128,29 +134,35 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(tl, "getInput").mockImplementation(() => "100");
   jest.spyOn(tl, "debug");
+  jest.spyOn(tl, "command").mockImplementation(() => null);
 
   jest.spyOn(tl, "getVariable").mockImplementationOnce(() => "anything...");
   jest.spyOn(tl, "getVariable").mockImplementation(() => SC_ENDPOINT.toJson());
+
+  jest.spyOn(fs, "writeFileSync").mockImplementation(() => null);
 
   jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue(null);
   jest.spyOn(apiUtils, "getAuthToken").mockImplementation(() => null);
 
   jest.spyOn(serverUtils, "fillBuildProperty");
 
-  jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
-
   await publish.publishTask(EndpointType.SonarCloud);
 
-  expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: ok`);
-  expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 2`);
+  expect(log).toHaveBeenCalledWith(LogLevel.INFO, `Overall Quality Gate status: ok`);
+  expect(log).toHaveBeenCalledWith(LogLevel.DEBUG, `Number of analyses in this build: 2`);
   expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "ok");
+  expect(tl.command).toHaveBeenCalledWith(
+    "task.addattachment",
+    { type: "Distributedtask.Core.Summary", name: "SonarCloud Analysis Report" },
+    expect.any(String),
+  );
 });
 
 it("check multiple report status and set global quality gate for build properties should be failed", async () => {
   jest.spyOn(tl, "getHttpProxyConfiguration").mockImplementation(() => null);
 
   // Mock waiting for the ceTask to complete and return a Task
-  const returnedTaskOk = new Task({
+  const returnedTaskOk = mockTask({
     analysisId: "123",
     componentKey: "key",
     status: "OK",
@@ -172,7 +184,7 @@ it("check multiple report status and set global quality gate for build propertie
   taskReportArray.push(taskReport);
   taskReportArray.push(taskReport);
 
-  jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTaskOk);
+  jest.mocked(waitForTaskCompletion).mockResolvedValue(returnedTaskOk);
 
   jest.spyOn(TaskReport, "createTaskReportsFromFiles").mockResolvedValue(taskReportArray);
 
@@ -202,16 +214,16 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
 
-  await publish.publishTask(EndpointType.SonarCloud);
+  await runTask(publish.publishTask, "Publish", EndpointType.SonarCloud);
 
-  expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: failed`);
-  expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 3`);
+  expect(log).toHaveBeenCalledWith(LogLevel.INFO, `Overall Quality Gate status: failed`);
+  expect(log).toHaveBeenCalledWith(LogLevel.DEBUG, `Number of analyses in this build: 3`);
   expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "failed");
 });
 
 it("get report string should return undefined if ceTask times out", async () => {
   // Mock the ceTask timing out
-  jest.spyOn(Task, "waitForTaskCompletion").mockImplementation(() => {
+  jest.mocked(waitForTaskCompletion).mockImplementation(() => {
     throw new TimeOutReachedError();
   });
   jest.spyOn(api, "fetchProjectStatus");
@@ -221,13 +233,9 @@ it("get report string should return undefined if ceTask times out", async () => 
   const result = await publish.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
   expect(result).toBe("");
-  expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(
-    SQ_ENDPOINT,
-    TASK_REPORT.ceTaskId,
-    999,
-    1000,
-  );
-  expect(tl.warning).toHaveBeenCalledWith(
+  expect(waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999, 1000);
+  expect(log).toHaveBeenCalledWith(
+    LogLevel.WARN,
     "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result.",
   );
   expect(fetchProjectStatus).not.toHaveBeenCalled();
@@ -236,7 +244,7 @@ it("get report string should return undefined if ceTask times out", async () => 
 
 it("get report string should fail for non-timeout errors", async () => {
   // Mock the ceTask timing out
-  jest.spyOn(Task, "waitForTaskCompletion").mockImplementation(() => {
+  jest.mocked(waitForTaskCompletion).mockImplementation(() => {
     throw new InvalidApiResourceVersionError("my error");
   });
   jest.spyOn(HtmlAnalysisReport, "getInstance");
@@ -252,15 +260,10 @@ it("get report string should fail for non-timeout errors", async () => {
 
 it("get report string for single report", async () => {
   // Mock waiting for the ceTask to complete and return a Task
-  const returnedTask = new Task({
-    analysisId: "123",
-    componentKey: "key",
+  const returnedTask = mockTask({
     status: "status",
-    type: EndpointType.SonarQube,
-    componentName: "componentName",
-    warnings: [],
   });
-  jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
+  jest.mocked(waitForTaskCompletion).mockResolvedValue(returnedTask);
 
   jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
 
@@ -270,12 +273,7 @@ it("get report string for single report", async () => {
 
   const result = await publish.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
-  expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(
-    SQ_ENDPOINT,
-    TASK_REPORT.ceTaskId,
-    999,
-    1000,
-  );
+  expect(waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999, 1000);
   expect(fetchProjectStatus).toHaveBeenCalledWith(SQ_ENDPOINT, "123");
 
   expect(result).toBe("dummy html");
@@ -283,7 +281,7 @@ it("get report string for single report", async () => {
 
 it("get report string should fail for non-timeout errors", async () => {
   // Mock the ceTask timing out
-  jest.spyOn(Task, "waitForTaskCompletion").mockImplementation(() => {
+  jest.mocked(waitForTaskCompletion).mockImplementation(() => {
     throw new InvalidApiResourceVersionError("my error");
   });
   jest.spyOn(HtmlAnalysisReport, "getInstance");
@@ -320,7 +318,7 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
     .spyOn(TaskReport, "createTaskReportsFromFiles")
     .mockResolvedValue([TASK_REPORT, taskReport2]);
 
-  jest.spyOn(Task, "waitForTaskCompletion").mockImplementation(() => {
+  jest.mocked(waitForTaskCompletion).mockImplementation(() => {
     throw new TimeOutReachedError();
   });
   const publishSummaryMock = jest
@@ -336,7 +334,7 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
       }),
   );
 
-  await publish.publishTask(EndpointType.SonarCloud);
+  await runTask(publish.publishTask, "Publish", EndpointType.SonarCloud);
 
   expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
   expect(publishSummaryMock.mock.calls[0][1]).toBe(EndpointType.SonarCloud);
@@ -344,10 +342,12 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
 
   expect(serverUtils.publishBuildSummary).toHaveBeenCalledWith("\r\n", EndpointType.SonarCloud);
 
-  expect(tl.warning).toHaveBeenCalledWith(
+  expect(log).toHaveBeenCalledWith(
+    LogLevel.WARN,
     "Task '111' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
   );
-  expect(tl.warning).toHaveBeenCalledWith(
+  expect(log).toHaveBeenCalledWith(
+    LogLevel.WARN,
     "Task '222' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
   );
 });
@@ -366,18 +366,13 @@ describe("it should generate passing report correctly", () => {
     jest.spyOn(api, "fetchMetrics").mockResolvedValue(METRICS);
 
     // Mock waiting for the ceTask to complete and return a Task
-    const returnedTask = new Task({
-      analysisId: "123",
-      componentKey: "projectKey1",
+    const returnedTask = mockTask({
       status: "status",
-      type: EndpointType.SonarQube,
-      componentName: "componentName",
-      warnings: [],
     });
 
     // Mock finding the report file to process
     jest.spyOn(TaskReport, "createTaskReportsFromFiles").mockResolvedValue([TASK_REPORT]);
-    jest.spyOn(Task, "waitForTaskCompletion").mockResolvedValue(returnedTask);
+    jest.mocked(waitForTaskCompletion).mockResolvedValue(returnedTask);
 
     jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue(null);
     jest.spyOn(apiUtils, "getAuthToken").mockImplementation(() => null);
@@ -393,9 +388,10 @@ describe("it should generate passing report correctly", () => {
     tl.setVariable(TaskVariables.SonarEndpoint, SQ_ENDPOINT.toJson());
     jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
 
-    await publish.publishTask(EndpointType.SonarQube);
+    await runTask(publish.publishTask, "Publish", EndpointType.SonarCloud);
 
-    expect(tl.debug).toHaveBeenCalledWith(
+    expect(log).toHaveBeenCalledWith(
+      LogLevel.DEBUG,
       "Unable to get measures. It is expected if you are not using a user token but instead a global or project analysis token.",
     );
   });
@@ -410,7 +406,7 @@ describe("it should generate passing report correctly", () => {
       },
     ]);
 
-    await publish.publishTask(EndpointType.SonarQube);
+    await runTask(publish.publishTask, "Publish", EndpointType.SonarQube);
 
     // spy on publishBuildSummary
     expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
@@ -427,7 +423,7 @@ describe("it should generate passing report correctly", () => {
       .mockResolvedValueOnce({ ...PROJECT_STATUS_OK, conditions: [] });
     jest.spyOn(api, "fetchComponentMeasures").mockResolvedValueOnce([]);
 
-    await publish.publishTask(EndpointType.SonarQube);
+    await runTask(publish.publishTask, "Publish", EndpointType.SonarQube);
 
     // spy on publishBuildSummary
     expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
@@ -459,7 +455,7 @@ describe("it should generate passing report correctly", () => {
         );
       });
 
-      await publish.publishTask(endpointType);
+      await runTask(publish.publishTask, "Publish", endpointType);
 
       // Check build summary
       expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);

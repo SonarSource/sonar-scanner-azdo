@@ -3,8 +3,9 @@ import * as fs from "fs-extra";
 import { Guid } from "guid-typescript";
 import * as path from "path";
 import * as semver from "semver";
-import Endpoint, { EndpointType } from "./Endpoint";
 import { TaskVariables } from "../helpers/constants";
+import { log, LogLevel } from "../helpers/logging";
+import Endpoint, { EndpointType } from "./Endpoint";
 
 export const REPORT_TASK_NAME = "report-task.txt";
 export const SONAR_TEMP_DIRECTORY_NAME = "sonar";
@@ -70,7 +71,8 @@ export default class TaskReport {
     let taskReportGlobResult: string[];
 
     if (endpoint.type === EndpointType.SonarQube && semver.satisfies(serverVersion, "<7.2.0")) {
-      tl.debug(
+      log(
+        LogLevel.INFO,
         "SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file.",
       );
       taskReportGlob = path.join("**", REPORT_TASK_NAME);
@@ -83,7 +85,10 @@ export default class TaskReport {
       taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.TempDirectory"), taskReportGlob);
     }
 
-    tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
+    log(
+      LogLevel.DEBUG,
+      `Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`,
+    );
     return taskReportGlobResult;
   }
 
@@ -97,16 +102,16 @@ export default class TaskReport {
         if (!filePath) {
           return Promise.reject(
             TaskReport.throwInvalidReport(
-              `[SQ] Could not find '${REPORT_TASK_NAME}'.` +
+              `Could not find '${REPORT_TASK_NAME}'.` +
                 ` Possible cause: the analysis did not complete successfully.`,
             ),
           );
         }
-        tl.debug(`[SQ] Read Task report file: ${filePath}`);
+        log(LogLevel.DEBUG, `Read Task report file: ${filePath}`);
         return fs.access(filePath, fs.constants.R_OK).then(
           () => this.parseReportFile(filePath),
           () => {
-            throw TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`);
+            throw TaskReport.throwInvalidReport(`Task report not found at: ${filePath}`);
           },
         );
       }),
@@ -116,9 +121,9 @@ export default class TaskReport {
   private static parseReportFile(filePath: string): Promise<TaskReport> {
     return fs.readFile(filePath, "utf-8").then(
       (fileContent) => {
-        tl.debug(`[SQ] Parse Task report file: ${fileContent}`);
+        log(LogLevel.DEBUG, `Parse Task report file: ${fileContent}`);
         if (!fileContent || fileContent.length <= 0) {
-          throw TaskReport.throwInvalidReport(`[SQ] Error reading file: ${fileContent}`);
+          throw TaskReport.throwInvalidReport(`Error reading file: ${fileContent}`);
         }
         try {
           const settings = TaskReport.createTaskReportFromString(fileContent);
@@ -131,17 +136,15 @@ export default class TaskReport {
           });
           return taskReport;
         } catch (err) {
-          if (err && err.message) {
-            tl.error(`[SQ] Parse Task report error: ${err.message}`);
-          } else if (err) {
-            tl.error(`[SQ] Parse Task report error: ${JSON.stringify(err)}`);
+          if (err) {
+            log(LogLevel.ERROR, `Parse Task report error: ${err.message ?? JSON.stringify(err)}`);
           }
           throw err;
         }
       },
       (err) => {
         throw TaskReport.throwInvalidReport(
-          `[SQ] Error reading file: ${err.message || JSON.stringify(err)}`,
+          `Error reading file: ${err.message || JSON.stringify(err)}`,
         );
       },
     );
@@ -164,7 +167,7 @@ export default class TaskReport {
   }
 
   private static throwInvalidReport(debugMsg: string): Error {
-    tl.error(debugMsg);
+    log(LogLevel.ERROR, debugMsg);
     return new Error(
       "Invalid or missing task report. Check that the analysis finished successfully.",
     );

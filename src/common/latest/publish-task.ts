@@ -7,11 +7,12 @@ import {
   TASK_MISSING_VARIABLE_ERROR_HINT,
   TaskVariables,
 } from "./helpers/constants";
+import { log, LogLevel } from "./helpers/logging";
 import { getServerVersion } from "./helpers/request";
 import { TaskJob } from "./run";
 import Endpoint, { EndpointData, EndpointType } from "./sonarqube/Endpoint";
 import HtmlAnalysisReport from "./sonarqube/HtmlAnalysisReport";
-import Task, { TimeOutReachedError } from "./sonarqube/Task";
+import { TimeOutReachedError, waitForTaskCompletion } from "./sonarqube/Task";
 import TaskReport from "./sonarqube/TaskReport";
 import { Measure, Metric } from "./sonarqube/types";
 
@@ -48,12 +49,12 @@ export const publishTask: TaskJob = async (_endpointType: EndpointType) => {
   }
 
   if (!taskReports.length) {
-    tl.warning("No analyses found in this build! Please check your build configuration.");
+    log(LogLevel.WARN, "No analyses found in this build! Please check your build configuration.");
   } else {
-    tl.debug(`Number of analyses in this build: ${taskReports.length}`);
+    log(LogLevel.DEBUG, `Number of analyses in this build: ${taskReports.length}`);
   }
 
-  tl.debug(`Overall Quality Gate status: ${globalQualityGateStatus}`);
+  log(LogLevel.INFO, `Overall Quality Gate status: ${globalQualityGateStatus}`);
 
   await fillBuildProperty("sonarglobalqualitygate", globalQualityGateStatus);
 
@@ -97,7 +98,8 @@ async function fetchRelevantMeasures(
     }
     return await fetchComponentMeasures(endpoint, data);
   } catch (error) {
-    tl.debug(
+    log(
+      LogLevel.DEBUG,
       `Unable to get measures. It is expected if you are not using a user token but instead a global or project analysis token.`,
     );
     return [];
@@ -111,7 +113,11 @@ export async function getReportForTask(
   timeoutSec: number,
 ): Promise<string> {
   try {
-    const task = await Task.waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec, 1000);
+    const task = await waitForTaskCompletion(endpoint, taskReport.ceTaskId, timeoutSec, 1000);
+    for (const warning of task.warnings ?? []) {
+      log(LogLevel.INFO, `Analysis succeeded with warning: ${warning}`);
+    }
+
     const projectStatus = await fetchProjectStatus(endpoint, task.analysisId);
     const measures = await fetchRelevantMeasures(endpoint, task.componentKey, metrics);
     const analysis = HtmlAnalysisReport.getInstance(endpoint.type, projectStatus, measures, {
@@ -132,7 +138,8 @@ export async function getReportForTask(
     return analysis.getHtmlAnalysisReport();
   } catch (e) {
     if (e instanceof TimeOutReachedError) {
-      tl.warning(
+      log(
+        LogLevel.WARN,
         `Task '${taskReport.ceTaskId}' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`,
       );
       return "";

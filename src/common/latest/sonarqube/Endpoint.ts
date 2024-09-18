@@ -3,6 +3,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import { HttpProxyAgent, HttpsProxyAgent } from "hpagent";
 import * as semver from "semver";
 import { PROP_NAMES } from "../helpers/constants";
+import { log, LogLevel } from "../helpers/logging";
 import { getProxyFromURI } from "../helpers/proxyFromEnv";
 
 export enum EndpointType {
@@ -63,14 +64,10 @@ export default class Endpoint {
     const proxyUrl = getProxyFromURI(new URL(this.url))
       ? getProxyFromURI(new URL(this.url))
       : undefined;
-    if (proxyUrl) {
-      tl.debug("Using proxy agent from environment: " + proxyUrl);
-    } else {
-      tl.debug("Not using a proxy agent");
-    }
 
     // When proxy is used we use HttpsProxyAgent or HttpProxyAgent to handle it.
     if (proxyUrl) {
+      log(LogLevel.DEBUG, "Using proxy agent from environment: " + proxyUrl);
       // We need to set proxy to false to avoid conflicts with agent proxy configuration
       options.proxy = false;
       const isHttps = this.url.startsWith("https://");

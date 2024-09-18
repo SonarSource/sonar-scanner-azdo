@@ -2,6 +2,9 @@ import * as tl from "azure-pipelines-task-lib/task";
 import { EndpointType } from "../../sonarqube/Endpoint";
 import { JdkVersionSource, TaskVariables } from "../constants";
 import JavaVersionResolver from "../java-version-resolver";
+import { log, LogLevel } from "../logging";
+
+jest.mock("../logging");
 
 const MOCKED_JAVA_VARIABLES = {
   [JdkVersionSource.JavaHome]: "/opt/bin/java/bin",
@@ -66,7 +69,7 @@ describe("JavaVersionResolver", () => {
       expect(tl.setVariable).not.toHaveBeenCalled();
 
       // Expect a warning to be logged at the task level
-      expect(tl.warning).toHaveBeenCalled();
+      expect(log).toHaveBeenCalledWith(LogLevel.WARN, expect.stringMatching(/Java 11/));
 
       JavaVersionResolver.revertJavaHomeToOriginal();
       expect(tl.setVariable).not.toHaveBeenCalled();

@@ -1,4 +1,3 @@
-import * as tl from "azure-pipelines-task-lib/task";
 import Endpoint from "../sonarqube/Endpoint";
 import {
   Measure,
@@ -7,7 +6,8 @@ import {
   MetricsResponse,
   ProjectStatus,
 } from "../sonarqube/types";
-import { RequestData, get } from "./request";
+import { log, LogLevel } from "./logging";
+import { get, RequestData } from "./request";
 import { waitFor } from "./utils";
 
 export const RETRY_MAX_ATTEMPTS = 3;
@@ -24,18 +24,18 @@ export async function fetchWithRetry<T>(
       return await get<T>(endpoint, path, query);
     } catch (error) {
       attempts++;
-      tl.debug(`[SQ] API GET '${path}' failed (attempt ${attempts}/${RETRY_MAX_ATTEMPTS})`);
+      log(LogLevel.DEBUG, `API GET '${path}' failed (attempt ${attempts}/${RETRY_MAX_ATTEMPTS})`);
       await waitFor(RETRY_DELAY);
     }
   }
-  throw new Error(`[SQ] API GET '${path}' failed, max attempts reached`);
+  throw new Error(`API GET '${path}' failed, max attempts reached`);
 }
 
 export async function fetchProjectStatus(
   endpoint: Endpoint,
   analysisId: string,
 ): Promise<ProjectStatus> {
-  tl.debug(`Retrieve Analysis id '${analysisId}.'`);
+  log(LogLevel.DEBUG, `Retrieve Analysis id '${analysisId}.'`);
 
   try {
     const { projectStatus } = await get<{ projectStatus: ProjectStatus }>(
@@ -48,9 +48,9 @@ export async function fetchProjectStatus(
     return projectStatus;
   } catch (error) {
     if (error?.message) {
-      tl.error(`Error retrieving analysis: ${error.message}`);
+      log(LogLevel.ERROR, `Error retrieving analysis: ${error.message}`);
     } else if (error) {
-      tl.error(`Error retrieving analysis: ${JSON.stringify(error)}`);
+      log(LogLevel.ERROR, `Error retrieving analysis: ${JSON.stringify(error)}`);
     }
     throw new Error(`Could not fetch analysis for ID '${analysisId}'`);
   }
@@ -78,9 +78,9 @@ export async function fetchMetrics(
     );
   } catch (error) {
     if (error?.message) {
-      tl.error(error.message);
+      log(LogLevel.ERROR, error.message);
     } else if (error) {
-      tl.error(JSON.stringify(error));
+      log(LogLevel.ERROR, JSON.stringify(error));
     }
 
     throw new Error(`Could not fetch metrics`);
@@ -95,10 +95,11 @@ export async function fetchComponentMeasures(
     const response = await get<MeasureResponse>(endpoint, "/api/measures/component", data);
     return response.component.measures;
   } catch (error) {
-    if (error?.message) {
-      tl.debug("Error fetching component measures: " + error.message);
-    } else if (error) {
-      tl.debug("Error fetching component measures: " + JSON.stringify(error));
+    if (error) {
+      log(
+        LogLevel.INFO,
+        "Error fetching component measures: " + (error.message ?? JSON.stringify(error)),
+      );
     }
 
     throw new Error(`Could not fetch component measures`);
