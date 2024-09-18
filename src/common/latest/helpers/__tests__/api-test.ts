@@ -134,7 +134,7 @@ describe("fetchMetrics", () => {
     const metrics = await fetchMetrics(MOCKED_ENDPOINT);
     expect(get).toHaveBeenCalledWith(MOCKED_ENDPOINT, "/api/metrics/search", true, {
       f: "name",
-      ps: 500,
+      ps: "500",
     });
     expect(metrics).toHaveLength(2);
     expect(metrics[0].key).toBe("bugs");
