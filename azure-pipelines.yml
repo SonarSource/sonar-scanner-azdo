@@ -81,11 +81,12 @@ stages:
             inputs:
               PathtoPublish: "$(Agent.BuildDirectory)/a"
               ArtifactName: "extensions"
-  - stage: unpublish
+  - stage: run_qa
     condition: succeeded()
     dependsOn: build
-    displayName: "Unpublish test extension:"
+    displayName: "Re-publish test extension & Run QA"
     jobs:
+      # Unpublish extension
       - job: "unpublishextensions"
         displayName: "Unpublish test extensions on Marketplace"
         variables:
@@ -113,13 +114,8 @@ stages:
               method: "id"
               publisherId: "$(publisher)"
               extensionId: "sonarqube"
-  - stage: publish
-    condition: succeeded()
-    dependsOn:
-      - build
-      - unpublish
-    displayName: "Publish test extensions:"
-    jobs:
+
+      # Publish Extension
       - job: "publishextensions"
         displayName: "Publish test extensions on Marketplace"
         variables:
@@ -164,13 +160,7 @@ stages:
               extensionId: "sonarcloud"
               accounts: "https://devops.azure.com/$(itOrg)"
 
-  - stage: qa
-    dependsOn:
-      - build
-      - publish
-    displayName: "QA:"
-    condition: succeeded()
-    jobs:
+      # Run QA
       - job: "runqa"
         displayName: "Run QA"
         steps:
