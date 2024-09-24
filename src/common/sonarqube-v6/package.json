@@ -1,5 +1,5 @@
 {
-  "name": "sonar-scanner-azdo-common-latest",
+  "name": "sonar-scanner-azdo-common-sonarqube-v6",
   "private": true,
   "version": "0.0.1",
   "author": "SonarSource",
@@ -16,7 +16,7 @@
     "guid-typescript": "1.0.9",
     "hpagent": "1.2.0",
     "node-fetch": "2.7.0",
-    "semver": "5.7.1"
+    "semver": "7.6.3"
   },
   "overrides": {
     "azure-pipelines-task-lib": {
