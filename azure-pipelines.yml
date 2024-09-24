@@ -86,12 +86,14 @@ stages:
     dependsOn: build
     displayName: "Re-publish test extension & Run QA"
     jobs:
-      # Unpublish extension
-      - job: "unpublishextensions"
-        displayName: "Unpublish test extensions on Marketplace"
+      - job: "run_qa"
         variables:
           publisher: $(SonarSourceITPublisher)
+          sqExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SQ_VERSION'] ]
+          scExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_VERSION'] ]
+          itOrg: $(SonarSourceITOrganization)
         steps:
+          # Unpublish extension
           - task: TfxInstaller@3
             displayName: "Install TFX CLI"
             env:
@@ -115,15 +117,7 @@ stages:
               publisherId: "$(publisher)"
               extensionId: "sonarqube"
 
-      # Publish Extension
-      - job: "publishextensions"
-        displayName: "Publish test extensions on Marketplace"
-        variables:
-          sqExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SQ_VERSION'] ]
-          scExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_VERSION'] ]
-          itOrg: $(SonarSourceITOrganization)
-          publisher: $(SonarSourceITPublisher)
-        steps:
+          # Publish Extension
           - task: TfxInstaller@3
             displayName: "Install TFX CLI"
             env:
@@ -159,11 +153,26 @@ stages:
               publisherId: "$(publisher)"
               extensionId: "sonarcloud"
               accounts: "https://devops.azure.com/$(itOrg)"
+          - task: Bash@3
+            displayName: "Wait for tasks to be available in CI"
+            env:
+              SERVICE_URL: "https://devops.azure.com/$(AzdoItsOrga)"
+              AZURE_TOKEN: $(ItOrgPat)
+            inputs:
+              targetType: "inline"
+              script: |
+                extension_installed=""
+                while [ -z "$extension_installed" ]; do
+                  echo "Waiting for SonarCloudPublish task to be registered..."
+                  tasks=$(tfx build tasks list --authType pat --service-url "$SERVICE_URL" -t "$AZURE_TOKEN" --no-color --json)
+                  extension_installed=$(echo $tasks | jq -r ".[] | select(.name == \"SonarCloudPublish\") | .id")
+                  if [ -z "$extension_installed" ]; then
+                    sleep 5
+                  fi
+                done
+                echo "SonarCloudPublish task is registered with ID: $extension_installed"
 
-      # Run QA
-      - job: "runqa"
-        displayName: "Run QA"
-        steps:
+          # Run QA
           - task: DotNetCoreCLI@2
             displayName: "Run Integration tests project"
             env:
