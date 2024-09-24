@@ -14,7 +14,7 @@ const FORMATTERS: { [type: string]: Formatter } = {
   COMPARATOR: comparatorFormatter,
 };
 
-type Formatter = (value: string | number, options?: unknown) => string;
+type Formatter = (value: any, options?: any) => string;
 
 export function formatMeasure(
   value: string | number | undefined,
@@ -93,7 +93,7 @@ function ratingFormatter(value: string | number): string {
 }
 
 function levelFormatter(value: string): string {
-  const l10nKeys = {
+  const l10nKeys: { [key: string]: string } = {
     ERROR: "failed",
     WARN: "warning",
     OK: "passed",
@@ -103,7 +103,7 @@ function levelFormatter(value: string): string {
 }
 
 function levelIconFormatter(value: string): string {
-  const emojis = {
+  const emojis: { [key: string]: string } = {
     ERROR: "❌",
     WARN: "⚠",
     OK: "✅",
@@ -113,7 +113,7 @@ function levelIconFormatter(value: string): string {
 }
 
 function comparatorFormatter(value: string): string {
-  const l10nKeys = {
+  const l10nKeys: { [key: string]: string } = {
     EQ: "&#61;",
     GT: "&le;",
     LT: "&ge;",

@@ -19,9 +19,9 @@ it("should build jsonpath body properly", async () => {
     "System.TeamProjectId": "1234",
     "Build.BuildId": "4567",
   });
-  jest.spyOn(azdoApiUtils, "getAuthToken").mockImplementation(() => null);
+  jest.spyOn(azdoApiUtils, "getAuthToken").mockReturnValue("the-token");
 
-  const webApi = new vm.WebApi("http://vsts.net", null);
+  const webApi = new vm.WebApi("http://vsts.net", vm.getBearerHandler("the-token"));
 
   jest.spyOn(azdoApiUtils, "getWebApi").mockImplementation(() => webApi);
 

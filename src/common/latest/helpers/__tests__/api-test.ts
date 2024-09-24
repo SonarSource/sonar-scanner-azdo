@@ -70,12 +70,13 @@ describe("fetchWithRetry", () => {
         jest.mocked(get).mockRejectedValueOnce(new Error("foo"));
       }
 
-      expect.assertions(2);
+      expect.assertions(3);
       try {
         await fetchWithRetry(MOCKED_ENDPOINT, "/api");
-      } catch (error) {
+      } catch (error: unknown) {
         expect(get).toHaveBeenCalledTimes(3);
-        expect(error.message).toBe("API GET '/api' failed, max attempts reached");
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe("API GET '/api' failed, max attempts reached");
       }
     },
     RETRY_DELAY * 4,

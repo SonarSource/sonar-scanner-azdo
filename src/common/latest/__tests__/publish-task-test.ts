@@ -52,8 +52,8 @@ const PROJECT_STATUS_OK: ProjectStatus = {
 const ANALYSIS_OK = new HtmlAnalysisReport(EndpointType.SonarQube, PROJECT_STATUS_OK, [], {
   warnings: [],
   dashboardUrl: "",
-  metrics: null,
-  projectName: null,
+  metrics: undefined,
+  projectName: undefined,
 });
 
 const PROJECT_STATUS_ERROR: ProjectStatus = {
@@ -63,8 +63,8 @@ const PROJECT_STATUS_ERROR: ProjectStatus = {
 const ANALYSIS_ERROR = new HtmlAnalysisReport(EndpointType.SonarQube, PROJECT_STATUS_ERROR, [], {
   warnings: [],
   dashboardUrl: "",
-  metrics: null,
-  projectName: null,
+  metrics: undefined,
+  projectName: undefined,
 });
 
 const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
@@ -141,8 +141,8 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(fs, "writeFileSync").mockImplementation(() => null);
 
-  jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue(null);
-  jest.spyOn(apiUtils, "getAuthToken").mockImplementation(() => null);
+  jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue();
+  jest.spyOn(apiUtils, "getAuthToken").mockReturnValue("the-token");
 
   jest.spyOn(serverUtils, "fillBuildProperty");
 
@@ -207,8 +207,8 @@ it("check multiple report status and set global quality gate for build propertie
   jest.spyOn(tl, "getInput").mockImplementation(() => "100");
   jest.spyOn(tl, "debug");
 
-  jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue(null);
-  jest.spyOn(apiUtils, "getAuthToken").mockImplementation(() => null);
+  jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue();
+  jest.spyOn(apiUtils, "getAuthToken").mockReturnValue("the-token");
 
   jest.spyOn(serverUtils, "fillBuildProperty");
 
@@ -374,9 +374,9 @@ describe("it should generate passing report correctly", () => {
     jest.spyOn(TaskReport, "createTaskReportsFromFiles").mockResolvedValue([TASK_REPORT]);
     jest.mocked(waitForTaskCompletion).mockResolvedValue(returnedTask);
 
-    jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue(null);
-    jest.spyOn(apiUtils, "getAuthToken").mockImplementation(() => null);
-    jest.spyOn(serverUtils, "fillBuildProperty").mockImplementation(() => null);
+    jest.spyOn(apiUtils, "addBuildProperty").mockResolvedValue();
+    jest.spyOn(apiUtils, "getAuthToken").mockReturnValue("the-token");
+    jest.spyOn(serverUtils, "fillBuildProperty").mockResolvedValue();
     jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
   });
 

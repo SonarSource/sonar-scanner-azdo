@@ -33,22 +33,24 @@ it("waits for failing task", async () => {
   }
   jest.mocked(fetchWithRetry).mockResolvedValueOnce({ task: { status: "CANCELED" } });
 
-  expect.assertions(1);
+  expect.assertions(2);
   try {
     await waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
-  } catch (error) {
-    expect(error.message).toMatch("Task failed with status CANCELED");
+  } catch (error: unknown) {
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toMatch("Task failed with status CANCELED");
   }
 });
 
 it("should fail if polling fails", async () => {
   jest.mocked(fetchWithRetry).mockRejectedValue(new Error("Polling failed"));
 
-  expect.assertions(1);
+  expect.assertions(2);
   try {
     await waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
-  } catch (error) {
-    expect(error.message).toMatch("Could not fetch task for ID 'taskId'");
+  } catch (error: unknown) {
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toMatch("Could not fetch task for ID 'taskId'");
   }
 });
 

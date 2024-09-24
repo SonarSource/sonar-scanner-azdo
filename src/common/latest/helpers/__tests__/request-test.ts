@@ -81,11 +81,11 @@ describe("request", () => {
       axiosMock.onGet(`${ENDPOINT.url}/api/server/version`, { params: { a: "b" } }).networkError();
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "API GET '/api/server/version' failed. Error message: Network Error",
+        "API GET '/api/server/version' failed. Error message: Network Error.",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: Network Error`,
+        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: Network Error.`,
       );
     });
 
@@ -95,11 +95,11 @@ describe("request", () => {
         .reply(500, "some error");
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "API GET '/api/server/version' failed. Status code was: 500",
+        "API GET '/api/server/version' failed. Error message: Request failed with status code 500.",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Status code was: 500`,
+        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: Request failed with status code 500.`,
       );
     });
 
@@ -107,11 +107,11 @@ describe("request", () => {
       axiosMock.onGet(`${ENDPOINT.url}/api/server/version`, { params: { a: "b" } }).timeout();
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded",
+        "API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded.",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded`,
+        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded.`,
       );
     });
   });

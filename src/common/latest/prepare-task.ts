@@ -17,10 +17,10 @@ import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import TaskReport from "./sonarqube/TaskReport";
 
 export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
-  const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true), endpointType);
+  const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true) as string, endpointType);
   const rootPath = __dirname;
 
-  const scannerMode = ScannerMode[tl.getInput("scannerMode")];
+  const scannerMode = ScannerMode[tl.getInput("scannerMode") as ScannerMode];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
 
@@ -64,7 +64,7 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   await scanner.runPrepare();
 };
 
-export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
+export function branchFeatureSupported(endpoint: Endpoint, serverVersion: string | semver.SemVer) {
   if (endpoint.type === EndpointType.SonarCloud) {
     return true;
   }
@@ -72,7 +72,7 @@ export function branchFeatureSupported(endpoint, serverVersion: string | semver.
 }
 
 export async function populateBranchAndPrProps(props: { [key: string]: string }) {
-  const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri");
+  const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri") as string;
   const provider = tl.getVariable("Build.Repository.Provider") as AzureProvider;
   const pullRequestId = tl.getVariable("System.PullRequest.PullRequestId");
 
@@ -80,10 +80,10 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
   if (pullRequestId) {
     props["sonar.pullrequest.key"] = pullRequestId;
     props["sonar.pullrequest.base"] = getBranchNameFromRef(
-      tl.getVariable("System.PullRequest.TargetBranch"),
+      tl.getVariable("System.PullRequest.TargetBranch") as string,
     );
     props["sonar.pullrequest.branch"] = getBranchNameFromRef(
-      tl.getVariable("System.PullRequest.SourceBranch"),
+      tl.getVariable("System.PullRequest.SourceBranch") as string,
     );
     // Set provider-specific properties
     if (provider === AzureProvider.TfsGit) {
@@ -92,16 +92,18 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
       // is not rejecting this property. However we should drop it later on
       props["sonar.pullrequest.provider"] = "vsts";
       props["sonar.pullrequest.vsts.instanceUrl"] = collectionUrl;
-      props["sonar.pullrequest.vsts.project"] = tl.getVariable("System.TeamProject");
+      props["sonar.pullrequest.vsts.project"] = tl.getVariable("System.TeamProject") as string;
       props["sonar.pullrequest.vsts.repository"] = tl.getVariable(
         AzureBuildVariables.BuildRepositoryName,
-      );
+      ) as string;
     } else if (provider === AzureProvider.GitHub || provider === AzureProvider.GitHubEnterprise) {
-      props["sonar.pullrequest.key"] = tl.getVariable("System.PullRequest.PullRequestNumber");
+      props["sonar.pullrequest.key"] = tl.getVariable(
+        "System.PullRequest.PullRequestNumber",
+      ) as string;
       props["sonar.pullrequest.provider"] = "github";
       props["sonar.pullrequest.github.repository"] = tl.getVariable(
         AzureBuildVariables.BuildRepositoryName,
-      );
+      ) as string;
     } else if (provider === AzureProvider.Bitbucket) {
       props["sonar.pullrequest.provider"] = "bitbucketcloud";
     } else {
@@ -110,7 +112,9 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     }
   } else if (!(await isDefaultBranch())) {
     // If analyzing a branch and not on default branch, specify branch
-    props["sonar.branch.name"] = getBranchNameFromRef(tl.getVariable("Build.SourceBranch"));
+    props["sonar.branch.name"] = getBranchNameFromRef(
+      tl.getVariable("Build.SourceBranch") as string,
+    );
   }
 }
 
@@ -120,7 +124,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
  * rejected by SonarQube Communnity Edition.
  */
 async function isDefaultBranch() {
-  const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri");
+  const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri") as string;
   const provider = tl.getVariable("Build.Repository.Provider") as AzureProvider;
   const currentBranch = tl.getVariable("Build.SourceBranch");
 
@@ -163,12 +167,12 @@ export function getBranchNameFromRef(fullName: string) {
 /**
  * Query Azure Repo to get the full name of the default branch
  */
-export async function getDefaultBranch(collectionUrl: string): Promise<string | null> {
+export async function getDefaultBranch(collectionUrl: string): Promise<string | undefined> {
   try {
     const vsts = getWebApi(collectionUrl);
     const gitApi = await vsts.getGitApi();
     const repo = await gitApi.getRepository(
-      tl.getVariable(AzureBuildVariables.BuildRepositoryName),
+      tl.getVariable(AzureBuildVariables.BuildRepositoryName) as string,
       tl.getVariable("System.TeamProject"),
     );
     log(LogLevel.INFO, `Default branch of this repository is '${repo.defaultBranch}'`);

@@ -31,7 +31,7 @@ export const publishTask: TaskJob = async (_endpointType: EndpointType) => {
   }
 
   const endpointData: { type: EndpointType; data: EndpointData } = JSON.parse(
-    tl.getVariable(TaskVariables.SonarEndpoint),
+    tl.getVariable(TaskVariables.SonarEndpoint) as string,
   );
   const endpoint = new Endpoint(endpointData.type, endpointData.data);
   const metrics = await fetchMetrics(endpoint);
@@ -62,7 +62,7 @@ export const publishTask: TaskJob = async (_endpointType: EndpointType) => {
 };
 
 function timeoutInSeconds(): number {
-  return Number.parseInt(tl.getInput("pollingTimeoutSec", true), 10);
+  return Number.parseInt(tl.getInput("pollingTimeoutSec", true) as string, 10);
 }
 
 async function fetchRelevantMeasures(
@@ -71,7 +71,7 @@ async function fetchRelevantMeasures(
   metrics: Metric[],
 ): Promise<Measure[]> {
   // Are we in a PR, non-main branch or main branch?
-  const scannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarScannerParams));
+  const scannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarScannerParams) as string);
   const branch = scannerParams["sonar.branch.name"] ?? null;
   const pullRequest = scannerParams["sonar.pullrequest.key"] ?? null;
 
@@ -87,7 +87,7 @@ async function fetchRelevantMeasures(
   }
 
   try {
-    const data = {
+    const data: { component: string; branch?: string; pullRequest?: string; metricKeys: string } = {
       component: componentKey,
       metricKeys: availableMetrics.join(","),
     };

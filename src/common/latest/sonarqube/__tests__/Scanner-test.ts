@@ -3,6 +3,7 @@ import { TaskVariables } from "../../helpers/constants";
 import { AzureTaskLibMock } from "../../mocks/AzureTaskLibMock";
 import { AzureToolLibMock } from "../../mocks/AzureToolLibMock";
 import Scanner, { ScannerCLI, ScannerMSBuild, ScannerMode } from "../Scanner";
+import { ToolRunner } from "azure-pipelines-task-lib/toolrunner";
 
 jest.mock("fs-extra", () => ({
   ...jest.requireActual("fs-extra"),
@@ -126,8 +127,9 @@ describe("Scanner", () => {
 
         expect(tl.tool).toHaveBeenCalledWith(MOCK_ROOT_PATH + "/sonar-scanner/bin/sonar-scanner");
         const tool = azureTaskLibMock.getLastToolRunner();
-        expect(tool.execAsync).toHaveBeenCalled();
-        expect(tool.arg).not.toHaveBeenCalledWith("-X");
+        expect(tool).toBeDefined();
+        expect(tool!.execAsync).toHaveBeenCalled();
+        expect(tool!.arg).not.toHaveBeenCalledWith("-X");
       });
 
       it("should run with debug mode", async () => {
@@ -140,8 +142,9 @@ describe("Scanner", () => {
         await scanner.runAnalysis();
 
         const tool = azureTaskLibMock.getLastToolRunner();
-        expect(tool.execAsync).toHaveBeenCalled();
-        expect(tool.arg).toHaveBeenCalledWith("-X");
+        expect(tool).toBeDefined();
+        expect(tool!.execAsync).toHaveBeenCalled();
+        expect(tool!.arg).toHaveBeenCalledWith("-X");
       });
     });
   });
@@ -182,8 +185,9 @@ describe("Scanner", () => {
 
         expect(tl.tool).toHaveBeenCalledWith("/some-path/to/extracted/SonarScanner.MSBuild.exe");
         const toolRunner = azureTaskLibMock.getLastToolRunner();
-        expect(toolRunner.arg).toHaveBeenCalledWith("begin");
-        expect(toolRunner.arg).toHaveBeenCalledWith("/k:projectKey");
+        expect(toolRunner).toBeDefined();
+        expect(toolRunner!.arg).toHaveBeenCalledWith("begin");
+        expect(toolRunner!.arg).toHaveBeenCalledWith("/k:projectKey");
       });
 
       it("should use downloaded scanner on unix", async () => {
@@ -200,12 +204,13 @@ describe("Scanner", () => {
 
         expect(tl.tool).toHaveBeenCalledWith("/bin/dotnet");
         const toolRunner = azureTaskLibMock.getLastToolRunner();
-        expect(toolRunner.arg).toHaveBeenCalledWith(
+        expect(toolRunner).toBeDefined();
+        expect(toolRunner!.arg).toHaveBeenCalledWith(
           "/some-path/to/extracted/SonarScanner.MSBuild.dll",
         );
-        expect(toolRunner.arg).toHaveBeenCalledWith("begin");
-        expect(toolRunner.arg).toHaveBeenCalledWith("/k:projectKey");
-        expect(toolRunner.arg).toHaveBeenCalledWith("/o:my-org");
+        expect(toolRunner!.arg).toHaveBeenCalledWith("begin");
+        expect(toolRunner!.arg).toHaveBeenCalledWith("/k:projectKey");
+        expect(toolRunner!.arg).toHaveBeenCalledWith("/o:my-org");
       });
 
       it("should use the embedded framework scanner when not overriden by user", async () => {
@@ -233,7 +238,8 @@ describe("Scanner", () => {
 
         expect(tl.tool).toHaveBeenCalledWith("/bin/dotnet");
         const toolRunner = azureTaskLibMock.getLastToolRunner();
-        expect(toolRunner.arg).toHaveBeenCalledWith(
+        expect(toolRunner).toBeDefined();
+        expect(toolRunner!.arg).toHaveBeenCalledWith(
           MOCK_ROOT_PATH + "/dotnet-sonar-scanner-msbuild/SonarScanner.MSBuild.dll",
         );
       });
@@ -256,7 +262,8 @@ describe("Scanner", () => {
 
         expect(tl.tool).toHaveBeenCalledWith("/some-path/to/extracted/SonarScanner.MSBuild.exe");
         const toolRunner = azureTaskLibMock.getLastToolRunner();
-        expect(toolRunner.arg).toHaveBeenCalledWith("end");
+        expect(toolRunner).toBeDefined();
+        expect(toolRunner!.arg).toHaveBeenCalledWith("end");
       });
 
       it("should run dotnet scanner", async () => {
@@ -275,10 +282,11 @@ describe("Scanner", () => {
 
         expect(tl.tool).toHaveBeenCalledWith("/bin/dotnet");
         const toolRunner = azureTaskLibMock.getLastToolRunner();
-        expect(toolRunner.arg).toHaveBeenCalledWith(
+        expect(toolRunner).toBeDefined();
+        expect(toolRunner!.arg).toHaveBeenCalledWith(
           "/some-path/to/extracted/SonarScanner.MSBuild.dll",
         );
-        expect(toolRunner.arg).toHaveBeenCalledWith("end");
+        expect(toolRunner!.arg).toHaveBeenCalledWith("end");
       });
     });
   });

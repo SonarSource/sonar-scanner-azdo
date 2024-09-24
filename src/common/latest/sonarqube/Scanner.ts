@@ -42,14 +42,17 @@ export default class Scanner {
       log(LogLevel.DEBUG, `Unzipped file to ${unzipPath}`);
 
       return unzipPath;
-    } catch (error) {
-      if (error.message.includes("404")) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes("404")) {
         tl.setResult(
           tl.TaskResult.Failed,
           "The scanner version you are trying to download does not exist. Please check the version and try again.",
         );
       } else {
-        tl.setResult(tl.TaskResult.Failed, error.message);
+        tl.setResult(
+          tl.TaskResult.Failed,
+          error instanceof Error ? error.message : "An unknown error occurred",
+        );
       }
       throw error;
     }
@@ -337,7 +340,7 @@ export class ScannerMSBuild extends Scanner {
         useNetFramework
           ? TaskVariables.SonarScannerMSBuildExe
           : TaskVariables.SonarScannerMSBuildDll,
-      ),
+      ) as string,
       useNetFramework,
     );
     scannerRunner.arg("end");

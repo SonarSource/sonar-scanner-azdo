@@ -52,7 +52,7 @@ it("should run scanner", async () => {
 
   jest.spyOn(Scanner, "getAnalyzeScanner").mockImplementation(() => scanner);
 
-  jest.spyOn(scanner, "runAnalysis").mockImplementation(() => null);
+  jest.spyOn(scanner, "runAnalysis").mockResolvedValue();
 
   await analyzeTask(EndpointType.SonarCloud);
 

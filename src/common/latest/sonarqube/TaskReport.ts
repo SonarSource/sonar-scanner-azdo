@@ -49,7 +49,7 @@ export default class TaskReport {
   public static getDefaultPathTemplate() {
     return path.join(
       SONAR_TEMP_DIRECTORY_NAME,
-      tl.getVariable("Build.BuildId"),
+      tl.getVariable("Build.BuildId") as string,
       "<GUID>",
       REPORT_TASK_NAME,
     );
@@ -57,7 +57,7 @@ export default class TaskReport {
 
   public static getDefaultPath() {
     return path.join(
-      tl.getVariable("Agent.TempDirectory"),
+      tl.getVariable("Agent.TempDirectory") as string,
       TaskReport.getDefaultPathTemplate().replace("<GUID>", Guid.create().toString()),
     );
   }
@@ -76,13 +76,19 @@ export default class TaskReport {
         "SonarQube version < 7.2.0 detected, falling back to default location(s) for report-task.txt file.",
       );
       taskReportGlob = path.join("**", REPORT_TASK_NAME);
-      taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.BuildDirectory"), taskReportGlob);
+      taskReportGlobResult = tl.findMatch(
+        tl.getVariable("Agent.BuildDirectory") as string,
+        taskReportGlob,
+      );
     } else if (tl.getVariable(TaskVariables.SonarScannerReportTaskFile)) {
-      taskReportGlob = tl.getVariable(TaskVariables.SonarScannerReportTaskFile);
+      taskReportGlob = tl.getVariable(TaskVariables.SonarScannerReportTaskFile) as string;
       taskReportGlobResult = tl.find(taskReportGlob);
     } else {
       taskReportGlob = TaskReport.getDefaultPathGlob();
-      taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.TempDirectory"), taskReportGlob);
+      taskReportGlobResult = tl.findMatch(
+        tl.getVariable("Agent.TempDirectory") as string,
+        taskReportGlob,
+      );
     }
 
     log(
@@ -135,11 +141,11 @@ export default class TaskReport {
             serverUrl: settings.get("serverUrl"),
           });
           return taskReport;
-        } catch (err) {
-          if (err) {
-            log(LogLevel.ERROR, `Parse Task report error: ${err.message ?? JSON.stringify(err)}`);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            log(LogLevel.ERROR, `Parse Task report error: ${error.message}`);
           }
-          throw err;
+          throw error;
         }
       },
       (err) => {
