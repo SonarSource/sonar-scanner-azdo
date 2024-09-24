@@ -31,9 +31,11 @@ export default class JavaVersionResolver {
     /**
      * Ignore Java 11 setting it the SQ server doesn't support it @see SONARAZDO-355
      */
+    const serverVersionSemver = semver.coerce(serverVersion);
     const ignoreJava11 =
       serverVersion &&
-      semver.gte(semver.coerce(serverVersion), SQ_VERSION_DROPPING_JAVA_11) &&
+      serverVersionSemver &&
+      semver.gte(serverVersionSemver, SQ_VERSION_DROPPING_JAVA_11) &&
       endpointType === EndpointType.SonarQube;
     if (ignoreJava11 && jdkVersion === JdkVersionSource.JavaHome11) {
       log(
@@ -53,7 +55,10 @@ export default class JavaVersionResolver {
         LogLevel.DEBUG,
         `${jdkVersion} was found with value ${newJavaPath}, will switch to it for Sonar scanner...`,
       );
-      this.javaHomeOriginalPath = tl.getVariable(TaskVariables.JavaHome);
+      const javaHomeOriginalPath = tl.getVariable(TaskVariables.JavaHome);
+      if (javaHomeOriginalPath) {
+        this.javaHomeOriginalPath = javaHomeOriginalPath;
+      }
       // Replace the JAVA_HOME variable with the new path
       tl.setVariable(TaskVariables.JavaHome, newJavaPath);
       this.isJavaVersionChanged = true;

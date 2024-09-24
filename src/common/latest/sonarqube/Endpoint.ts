@@ -41,11 +41,15 @@ export default class Endpoint {
 
   public get auth(): { username: string; password: string } {
     // If using user/password
-    if (!this.data.token && this.data.password && this.data.password.length > 0) {
+    if (
+      !this.data.token &&
+      this.data.username &&
+      this.data.password &&
+      this.data.password.length > 0
+    ) {
       return { username: this.data.username, password: this.data.password };
     }
-    // Using token
-    return { username: this.data.token || this.data.username, password: "" };
+    return { username: this.data.token ?? this.data.username ?? "", password: "" };
   }
 
   toAxiosOptions(): AxiosRequestConfig {
@@ -102,7 +106,7 @@ export default class Endpoint {
   }
 
   public static getEndpoint(id: string, type: EndpointType): Endpoint {
-    const url = tl.getEndpointUrl(id, false);
+    const url = tl.getEndpointUrl(id, false) as string;
     const token = tl.getEndpointAuthorizationParameter(
       id,
       "apitoken",

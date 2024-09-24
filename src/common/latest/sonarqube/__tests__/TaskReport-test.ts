@@ -28,7 +28,7 @@ serverUrl=http://sonar`,
     },
   );
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, null);
+  const endpoint = new Endpoint(EndpointType.SonarCloud, { url: "http://sc.io" });
 
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
@@ -70,7 +70,7 @@ serverUrl=http://sonar`,
     },
   );
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, null);
+  const endpoint = new Endpoint(EndpointType.SonarCloud, { url: "http://sc.io" });
 
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
@@ -99,7 +99,7 @@ it.each([
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock report task file path");
   jest.spyOn(tl, "find").mockImplementation(() => ["path1", "path2"]);
 
-  const endpoint = new Endpoint(endpointType, null);
+  const endpoint = new Endpoint(endpointType, { url: "http://some-endpoint.io" });
 
   const reportFiles = TaskReport.findTaskFileReport(endpoint, new semver.SemVer(version));
 
@@ -122,7 +122,7 @@ it("should find report files for SonarQube below 7.2.0", () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
   jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
 
-  const endpoint = new Endpoint(EndpointType.SonarQube, null);
+  const endpoint = new Endpoint(EndpointType.SonarQube, { url: "http://sc.io" });
 
   const reportFiles = TaskReport.findTaskFileReport(endpoint, new semver.SemVer("7.0.0"));
 

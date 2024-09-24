@@ -14,7 +14,9 @@ const MOCKED_JAVA_VARIABLES = {
 };
 
 beforeEach(() => {
-  jest.spyOn(tl, "getVariable").mockImplementation((name) => MOCKED_JAVA_VARIABLES[name]);
+  jest
+    .spyOn(tl, "getVariable")
+    .mockImplementation((name: string) => MOCKED_JAVA_VARIABLES[name as JdkVersionSource]);
   jest.spyOn(tl, "setVariable");
   jest.spyOn(tl, "warning");
 });

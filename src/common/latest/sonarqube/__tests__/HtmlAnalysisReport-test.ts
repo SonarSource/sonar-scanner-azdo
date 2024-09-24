@@ -29,7 +29,7 @@ const MOCKED_PROJECT_STATUS_SUCCESS = {
 };
 const MOCKED_ANALYSIS_RESULT: AnalysisResult = {
   dashboardUrl: "https://dashboard.url",
-  projectName: null,
+  projectName: undefined,
   metrics: MOCKED_METRICS,
   warnings: [],
 };

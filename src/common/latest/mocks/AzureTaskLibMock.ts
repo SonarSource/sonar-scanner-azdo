@@ -35,11 +35,12 @@ export class AzureTaskLibMock {
     this.reset();
   }
 
-  setInputs(inputs: { [key: string]: string }) {
-    this.inputs = {
-      ...this.inputs,
-      ...inputs,
-    };
+  setInputs(inputs: { [key: string]: string | undefined }) {
+    for (const key in inputs) {
+      if (inputs[key] !== undefined) {
+        this.inputs[key] = inputs[key];
+      }
+    }
   }
 
   setVariables(variables: { [key: string]: string }) {
@@ -64,7 +65,7 @@ export class AzureTaskLibMock {
     return this.inputs[name];
   }
 
-  handleGetDelimitedInput(name: string, delim: string, required = false) {
+  handleGetDelimitedInput(name: string, delim: string | RegExp, required = false) {
     const input = this.handleGetInput(name, required);
     return input ? input.split(delim) : [];
   }
@@ -78,14 +79,15 @@ export class AzureTaskLibMock {
   }
 
   handleTool(): ToolRunner {
-    this.lastToolRunner = {
+    const lastToolRunner = {
       ...jest.requireActual("azure-pipelines-task-lib/toolrunner").ToolRunner,
       arg: jest.fn().mockReturnThis(),
       line: jest.fn().mockReturnThis(),
       execAsync: jest.fn().mockResolvedValue(0),
       on: jest.fn().mockImplementation(() => {}),
     };
-    return this.lastToolRunner;
+    this.lastToolRunner = lastToolRunner;
+    return lastToolRunner;
   }
 
   handleFindMatch() {

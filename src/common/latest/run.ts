@@ -9,8 +9,9 @@ export async function runTask(fun: TaskJob, taskName: string, endpointType: Endp
 
   try {
     await fun(endpointType);
-  } catch (err) {
-    log(LogLevel.ERROR, `Error while executing task ${taskName}: ${err.message}`);
-    tl.setResult(tl.TaskResult.Failed, err.message);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "An unknown error occurred";
+    log(LogLevel.ERROR, `Error while executing task ${taskName}: ${msg}`);
+    tl.setResult(tl.TaskResult.Failed, msg);
   }
 }

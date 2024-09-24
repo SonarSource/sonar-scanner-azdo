@@ -72,4 +72,4 @@ export const SQ_BRANCH_MEASURES = [
 /**
  * First SQ version that drops support for Java 11
  */
-export const SQ_VERSION_DROPPING_JAVA_11 = semver.coerce("10.4");
+export const SQ_VERSION_DROPPING_JAVA_11 = semver.coerce("10.4") as semver.SemVer;

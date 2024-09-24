@@ -46,11 +46,9 @@ export async function fetchProjectStatus(
       },
     );
     return projectStatus;
-  } catch (error) {
-    if (error?.message) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       log(LogLevel.ERROR, `Error retrieving analysis: ${error.message}`);
-    } else if (error) {
-      log(LogLevel.ERROR, `Error retrieving analysis: ${JSON.stringify(error)}`);
     }
     throw new Error(`Could not fetch analysis for ID '${analysisId}'`);
   }
@@ -76,11 +74,9 @@ export async function fetchMetrics(
       { ...data, p: (p + 1).toString() },
       { ...response, metrics: result },
     );
-  } catch (error) {
-    if (error?.message) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       log(LogLevel.ERROR, error.message);
-    } else if (error) {
-      log(LogLevel.ERROR, JSON.stringify(error));
     }
 
     throw new Error(`Could not fetch metrics`);
@@ -94,8 +90,8 @@ export async function fetchComponentMeasures(
   try {
     const response = await get<MeasureResponse>(endpoint, "/api/measures/component", data);
     return response.component.measures;
-  } catch (error) {
-    if (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       log(
         LogLevel.INFO,
         "Error fetching component measures: " + (error.message ?? JSON.stringify(error)),

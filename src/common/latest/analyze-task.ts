@@ -27,9 +27,9 @@ export const analyzeTask: TaskJob = async (endpointType: EndpointType) => {
   JavaVersionResolver.setJavaVersion(jdkVersionSource, endpointType, serverVersion);
 
   // Run scanner
-  const scannerMode: ScannerMode = ScannerMode[tl.getVariable(TaskVariables.SonarScannerMode)];
+  const scannerMode = ScannerMode[tl.getVariable(TaskVariables.SonarScannerMode) as ScannerMode];
   const scanner = Scanner.getAnalyzeScanner(rootPath, scannerMode);
-  const sqScannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarScannerParams));
+  const sqScannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarScannerParams) as string);
   await scanner.runAnalysis();
 
   // Sanitize scanner params (SSF-194)

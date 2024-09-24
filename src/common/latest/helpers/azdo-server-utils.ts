@@ -16,7 +16,7 @@ export function saveBuildSummary(summary: string): string {
 }
 
 export function getStagingDirectory(): string {
-  const dir = path.join(tl.getVariable("build.artifactStagingDirectory"), ".sqAnalysis");
+  const dir = path.join(tl.getVariable("build.artifactStagingDirectory") as string, ".sqAnalysis");
   fs.ensureDirSync(dir);
   return dir;
 }

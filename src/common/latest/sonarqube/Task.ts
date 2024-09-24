@@ -36,8 +36,10 @@ export async function waitForTaskCompletion(
 
     try {
       ({ task } = (await fetchWithRetry(endpoint, `/api/ce/task`, query)) as { task: Task });
-    } catch (error) {
-      log(LogLevel.ERROR, JSON.stringify(error?.message ?? error ?? "Unknown error"));
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        log(LogLevel.ERROR, JSON.stringify(error.message));
+      }
       throw new Error(`Could not fetch task for ID '${taskId}'`);
     }
 

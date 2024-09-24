@@ -62,23 +62,26 @@ export default class HtmlAnalysisReport {
   }
 
   private getHtmlQualityGateDetailFailedSection() {
-    const rows = this.getFailedConditions().map((condition) => {
-      const metric = this.result.metrics.find((metric) => metric.key === condition.metricKey);
-      if (!metric) {
-        return null;
-      }
-      const threshold =
-        condition.status === "WARN" ? condition.warningThreshold : condition.errorThreshold;
-      const requiredContent =
-        (metric.type !== "RATING" ? formatMeasure(condition.comparator, "COMPARATOR") + " " : "") +
-        formatMeasure(threshold, metric.type);
+    const rows = this.getFailedConditions()
+      .map((condition) => {
+        const metric = this.result.metrics?.find((metric) => metric.key === condition.metricKey);
+        if (!metric) {
+          return null;
+        }
+        const threshold =
+          condition.status === "WARN" ? condition.warningThreshold : condition.errorThreshold;
+        const requiredContent =
+          (metric.type !== "RATING"
+            ? formatMeasure(condition.comparator, "COMPARATOR") + " "
+            : "") + formatMeasure(threshold, metric.type);
 
-      return htmlMetricListItem(
-        "❌",
-        `${formatMeasure(condition.actualValue, metric.type)} ${metric.name}`,
-        requiredContent,
-      );
-    });
+        return htmlMetricListItem(
+          "❌",
+          `${formatMeasure(condition.actualValue, metric.type)} ${metric.name}`,
+          requiredContent,
+        );
+      })
+      .filter(Boolean) as string[];
 
     return rows.length > 0 ? htmlSectionDiv("Failed Conditions", htmlMetricList(rows)) : "";
   }
@@ -86,7 +89,7 @@ export default class HtmlAnalysisReport {
   private getHtmlMeasureListItem(icon: string, metricKey: string, metricName: string) {
     const condition = this.projectStatus.conditions.find((c) => c.metricKey === metricKey);
     const measure = this.measures.find((m) => m.metric === metricKey);
-    const metric = this.result.metrics.find((m) => m.key === metricKey);
+    const metric = this.result.metrics?.find((m) => m.key === metricKey);
 
     // Try to get the value from the measure, then from the condition
     // There is difference in API response between SonarCloud and SonarQube

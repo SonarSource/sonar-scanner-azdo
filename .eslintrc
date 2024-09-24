@@ -39,7 +39,6 @@
     "guard-for-in": "error",
     "no-alert": "error",
     "no-caller": "error",
-    "no-div-regex": "warn",
     "no-eval": "error",
     "no-extend-native": "error",
     "no-extra-bind": "error",

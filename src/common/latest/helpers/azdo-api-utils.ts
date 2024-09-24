@@ -15,7 +15,7 @@ export interface IPropertyBag {
 export async function addBuildProperty(properties: IPropertyBag[]) {
   const collectionUri = tl.getVariable("System.TeamFoundationCollectionUri") + "/";
   const teamProjectId = tl.getVariable("System.TeamProjectId") + "/";
-  const buildId = tl.getVariable("Build.BuildId");
+  const buildId = tl.getVariable("Build.BuildId") as string;
 
   const patchBody: JsonPatchOperation[] = [];
 
@@ -56,7 +56,7 @@ export function getWebApi(collectionUrl: string): vm.WebApi {
 
 export function getAuthToken() {
   const auth = tl.getEndpointAuthorization("SYSTEMVSSCONNECTION", false);
-  if (auth.scheme.toLowerCase() === "oauth") {
+  if (auth?.scheme.toLowerCase() === "oauth") {
     return auth.parameters["AccessToken"];
   } else {
     throw new Error("Unable to get credential to perform rest API calls");
