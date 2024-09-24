@@ -1,5 +1,6 @@
 const { rimraf } = require("rimraf");
 const path = require("path");
+const shell = require("shelljs");
 const gulp = require("gulp");
 const gulpFile = require("gulp-file");
 const fs = require("fs-extra");
@@ -123,6 +124,7 @@ gulp.task("build:bundle", async () => {
       ...esbuildConfig,
       entryPoints: [task],
       outfile: outFilePath,
+      absWorkingDir: path.join(SOURCE_DIR, "common", commonFolder),
     });
   }
 });
@@ -191,10 +193,14 @@ gulp.task("build:copy", () => {
      * Hotfix for shelljs dependency
      * @see https://github.com/microsoft/azure-pipelines-task-lib/issues/942#issuecomment-1904939900
      */
-    const createShellJsDummyFile = gulpFile("index.js", "", { src: true }).pipe(
-      gulp.dest(path.join(outPath, "node_modules", "shelljs")),
-    );
-    streams.push(createShellJsDummyFile);
+    // eslint-disable-next-line import/no-dynamic-require
+    const esbuildConfig = require(path.join(SOURCE_DIR, "common", commonPath, "esbuild.config.js"));
+    if (esbuildConfig.external?.includes("shelljs")) {
+      const createShellJsDummyFile = gulpFile("index.js", "", { src: true }).pipe(
+        gulp.dest(path.join(outPath, "node_modules", "shelljs")),
+      );
+      streams.push(createShellJsDummyFile);
+    }
 
     /**
      * We have to bundle the translation file from for azure-pipelines-tool-lib, otherwise the task will fail
