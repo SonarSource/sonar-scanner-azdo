@@ -52,7 +52,7 @@ const isProd = process.env.BUILD_MODE === "production";
 /**
  * Delete all files in the build directory
  */
-gulp.task("clean", () => rimraf([path.join(BUILD_DIR, "**"), path.join(DIST_DIR, "**")]));
+gulp.task("clean", () => rimraf([BUILD_DIR, DIST_DIR]));
 
 /** BUILD *****************************************************************************************/
 
