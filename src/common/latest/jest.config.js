@@ -11,7 +11,7 @@ module.exports = {
   ],
   moduleFileExtensions: ["ts", "js"],
   testPathIgnorePatterns: ["<rootDir>/node_modules", "<rootDir>/config", "<rootDir>/build"],
-  testRegex: "(/__tests__/.*|\\-test)\\.ts$",
+  testRegex: "(/__tests__/.*-test)\\.ts$",
   testEnvironmentOptions: {
     url: "http://localhost/",
   },
@@ -20,4 +20,5 @@ module.exports = {
     ".(ts)$": ["ts-jest"],
     ".(js)$": ["babel-jest"],
   },
+  setupFilesAfterEnv: ["<rootDir>/__tests__/setup.ts"],
 };
