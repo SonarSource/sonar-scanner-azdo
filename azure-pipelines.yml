@@ -182,22 +182,6 @@ stages:
               AZDO_BASE_URL: $(AzdoBaseUrl)
               ITS_ORGA: $(AzdoItsOrga)
               ITS_PROJECT_NAME: $(AzdoItsProjectName)
-              ITS_DOTNET_PIPELINE_NAME: $(AzdoItsDotnetPipelineName)
-              ITS_DOTNET_SC_PROJECT_KEY: $(SonarCloudItsDotnetProjectKey)
-              ITS_DOTNET_EXPECTED_COVERAGE: $(DotnetExpectedCoverage)
-              ITS_DOTNET_EXPECTED_NCLOCS: $(DotnetExpectedNcLocs)
-              ITS_MAVEN_PIPELINE_NAME: $(AzdoItsMavenPipelineName)
-              ITS_MAVEN_SC_PROJECT_KEY: $(SonarCloudItsMavenProjectKey)
-              ITS_MAVEN_EXPECTED_COVERAGE: $(MavenExpectedCoverage)
-              ITS_MAVEN_EXPECTED_NCLOCS: $(MavenExpectedNcLocs)
-              ITS_GRADLE_PIPELINE_NAME: $(AzdoItsGradlePipelineName)
-              ITS_GRADLE_SC_PROJECT_KEY: $(SonarCloudItsGradleProjectKey)
-              ITS_GRADLE_EXPECTED_COVERAGE: $(GradleExpectedCoverage)
-              ITS_GRADLE_EXPECTED_NCLOCS: $(GradleExpectedNcLocs)
-              ITS_SCANNERCLI_PIPELINE_NAME: $(AzdoItsScannerCliPipelineName)
-              ITS_SCANNERCLI_SC_PROJECT_KEY: $(SonarCloudItsCLIProjectKey)
-              ITS_SCANNERCLI_EXPECTED_COVERAGE: $(CobolExpectedCoverage)
-              ITS_SCANNERCLI_EXPECTED_NCLOCS: $(CobolExpectedNcLocs)
             inputs:
               command: "test"
               projects: "its/IntegrationTests.csproj"

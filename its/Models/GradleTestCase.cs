@@ -18,18 +18,17 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System;
 namespace IntegrationTests.Models
 {
 	public class GradleTestCase : BuildTestCase
 	{
 		public GradleTestCase()
 		{
-			base.Coverage = Double.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_GRADLE_EXPECTED_COVERAGE"));
-			base.NcLocs = Int64.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_GRADLE_EXPECTED_NCLOCS"));
-			base.PipelineName = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_GRADLE_PIPELINE_NAME");
-			base.ProjectKey = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_GRADLE_SC_PROJECT_KEY");
-			base.LogPrefix = "Gradle";
+			Coverage = 50.0;
+			NcLocs = 9;
+			PipelineName = "gradle";
+			ProjectKey = "its-gradle";
+			LogPrefix = "Gradle";
 		}
 	}
 }

@@ -18,18 +18,17 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System;
 namespace IntegrationTests.Models
 {
 	public class DotnetFrameworkTestCase : BuildTestCase
 	{
 		public DotnetFrameworkTestCase()
 		{
-			base.Coverage = Double.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_DOTNET_EXPECTED_COVERAGE"));
-			base.NcLocs = Int64.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_DOTNET_EXPECTED_NCLOCS"));
-			base.PipelineName = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_DOTNET_PIPELINE_NAME");
-			base.ProjectKey = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_DOTNET_SC_PROJECT_KEY");
-			base.LogPrefix = "S4NET - .NET Framework";
+			Coverage = 25.0;
+			NcLocs = 49;
+			PipelineName = "dotnet";
+			ProjectKey = "its-dotnet";
+			LogPrefix = "S4NET - .NET Framework";
 		}
 	}
 }
