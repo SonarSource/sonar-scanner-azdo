@@ -12,4 +12,9 @@ module.exports = {
   transform: {
     ".(ts)$": "ts-jest",
   },
+  globals: {
+    "ts-jest": {
+      tsconfig: "../../tsconfig.sonarcloud.v1.json",
+    },
+  },
 };

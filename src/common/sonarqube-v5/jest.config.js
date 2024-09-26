@@ -12,4 +12,9 @@ module.exports = {
   transform: {
     ".(ts)$": "ts-jest",
   },
+  globals: {
+    "ts-jest": {
+      tsconfig: "../../tsconfig.sonarqube.v5.json",
+    },
+  },
 };
