@@ -1,9 +1,9 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import * as toolLib from "azure-pipelines-tool-lib/tool";
 import { TaskVariables } from "../../helpers/constants";
 import { AzureTaskLibMock } from "../../mocks/AzureTaskLibMock";
 import { AzureToolLibMock } from "../../mocks/AzureToolLibMock";
 import Scanner, { ScannerCLI, ScannerMSBuild, ScannerMode } from "../Scanner";
-import { ToolRunner } from "azure-pipelines-task-lib/toolrunner";
 
 jest.mock("fs-extra", () => ({
   ...jest.requireActual("fs-extra"),
@@ -11,6 +11,7 @@ jest.mock("fs-extra", () => ({
 }));
 
 jest.mock("azure-pipelines-task-lib/task");
+jest.mock("azure-pipelines-tool-lib/tool");
 
 const azureTaskLibMock = new AzureTaskLibMock();
 const azureToolLibMock = new AzureToolLibMock();
@@ -76,9 +77,12 @@ describe("Scanner", () => {
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
         await scanner.runPrepare();
 
+        expect(toolLib.downloadTool).toHaveBeenCalledWith(
+          "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-1.22.333.zip",
+        );
         expect(tl.setVariable).toHaveBeenLastCalledWith(
           TaskVariables.SonarScannerLocation,
-          "/some-path/to/extracted/sonar-scanner-1.22.333/bin/sonar-scanner.bat",
+          "/some-path/to/cached/sonar-scanner-1.22.333/bin/sonar-scanner.bat",
         );
       });
 
@@ -91,17 +95,39 @@ describe("Scanner", () => {
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
         await scanner.runPrepare();
 
+        expect(toolLib.downloadTool).toHaveBeenCalledWith(
+          "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-1.22.333.zip",
+        );
+
         expect(tl.setVariable).toHaveBeenLastCalledWith(
           TaskVariables.SonarScannerLocation,
-          "/some-path/to/extracted/sonar-scanner-1.22.333/bin/sonar-scanner",
+          "/some-path/to/cached/sonar-scanner-1.22.333/bin/sonar-scanner",
         );
       });
 
-      it("should not download scanner when not overriden by user", async () => {
+      it("should not download scanner when not overridden by user", async () => {
         azureTaskLibMock.setPlatform(tl.Platform.Linux);
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
         await scanner.runPrepare();
         expect(tl.setVariable).toHaveBeenLastCalledWith(TaskVariables.SonarScannerLocation, "");
+      });
+
+      it("should not download scanner when found in the cache", async () => {
+        jest.mocked(toolLib.findLocalTool).mockImplementationOnce(() => "/some-path/to/cached");
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+        azureTaskLibMock.setInputs({
+          cliVersion: "1.22.333",
+        });
+
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
+        await scanner.runPrepare();
+
+        expect(toolLib.downloadTool).not.toHaveBeenCalled();
+
+        expect(tl.setVariable).toHaveBeenLastCalledWith(
+          TaskVariables.SonarScannerLocation,
+          "/some-path/to/cached/sonar-scanner-1.22.333/bin/sonar-scanner",
+        );
       });
     });
 
@@ -183,7 +209,11 @@ describe("Scanner", () => {
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
         await scanner.runPrepare();
 
-        expect(tl.tool).toHaveBeenCalledWith("/some-path/to/extracted/SonarScanner.MSBuild.exe");
+        expect(toolLib.downloadTool).toHaveBeenCalledWith(
+          "https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/1.22.333/sonar-scanner-1.22.333-net-framework.zip",
+        );
+
+        expect(tl.tool).toHaveBeenCalledWith("/some-path/to/cached/SonarScanner.MSBuild.exe");
         const toolRunner = azureTaskLibMock.getLastToolRunner();
         expect(toolRunner).toBeDefined();
         expect(toolRunner!.arg).toHaveBeenCalledWith("begin");
@@ -202,11 +232,41 @@ describe("Scanner", () => {
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
         await scanner.runPrepare();
 
+        expect(toolLib.downloadTool).toHaveBeenCalledWith(
+          "https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/1.22.333/sonar-scanner-1.22.333-net.zip",
+        );
+
         expect(tl.tool).toHaveBeenCalledWith("/bin/dotnet");
         const toolRunner = azureTaskLibMock.getLastToolRunner();
         expect(toolRunner).toBeDefined();
         expect(toolRunner!.arg).toHaveBeenCalledWith(
-          "/some-path/to/extracted/SonarScanner.MSBuild.dll",
+          "/some-path/to/cached/SonarScanner.MSBuild.dll",
+        );
+        expect(toolRunner!.arg).toHaveBeenCalledWith("begin");
+        expect(toolRunner!.arg).toHaveBeenCalledWith("/k:projectKey");
+        expect(toolRunner!.arg).toHaveBeenCalledWith("/o:my-org");
+      });
+
+      it("should not download scanner when found in the cache", async () => {
+        jest.mocked(toolLib.findLocalTool).mockImplementationOnce(() => "/some-path/to/cached");
+        azureTaskLibMock.setPlatform(tl.Platform.Linux);
+        azureTaskLibMock.setInputs({
+          msBuildVersion: "1.22.333",
+          projectKey: "projectKey",
+          projectName: "projectName",
+          organization: "my-org",
+        });
+
+        const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
+        await scanner.runPrepare();
+
+        expect(toolLib.downloadTool).not.toHaveBeenCalled();
+
+        expect(tl.tool).toHaveBeenCalledWith("/bin/dotnet");
+        const toolRunner = azureTaskLibMock.getLastToolRunner();
+        expect(toolRunner).toBeDefined();
+        expect(toolRunner!.arg).toHaveBeenCalledWith(
+          "/some-path/to/cached/SonarScanner.MSBuild.dll",
         );
         expect(toolRunner!.arg).toHaveBeenCalledWith("begin");
         expect(toolRunner!.arg).toHaveBeenCalledWith("/k:projectKey");
@@ -253,14 +313,13 @@ describe("Scanner", () => {
           projectName: "projectName",
         });
         azureTaskLibMock.setVariables({
-          [TaskVariables.SonarScannerMSBuildExe]:
-            "/some-path/to/extracted/SonarScanner.MSBuild.exe",
+          [TaskVariables.SonarScannerMSBuildExe]: "/some-path/to/cached/SonarScanner.MSBuild.exe",
         });
 
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
         await scanner.runAnalysis();
 
-        expect(tl.tool).toHaveBeenCalledWith("/some-path/to/extracted/SonarScanner.MSBuild.exe");
+        expect(tl.tool).toHaveBeenCalledWith("/some-path/to/cached/SonarScanner.MSBuild.exe");
         const toolRunner = azureTaskLibMock.getLastToolRunner();
         expect(toolRunner).toBeDefined();
         expect(toolRunner!.arg).toHaveBeenCalledWith("end");
@@ -273,8 +332,7 @@ describe("Scanner", () => {
           projectName: "projectName",
         });
         azureTaskLibMock.setVariables({
-          [TaskVariables.SonarScannerMSBuildDll]:
-            "/some-path/to/extracted/SonarScanner.MSBuild.dll",
+          [TaskVariables.SonarScannerMSBuildDll]: "/some-path/to/cached/SonarScanner.MSBuild.dll",
         });
 
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.MSBuild);
@@ -284,7 +342,7 @@ describe("Scanner", () => {
         const toolRunner = azureTaskLibMock.getLastToolRunner();
         expect(toolRunner).toBeDefined();
         expect(toolRunner!.arg).toHaveBeenCalledWith(
-          "/some-path/to/extracted/SonarScanner.MSBuild.dll",
+          "/some-path/to/cached/SonarScanner.MSBuild.dll",
         );
         expect(toolRunner!.arg).toHaveBeenCalledWith("end");
       });
