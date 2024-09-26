@@ -3,6 +3,7 @@ import { ToolRunner } from "azure-pipelines-task-lib/toolrunner";
 import * as toolLib from "azure-pipelines-tool-lib/tool";
 import * as fs from "fs-extra";
 import * as path from "path";
+import * as semver from "semver";
 import { scanner as scannerConfig } from "../config";
 import { PROP_NAMES, SCANNER_CLI_NAME, TaskVariables } from "../helpers/constants";
 import { log, LogLevel } from "../helpers/logging";
@@ -31,9 +32,22 @@ export default class Scanner {
     return this.isSonarCloud;
   }
 
-  static async downloadScanner(fileUrl: string) {
+  static async downloadScanner(fileUrl: string, name: string, version: string) {
+    let cachedPath;
+
+    const semverCompliantVersion = semver.coerce(version)?.version;
+    if (!semverCompliantVersion) {
+      throw new Error(`Invalid version format: ${version}`);
+    }
+
     try {
-      log(LogLevel.DEBUG, `Downloading scanner from ${fileUrl}`);
+      cachedPath = toolLib.findLocalTool(name, semverCompliantVersion);
+      if (cachedPath) {
+        log(LogLevel.DEBUG, `Found cached scanner at ${cachedPath}`);
+        return cachedPath;
+      }
+      log(LogLevel.DEBUG, `Cache not found for ${name} ${semverCompliantVersion}`);
+      log(LogLevel.INFO, `Downloading scanner from ${fileUrl}`);
       const downloadPath = await toolLib.downloadTool(fileUrl);
       log(LogLevel.DEBUG, `Downloaded: ${fileUrl} file to ${downloadPath}`);
 
@@ -41,7 +55,10 @@ export default class Scanner {
       const unzipPath = await toolLib.extractZip(downloadPath);
       log(LogLevel.DEBUG, `Unzipped file to ${unzipPath}`);
 
-      return unzipPath;
+      cachedPath = await toolLib.cacheDir(unzipPath, name, semverCompliantVersion);
+      log(LogLevel.DEBUG, `Cached scanner to ${cachedPath}`);
+
+      return cachedPath;
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes("404")) {
         tl.setResult(
@@ -181,13 +198,18 @@ export class ScannerCLI extends Scanner {
     }
 
     const downloadUrl = scannerConfig.cliUrlTemplate(cliVersion);
-    const scannerArchivePath = await Scanner.downloadScanner(downloadUrl);
+    const scannerArchivePath = await Scanner.downloadScanner(
+      downloadUrl,
+      "SonarScanner CLI",
+      cliVersion,
+    );
     const scannerPath = tl.resolve(
       scannerArchivePath,
       `sonar-scanner-${cliVersion}`,
       "bin",
       isWindows() ? `${SCANNER_CLI_NAME}.bat` : SCANNER_CLI_NAME,
     );
+
     tl.setVariable(TaskVariables.SonarScannerLocation, scannerPath);
   }
 
@@ -266,7 +288,12 @@ export class ScannerMSBuild extends Scanner {
     if (msBuildVersion) {
       // Download the specified scanner version
       const downloadUrl = scannerConfig.msBuildUrlTemplate(msBuildVersion, useNetFramework);
-      const scannerArchivePath = await Scanner.downloadScanner(downloadUrl);
+      const scannerArchivePath = await Scanner.downloadScanner(
+        downloadUrl,
+        "SonarScanner MSBuild",
+        msBuildVersion,
+      );
+
       scannerPath = tl.resolve(
         scannerArchivePath,
         useNetFramework ? "SonarScanner.MSBuild.exe" : "SonarScanner.MSBuild.dll",
