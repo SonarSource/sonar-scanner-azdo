@@ -18,18 +18,17 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System;
 namespace IntegrationTests.Models
 {
 	public class MavenTestCase : BuildTestCase
 	{
 		public MavenTestCase()
 		{
-			base.Coverage = Double.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_MAVEN_EXPECTED_COVERAGE"));
-			base.NcLocs = Int64.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_MAVEN_EXPECTED_NCLOCS"));
-			base.PipelineName = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_MAVEN_PIPELINE_NAME");
-			base.ProjectKey = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_MAVEN_SC_PROJECT_KEY");
-			base.LogPrefix = "Maven";
+			Coverage = 23.1;
+			NcLocs = 211;
+			PipelineName = "maven";
+			ProjectKey = "its-maven";
+			LogPrefix = "Maven";
 		}
 	}
 }

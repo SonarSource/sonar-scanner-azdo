@@ -33,7 +33,6 @@ namespace AzureDevOpsExtension.IntegrationTests
     public class SonarCloudCallWrapper
     {
         private string _sonarCloudToken => EnvironmentVariableWrapper.GetVariableOrThrow("SC_TOKEN");
-        private string _sonarCloudBaseUrl => EnvironmentVariableWrapper.GetVariableOrThrow("SC_BASE_URL");
 
         private string GetBase64EncodedToken()
         {
@@ -44,7 +43,7 @@ namespace AzureDevOpsExtension.IntegrationTests
         {
             var httpClient = new HttpClient()
             {
-                BaseAddress = new Uri(_sonarCloudBaseUrl),
+                BaseAddress = new Uri("https://sonarcloud.io/"),
             };
 
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {GetBase64EncodedToken()}");

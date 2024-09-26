@@ -18,18 +18,17 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System;
 namespace IntegrationTests.Models
 {
 	public class CobolTestCase : BuildTestCase
 	{
 		public CobolTestCase()
 		{
-			base.Coverage = Double.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_SCANNERCLI_EXPECTED_COVERAGE"));
-			base.NcLocs = Int64.Parse(EnvironmentVariableWrapper.GetVariableOrThrow("ITS_SCANNERCLI_EXPECTED_NCLOCS"));
-			base.PipelineName = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_SCANNERCLI_PIPELINE_NAME");
-			base.ProjectKey = EnvironmentVariableWrapper.GetVariableOrThrow("ITS_SCANNERCLI_SC_PROJECT_KEY");
-			base.LogPrefix = "ScannerCLI/Cobol";
+			Coverage = 0.5;
+			NcLocs = 2907;
+			PipelineName = "cobol";
+			ProjectKey = "its-dotnet";
+			LogPrefix = "ScannerCLI/Cobol";
 		}
 	}
 }
