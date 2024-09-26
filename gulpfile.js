@@ -139,7 +139,7 @@ gulp.task("build:download-scanners", () => {
     // eslint-disable-next-line import/no-dynamic-require
     const { scanner } = require(configJs);
     streams.push(
-      downloadOrCopy(scanner.classicUrl)
+      downloadOrCopy(process.env.SCANNER_NET_FRAMEWORK_LOCATION ?? scanner.classicUrl)
         .pipe(decompress())
         .pipe(
           gulp.dest(
@@ -149,7 +149,7 @@ gulp.task("build:download-scanners", () => {
     );
 
     streams.push(
-      downloadOrCopy(scanner.dotnetUrl)
+      downloadOrCopy(process.env.SCANNER_NET_LOCATION ?? scanner.dotnetUrl)
         .pipe(decompress())
         .pipe(
           gulp.dest(

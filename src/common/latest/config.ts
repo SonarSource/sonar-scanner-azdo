@@ -3,9 +3,10 @@ const msBuildVersion = "6.2.0.85879";
 const cliVersion = "6.1.0.4477";
 
 // MSBUILD scanner location
-const scannersLocation = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/`;
+const dotnetScannersBaseUrl = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/`;
+
 // CLI scanner location
-const cliUrl = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/";
+const cliScannerBaseUrl = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/";
 
 function getMsBuildClassicFilename(msBuildVersion: string) {
   return `sonar-scanner-${msBuildVersion}-net-framework.zip`;
@@ -23,11 +24,11 @@ function msBuildUrlTemplate(msBuildVersion: string, framework: boolean) {
   const filename = framework
     ? getMsBuildClassicFilename(msBuildVersion)
     : getMsBuildDotnetFilename(msBuildVersion);
-  return `${scannersLocation}${msBuildVersion}/${filename}`;
+  return `${dotnetScannersBaseUrl}${msBuildVersion}/${filename}`;
 }
 
 function cliUrlTemplate(cliVersion: string) {
-  return `${cliUrl}${getCliScannerFilename(cliVersion)}`;
+  return `${cliScannerBaseUrl}${getCliScannerFilename(cliVersion)}`;
 }
 
 export const scanner = {
