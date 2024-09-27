@@ -190,22 +190,22 @@ export class ScannerCLI extends Scanner {
    * Instead, it downloads the SonarScanner CLI if not using the embedded one.
    */
   public async runPrepare() {
-    const cliVersion = tl.getInput("cliVersion");
-    if (!cliVersion) {
+    const cliScannerVersion = tl.getInput("cliScannerVersion");
+    if (!cliScannerVersion) {
       // Delete variable (Needed if there are multiple sonar scans in the same pipeline)
       tl.setVariable(TaskVariables.SonarScannerLocation, "");
       return;
     }
 
-    const downloadUrl = scannerConfig.cliUrlTemplate(cliVersion);
+    const downloadUrl = scannerConfig.cliUrlTemplate(cliScannerVersion);
     const scannerArchivePath = await Scanner.downloadScanner(
       downloadUrl,
       "SonarScanner CLI",
-      cliVersion,
+      cliScannerVersion,
     );
     const scannerPath = tl.resolve(
       scannerArchivePath,
-      `sonar-scanner-${cliVersion}`,
+      `sonar-scanner-${cliScannerVersion}`,
       "bin",
       isWindows() ? `${SCANNER_CLI_NAME}.bat` : SCANNER_CLI_NAME,
     );
@@ -283,15 +283,15 @@ export class ScannerMSBuild extends Scanner {
     //  as .NET Core is now supported on Windows
     const useNetFramework = isWindows();
 
-    const msBuildVersion = tl.getInput("msBuildVersion");
+    const dotnetScannerVersion = tl.getInput("dotnetScannerVersion");
     let scannerPath: string | undefined;
-    if (msBuildVersion) {
+    if (dotnetScannerVersion) {
       // Download the specified scanner version
-      const downloadUrl = scannerConfig.msBuildUrlTemplate(msBuildVersion, useNetFramework);
+      const downloadUrl = scannerConfig.msBuildUrlTemplate(dotnetScannerVersion, useNetFramework);
       const scannerArchivePath = await Scanner.downloadScanner(
         downloadUrl,
         "SonarScanner MSBuild",
-        msBuildVersion,
+        dotnetScannerVersion,
       );
 
       scannerPath = tl.resolve(

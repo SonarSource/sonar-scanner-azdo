@@ -193,13 +193,13 @@ describe("downloading the scanner", () => {
     [ScannerMode.MSBuild, undefined, "5.0.0.1", null],
   ])(
     "should download the correct version of the %s scanner",
-    async (scannerMode, msBuildVersion, cliVersion, url) => {
+    async (scannerMode, dotnetScannerVersion, cliScannerVersion, url) => {
       azureTaskLibMock.setInputs({
         SonarQube: "SQ",
         jdkversion: JdkVersionSource.JavaHome,
         organization: "mock-organization",
-        msBuildVersion,
-        cliVersion,
+        dotnetScannerVersion,
+        cliScannerVersion,
         scannerMode,
       });
 
@@ -229,8 +229,8 @@ describe("downloading the scanner", () => {
       SonarQube: "SQ",
       jdkversion: JdkVersionSource.JavaHome,
       organization: "mock-organization",
-      msBuildVersion: "6.0.0.1",
-      cliVersion: "5.0.0.1",
+      dotnetScannerVersion: "6.0.0.1",
+      cliScannerVersion: "5.0.0.1",
       scannerMode: ScannerMode.CLI,
     });
 

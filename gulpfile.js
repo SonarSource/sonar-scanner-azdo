@@ -143,7 +143,7 @@ gulp.task("build:download-scanners", () => {
         .pipe(decompress())
         .pipe(
           gulp.dest(
-            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_NET_FRAMEWORK_DIRNAME, scanner.cliVersion),
+            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_NET_FRAMEWORK_DIRNAME, scanner.cliScannerVersion),
           ),
         ),
     );
@@ -153,7 +153,7 @@ gulp.task("build:download-scanners", () => {
         .pipe(decompress())
         .pipe(
           gulp.dest(
-            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_NET_DOTNET_DIRNAME, scanner.msBuildVersion),
+            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_NET_DOTNET_DIRNAME, scanner.dotnetScannerVersion),
           ),
         ),
     );
@@ -163,7 +163,7 @@ gulp.task("build:download-scanners", () => {
         downloadOrCopy(scanner.cliUrl)
           .pipe(decompress())
           .pipe(
-            gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliVersion)),
+            gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliScannerVersion)),
           ),
       );
     }
@@ -250,8 +250,8 @@ gulp.task("build:copy", () => {
             path.join(
               BUILD_SCANNER_DIR,
               BUILD_SCANNER_CLI_DIRNAME,
-              scanner.cliVersion,
-              `sonar-scanner-${scanner.cliVersion}`,
+              scanner.cliScannerVersion,
+              `sonar-scanner-${scanner.cliScannerVersion}`,
               "**/*",
             ),
           )
@@ -267,7 +267,7 @@ gulp.task("build:copy", () => {
             path.join(
               BUILD_SCANNER_DIR,
               BUILD_SCANNER_NET_FRAMEWORK_DIRNAME,
-              scanner.cliVersion,
+              scanner.cliScannerVersion,
               "**/*",
             ),
           )
@@ -279,7 +279,7 @@ gulp.task("build:copy", () => {
             path.join(
               BUILD_SCANNER_DIR,
               BUILD_SCANNER_NET_DOTNET_DIRNAME,
-              scanner.msBuildVersion,
+              scanner.dotnetScannerVersion,
               "**/*",
             ),
           )

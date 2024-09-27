@@ -44,15 +44,17 @@
       }
     },
     {
-      "name": "msBuildVersion",
+      "name": "dotnetScannerVersion",
+      "aliases": ["dotnetScannerVersion", "msBuildVersion"],
       "type": "string",
-      "label": "Scanner MSBuild Version",
+      "label": ".NET Scanner Version",
       "required": false,
-      "visibleRule": "scannerMode = MSBuild",
-      "helpMarkDown": "Specify the version of the MSBuild scanner to use. Versions can be located [here](https://github.com/SonarSource/sonar-scanner-msbuild/tags)."
+      "visibleRule": "scannerMode = dotnet",
+      "helpMarkDown": "Specify the version of the .NET Scanner to use. Versions can be located [here](https://github.com/SonarSource/sonar-scanner-msbuild/tags)."
     },
     {
-      "name": "cliVersion",
+      "name": "cliScannerVersion",
+      "aliases": ["cliScannerVersion", "cliVersion"],
       "type": "string",
       "label": "Scanner CLI Version",
       "required": false,
