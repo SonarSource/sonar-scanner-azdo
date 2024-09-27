@@ -39,4 +39,8 @@ export const scanner = {
 
   msBuildUrlTemplate,
   cliUrlTemplate,
+
+  // Added for compatibility with the build process
+  dotnetScannerVersion: msBuildVersion,
+  cliScannerVersion: cliVersion,
 };

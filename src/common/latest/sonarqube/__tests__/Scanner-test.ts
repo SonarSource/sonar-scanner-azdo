@@ -71,7 +71,7 @@ describe("Scanner", () => {
       it("should download scanner when needed (windows)", async () => {
         azureTaskLibMock.setPlatform(tl.Platform.Windows);
         azureTaskLibMock.setInputs({
-          cliVersion: "1.22.333",
+          cliScannerVersion: "1.22.333",
         });
 
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
@@ -89,7 +89,7 @@ describe("Scanner", () => {
       it("should download scanner when needed (unix)", async () => {
         azureTaskLibMock.setPlatform(tl.Platform.Linux);
         azureTaskLibMock.setInputs({
-          cliVersion: "1.22.333",
+          cliScannerVersion: "1.22.333",
         });
 
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
@@ -116,7 +116,7 @@ describe("Scanner", () => {
         jest.mocked(toolLib.findLocalTool).mockImplementationOnce(() => "/some-path/to/cached");
         azureTaskLibMock.setPlatform(tl.Platform.Linux);
         azureTaskLibMock.setInputs({
-          cliVersion: "1.22.333",
+          cliScannerVersion: "1.22.333",
         });
 
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.CLI);
@@ -198,7 +198,7 @@ describe("Scanner", () => {
       it("should use downloaded scanner on windows", async () => {
         azureTaskLibMock.setPlatform(tl.Platform.Windows);
         azureTaskLibMock.setInputs({
-          msBuildVersion: "1.22.333",
+          dotnetScannerVersion: "1.22.333",
           projectKey: "projectKey",
           projectName: "projectName",
         });
@@ -223,7 +223,7 @@ describe("Scanner", () => {
       it("should use downloaded scanner on unix", async () => {
         azureTaskLibMock.setPlatform(tl.Platform.Linux);
         azureTaskLibMock.setInputs({
-          msBuildVersion: "1.22.333",
+          dotnetScannerVersion: "1.22.333",
           projectKey: "projectKey",
           projectName: "projectName",
           organization: "my-org",
