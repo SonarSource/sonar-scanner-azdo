@@ -10,9 +10,14 @@ import { log, LogLevel } from "../helpers/logging";
 import { isWindows } from "../helpers/utils";
 
 export enum ScannerMode {
-  MSBuild = "MSBuild",
-  CLI = "CLI",
-  Other = "Other",
+  dotnet = "dotnet",
+  cli = "cli",
+  other = "other",
+
+  /**
+   * @deprecated Use `ScannerMode.dotnet` instead.
+   */
+  msbuild = "msbuild",
 }
 
 export default class Scanner {
@@ -88,17 +93,21 @@ export default class Scanner {
   }
 
   public static getScanner(rootPath: string) {
-    return new Scanner(rootPath, ScannerMode.Other);
+    return new Scanner(rootPath, ScannerMode.other);
   }
 
   public static getPrepareScanner(rootPath: string, mode: ScannerMode) {
     switch (mode) {
-      case ScannerMode.Other:
+      case ScannerMode.other:
         return Scanner.getScanner(rootPath);
-      case ScannerMode.MSBuild:
+      case ScannerMode.dotnet:
         return ScannerMSBuild.getScanner(rootPath);
-      case ScannerMode.CLI:
+      case ScannerMode.cli:
         return ScannerCLI.getScanner(rootPath);
+      case ScannerMode.msbuild:
+        throw new Error(
+          `Use 'scannerMode: dotnet' instead of 'scannerMode: MSBuild' in your task configuration.`,
+        );
       default:
         throw new Error(`Unknown scanner mode: ${mode}`);
     }
@@ -106,16 +115,16 @@ export default class Scanner {
 
   public static getAnalyzeScanner(rootPath: string, mode: ScannerMode) {
     switch (mode) {
-      case ScannerMode.Other:
+      case ScannerMode.other:
         log(
           LogLevel.WARN,
           `When using Maven or Gradle, don't use the analyze task but instead tick the ` +
             `'SonarQube' option in the Maven/Gradle task to run the scanner as part of the build.`,
         );
         return Scanner.getScanner(rootPath);
-      case ScannerMode.MSBuild:
+      case ScannerMode.dotnet:
         return new ScannerMSBuild(rootPath, {});
-      case ScannerMode.CLI:
+      case ScannerMode.cli:
         return new ScannerCLI(rootPath, {});
       default:
         throw new Error(`Unknown scanner mode: ${mode}`);
@@ -170,7 +179,7 @@ export class ScannerCLI extends Scanner {
     private readonly data: ScannerCLIData,
     private readonly cliMode?: string,
   ) {
-    super(rootPath, ScannerMode.CLI);
+    super(rootPath, ScannerMode.cli);
   }
 
   public toSonarProps() {
@@ -267,7 +276,7 @@ export class ScannerMSBuild extends Scanner {
     rootPath: string,
     private readonly data: ScannerMSData,
   ) {
-    super(rootPath, ScannerMode.MSBuild);
+    super(rootPath, ScannerMode.dotnet);
   }
 
   public toSonarProps() {

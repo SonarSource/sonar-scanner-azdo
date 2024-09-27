@@ -34,13 +34,13 @@
       "name": "scannerMode",
       "type": "radio",
       "label": "Choose the way to run the analysis",
-      "defaultValue": "MSBuild",
+      "defaultValue": "dotnet",
       "required": true,
-      "helpMarkDown": "####MSBuild\n* Put this task before your MSBuild task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
+      "helpMarkDown": "####dotnet\n* Put this task before your build task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
       "options": {
-        "MSBuild": "Integrate with MSBuild",
-        "Other": "Integrate with Maven or Gradle",
-        "CLI": "Use standalone scanner"
+        "dotnet": "Integrate with .NET",
+        "cli": "Use standalone SonarScanner CLI",
+        "other": "Integrate with Maven or Gradle"
       }
     },
     {
@@ -58,7 +58,7 @@
       "type": "string",
       "label": "Scanner CLI Version",
       "required": false,
-      "visibleRule": "scannerMode = CLI",
+      "visibleRule": "scannerMode = cli",
       "helpMarkDown": "Specify the version of the CLI scanner to use. Versions can be located [here](https://github.com/SonarSource/sonar-scanner-cli/tags)."
     },
     {
@@ -72,7 +72,7 @@
         "file": "Store configuration with my source code (sonar-project.properties)",
         "manual": "Manually provide configuration"
       },
-      "visibleRule": "scannerMode = CLI"
+      "visibleRule": "scannerMode = cli"
     },
     {
       "name": "configFile",
@@ -81,7 +81,7 @@
       "label": "Settings File",
       "required": false,
       "helpMarkDown": "More information is available [here](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/)",
-      "visibleRule": "scannerMode = CLI && configMode = file"
+      "visibleRule": "scannerMode = cli && configMode = file"
     },
     {
       "name": "cliProjectKey",
@@ -89,7 +89,7 @@
       "label": "Project Key",
       "required": true,
       "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
-      "visibleRule": "scannerMode = CLI && configMode = manual"
+      "visibleRule": "scannerMode = cli && configMode = manual"
     },
     {
       "name": "projectKey",
@@ -97,7 +97,7 @@
       "label": "Project Key",
       "required": true,
       "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
-      "visibleRule": "scannerMode = MSBuild"
+      "visibleRule": "scannerMode = dotnet"
     },
     {
       "name": "cliProjectName",
@@ -105,7 +105,7 @@
       "label": "Project Name",
       "required": false,
       "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
-      "visibleRule": "scannerMode = CLI && configMode = manual"
+      "visibleRule": "scannerMode = cli && configMode = manual"
     },
     {
       "name": "projectName",
@@ -113,7 +113,7 @@
       "label": "Project Name",
       "required": false,
       "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
-      "visibleRule": "scannerMode = MSBuild"
+      "visibleRule": "scannerMode = dotnet"
     },
     {
       "name": "cliProjectVersion",
@@ -122,7 +122,7 @@
       "defaultValue": "1.0",
       "required": false,
       "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
-      "visibleRule": "scannerMode = CLI && configMode = manual"
+      "visibleRule": "scannerMode = cli && configMode = manual"
     },
     {
       "name": "projectVersion",
@@ -131,7 +131,7 @@
       "defaultValue": "1.0",
       "required": false,
       "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
-      "visibleRule": "scannerMode = MSBuild"
+      "visibleRule": "scannerMode = dotnet"
     },
     {
       "name": "cliSources",
@@ -140,7 +140,7 @@
       "defaultValue": ".",
       "required": true,
       "helpMarkDown": "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarQube property",
-      "visibleRule": "scannerMode = CLI && configMode = manual"
+      "visibleRule": "scannerMode = cli && configMode = manual"
     },
     {
       "name": "extraProperties",
