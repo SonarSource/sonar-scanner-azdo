@@ -7,7 +7,7 @@ import {
 } from "../helpers/constants";
 import { AzureTaskLibMock } from "../mocks/AzureTaskLibMock";
 import { EndpointType } from "../sonarqube";
-import Scanner, { ScannerCLI } from "../sonarqube/Scanner";
+import Scanner, { ScannerCLI, ScannerMode } from "../sonarqube/Scanner";
 
 jest.mock("azure-pipelines-task-lib/task");
 
@@ -37,7 +37,7 @@ it("should not have SONAR_SCANNER_MODE property filled", async () => {
 it("should run scanner", async () => {
   azureTaskLibMock.setVariables({
     [TaskVariables.SonarServerVersion]: "9.9.0.213",
-    [TaskVariables.SonarScannerMode]: "CLI",
+    [TaskVariables.SonarScannerMode]: ScannerMode.cli,
     [TaskVariables.SonarScannerParams]: '{"sonar.metadata": "/home/user/metadata.txt"}',
     [TaskVariables.SonarEndpoint]:
       '{"type":"SonarQube","data":{"url":"https://sonarqube.com/","username":"token"}}',

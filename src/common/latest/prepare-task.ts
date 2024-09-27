@@ -20,7 +20,7 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true) as string, endpointType);
   const rootPath = __dirname;
 
-  const scannerMode = ScannerMode[tl.getInput("scannerMode") as ScannerMode];
+  const scannerMode = ScannerMode[tl.getInput("scannerMode", true)?.toLowerCase() as ScannerMode];
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
 
