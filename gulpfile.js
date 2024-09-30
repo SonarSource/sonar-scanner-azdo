@@ -41,7 +41,7 @@ const {
   getTaskExtension,
   getTaskCommonFolder,
   taskNeedsCliScanner,
-  taskNeedsMsBuildScanner,
+  taskNeedsDotNetScanner,
 } = require("./config/tasks");
 const { getSignature } = require("./config/gulp-sign");
 
@@ -143,7 +143,11 @@ gulp.task("build:download-scanners", () => {
         .pipe(decompress())
         .pipe(
           gulp.dest(
-            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_NET_FRAMEWORK_DIRNAME, scanner.cliScannerVersion),
+            path.join(
+              BUILD_SCANNER_DIR,
+              BUILD_SCANNER_NET_FRAMEWORK_DIRNAME,
+              scanner.cliScannerVersion,
+            ),
           ),
         ),
     );
@@ -153,7 +157,11 @@ gulp.task("build:download-scanners", () => {
         .pipe(decompress())
         .pipe(
           gulp.dest(
-            path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_NET_DOTNET_DIRNAME, scanner.dotnetScannerVersion),
+            path.join(
+              BUILD_SCANNER_DIR,
+              BUILD_SCANNER_NET_DOTNET_DIRNAME,
+              scanner.dotnetScannerVersion,
+            ),
           ),
         ),
     );
@@ -163,7 +171,9 @@ gulp.task("build:download-scanners", () => {
         downloadOrCopy(scanner.cliUrl)
           .pipe(decompress())
           .pipe(
-            gulp.dest(path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliScannerVersion)),
+            gulp.dest(
+              path.join(BUILD_SCANNER_DIR, BUILD_SCANNER_CLI_DIRNAME, scanner.cliScannerVersion),
+            ),
           ),
       );
     }
@@ -259,8 +269,8 @@ gulp.task("build:copy", () => {
       );
     }
 
-    // Copy Scanner MSBuild
-    if (taskNeedsMsBuildScanner(taskName)) {
+    // Copy Scanner .NET
+    if (taskNeedsDotNetScanner(taskName)) {
       streams.push(
         gulp
           .src(

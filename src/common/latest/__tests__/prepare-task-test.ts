@@ -12,7 +12,7 @@ import { AzureToolLibMock } from "../mocks/AzureToolLibMock";
 import * as prept from "../prepare-task";
 import { runTask } from "../run";
 import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
-import Scanner, { ScannerCLI, ScannerMSBuild, ScannerMode } from "../sonarqube/Scanner";
+import Scanner, { ScannerCLI, ScannerDotnet, ScannerMode } from "../sonarqube/Scanner";
 import TaskReport from "../sonarqube/TaskReport";
 
 jest.mock("azure-pipelines-task-lib/task");
@@ -206,7 +206,7 @@ describe("downloading the scanner", () => {
       const mockedScanner =
         scannerMode === ScannerMode.cli
           ? new ScannerCLI(__dirname, { projectSettings: "scanner.properties" })
-          : new ScannerMSBuild(__dirname, {});
+          : new ScannerDotnet(__dirname, {});
       jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => mockedScanner);
 
       await runTask(prept.prepareTask, "Prepare", EndpointType.SonarQube);

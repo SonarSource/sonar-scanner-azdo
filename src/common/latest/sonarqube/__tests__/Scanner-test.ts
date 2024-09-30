@@ -3,7 +3,7 @@ import * as toolLib from "azure-pipelines-tool-lib/tool";
 import { TaskVariables } from "../../helpers/constants";
 import { AzureTaskLibMock } from "../../mocks/AzureTaskLibMock";
 import { AzureToolLibMock } from "../../mocks/AzureToolLibMock";
-import Scanner, { ScannerCLI, ScannerMSBuild, ScannerMode } from "../Scanner";
+import Scanner, { ScannerCLI, ScannerDotnet, ScannerMode } from "../Scanner";
 
 jest.mock("fs-extra", () => ({
   ...jest.requireActual("fs-extra"),
@@ -175,7 +175,7 @@ describe("Scanner", () => {
     });
   });
 
-  describe("ScannerMSBuild", () => {
+  describe("ScannerDotnet", () => {
     describe("instantiation", () => {
       it("should be instantiated properly", () => {
         azureTaskLibMock.setInputs({
@@ -184,7 +184,7 @@ describe("Scanner", () => {
           projectVersion: "projectVersion",
         });
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.dotnet);
-        expect(scanner).toBeInstanceOf(ScannerMSBuild);
+        expect(scanner).toBeInstanceOf(ScannerDotnet);
 
         expect(scanner.toSonarProps()).toEqual({
           "sonar.projectKey": "projectKey",
@@ -195,7 +195,7 @@ describe("Scanner", () => {
     });
 
     describe("prepare", () => {
-      it("fail with verbosity on old MSBuild usage", () => {
+      it("fail with verbosity on old 'MSBuild' usage", () => {
         expect(() => Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.msbuild)).toThrow(
           `Use 'scannerMode: dotnet' instead of 'scannerMode: MSBuild' in your task configuration.`,
         );
@@ -254,7 +254,7 @@ describe("Scanner", () => {
       });
 
       it("should not download scanner when found in the cache", async () => {
-        azureToolLibMock.setLocalToolPath("SonarScanner MSBuild", "/some-path/to/cached");
+        azureToolLibMock.setLocalToolPath("SonarScanner .NET", "/some-path/to/cached");
         azureTaskLibMock.setPlatform(tl.Platform.Linux);
         azureTaskLibMock.setInputs({
           msBuildVersion: "1.22.333",
@@ -319,7 +319,7 @@ describe("Scanner", () => {
           projectName: "projectName",
         });
         azureTaskLibMock.setVariables({
-          [TaskVariables.SonarScannerMSBuildExe]: "/some-path/to/cached/SonarScanner.MSBuild.exe",
+          [TaskVariables.SonarScannerDotnetExe]: "/some-path/to/cached/SonarScanner.MSBuild.exe",
         });
 
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.dotnet);
@@ -338,7 +338,7 @@ describe("Scanner", () => {
           projectName: "projectName",
         });
         azureTaskLibMock.setVariables({
-          [TaskVariables.SonarScannerMSBuildDll]: "/some-path/to/cached/SonarScanner.MSBuild.dll",
+          [TaskVariables.SonarScannerDotnetDll]: "/some-path/to/cached/SonarScanner.MSBuild.dll",
         });
 
         const scanner = Scanner.getPrepareScanner(MOCK_ROOT_PATH, ScannerMode.dotnet);

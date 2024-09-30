@@ -8,11 +8,11 @@ const dotnetScannersBaseUrl = `https://github.com/SonarSource/sonar-scanner-msbu
 // CLI scanner location
 const cliScannerBaseUrl = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/";
 
-function getMsBuildClassicFilename(dotnetScannerVersion: string) {
+function getDotnetFrameworkFilename(dotnetScannerVersion: string) {
   return `sonar-scanner-${dotnetScannerVersion}-net-framework.zip`;
 }
 
-function getMsBuildDotnetFilename(dotnetScannerVersion: string) {
+function getDotnetetCoreFilename(dotnetScannerVersion: string) {
   return `sonar-scanner-${dotnetScannerVersion}-net.zip`;
 }
 
@@ -20,10 +20,10 @@ function getCliScannerFilename(cliScannerVersion: string) {
   return `sonar-scanner-cli-${cliScannerVersion}.zip`;
 }
 
-function msBuildUrlTemplate(dotnetScannerVersion: string, framework: boolean) {
+function dotnetScannerUrlTemplate(dotnetScannerVersion: string, framework: boolean) {
   const filename = framework
-    ? getMsBuildClassicFilename(dotnetScannerVersion)
-    : getMsBuildDotnetFilename(dotnetScannerVersion);
+    ? getDotnetFrameworkFilename(dotnetScannerVersion)
+    : getDotnetetCoreFilename(dotnetScannerVersion);
   return `${dotnetScannersBaseUrl}${dotnetScannerVersion}/${filename}`;
 }
 
@@ -34,10 +34,10 @@ function cliUrlTemplate(cliScannerVersion: string) {
 export const scanner = {
   dotnetScannerVersion,
   cliScannerVersion,
-  classicUrl: msBuildUrlTemplate(dotnetScannerVersion, true),
-  dotnetUrl: msBuildUrlTemplate(dotnetScannerVersion, false),
+  classicUrl: dotnetScannerUrlTemplate(dotnetScannerVersion, true),
+  dotnetUrl: dotnetScannerUrlTemplate(dotnetScannerVersion, false),
   cliUrl: cliUrlTemplate(cliScannerVersion),
 
-  msBuildUrlTemplate,
+  dotnetScannerUrlTemplate,
   cliUrlTemplate,
 };
