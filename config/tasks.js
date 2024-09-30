@@ -3,7 +3,7 @@ const path = require("path");
 /**
  * Tasks that need the msbuild scanner embedded
  */
-exports.taskNeedsMsBuildScanner = function (taskName) {
+exports.taskNeedsDotNetScanner = function (taskName) {
   return ["SonarQubePrepare", "SonarCloudPrepare"].includes(taskName);
 };
 

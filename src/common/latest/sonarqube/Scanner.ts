@@ -101,7 +101,7 @@ export default class Scanner {
       case ScannerMode.other:
         return Scanner.getScanner(rootPath);
       case ScannerMode.dotnet:
-        return ScannerMSBuild.getScanner(rootPath);
+        return ScannerDotnet.getScanner(rootPath);
       case ScannerMode.cli:
         return ScannerCLI.getScanner(rootPath);
       case ScannerMode.msbuild:
@@ -123,7 +123,7 @@ export default class Scanner {
         );
         return Scanner.getScanner(rootPath);
       case ScannerMode.dotnet:
-        return new ScannerMSBuild(rootPath, {});
+        return new ScannerDotnet(rootPath, {});
       case ScannerMode.cli:
         return new ScannerCLI(rootPath, {});
       default:
@@ -264,17 +264,17 @@ export class ScannerCLI extends Scanner {
   }
 }
 
-interface ScannerMSData {
+interface ScannerDotNetData {
   projectKey?: string;
   projectName?: string;
   projectVersion?: string;
   organization?: string;
 }
 
-export class ScannerMSBuild extends Scanner {
+export class ScannerDotnet extends Scanner {
   constructor(
     rootPath: string,
-    private readonly data: ScannerMSData,
+    private readonly data: ScannerDotNetData,
   ) {
     super(rootPath, ScannerMode.dotnet);
   }
@@ -296,10 +296,13 @@ export class ScannerMSBuild extends Scanner {
     let scannerPath: string | undefined;
     if (dotnetScannerVersion) {
       // Download the specified scanner version
-      const downloadUrl = scannerConfig.msBuildUrlTemplate(dotnetScannerVersion, useNetFramework);
+      const downloadUrl = scannerConfig.dotnetScannerUrlTemplate(
+        dotnetScannerVersion,
+        useNetFramework,
+      );
       const scannerArchivePath = await Scanner.downloadScanner(
         downloadUrl,
-        "SonarScanner MSBuild",
+        "SonarScanner .NET",
         dotnetScannerVersion,
       );
 
@@ -321,7 +324,7 @@ export class ScannerMSBuild extends Scanner {
       `Using ${useNetFramework ? ".NET framework" : ".NET core"} scanner at ${scannerPath}`,
     );
     tl.setVariable(
-      useNetFramework ? TaskVariables.SonarScannerMSBuildExe : TaskVariables.SonarScannerMSBuildDll,
+      useNetFramework ? TaskVariables.SonarScannerDotnetExe : TaskVariables.SonarScannerDotnetDll,
       scannerPath,
     );
 
@@ -373,9 +376,7 @@ export class ScannerMSBuild extends Scanner {
 
     const scannerRunner = this.getScannerRunner(
       tl.getVariable(
-        useNetFramework
-          ? TaskVariables.SonarScannerMSBuildExe
-          : TaskVariables.SonarScannerMSBuildDll,
+        useNetFramework ? TaskVariables.SonarScannerDotnetExe : TaskVariables.SonarScannerDotnetDll,
       ) as string,
       useNetFramework,
     );
@@ -386,7 +387,7 @@ export class ScannerMSBuild extends Scanner {
   }
 
   public static getScanner(rootPath: string) {
-    return new ScannerMSBuild(rootPath, {
+    return new ScannerDotnet(rootPath, {
       projectKey: tl.getInput("projectKey", true),
       projectName: tl.getInput("projectName"),
       projectVersion: tl.getInput("projectVersion"),
