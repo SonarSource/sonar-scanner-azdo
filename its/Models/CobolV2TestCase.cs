@@ -20,15 +20,15 @@
 
 namespace IntegrationTests.Models
 {
-	public class GradleTestCase : BuildTestCase
+	public class CobolV2TestCase : BuildTestCase
 	{
-		public GradleTestCase()
+		public CobolV2TestCase()
 		{
-			Coverage = 50.0;
-			NcLocs = 9;
-			PipelineName = "gradle";
-			ProjectKey = "its-gradle";
-			LogPrefix = "Gradle";
+			Coverage = 0.5;
+			NcLocs = 2907;
+			PipelineName = "sonarcloud-cobol-v2";
+			ProjectKey = "its-cobol-v2";
+			LogPrefix = "ScannerCLI/Cobol";
 		}
 	}
 }

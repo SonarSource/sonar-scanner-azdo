@@ -20,15 +20,15 @@
 
 namespace IntegrationTests.Models
 {
-	public class DotnetFrameworkTestCase : BuildTestCase
+	public class MavenV3TestCase : BuildTestCase
 	{
-		public DotnetFrameworkTestCase()
+		public MavenV3TestCase()
 		{
-			Coverage = 25.0;
-			NcLocs = 49;
-			PipelineName = "dotnet";
-			ProjectKey = "its-dotnet";
-			LogPrefix = "S4NET - .NET Framework";
+			Coverage = 23.1;
+			NcLocs = 211;
+			PipelineName = "sonarcloud-maven-v3";
+			ProjectKey = "its-maven-v3";
+			LogPrefix = "Maven";
 		}
 	}
 }
