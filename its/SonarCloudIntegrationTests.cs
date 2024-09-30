@@ -58,10 +58,12 @@ namespace AzureDevOpsExtension.IntegrationTests
 
         public static IEnumerable<BuildTestCase> GetTestCases()
         {
-            yield return new DotnetFrameworkTestCase();
-            yield return new CobolTestCase();
-            yield return new MavenTestCase();
-            yield return new GradleTestCase();
+            yield return new DotnetFrameworkV3TestCase();
+            yield return new DotnetCoreV3TestCase();
+            yield return new CobolV3TestCase();
+            yield return new CobolV2TestCase();
+            yield return new MavenV3TestCase();
+            yield return new GradleV3TestCase();
         }
 
         [Test]
@@ -120,7 +122,7 @@ namespace AzureDevOpsExtension.IntegrationTests
                 Project = target.Project
             });
 
-            
+
             var currentBuildResult = await _buildHttpClient.GetBuildAsync(queuedBuild.Project.Id, queuedBuild.Id);
 
 

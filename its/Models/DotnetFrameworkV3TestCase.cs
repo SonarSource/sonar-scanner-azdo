@@ -20,15 +20,15 @@
 
 namespace IntegrationTests.Models
 {
-	public class CobolTestCase : BuildTestCase
+	public class DotnetFrameworkV3TestCase : BuildTestCase
 	{
-		public CobolTestCase()
+		public DotnetFrameworkV3TestCase()
 		{
-			Coverage = 0.5;
-			NcLocs = 2907;
-			PipelineName = "cobol";
-			ProjectKey = "its-dotnet";
-			LogPrefix = "ScannerCLI/Cobol";
+			Coverage = 25.0;
+			NcLocs = 49;
+			PipelineName = "sonarcloud-dotnet-framework-v3";
+			ProjectKey = "its-dotnet-framework-v3";
+			LogPrefix = "S4NET - .NET Framework";
 		}
 	}
 }

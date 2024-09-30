@@ -20,15 +20,15 @@
 
 namespace IntegrationTests.Models
 {
-	public class MavenTestCase : BuildTestCase
+	public class DotnetCoreV3TestCase : BuildTestCase
 	{
-		public MavenTestCase()
+		public DotnetCoreV3TestCase()
 		{
-			Coverage = 23.1;
-			NcLocs = 211;
-			PipelineName = "maven";
-			ProjectKey = "its-maven";
-			LogPrefix = "Maven";
+			Coverage = 0;
+			NcLocs = 807;
+			PipelineName = "sonarcloud-dotnet-core-v3";
+			ProjectKey = "its-dotnet-core-v3";
+			LogPrefix = "S4NET - .NET Core";
 		}
 	}
 }
