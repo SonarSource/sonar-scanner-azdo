@@ -24,8 +24,8 @@ namespace IntegrationTests.Models
 	{
 		public DotnetFrameworkV3TestCase()
 		{
-			Coverage = 25.0;
-			NcLocs = 49;
+			Coverage = 2.7;
+			NcLocs = 262;
 			PipelineName = "sonarcloud-dotnet-framework-v3";
 			ProjectKey = "its-dotnet-framework-v3";
 			LogPrefix = "S4NET - .NET Framework";
