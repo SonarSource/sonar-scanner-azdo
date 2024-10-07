@@ -25,7 +25,7 @@ namespace IntegrationTests.Models
 		public DotnetCoreV3TestCase()
 		{
 			Coverage = 0;
-			NcLocs = 807;
+			NcLocs = 1020;
 			PipelineName = "sonarcloud-dotnet-core-v3";
 			ProjectKey = "its-dotnet-core-v3";
 			LogPrefix = "S4NET - .NET Core";
