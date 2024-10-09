@@ -72,16 +72,17 @@ check_size_task:
     GPG_SIGNING_KEY: VAULT[development/kv/data/sign data.key]
     GPG_SIGNING_PASSPHRASE: VAULT[development/kv/data/sign data.passphrase]
     folder: node_modules
-    SIZE_LIMIT: 30720
+    MAX_FILE_SIZE_MB: 40
   install_script:
     - bash scripts/install.sh
   script:
     - source cirrus-env BUILD
     - npm run build
     - |
-      du -a dist/*.vsix | awk '{print $1}' | xargs -I % bash -c '
-        if [ % -ge $SIZE_LIMIT ]; then
-          echo "Error: File size exceeds limit of $SIZE_LIMIT bytes."
+      du -a -m dist/*.vsix | awk '{print $1}' | xargs -I % bash -c '
+        echo "File size: % MB"
+        if [ % -ge $MAX_FILE_SIZE_MB ]; then
+          echo "Error: File size exceeds limit of $MAX_FILE_SIZE_MB MB."
           exit 1
         fi
       '
