@@ -188,7 +188,8 @@ exports.runSonarQubeScanner = function (extension, customOptions, callback) {
     "sonar.sources": "src",
     "sonar.projectVersion": vssExtension.version,
     "sonar.coverage.exclusions":
-      "gulpfile.js, build/**, config/**, coverage/**, extensions/**, scripts/**, **/__tests__/**, **/mocks/**, **/temp-find-method.ts",
+      "gulpfile.js, build/**, config/**, coverage/**, extensions/**, scripts/**, **/__tests__/**, **/mocks/**, **/temp-find-method.ts, src/common/sonarqube-v*/**, src/common/sonarcloud-v*/**",
+    "sonar.cpd.exclusions": "src/common/sonarqube-v*/**, src/common/sonarcloud-v*/**",
     "sonar.tests": ".",
     "sonar.test.inclusions": "**/__tests__/**",
     "sonar.analysis.buildNumber": process.env.CIRRUS_BUILD_ID,
