@@ -146,7 +146,7 @@ gulp.task("build:download-scanners", () => {
             path.join(
               BUILD_SCANNER_DIR,
               BUILD_SCANNER_NET_FRAMEWORK_DIRNAME,
-              scanner.cliScannerVersion,
+              scanner.dotnetScannerVersion,
             ),
           ),
         ),
@@ -277,7 +277,7 @@ gulp.task("build:copy", () => {
             path.join(
               BUILD_SCANNER_DIR,
               BUILD_SCANNER_NET_FRAMEWORK_DIRNAME,
-              scanner.cliScannerVersion,
+              scanner.dotnetScannerVersion,
               "**/*",
             ),
           )
