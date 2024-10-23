@@ -62,3 +62,12 @@ export function getAuthToken() {
     throw new Error("Unable to get credential to perform rest API calls");
   }
 }
+
+export function parseScannerExtraProperties(): { [key: string]: string } {
+  const props: { [key: string]: string } = {};
+  tl.getDelimitedInput("extraProperties", "\n")
+    .filter((keyValue) => !keyValue.startsWith("#"))
+    .map((keyValue) => keyValue.split(/=(.+)/))
+    .forEach(([k, v]) => (props[k] = v));
+  return props;
+}

@@ -38,3 +38,18 @@ it("should build jsonpath body properly", async () => {
 
   expect(log).toHaveBeenCalledWith(LogLevel.DEBUG, `Adding build property: ${jsonAsString}`);
 });
+
+it("should parse extra properties correctly", () => {
+  azureTaskLibMock.setInputs({
+    extraProperties: `# Additional properties that will be passed to the scanner, 
+# Put one key=value per line, example:
+# sonar.exclusions=**/*.bin
+sonar.scanner.metadataFilePath=/tmp/report-task-debug.txt
+sonar.scanner.metadataFilePath=C:\\tmp\\report/task/debug-override.txt`,
+  });
+  const props = azdoApiUtils.parseScannerExtraProperties();
+
+  // SONARAZDO-417 We don't treat "\" as an escape character to support pipeline predefined variables
+  // eg sonar.cs.vstest.reportsPaths="$(Build.SourcesDirectory)\file.txt"
+  expect(props["sonar.scanner.metadataFilePath"]).toBe("C:\\tmp\\report/task/debug-override.txt");
+});

@@ -1,7 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { getProperties } from "properties-file";
 import * as semver from "semver";
-import { getWebApi } from "./helpers/azdo-api-utils";
+import { getWebApi, parseScannerExtraProperties } from "./helpers/azdo-api-utils";
 import {
   AzureBuildVariables,
   AzureProvider,
@@ -24,7 +23,7 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   const scanner = Scanner.getPrepareScanner(rootPath, scannerMode);
   const serverVersion = await getServerVersion(endpoint);
 
-  const extraProperties = getProperties(tl.getInput("extraProperties") ?? "");
+  const extraProperties = parseScannerExtraProperties();
 
   let props: { [key: string]: string } = {};
 
