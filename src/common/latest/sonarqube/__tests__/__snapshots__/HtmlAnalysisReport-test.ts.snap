@@ -6,7 +6,6 @@ exports[`should display the project name 1`] = `
     font-style: normal;
     line-height: normal;
     font-weight: 400;
-    color: rgb(29, 33, 47);
     padding-bottom: 1px;"><div style="font-size: 21px;
     font-weight: 600;"><span>❌</span><span style="
         height: 100%;
@@ -46,7 +45,6 @@ exports[`should generate an analysis status with error 1`] = `
     font-style: normal;
     line-height: normal;
     font-weight: 400;
-    color: rgb(29, 33, 47);
     padding-bottom: 1px;"><div style="font-size: 21px;
     font-weight: 600;"><span>❌</span><span style="
         height: 100%;
@@ -86,7 +84,6 @@ exports[`should not fail when metrics are missing 1`] = `
     font-style: normal;
     line-height: normal;
     font-weight: 400;
-    color: rgb(29, 33, 47);
     padding-bottom: 1px;"><div style="font-size: 21px;
     font-weight: 600;"><span>❌</span><span style="
         height: 100%;
@@ -103,7 +100,6 @@ exports[`should render passing quality gate measures correctly 1`] = `
     font-style: normal;
     line-height: normal;
     font-weight: 400;
-    color: rgb(29, 33, 47);
     padding-bottom: 1px;"><div style="font-size: 21px;
     font-weight: 600;"><span>✅</span><span style="
         height: 100%;
@@ -143,7 +139,6 @@ exports[`should render passing quality gate measures correctly 2`] = `
     font-style: normal;
     line-height: normal;
     font-weight: 400;
-    color: rgb(29, 33, 47);
     padding-bottom: 1px;"><div style="font-size: 21px;
     font-weight: 600;"><span>✅</span><span style="
         height: 100%;
