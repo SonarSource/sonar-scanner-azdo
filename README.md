@@ -1,4 +1,4 @@
-# SonarQube/SonarCloud Azure Pipelines Extension
+# SonarQube/SonarCloud Azure DevOps Extension
 
 [![Build Status](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_apis/build/status%2FSonarSource.sonar-scanner-azdo?branchName=master)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/latest?definitionId=126&branchName=master)
 
@@ -6,8 +6,8 @@ Sonar's [Clean Code solutions](https://www.sonarsource.com/solutions/clean-code/
 
 ## Marketplace
 
-https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube
-https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud
+- [SonarQube Extension](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube)
+- [SonarCloud Extension](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud)
 
 ## Have Questions or Feedback?
 
@@ -23,27 +23,73 @@ Please be aware that we are not actively looking for feature contributions. The 
 
 With that in mind, if you would like to submit a code contribution, please create a pull request for this repository. Please explain your motives to contribute this change: what problem you are trying to fix, what improvement you are trying to make.
 
-Make sure that you follow our [code style](https://github.com/SonarSource/sonar-developer-toolset#code-style) and all tests are passing (Travis build is executed for each pull request).
+Make sure that you follow our [code style](https://github.com/SonarSource/sonar-developer-toolset#code-style) and all tests are passing (A cirrus build and Azure DevOps integration tests are executed for each pull request).
 
 ## Developer documentation
 
 ### How to set the environment
 
 - Install NPM (v8 or higher) / Node.js (v14 or higher)
-- `npm install -g tfx-cli`
-- `bash scripts/install.sh` (run `scripts/install.ps1` on Windows)
+- ```bash
+  npm install -g tfx-cli
+  bash scripts/install.sh
+  ```
 
-### Package a production build
+### Formatting and Linting
 
-- `npm run build`
-
-### Package a test build
-
-- `npm run test-build -- --publisher <publisher-id>`
+Automatic formatting can be achieved by using `npm run format`. Pipeline execution in PRs will fail if the format is not ok. There is also linting enabled in the pipeline, you can run `npm run lint` to ensure your code is properly lint.
 
 ### Run tests
 
-- `npm test`
+```bash
+npm test
+```
+
+To run the same set of validation that happens in the pipeline, use:
+
+```bash
+npm run validate-ci
+```
+
+### Package a production build
+
+```bash
+npm run build
+```
+
+### Package a test build
+
+```bash
+npm run test-build -- --publisher <your-publisher>
+```
+
+### Update the extension/task versions automatically
+
+During testing, when publishing an extension for validation, it is useful to have a way to increment the patch versions automatically so your changes are not rejected.
+
+Use these helpers to automatically bump the patch versions of the extensions and tasks, to ensure your changes are taken
+
+```bash
+# Change the task versions from X.Y.X to X.Y.123
+BUILD_BUILDID=123 npx gulp ci:azure:hotfix-tasks-version
+
+# Change the extensions versions from X.Y.Z to X.Y.Z.123
+BUILD_BUILDID=123 npx gulp ci:azure:hotfix-extensions-version
+```
+
+Run a test build after to create a test extension with the modified versions. Increment the value of `BUILD_BUILDID` every time you want to publish a new version for test purposes.
+
+### Package a test build with custom .NET scanners inside the extension
+
+Download the sonar-scanner-XXX-net.zip and sonar-scanner-XXX-net-framework.zip that you wish to test from the [SonarScanner for .NET releases page](https://github.com/SonarSource/sonar-scanner-msbuild/releases).
+
+When building the extension with your test publisher use the command:
+
+```bash
+SCANNER_NET_FRAMEWORK_LOCATION=/path/to/sonar-scanner-9.0.0-rc.99116-net-framework.zip \
+SCANNER_NET_LOCATION=/path/to/sonar-scanner-9.0.0-rc.99116-net.zip \
+npm run test-build -- --publisher <your-publisher>
+```
 
 ## License
 
