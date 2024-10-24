@@ -213,17 +213,23 @@ gulp.task("build:copy", () => {
     }
 
     /**
-     * We have to bundle the translation file from for azure-pipelines-tool-lib, otherwise the task will fail
-     * We do not put an empty file otherwise warnings are displayed in the job logs
+     * We must put a lib.json file in task root not to make the job fail
+     * We merge messages from libs that have translation files so that they are available in the task
      * @see https://github.com/microsoft/azure-pipelines-tool-lib/issues/240
      */
-    const copyLibJson = gulp
-      .src(path.join(SOURCE_DIR, "common", commonPath, "azure-pipelines-tool-lib.json"), {
-        allowEmpty: true,
-      })
-      .pipe(gulpRename("lib.json"))
-      .pipe(gulp.dest(outPath));
-    streams.push(copyLibJson);
+    const messages = ["azure-pipelines-task-lib", "azure-pipelines-tool-lib"]
+      .map((libName) =>
+        path.join(SOURCE_DIR, "common", commonPath, "node_modules", libName, "lib.json"),
+      )
+      .filter((libJsonPath) => fs.existsSync(libJsonPath))
+      // eslint-disable-next-line import/no-dynamic-require
+      .map((libJsonPath) => require(libJsonPath).messages)
+      .reduce((acc, libJson) => ({ ...acc, ...libJson }), {});
+    streams.push(
+      gulpFile("lib.json", JSON.stringify({ messages }), {
+        src: true,
+      }).pipe(gulp.dest(outPath)),
+    );
 
     // Copy common package.json into root task directory
     const copyPackageJson = gulp
