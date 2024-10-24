@@ -32,7 +32,6 @@ export const htmlMainDiv = (content: string) =>
     font-style: normal;
     line-height: normal;
     font-weight: 400;
-    color: rgb(29, 33, 47);
     padding-bottom: 1px;`,
     content,
   );
