@@ -1,0 +1,19 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarcloud","version":1},"scanner":{"type":"dotnet"}}
+
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarcloudPrepare@1
+    inputs:
+      SonarCloud: SonarCloud
+      organization: my-org
+      projectKey: azdo-it-project
+      projectName: AZDO IT Project
+  - task: SonarcloudAnalyze@1
+    inputs: {}
+  - task: SonarcloudPublish@1
+    inputs:
+      pollingTimeoutSec: "300"

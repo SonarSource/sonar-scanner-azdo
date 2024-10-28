@@ -1,0 +1,19 @@
+# This pipeline was automatically generated
+# Config: {"os":"windows","version":{"extension":"sonarqube","version":5},"scanner":{"type":"cli"}}
+
+pool:
+  vmImage: windows-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarqubePrepare@5
+    inputs:
+      SonarQube: SonarQube
+      cliProjectKey: azdo-it-project
+      cliProjectName: AZDO IT Project
+      cliSources: .
+  - task: SonarqubeAnalyze@5
+    inputs: {}
+  - task: SonarqubePublish@5
+    inputs:
+      pollingTimeoutSec: "300"

@@ -1,0 +1,19 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarqube","version":6},"scanner":{"type":"dotnet","version":"4.5.6"}}
+
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarqubePrepare@6
+    inputs:
+      SonarQube: SonarQube
+      projectKey: azdo-it-project
+      projectName: AZDO IT Project
+      msBuildVersion: 4.5.6
+  - task: SonarqubeAnalyze@6
+    inputs: {}
+  - task: SonarqubePublish@6
+    inputs:
+      pollingTimeoutSec: "300"

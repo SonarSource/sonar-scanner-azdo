@@ -1,0 +1,17 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarqube:lts","version":5},"scanner":"other"}
+
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarqubePrepare@5
+    inputs:
+      SonarQube: SonarQube
+      scannerMode: other
+  - task: SonarqubeAnalyze@5
+    inputs: {}
+  - task: SonarqubePublish@5
+    inputs:
+      pollingTimeoutSec: "300"

@@ -1,0 +1,17 @@
+# This pipeline was automatically generated
+# Config: {"os":"windows","version":{"extension":"sonarqube:lts","version":7},"scanner":"other"}
+
+pool:
+  vmImage: windows-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarqubePrepare@7
+    inputs:
+      SonarQube: SonarQube
+      scannerMode: other
+  - task: SonarqubeAnalyze@7
+    inputs: {}
+  - task: SonarqubePublish@7
+    inputs:
+      pollingTimeoutSec: "300"

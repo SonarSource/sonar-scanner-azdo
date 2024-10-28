@@ -1,0 +1,18 @@
+# This pipeline was automatically generated
+# Config: {"os":"windows","version":{"extension":"sonarcloud","version":3},"scanner":"other"}
+
+pool:
+  vmImage: windows-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarcloudPrepare@3
+    inputs:
+      SonarCloud: SonarCloud
+      organization: my-org
+      scannerMode: other
+  - task: SonarcloudAnalyze@3
+    inputs: {}
+  - task: SonarcloudPublish@3
+    inputs:
+      pollingTimeoutSec: "300"

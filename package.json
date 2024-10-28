@@ -6,6 +6,7 @@
   "scripts": {
     "build": "BUILD_MODE=production gulp",
     "test-build": "gulp",
+    "build-its": "ts-node its/index.ts",
     "clean": "gulp clean",
     "upload": "gulp upload",
     "promote": "gulp promote",
@@ -61,8 +62,10 @@
     "tfx-cli": "0.17.0",
     "through2": "4.0.2",
     "ts-jest": "29.2.4",
+    "ts-node": "10.9.2",
     "typescript": "5.5.4",
     "vinyl": "3.0.0",
+    "yaml": "2.6.0",
     "yargs": "17.7.2"
   },
   "engines": {

@@ -1,0 +1,20 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarqube:lts","version":6},"scanner":{"type":"cli","version":"1.2.3"}}
+
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarqubePrepare@6
+    inputs:
+      SonarQube: SonarQube
+      cliProjectKey: azdo-it-project
+      cliProjectName: AZDO IT Project
+      cliSources: .
+      cliScannerVersion: 1.2.3
+  - task: SonarqubeAnalyze@6
+    inputs: {}
+  - task: SonarqubePublish@6
+    inputs:
+      pollingTimeoutSec: "300"
