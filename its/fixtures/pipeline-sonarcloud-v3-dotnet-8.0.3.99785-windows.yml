@@ -1,0 +1,30 @@
+# This pipeline was automatically generated
+# Config: {"os":"windows","version":{"extension":"sonarcloud","version":3},"scanner":{"type":"dotnet","version":"8.0.3.99785"}}
+
+trigger: none
+pool:
+  vmImage: windows-latest
+variables:
+  system.debug: true
+steps:
+  - task: NuGetToolInstaller@1
+    inputs: {}
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: dummy-project-dotnet-framework/*.sln
+  - task: SonarcloudPrepare@3
+    inputs:
+      SonarCloud: SonarCloud
+      organization: sonarsource-integration-tests
+      scannerMode: dotnet
+      projectKey: dummy-project-dotnet-framework
+      projectName: AZDO IT Project
+      extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/dummy-project-dotnet-framework
+      msBuildVersion: 8.0.3.99785
+  - task: DotNetCoreCLI@2
+    inputs: {}
+  - task: SonarcloudAnalyze@3
+    inputs: {}
+  - task: SonarcloudPublish@3
+    inputs:
+      pollingTimeoutSec: "300"

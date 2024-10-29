@@ -1,0 +1,24 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarcloud","version":3},"scanner":{"type":"dotnet"}}
+
+trigger: none
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarcloudPrepare@3
+    inputs:
+      SonarCloud: SonarCloud
+      organization: sonarsource-integration-tests
+      scannerMode: dotnet
+      projectKey: dummy-project-dotnet-core
+      projectName: AZDO IT Project
+      extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/dummy-project-dotnet-core
+  - script: dotnet build --configuration Release
+    workingDirectory: dummy-project-dotnet-core
+  - task: SonarcloudAnalyze@3
+    inputs: {}
+  - task: SonarcloudPublish@3
+    inputs:
+      pollingTimeoutSec: "300"

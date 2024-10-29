@@ -1,0 +1,24 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarcloud","version":2},"scanner":{"type":"cli","version":"6.2.1.4610"}}
+
+trigger: none
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarcloudPrepare@2
+    inputs:
+      SonarCloud: SonarCloud
+      organization: sonarsource-integration-tests
+      scannerMode: cli
+      configMode: manual
+      cliProjectKey: dummy-project-cli
+      cliProjectName: AZDO IT Project
+      cliSources: dummy-project-cli
+      cliScannerVersion: 6.2.1.4610
+  - task: SonarcloudAnalyze@2
+    inputs: {}
+  - task: SonarcloudPublish@2
+    inputs:
+      pollingTimeoutSec: "300"
