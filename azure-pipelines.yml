@@ -16,6 +16,8 @@ variables:
     value: true
   - name: NPM_CONFIG_registry
     value: $(ARTIFACTORY_URL)/api/npm/npm
+  - name: isMain
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
 
 stages:
   - stage: build
@@ -62,7 +64,7 @@ stages:
               customCommand: "run test-build -- --publisher $(publisher)"
 
           - task: CopyFiles@2
-            displayName: "Copy artefacts to build directory"
+            displayName: "Copy artifacts to build directory"
             inputs:
               SourceFolder: "$(Build.SourcesDirectory)/dist"
               Contents: "*.vsix"
@@ -89,10 +91,13 @@ stages:
       - job: "run_qa"
         variables:
           publisher: $(SonarSourceITPublisher)
-          sqExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SQ_VERSION'] ]
-          scExtensionVersion: $[ stageDependencies.build.npminstall.outputs['versions.SC_VERSION'] ]
+          sqExtensionVersion: $[stageDependencies.build.npminstall.outputs['versions.SQ_VERSION']]
+          scExtensionVersion: $[stageDependencies.build.npminstall.outputs['versions.SC_VERSION']]
           itOrg: $(SonarSourceITOrganization)
         steps:
+          - bash: |
+              echo "##vso[task.setvariable variable=SC_VERSION;isoutput=true]$(scExtensionVersion)"
+            name: versions
           # Unpublish extension
           - task: TfxInstaller@3
             displayName: "Install TFX CLI"
@@ -131,6 +136,7 @@ stages:
               downloadType: "single"
               artifactName: "extensions"
               downloadPath: "$(System.ArtifactsDirectory)"
+
           - task: PublishAzureDevOpsExtension@3
             displayName: "Publish SonarCloud test extension"
             inputs:
@@ -144,6 +150,7 @@ stages:
               extensionVisibility: "private"
               shareWith: "$(itOrg)"
               cwd: "$(System.ArtifactsDirectory)"
+
           - task: InstallAzureDevOpsExtension@3
             displayName: "Install extension in IT org"
             inputs:
@@ -185,3 +192,42 @@ stages:
             inputs:
               command: "test"
               projects: "its/runner/IntegrationTests.csproj"
+
+  - stage: publish_dogfood
+    displayName: "Publish dogfood extension"
+    condition: and(succeeded(), eq(variables['isMain'], true))
+    jobs:
+      - job: "publish_dogfood"
+        variables:
+          publisher: $(SonarSourceITPublisher)
+          scExtensionVersion: $[stageDependencies.run_qa.run_qa.outputs['versions.SC_VERSION']]
+        steps:
+          - task: TfxInstaller@3
+            displayName: "Install TFX CLI"
+            env:
+              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
+            inputs:
+              version: "v0.10.x"
+
+          - task: DownloadBuildArtifacts@1
+            displayName: "Download artifacts"
+            inputs:
+              buildType: "current"
+              downloadType: "single"
+              artifactName: "extensions"
+              downloadPath: "$(System.ArtifactsDirectory)"
+
+          - task: PublishAzureDevOpsExtension@4
+            displayName: "Publish SonarCloud dogfood extension"
+            inputs:
+              connectTo: "VsTeam"
+              connectedServiceName: "AzDO Extension - Marketplace - Dogfood"
+              fileType: "vsix"
+              vsixFile: "$(System.ArtifactsDirectory)/extensions/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
+              extensionName: "[Dogfood] SonarCloud"
+              extensionId: "sonarcloud-dogfood"
+              updateTasksVersion: false
+              updateTasksId: false
+              extensionVisibility: "private"
+              shareWith: "sonarsource"
+              cwd: "$(System.ArtifactsDirectory)"

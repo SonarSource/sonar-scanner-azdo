@@ -497,7 +497,7 @@ gulp.task("ci:azure:get-extensions-version", (done) => {
     console.log(`Fetched ext version ${version} for ${extension}`);
     console.log(`##vso[task.setvariable variable=${extensionPrefix}_EXT_NAME]${extensionManifest}`);
     console.log(
-      `##vso[task.setvariable variable=${extensionPrefix}_VERSION;isOutput=true]${version}`,
+      `##vso[task.setvariable variable=${extensionPrefix}_VERSION;isOutput=true;isreadonly=true]${version}`,
     );
   }
 
