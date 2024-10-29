@@ -1,0 +1,23 @@
+# This pipeline was automatically generated
+# Config: {"os":"windows","version":{"extension":"sonarcloud","version":1},"scanner":{"type":"cli"}}
+
+trigger: none
+pool:
+  vmImage: windows-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarcloudPrepare@1
+    inputs:
+      SonarCloud: SonarCloud
+      organization: sonarsource-integration-tests
+      scannerMode: cli
+      configMode: manual
+      cliProjectKey: dummy-project-cli
+      cliProjectName: AZDO IT Project
+      cliSources: dummy-project-cli
+  - task: SonarcloudAnalyze@1
+    inputs: {}
+  - task: SonarcloudPublish@1
+    inputs:
+      pollingTimeoutSec: "300"
