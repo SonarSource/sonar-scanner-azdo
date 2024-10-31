@@ -312,6 +312,7 @@ gulp.task("build:copy", () => {
  */
 gulp.task("extension:patch-test", () => {
   if (isProd) {
+    console.log("Not in test mode, skip patching extension");
     return Promise.resolve();
   }
 
@@ -329,6 +330,7 @@ gulp.task("extension:patch-test", () => {
     .pipe(
       gulpJsonEditor((json) => ({
         ...json,
+        id: json.id + "-test",
         name: "[Test] " + json.name,
         public: false,
         branding: {
@@ -469,6 +471,47 @@ gulp.task("ci:azure:hotfix-tasks-version", () => {
         )
         .pipe(gulp.dest(path.dirname(task))),
     ),
+  );
+});
+
+gulp.task("ci:azure:hotfix-tasks-names", () => {
+  const tasks = glob(["src/extensions/*/tasks/*/v*/*.json"]);
+  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json")]);
+
+  function obfuscateTaskGuid(guid) {
+    return "00000001" + guid.slice(8);
+  }
+
+  return mergeStream(
+    tasks
+      .map((task) =>
+        gulp
+          .src(task)
+          .pipe(
+            gulpJsonEditor((json) => ({
+              ...json,
+              name: json.name + "Test",
+              id: obfuscateTaskGuid(json.id),
+            })),
+          )
+          .pipe(gulp.dest(path.dirname(task))),
+      )
+      .concat(
+        vssExtensions.map((vssExtension) =>
+          gulp
+            .src(vssExtension)
+            .pipe(
+              gulpJsonEditor((json) => ({
+                ...json,
+                contributions: json.contributions.map((contribution) => ({
+                  ...contribution,
+                  id: obfuscateTaskGuid(contribution.id),
+                })),
+              })),
+            )
+            .pipe(gulp.dest(path.dirname(vssExtension))),
+        ),
+      ),
   );
 });
 

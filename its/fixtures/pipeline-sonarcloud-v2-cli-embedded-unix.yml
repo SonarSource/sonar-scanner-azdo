@@ -2,22 +2,23 @@
 # Config: {"os":"unix","version":{"extension":"sonarcloud","version":2},"scanner":{"type":"cli"}}
 
 trigger: none
+pr: none
 pool:
   vmImage: ubuntu-latest
 variables:
   system.debug: true
 steps:
-  - task: SonarcloudPrepare@2
+  - task: SonarCloudPrepareTest@2
     inputs:
       SonarCloud: SonarCloud
-      organization: sonarsource-integration-tests
+      organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: cli
       configMode: manual
-      cliProjectKey: dummy-project-cli
-      cliProjectName: AZDO IT Project
-      cliSources: dummy-project-cli
-  - task: SonarcloudAnalyze@2
+      cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
+      cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
+      cliSources: its/fixtures/dummy-project-cli
+  - task: SonarCloudAnalyzeTest@2
     inputs: {}
-  - task: SonarcloudPublish@2
+  - task: SonarCloudPublishTest@2
     inputs:
       pollingTimeoutSec: "300"

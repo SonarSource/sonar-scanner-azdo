@@ -2,22 +2,23 @@
 # Config: {"os":"windows","version":{"extension":"sonarcloud","version":3},"scanner":{"type":"cli"}}
 
 trigger: none
+pr: none
 pool:
   vmImage: windows-latest
 variables:
   system.debug: true
 steps:
-  - task: SonarcloudPrepare@3
+  - task: SonarCloudPrepareTest@3
     inputs:
       SonarCloud: SonarCloud
-      organization: sonarsource-integration-tests
+      organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: cli
       configMode: manual
-      cliProjectKey: dummy-project-cli
-      cliProjectName: AZDO IT Project
-      cliSources: dummy-project-cli
-  - task: SonarcloudAnalyze@3
+      cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
+      cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
+      cliSources: its/fixtures/dummy-project-cli
+  - task: SonarCloudAnalyzeTest@3
     inputs: {}
-  - task: SonarcloudPublish@3
+  - task: SonarCloudPublishTest@3
     inputs:
       pollingTimeoutSec: "300"

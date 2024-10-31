@@ -6,7 +6,8 @@
   "scripts": {
     "build": "BUILD_MODE=production gulp",
     "test-build": "gulp",
-    "build-its": "ts-node its/index.ts",
+    "generate-its": "ts-node its/generate.ts",
+    "test-its": "ts-node its/index.ts",
     "clean": "gulp clean",
     "upload": "gulp upload",
     "promote": "gulp promote",

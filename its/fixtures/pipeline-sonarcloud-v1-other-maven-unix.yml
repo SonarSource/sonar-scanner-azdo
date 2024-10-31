@@ -2,6 +2,7 @@
 # Config: {"os":"unix","version":{"extension":"sonarcloud","version":1},"scanner":{"type":"other","subtype":"maven"}}
 
 trigger: none
+pr: none
 pool:
   vmImage: ubuntu-latest
 variables:
@@ -12,18 +13,18 @@ steps:
       versionSpec: "17"
       jdkArchitectureOption: x64
       jdkSourceOption: PreInstalled
-  - task: SonarcloudPrepare@1
+  - task: SonarCloudPrepareTest@1
     inputs:
       SonarCloud: SonarCloud
-      organization: sonarsource-integration-tests
+      organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: other
-      projectKey: azdo-it-project
+      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-maven
   - task: Maven@4
     inputs:
-      mavenPomFile: dummy-project-maven/pom.xml
+      mavenPomFile: its/fixtures/dummy-project-maven/pom.xml
       goals: package
       options: -X
       sonarQubeRunAnalysis: true
-  - task: SonarcloudPublish@1
+  - task: SonarCloudPublishTest@1
     inputs:
       pollingTimeoutSec: "300"
