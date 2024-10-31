@@ -65,6 +65,7 @@ stages:
               script: |
                 npx gulp ci:azure:hotfix-extensions-version
                 npx gulp ci:azure:hotfix-tasks-version
+                npx gulp ci:azure:hotfix-tasks-names
 
           - task: Npm@1
             displayName: "Create test extension"
@@ -107,29 +108,14 @@ stages:
           - bash: |
               echo "##vso[task.setvariable variable=SC_VERSION;isoutput=true]$(scExtensionVersion)"
             name: versions
-          # Unpublish extension
+
+          # Install TFX
           - task: TfxInstaller@3
             displayName: "Install TFX CLI"
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
               version: "v0.10.x"
-          - task: UnpublishAzureDevOpsExtension@3
-            displayName: "Remove SonarCloud test extension from CI publisher"
-            inputs:
-              connectTo: "VsTeam"
-              connectedServiceName: "AzDo Extension - Marketplace - IntegrationTests"
-              method: "id"
-              publisherId: "$(publisher)"
-              extensionId: "sonarcloud"
-          - task: UnpublishAzureDevOpsExtension@3
-            displayName: "Remove SonarQube test extension from CI publisher"
-            inputs:
-              connectTo: "VsTeam"
-              connectedServiceName: "AzDo Extension - Marketplace - IntegrationTests"
-              method: "id"
-              publisherId: "$(publisher)"
-              extensionId: "sonarqube"
 
           # Publish Extension
           - task: TfxInstaller@3
@@ -145,7 +131,6 @@ stages:
               downloadType: "single"
               artifactName: "extensions"
               downloadPath: "$(System.ArtifactsDirectory)"
-
           - task: PublishAzureDevOpsExtension@3
             displayName: "Publish SonarCloud test extension"
             inputs:
@@ -160,6 +145,7 @@ stages:
               shareWith: "$(itOrg)"
               cwd: "$(System.ArtifactsDirectory)"
 
+          # Install extension
           - task: InstallAzureDevOpsExtension@3
             displayName: "Install extension in IT org"
             inputs:
@@ -167,40 +153,50 @@ stages:
               connectedServiceName: "AzDo Extension - Marketplace - IntegrationTests"
               method: "id"
               publisherId: "$(publisher)"
-              extensionId: "sonarcloud"
+              extensionId: "sonarcloud-test"
               accounts: "https://devops.azure.com/$(itOrg)"
           - task: Bash@3
             displayName: "Wait for tasks to be available in CI"
             env:
-              SERVICE_URL: "https://devops.azure.com/$(AzdoItsOrga)"
-              AZURE_TOKEN: $(ItOrgPat)
+              SERVICE_URL: "https://devops.azure.com/$(SonarSourceITOrganization)"
+              AZURE_TOKEN: $(SonarSourceITOrganizationPAT)
             inputs:
               targetType: "inline"
               script: |
                 extension_installed=""
                 while [ -z "$extension_installed" ]; do
-                  echo "Waiting for SonarCloudPublish task to be registered..."
+                  echo "Waiting for SonarCloudPublishTest task to be registered..."
                   tasks=$(tfx build tasks list --authType pat --service-url "$SERVICE_URL" -t "$AZURE_TOKEN" --no-color --json)
-                  extension_installed=$(echo $tasks | jq -r ".[] | select(.name == \"SonarCloudPublish\") | .id")
+                  extension_installed=$(echo $tasks | jq -r ".[] | select(.name == \"SonarCloudPublishTest\") | .id")
                   if [ -z "$extension_installed" ]; then
                     sleep 5
                   fi
                 done
-                echo "SonarCloudPublish task is registered with ID: $extension_installed"
+                echo "SonarCloudPublishTest task is registered with ID: $extension_installed"
 
-          # Run QA
-          - task: DotNetCoreCLI@2
-            displayName: "Run Integration tests project"
+          # Run ITs
+          - task: Bash@3
+            displayName: "Install all dependencies"
             env:
-              SC_TOKEN: $(SonarCloudToken)
-              SC_BASE_URL: $(SonarCloudBaseUrl)
-              AZURE_TOKEN: $(PAT)
-              AZDO_BASE_URL: $(AzdoBaseUrl)
-              ITS_ORGA: $(AzdoItsOrga)
-              ITS_PROJECT_NAME: $(AzdoItsProjectName)
+              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
-              command: "test"
-              projects: "its/runner/IntegrationTests.csproj"
+              filePath: "scripts/install.sh"
+          - task: Bash@3
+            displayName: "Install all extension dependencies"
+            env:
+              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
+            inputs:
+              filePath: "scripts/install.sh"
+          - task: Bash@3
+            displayName: "Run the ITs"
+            env:
+              SONARCLOUD_TOKEN: $(SonarCloudToken)
+              AZURE_TOKEN: $(SonarSourceITOrganizationPAT)
+              AZURE_BRANCH: $(System.PullRequest.SourceBranch)
+            inputs:
+              targetType: "inline"
+              script: |
+                npm run test-its
 
   - stage: publish_dogfood
     displayName: "Publish dogfood extension"

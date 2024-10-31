@@ -2,6 +2,7 @@
 # Config: {"os":"windows","version":{"extension":"sonarcloud","version":1},"scanner":{"type":"dotnet","version":"8.0.3.99785"}}
 
 trigger: none
+pr: none
 pool:
   vmImage: windows-latest
 variables:
@@ -11,20 +12,21 @@ steps:
     inputs: {}
   - task: NuGetCommand@2
     inputs:
-      restoreSolution: dummy-project-dotnet-framework/*.sln
-  - task: SonarcloudPrepare@1
+      restoreSolution: its/fixtures/dummy-project-dotnet-framework/*.sln
+  - task: SonarCloudPrepareTest@1
     inputs:
       SonarCloud: SonarCloud
-      organization: sonarsource-integration-tests
+      organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: dotnet
-      projectKey: dummy-project-dotnet-framework
-      projectName: AZDO IT Project
-      extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/dummy-project-dotnet-framework
+      projectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-framework
+      projectName: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-framework
+      extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/its/fixtures/dummy-project-dotnet-framework
       msBuildVersion: 8.0.3.99785
   - task: DotNetCoreCLI@2
+    inputs:
+      projects: its/fixtures/dummy-project-dotnet-framework/*.sln
+  - task: SonarCloudAnalyzeTest@1
     inputs: {}
-  - task: SonarcloudAnalyze@1
-    inputs: {}
-  - task: SonarcloudPublish@1
+  - task: SonarCloudPublishTest@1
     inputs:
       pollingTimeoutSec: "300"

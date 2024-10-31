@@ -2,27 +2,28 @@
 # Config: {"os":"windows","version":{"extension":"sonarcloud","version":2},"scanner":{"type":"other","subtype":"gradle"}}
 
 trigger: none
+pr: none
 pool:
   vmImage: windows-latest
 variables:
   system.debug: true
 steps:
-  - task: SonarcloudPrepare@2
+  - task: SonarCloudPrepareTest@2
     inputs:
       SonarCloud: SonarCloud
-      organization: sonarsource-integration-tests
+      organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: other
-      projectKey: azdo-it-project
+      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-gradle
   - task: Gradle@3
     inputs:
-      gradleWrapperFile: dummy-project-gradle/gradlew
-      workingDirectory: dummy-project-gradle
+      gradleWrapperFile: its/fixtures/dummy-project-gradle/gradlew
+      workingDirectory: its/fixtures/dummy-project-gradle
       tasks: build
       javaHomeOption: JDKVersion
       jdkVersionOption: "1.17"
       sonarQubeRunAnalysis: true
       sqGradlePluginVersionChoice: build
       spotBugsAnalysis: false
-  - task: SonarcloudPublish@2
+  - task: SonarCloudPublishTest@2
     inputs:
       pollingTimeoutSec: "300"
