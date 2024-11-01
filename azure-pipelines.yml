@@ -3,6 +3,15 @@
 # Add steps that analyze code, save build artifacts, upload, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
+schedules:
+  # Run from Monday to Friday at 2:0 UTC (https://docs.microsoft.com/en-us/azure/devops/pipelines/process/scheduled-triggers?view=azure-devops&tabs=yaml#cron-syntax)
+  - cron: "0 2 * * 1-5"
+    displayName: Nightly build
+    branches:
+      include:
+        - master
+    always: true
+
 trigger:
   - master
 
