@@ -41,6 +41,19 @@ function generateTaskName(
   return `${taskName}${TASK_NAME_PREFIX}@${config.version.version}`;
 }
 
+function getScannerMode(config: PipelineCombination): string {
+  if (config.version.extension === "sonarcloud" && config.version.version <= 2) {
+    // These are the old names for the scanner modes (prior to SC V3)
+    return {
+      cli: "CLI",
+      dotnet: "MSBuild",
+      other: "Other",
+    }[config.scanner.type];
+  }
+
+  return config.scanner.type;
+}
+
 function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
   const prepareTask: TaskDefinition = {
     task: generateTaskName(config, "Prepare"),
@@ -49,11 +62,11 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
         ? {
             SonarCloud: SONARCLOUD_SERVICE_CONNECTION,
             organization: SONARCLOUD_ORGANIZATION_KEY,
-            scannerMode: config.scanner.type,
+            scannerMode: getScannerMode(config),
           }
         : {
             SonarQube: SONARQUBE_SERVICE_CONNECTION,
-            scannerMode: config.scanner.type,
+            scannerMode: getScannerMode(config),
           },
   };
 

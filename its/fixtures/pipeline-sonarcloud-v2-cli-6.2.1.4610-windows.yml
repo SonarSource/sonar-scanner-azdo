@@ -12,7 +12,7 @@ steps:
     inputs:
       SonarCloud: SonarCloud
       organization: sonarsource-sonar-scanner-azdo-it
-      scannerMode: cli
+      scannerMode: CLI
       configMode: manual
       cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
       cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
