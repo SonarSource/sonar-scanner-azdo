@@ -62,4 +62,16 @@ export const testCases: TestCase[] = [
     pipelineName: "pipeline-sonarcloud-v3-cli-6.2.1.4610-windows",
     nloc: 3,
   },
+  {
+    sonarHostUrl: "https://sonarcloud.io",
+    projectKey: DUMMY_PROJECT_CLI_KEY,
+    pipelineName: "pipeline-sonarcloud-v1-cli-embedded-unix",
+    nloc: 3,
+  },
+  {
+    sonarHostUrl: "https://sonarcloud.io",
+    projectKey: DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY,
+    pipelineName: "pipeline-sonarcloud-v2-dotnet-embedded-windows",
+    nloc: 39,
+  },
 ];
