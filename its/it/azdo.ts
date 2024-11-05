@@ -15,11 +15,15 @@ export async function runPipeline(azdoApi: vm.WebApi, pipelineName: string): Pro
   if (definitions.length === 0) {
     throw new Error(`No pipeline found with name ${pipelineName}`);
   }
+
+  const branch = getBranch();
+  const definition = definitions[0];
+  console.log(`Running pipeline "${definition.name}" on branch "${branch}"`);
   const build = await azdoBuildApi.queueBuild(
     {
-      definition: { id: definitions[0].id as number },
-      project: definitions[0].project,
-      sourceBranch: getBranch(),
+      definition: { id: definition.id },
+      project: definition.project,
+      sourceBranch: branch,
     },
     AZDO_PROJECT,
   );

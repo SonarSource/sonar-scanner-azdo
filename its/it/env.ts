@@ -17,5 +17,5 @@ export function loadEnvironmentVariables() {
 }
 
 export function getBranch() {
-  return process.env.AZURE_BRANCH ?? GITHUB_MAIN_BRANCH;
+  return process.env.AZURE_BRANCH || GITHUB_MAIN_BRANCH;
 }
