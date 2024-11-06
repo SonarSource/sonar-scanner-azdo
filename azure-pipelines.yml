@@ -27,6 +27,8 @@ variables:
     value: $(ARTIFACTORY_URL)/api/npm/npm
   - name: isMain
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  - name: azureBranch
+    value: $[coalesce(variables['System.PullRequest.SourceBranch'], 'master')]
 
 stages:
   - stage: build
@@ -192,7 +194,7 @@ stages:
             env:
               SONARCLOUD_TOKEN: $(SonarCloudToken)
               AZURE_TOKEN: $(SonarSourceITOrganizationPAT)
-              AZURE_BRANCH: $(System.PullRequest.SourceBranch)
+              AZURE_BRANCH: $(azureBranch)
             inputs:
               targetType: "inline"
               script: |

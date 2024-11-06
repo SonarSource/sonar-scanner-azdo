@@ -3,9 +3,6 @@ export const AZDO_BASE_URL = "https://dev.azure.com/";
 export const AZDO_ORGANIZATION = "sonarsource";
 export const AZDO_PROJECT = "SonarScannerAzdo";
 
-// Default branch name on GitHub
-export const GITHUB_MAIN_BRANCH = "master";
-
 // Information to bind to the SonarCloud used in the E2E tests
 export const SONARCLOUD_ORGANIZATION_KEY = "sonarsource-sonar-scanner-azdo-it";
 export const SONARCLOUD_SERVICE_CONNECTION = "SonarCloud";
