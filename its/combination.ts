@@ -6,6 +6,7 @@ export function generateCombinations(): PipelineCombination[] {
     { extension: "sonarcloud", version: 1 },
     { extension: "sonarcloud", version: 2 },
     { extension: "sonarcloud", version: 3 },
+    { extension: "sonarqube", version: 7 },
   ];
   const scannerCombinations: PipelineCombination["scanner"][] = [
     { type: "cli" },

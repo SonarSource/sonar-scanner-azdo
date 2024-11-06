@@ -1,0 +1,23 @@
+# This pipeline was automatically generated
+# Config: {"os":"windows","version":{"extension":"sonarqube","version":7},"scanner":{"type":"cli"}}
+
+trigger: none
+pr: none
+pool:
+  vmImage: windows-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarqubePrepareTest@7
+    inputs:
+      SonarQube: SonarQube
+      scannerMode: cli
+      configMode: manual
+      cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
+      cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
+      cliSources: its/fixtures/dummy-project-cli
+  - task: SonarqubeAnalyzeTest@7
+    inputs: {}
+  - task: SonarqubePublishTest@7
+    inputs:
+      pollingTimeoutSec: "300"

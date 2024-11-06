@@ -46,3 +46,6 @@ eslint-report.json
 
 # Custom scanners
 /*.zip
+
+# env files
+/.env

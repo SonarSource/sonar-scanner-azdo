@@ -5,6 +5,7 @@ export async function getLastAnalysisDate(
   sonarHostUrl: string,
   componentKey: string,
   log: (...args: any[]) => void = console.log,
+  token?: string,
 ): Promise<string | null> {
   const env = loadEnvironmentVariables();
 
@@ -13,7 +14,7 @@ export async function getLastAnalysisDate(
   try {
     const response = await axios.get(url, {
       headers: {
-        Authorization: `Bearer ${env.SONARCLOUD_TOKEN}`,
+        Authorization: `Bearer ${token || env.SONARCLOUD_TOKEN}`,
       },
     });
     return response.data.component.analysisDate;

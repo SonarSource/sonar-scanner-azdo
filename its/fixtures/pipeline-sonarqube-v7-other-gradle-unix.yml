@@ -1,0 +1,28 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarqube","version":7},"scanner":{"type":"other","subtype":"gradle"}}
+
+trigger: none
+pr: none
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarqubePrepareTest@7
+    inputs:
+      SonarQube: SonarQube
+      scannerMode: other
+      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-gradle
+  - task: Gradle@3
+    inputs:
+      gradleWrapperFile: its/fixtures/dummy-project-gradle/gradlew
+      workingDirectory: its/fixtures/dummy-project-gradle
+      tasks: build
+      javaHomeOption: JDKVersion
+      jdkVersionOption: "1.17"
+      sonarQubeRunAnalysis: true
+      sqGradlePluginVersionChoice: build
+      spotBugsAnalysis: false
+  - task: SonarqubePublishTest@7
+    inputs:
+      pollingTimeoutSec: "300"

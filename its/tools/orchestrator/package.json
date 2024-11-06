@@ -1,0 +1,33 @@
+{
+  "name": "orchestrator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm ci && npm run check-format && npm run compile",
+    "compile": "tsc -b . && cp src/stop.java dist/stop.java",
+    "sonarqube": "npm run compile && node scripts/sonarqube.js",
+    "test": "npm run compile && node scripts/full.js",
+    "format": "prettier --write \"{src,scripts}/**/!(*.lint).(js|ts)\"",
+    "check-format": "prettier --list-different \"{src,scripts}/**/!(*.lint).(js|ts)\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "1.7.7",
+    "mkdirp": "3.0.1"
+  },
+  "devDependencies": {
+    "@types/mkdirp": "2.0.0",
+    "@types/node": "20.11.30",
+    "prettier": "3.2.5",
+    "typescript": "5.4.3"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "arrowParens": "avoid"
+  }
+}

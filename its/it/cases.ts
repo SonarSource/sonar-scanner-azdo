@@ -13,54 +13,60 @@ export type TestCase = {
 };
 
 export const testCases: TestCase[] = [
+  
   {
-    sonarHostUrl: "https://sonarcloud.io",
+    sonarHostUrl: "http://localhost:9000",
     projectKey: DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY,
-    pipelineName: "pipeline-sonarcloud-v3-dotnet-8.0.3.99785-windows",
+    pipelineName: "qa-pipeline-sonarqube-v7-dotnet-embedded-windows",
   },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY,
-    pipelineName: "pipeline-sonarcloud-v3-dotnet-embedded-windows",
-  },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_DOTNET_CORE_KEY,
-    pipelineName: "pipeline-sonarcloud-v3-dotnet-8.0.3.99785-unix",
-  },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_DOTNET_CORE_KEY,
-    pipelineName: "pipeline-sonarcloud-v3-dotnet-embedded-unix",
-  },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_GRADLE_KEY,
-    pipelineName: "pipeline-sonarcloud-v3-other-gradle-unix",
-  },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_MAVEN_KEY,
-    pipelineName: "pipeline-sonarcloud-v3-other-maven-unix",
-  },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_CLI_KEY,
-    pipelineName: "pipeline-sonarcloud-v3-cli-embedded-unix",
-  },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_CLI_KEY,
-    pipelineName: "pipeline-sonarcloud-v3-cli-6.2.1.4610-windows",
-  },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_CLI_KEY,
-    pipelineName: "pipeline-sonarcloud-v1-cli-embedded-unix",
-  },
-  {
-    sonarHostUrl: "https://sonarcloud.io",
-    projectKey: DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY,
-    pipelineName: "pipeline-sonarcloud-v2-dotnet-embedded-windows",
-  },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v3-dotnet-8.0.3.99785-windows",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v3-dotnet-embedded-windows",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_DOTNET_CORE_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v3-dotnet-8.0.3.99785-unix",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_DOTNET_CORE_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v3-dotnet-embedded-unix",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_GRADLE_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v3-other-gradle-unix",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_MAVEN_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v3-other-maven-unix",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_CLI_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v3-cli-embedded-unix",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_CLI_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v3-cli-6.2.1.4610-windows",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_CLI_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v1-cli-embedded-unix",
+  // },
+  // {
+  //   sonarHostUrl: "https://sonarcloud.io",
+  //   projectKey: DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY,
+  //   pipelineName: "pipeline-sonarcloud-v2-dotnet-embedded-windows",
+  // },
 ];

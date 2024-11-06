@@ -1,0 +1,24 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarqube","version":7},"scanner":{"type":"dotnet"}}
+
+trigger: none
+pr: none
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+steps:
+  - task: SonarqubePrepareTest@7
+    inputs:
+      SonarQube: SonarQube
+      scannerMode: dotnet
+      projectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-core
+      projectName: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-core
+      extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/its/fixtures/dummy-project-dotnet-core
+  - script: dotnet build --configuration Release
+    workingDirectory: its/fixtures/dummy-project-dotnet-core
+  - task: SonarqubeAnalyzeTest@7
+    inputs: {}
+  - task: SonarqubePublishTest@7
+    inputs:
+      pollingTimeoutSec: "300"
