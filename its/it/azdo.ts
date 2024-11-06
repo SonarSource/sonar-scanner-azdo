@@ -9,7 +9,11 @@ export function getAzdoApi(): vm.WebApi {
   return new vm.WebApi(AZDO_BASE_URL + AZDO_ORGANIZATION, credentialHandler);
 }
 
-export async function runPipeline(azdoApi: vm.WebApi, pipelineName: string): Promise<Build> {
+export async function runPipeline(
+  azdoApi: vm.WebApi,
+  pipelineName: string,
+  log: (...args: unknown[]) => void = console.log,
+): Promise<Build> {
   const azdoBuildApi = await azdoApi.getBuildApi();
   const definitions = await azdoBuildApi.getDefinitions(AZDO_PROJECT, pipelineName);
   if (definitions.length === 0) {
@@ -18,7 +22,7 @@ export async function runPipeline(azdoApi: vm.WebApi, pipelineName: string): Pro
 
   const branch = getBranch();
   const definition = definitions[0];
-  console.log(`Running pipeline "${definition.name}" on branch "${branch}"`);
+  log(`Running pipeline on branch "${branch}"`);
   const build = await azdoBuildApi.queueBuild(
     {
       definition: { id: definition.id },
@@ -30,7 +34,7 @@ export async function runPipeline(azdoApi: vm.WebApi, pipelineName: string): Pro
   const buildId = build.id as number;
   const projectId = build.project?.id as string;
 
-  console.log(`Build ${buildId} queued`);
+  log(`Build ${buildId} queued`);
   let buildResult = await azdoBuildApi.getBuild(projectId, buildId);
   while (buildResult.status !== BuildStatus.Completed) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -38,7 +42,7 @@ export async function runPipeline(azdoApi: vm.WebApi, pipelineName: string): Pro
   }
 
   if (buildResult.result !== BuildResult.Succeeded) {
-    throw new Error(`Pipeline ${pipelineName} failed`);
+    throw new Error(`Pipeline failed`);
   }
 
   return buildResult;
