@@ -1,35 +1,25 @@
 import axios from "axios";
 import { getBranch, loadEnvironmentVariables } from "./env";
 
-export async function getMeasures(
+export async function getLastAnalysisDate(
   sonarHostUrl: string,
   componentKey: string,
-): Promise<{ nloc: number }> {
+): Promise<string | null> {
   const env = loadEnvironmentVariables();
 
-  const url = `${sonarHostUrl}/api/measures/component?component=${componentKey}&branch=${getBranch()}&metricKeys=coverage,ncloc`;
-  console.log(`Getting measures for ${componentKey} at ${url}...`);
-  const response = await axios.get(
-    url,
-    {
-      headers: {
-        Authorization: `Bearer ${env.SONARCLOUD_TOKEN}`,
+  const url = `${sonarHostUrl}/api/components/show?component=${componentKey}&branch=${getBranch()}&ps=1`;
+  console.log(`Getting last analysis date for ${componentKey} at ${url}...`);
+  try {
+    const response = await axios.get(
+      url,
+      {
+        headers: {
+          Authorization: `Bearer ${env.SONARCLOUD_TOKEN}`,
+        },
       },
-    },
-  );
-  const { measures } = response.data.component;
-  return {
-    nloc: parseInt(measures.find((m: any) => m.metric === "ncloc").value, 10),
-  };
-}
-
-export async function verifyMeasures(
-  sonarHostUrl: string,
-  componentKey: string,
-  expectedNloc: number,
-): Promise<void> {
-  const { nloc } = await getMeasures(sonarHostUrl, componentKey);
-  if (nloc !== expectedNloc) {
-    throw new Error(`NLOC is not as expected: ${nloc} !== ${expectedNloc}`);
+    );
+    return response.data.component.analysisDate;
+  } catch (error: unknown) {
+    return null;
   }
 }
