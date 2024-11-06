@@ -1,5 +1,3 @@
-import { GITHUB_MAIN_BRANCH } from "../constant";
-
 export function loadEnvironmentVariables() {
   const { SONARCLOUD_TOKEN, AZURE_TOKEN } = process.env;
 
@@ -17,5 +15,5 @@ export function loadEnvironmentVariables() {
 }
 
 export function getBranch() {
-  return process.env.AZURE_BRANCH || GITHUB_MAIN_BRANCH;
+  return process.env.AZURE_BRANCH;
 }

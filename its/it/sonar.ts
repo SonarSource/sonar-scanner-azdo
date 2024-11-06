@@ -7,8 +7,10 @@ export async function getMeasures(
 ): Promise<{ nloc: number }> {
   const env = loadEnvironmentVariables();
 
+  const url = `${sonarHostUrl}/api/measures/component?component=${componentKey}&branch=${getBranch()}&metricKeys=coverage,ncloc`;
+  console.log(`Getting measures for ${componentKey} at ${url}...`);
   const response = await axios.get(
-    `${sonarHostUrl}/api/measures/component?component=${componentKey}&branch=${getBranch()}&metricKeys=coverage,ncloc`,
+    url,
     {
       headers: {
         Authorization: `Bearer ${env.SONARCLOUD_TOKEN}`,
