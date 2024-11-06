@@ -6,7 +6,7 @@ import {
   DUMMY_PROJECT_MAVEN_KEY,
 } from "../constant";
 
-type TestCase = {
+export type TestCase = {
   sonarHostUrl: string;
   projectKey: string;
   pipelineName: string;
