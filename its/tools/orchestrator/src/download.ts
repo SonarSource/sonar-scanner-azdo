@@ -27,7 +27,7 @@ import * as os from 'os';
 
 const DEFAULT_VERSION = '9.7.1.62043';
 const ARTIFACTORY_URL = process.env.ARTIFACTORY_URL || 'https://repox.jfrog.io';
-const ARTIFACTORY_ACCESS_TOKEN = process.env.ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN;
+const { ARTIFACTORY_ACCESS_TOKEN } = process.env;
 const CACHE_PATH = path.join(os.homedir(), '.sonar');
 const DEFAULT_SONARQUBE_PATH = path.join(CACHE_PATH, 'sonarqube');
 
