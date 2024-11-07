@@ -36,7 +36,7 @@ function generateTaskName(
   config: PipelineCombination,
   name: "Prepare" | "Analyze" | "Publish",
 ): string {
-  const extension = config.version.extension.replace("sonar", "Sonar").replace("cloud", "Cloud");
+  const extension = config.version.extension.replace("sonar", "Sonar").replace("cloud", "Cloud").replace('qube', "Qube");
   const taskName = `${extension.split(":")[0]}${name}`;
   return `${taskName}${TASK_NAME_PREFIX}@${config.version.version}`;
 }

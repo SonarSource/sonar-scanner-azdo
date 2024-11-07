@@ -156,7 +156,7 @@ stages:
 
           # Install SonarCloud extension
           - task: InstallAzureDevOpsExtension@3
-            displayName: "Install extension in IT org"
+            displayName: "Install SC extension in IT org"
             inputs:
               connectTo: "VsTeam"
               connectedServiceName: "AzDo Extension - Marketplace - IntegrationTests"
@@ -185,7 +185,7 @@ stages:
           
           # Install SonarQube extension
           - task: InstallAzureDevOpsExtension@3
-            displayName: "Install extension in IT org"
+            displayName: "Install SQ extension in IT org"
             inputs:
               connectTo: "VsTeam"
               connectedServiceName: "AzDo Extension - Marketplace - IntegrationTests"

@@ -8,7 +8,7 @@ pool:
 variables:
   system.debug: true
 steps:
-  - task: SonarqubePrepareTest@7
+  - task: SonarQubePrepareTest@7
     inputs:
       SonarQube: SonarQube
       scannerMode: dotnet
@@ -17,8 +17,8 @@ steps:
       extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/its/fixtures/dummy-project-dotnet-core
   - script: dotnet build --configuration Release
     workingDirectory: its/fixtures/dummy-project-dotnet-core
-  - task: SonarqubeAnalyzeTest@7
+  - task: SonarQubeAnalyzeTest@7
     inputs: {}
-  - task: SonarqubePublishTest@7
+  - task: SonarQubePublishTest@7
     inputs:
       pollingTimeoutSec: "300"

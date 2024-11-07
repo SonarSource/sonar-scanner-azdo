@@ -8,7 +8,7 @@ pool:
 variables:
   system.debug: true
 steps:
-  - task: SonarqubePrepareTest@7
+  - task: SonarQubePrepareTest@7
     inputs:
       SonarQube: SonarQube
       scannerMode: cli
@@ -16,8 +16,8 @@ steps:
       cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
       cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
       cliSources: its/fixtures/dummy-project-cli
-  - task: SonarqubeAnalyzeTest@7
+  - task: SonarQubeAnalyzeTest@7
     inputs: {}
-  - task: SonarqubePublishTest@7
+  - task: SonarQubePublishTest@7
     inputs:
       pollingTimeoutSec: "300"

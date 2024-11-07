@@ -13,7 +13,7 @@ steps:
   - task: NuGetCommand@2
     inputs:
       restoreSolution: its/fixtures/dummy-project-dotnet-framework/*.sln
-  - task: SonarqubePrepareTest@7
+  - task: SonarQubePrepareTest@7
     inputs:
       SonarQube: SonarQube
       scannerMode: dotnet
@@ -24,8 +24,8 @@ steps:
   - task: DotNetCoreCLI@2
     inputs:
       projects: its/fixtures/dummy-project-dotnet-framework/*.sln
-  - task: SonarqubeAnalyzeTest@7
+  - task: SonarQubeAnalyzeTest@7
     inputs: {}
-  - task: SonarqubePublishTest@7
+  - task: SonarQubePublishTest@7
     inputs:
       pollingTimeoutSec: "300"
