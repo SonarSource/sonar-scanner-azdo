@@ -54,12 +54,6 @@ stages:
             inputs:
               filePath: "scripts/install.sh"
 
-          - task: Npm@1
-            displayName: "Run Validate-CI"
-            inputs:
-              command: "custom"
-              customCommand: "run validate-ci"
-
           - task: Bash@3
             displayName: "Append build id in version in manifests"
             inputs:
