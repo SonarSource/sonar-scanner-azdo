@@ -234,7 +234,6 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                cd its/tools/orchestrator && npm ci && cd ../../..
                 npm run test-its
 
   - stage: publish_dogfood

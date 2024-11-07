@@ -4,6 +4,7 @@
 GIT_ROOT=$(git rev-parse --show-toplevel)
 
 COMMON_DIR="$GIT_ROOT/src/common"
+ORCHESTRATOR_DIR="$GIT_ROOT/its/tools/orchestrator"
 
 # Change directory to the root of the repository
 cd "$GIT_ROOT" || exit
@@ -17,3 +18,5 @@ for folder in "$COMMON_DIR"/*; do
         cd "$folder" && npm install || exit
     fi
 done
+
+cd "$ORCHESTRATOR_DIR" && npm install || exit
