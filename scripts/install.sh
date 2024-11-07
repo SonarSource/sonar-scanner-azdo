@@ -10,13 +10,17 @@ ORCHESTRATOR_DIR="$GIT_ROOT/its/tools/orchestrator"
 cd "$GIT_ROOT" || exit
 
 # Install dependencies at the root level
+echo "Running npm install in $GIT_ROOT"
 npm install
 
 # Iterate through each folder in the common directory
 for folder in "$COMMON_DIR"/*; do
     if [ -d "$folder" ]; then
+         echo "Running npm install in $folder"
         cd "$folder" && npm install || exit
     fi
 done
 
+# Echo and install dependencies in the orchestrator directory
+echo "Running npm install in $ORCHESTRATOR_DIR"
 cd "$ORCHESTRATOR_DIR" && npm install || exit

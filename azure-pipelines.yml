@@ -155,6 +155,11 @@ stages:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
               filePath: "scripts/install.sh"
+          - task: JavaToolInstaller@1
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
           - task: Bash@3
             displayName: "Run the ITs"
             env:
