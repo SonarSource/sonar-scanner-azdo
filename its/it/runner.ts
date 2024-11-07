@@ -1,7 +1,69 @@
 import * as vm from "azure-devops-node-api";
+import { generateCombinations, serializeCombination } from "../combination";
+import {
+  AZDO_PIPELINE_NAME_PREFIX,
+  DUMMY_PROJECT_CLI_KEY,
+  DUMMY_PROJECT_DOTNET_CORE_KEY,
+  DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY,
+  DUMMY_PROJECT_GRADLE_KEY,
+  DUMMY_PROJECT_MAVEN_KEY,
+} from "../constant";
+import { PipelineCombination } from "../types";
 import { getAzdoApi, runPipeline } from "./azdo";
-import { TestCase, testCases } from "./cases";
 import { getLastAnalysisDate } from "./sonar";
+
+type TestCase = {
+  sonarHostUrl: string;
+  projectKey: string;
+  pipelineName: string;
+};
+
+/**
+ * Get a test case from a combination to run
+ */
+export function getTestCase(combination: PipelineCombination): TestCase {
+  let projectKey;
+  switch (combination.scanner.type) {
+    case "cli":
+      projectKey = DUMMY_PROJECT_CLI_KEY;
+      break;
+    case "dotnet":
+      switch (combination.os) {
+        case "unix":
+          projectKey = DUMMY_PROJECT_DOTNET_CORE_KEY;
+          break;
+        case "windows":
+          projectKey = DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY;
+          break;
+        default:
+          throw new Error(`Unsupported os: ${combination.os}`);
+      }
+      break;
+    case "other":
+      switch (combination.scanner.subtype) {
+        case "gradle":
+          projectKey = DUMMY_PROJECT_GRADLE_KEY;
+          break;
+        case "maven":
+          projectKey = DUMMY_PROJECT_MAVEN_KEY;
+          break;
+        default:
+          throw new Error(`Unsupported scanner subtype: ${combination.scanner.subtype}`);
+      }
+      break;
+  }
+
+  const sonarHostUrl =
+    combination.version.extension === "sonarcloud"
+      ? "https://sonarcloud.io"
+      : "http://localhost:9000"; // SONARAZDO-425 We do not support SonarQube in the E2E tests
+
+  return {
+    pipelineName: AZDO_PIPELINE_NAME_PREFIX + serializeCombination(combination),
+    projectKey,
+    sonarHostUrl,
+  };
+}
 
 /**
  * We group test cases by project key and parallelize the execution of test cases
@@ -49,6 +111,8 @@ async function run(
 
 export async function main() {
   const azdoApi = getAzdoApi();
+
+  const testCases = generateCombinations().map(getTestCase);
 
   const executionPlan = getExecutionPlan(testCases);
   console.log(
