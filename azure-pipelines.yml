@@ -106,7 +106,7 @@ stages:
             name: versions
 
           # Install TFX
-          - task: TfxInstaller@3
+          - task: TfxInstaller@4
             displayName: "Install TFX CLI"
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
@@ -182,7 +182,7 @@ stages:
           publisher: $(SonarSourceITPublisher)
           scExtensionVersion: $[stageDependencies.run_qa.run_qa.outputs['versions.SC_VERSION']]
         steps:
-          - task: TfxInstaller@3
+          - task: TfxInstaller@4
             displayName: "Install TFX CLI"
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
