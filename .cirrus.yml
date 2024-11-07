@@ -54,6 +54,7 @@ build_task:
   script:
     - git fetch
     - source cirrus-env BUILD
+    - npm run generate-its && git diff --exit-code # Ensure that the generated ITS are up-to-date
     - npm run validate-ci
     - npm run build
     - npm run sonarqube
