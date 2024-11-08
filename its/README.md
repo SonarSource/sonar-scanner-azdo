@@ -5,7 +5,7 @@
 On each pull request and main branch, the QA pipeline should:
 
 - Build a test extension and install it
-- Run each [test case](./it/cases.ts) and verify the result on SonarCloud
+- Run each [test case](./it/cases.ts) and verify the result on SonarQube Cloud
 
 ## How to register a new pipeline to every PR analysis
 
