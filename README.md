@@ -1,4 +1,4 @@
-# SonarQube/SonarCloud Azure DevOps Extension
+# SonarQube (Server, Cloud) Azure DevOps Extension
 
 [![Build Status](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_apis/build/status%2FSonarSource.sonar-scanner-azdo?branchName=master)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/latest?definitionId=126&branchName=master)
 
@@ -6,8 +6,8 @@ Sonar's [Clean Code solutions](https://www.sonarsource.com/solutions/clean-code/
 
 ## Marketplace
 
-- [SonarQube Extension](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube)
-- [SonarCloud Extension](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud)
+- [SonarQube Server Extension](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube)
+- [SonarQube Cloud Extension](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud)
 
 ## Have Questions or Feedback?
 
