@@ -92,8 +92,8 @@ export default class HtmlAnalysisReport {
     const metric = this.result.metrics?.find((m) => m.key === metricKey);
 
     // Try to get the value from the measure, then from the condition
-    // There is difference in API response between SonarCloud and SonarQube
-    // SonarCloud is using periods when SonarQube is using period
+    // There is difference in API response between SonarQube (Server, Cloud)
+    // SonarQube Cloud is using periods when SonarQube is using period
     const value =
       measure?.periods?.[0]?.value ??
       measure?.period?.value ??

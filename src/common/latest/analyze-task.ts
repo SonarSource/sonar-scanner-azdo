@@ -22,7 +22,7 @@ export const analyzeTask: TaskJob = async (endpointType: EndpointType) => {
     return;
   }
 
-  Scanner.setIsSonarCloud(endpointType === EndpointType.SonarCloud);
+  Scanner.setIsSonarCloud(endpointType === EndpointType.Cloud);
   const serverVersion = tl.getVariable(TaskVariables.SonarServerVersion);
   JavaVersionResolver.setJavaVersion(jdkVersionSource, endpointType, serverVersion);
 

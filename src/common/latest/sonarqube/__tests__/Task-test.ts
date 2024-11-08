@@ -4,7 +4,7 @@ import { log, LogLevel } from "../../helpers/logging";
 import Endpoint, { EndpointType } from "../Endpoint";
 import { TimeOutReachedError, waitForTaskCompletion } from "../Task";
 
-const MOCKED_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
+const MOCKED_ENDPOINT = new Endpoint(EndpointType.Server, { url: "https://endpoint.url" });
 
 jest.mock("../../helpers/logging");
 

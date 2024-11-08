@@ -13,7 +13,7 @@ const MOCKED_CONDITIONS = [
     actualValue: "1",
   },
 ];
-const MOCKED_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
+const MOCKED_ENDPOINT = new Endpoint(EndpointType.Server, { url: "https://endpoint.url" });
 
 const MOCKED_METRICS: Metric[] = [
   {

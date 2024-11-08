@@ -1,11 +1,11 @@
 {
   "id": "sonarcloud_netcore_template",
-  "name": ".NET Core with SonarCloud",
+  "name": ".NET Core with SonarQube Cloud",
   "canDelete": false,
   "category": "Build",
   "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
   "defaultHostedQueue": null,
-  "description": "Build .NET Core and ASP.Net Core applications, and analyze with SonarCloud.",
+  "description": "Build .NET Core and ASP.Net Core applications, and analyze with SonarQube Cloud.",
   "template": {
     "build": [
       {

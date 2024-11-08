@@ -1,5 +1,3 @@
-const path = require("path");
-
 /**
  * Tasks that need the msbuild scanner embedded
  */

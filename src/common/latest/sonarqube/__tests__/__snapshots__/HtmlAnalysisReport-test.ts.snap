@@ -36,7 +36,7 @@ exports[`should display the project name 1`] = `
       width: fit-content; 
     "
     href="https://dashboard.url"
-  >See analysis details on SonarQube</a></div></div>"
+  >See analysis details on SonarQube Server</a></div></div>"
 `;
 
 exports[`should generate an analysis status with error 1`] = `
@@ -75,7 +75,7 @@ exports[`should generate an analysis status with error 1`] = `
       width: fit-content; 
     "
     href="https://dashboard.url"
-  >See analysis details on SonarQube</a></div></div>"
+  >See analysis details on SonarQube Server</a></div></div>"
 `;
 
 exports[`should not fail when metrics are missing 1`] = `
@@ -130,7 +130,7 @@ exports[`should render passing quality gate measures correctly 1`] = `
       width: fit-content; 
     "
     href="https://dashboard.url"
-  >See analysis details on SonarQube</a></div></div>"
+  >See analysis details on SonarQube Server</a></div></div>"
 `;
 
 exports[`should render passing quality gate measures correctly 2`] = `
@@ -169,5 +169,5 @@ exports[`should render passing quality gate measures correctly 2`] = `
       width: fit-content; 
     "
     href="https://dashboard.url"
-  >See analysis details on SonarCloud</a></div></div>"
+  >See analysis details on SonarQube Cloud</a></div></div>"
 `;

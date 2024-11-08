@@ -16,7 +16,7 @@ import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import TaskReport from "./sonarqube/TaskReport";
 
 export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
-  const endpoint = Endpoint.getEndpoint(tl.getInput(endpointType, true) as string, endpointType);
+  const endpoint = Endpoint.getEndpoint(tl.getInput(Endpoint.ENDPOINT_INPUT_NAME, true) as string, endpointType);
   const rootPath = __dirname;
 
   const scannerMode = ScannerMode[tl.getInput("scannerMode", true)?.toLowerCase() as ScannerMode];
@@ -33,7 +33,7 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
     log(
       LogLevel.DEBUG,
-      "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location.",
+      "SonarQube (Server, Cloud) version >= 7.2.0 detected, setting report-task.txt file to its newest location.",
     );
     props["sonar.scanner.metadataFilePath"] = TaskReport.getDefaultPath();
     log(LogLevel.DEBUG, `Branch and PR parameters: ${JSON.stringify(props)}`);
@@ -64,7 +64,7 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
 };
 
 export function branchFeatureSupported(endpoint: Endpoint, serverVersion: string | semver.SemVer) {
-  if (endpoint.type === EndpointType.SonarCloud) {
+  if (endpoint.type === EndpointType.Cloud) {
     return true;
   }
   return semver.satisfies(serverVersion, ">=7.2.0");
@@ -120,7 +120,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
 /**
  * In the case of branch analysis, we need to know if we are on the default branch.
  * If that is the case, we try to not specify the sonar.branch.name parameter to avoid getting
- * rejected by SonarQube Communnity Edition.
+ * rejected by SonarQube Server tiers that do not support it.
  */
 async function isDefaultBranch() {
   const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri") as string;

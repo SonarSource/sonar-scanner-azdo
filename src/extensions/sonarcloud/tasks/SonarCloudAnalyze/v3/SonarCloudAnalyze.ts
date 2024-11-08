@@ -1,3 +1,3 @@
 import { EndpointType, analyzeTask, runTask } from "../../../../../common/latest";
 
-runTask(analyzeTask, "Analyze", EndpointType.SonarCloud);
+runTask(analyzeTask, "Analyze", EndpointType.Cloud);

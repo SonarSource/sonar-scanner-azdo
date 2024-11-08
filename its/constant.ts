@@ -13,7 +13,7 @@ export const CLI_VERSION_INPUT_NAME = "cliScannerVersion";
 export const DOTNET_VERSION_INPUT_NAME = "msBuildVersion";
 
 // The following constants are used to identify the different projects used in the E2E tests
-// All the *_KEY values are projects that should exist in SonarCloud's ${SONARCLOUD_ORGANIZATION_KEY} organization
+// All the *_KEY values are projects that should exist in SonarQube Cloud's ${SONARCLOUD_ORGANIZATION_KEY} organization
 // All the *_PATH values are paths to the fixtures in the repository (relative to the root of the repository)
 
 // CLI Project

@@ -9,7 +9,7 @@ import { get, getServerVersion } from "../request";
 const axiosMock = new AxiosMock(axios);
 const azureTaskLibMock = new AzureTaskLibMock();
 
-const ENDPOINT = new Endpoint(EndpointType.SonarQube, {
+const ENDPOINT = new Endpoint(EndpointType.Server, {
   url: "https://endpoint.url",
   token: "the-token",
 });
@@ -49,7 +49,7 @@ describe("request", () => {
     });
 
     it("should get a JSON response with password auth", async () => {
-      const endpoint = new Endpoint(EndpointType.SonarQube, {
+      const endpoint = new Endpoint(EndpointType.Server, {
         url: "https://endpoint.url",
         username: "the-username",
         password: "the-password",
@@ -85,7 +85,7 @@ describe("request", () => {
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: Network Error.`,
+        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: Network Error.`,
       );
     });
 
@@ -99,7 +99,7 @@ describe("request", () => {
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: Request failed with status code 500.`,
+        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: Request failed with status code 500.`,
       );
     });
 
@@ -111,7 +111,7 @@ describe("request", () => {
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube: API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded.`,
+        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded.`,
       );
     });
   });
@@ -130,7 +130,7 @@ describe("request", () => {
 
     it("should use proxy for https endpoint", async () => {
       process.env.HTTP_PROXY = "http://proxy.url";
-      const endpoint = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
+      const endpoint = new Endpoint(EndpointType.Server, { url: "https://endpoint.url" });
 
       axiosMock.onGet(`${endpoint.url}/api/server/version`).reply(200, "1.2.3.4");
 
@@ -146,7 +146,7 @@ describe("request", () => {
 
     it("should use proxy for http endpoint", async () => {
       process.env.HTTP_PROXY = "http://proxy.url";
-      const endpoint = new Endpoint(EndpointType.SonarQube, { url: "http://endpoint.url" });
+      const endpoint = new Endpoint(EndpointType.Server, { url: "http://endpoint.url" });
 
       axiosMock.onGet(`${endpoint.url}/api/server/version`).reply(200, "1.2.3.4");
 
@@ -168,7 +168,7 @@ describe("request", () => {
       const semver = await getServerVersion(ENDPOINT);
       expect(semver.toString()).toEqual("7.9.1");
 
-      expect(console.log).toHaveBeenCalledWith(`[INFO]  SonarQube: Server version: 7.9.1.48248`);
+      expect(console.log).toHaveBeenCalledWith(`[INFO]  SonarQube Server: Server version: 7.9.1.48248`);
     });
   });
 });

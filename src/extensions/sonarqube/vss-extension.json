@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "sonarqube",
-  "name": "SonarQube",
+  "name": "SonarQube Server",
   "version": "7.0.3",
   "branding": {
     "color": "rgb(67, 157, 210)",
@@ -104,12 +104,12 @@
     },
     {
       "id": "EDC775DD-1A82-4ADD-A073-7B5813E87202",
-      "description": "Service Endpoint type for SonarQube Connections",
+      "description": "Service Endpoint type for SonarQube Server Connections",
       "type": "ms.vss-endpoint.service-endpoint-type",
       "targets": ["ms.vss-endpoint.endpoint-types"],
       "properties": {
         "name": "sonarqube",
-        "displayName": "SonarQube",
+        "displayName": "SonarQube Server",
         "icon": "icons/SonarQube_endpoint.png",
         "url": {
           "displayName": "Server Url",
@@ -122,7 +122,7 @@
               {
                 "id": "username",
                 "name": "Token",
-                "description": "Authentication Token generated through SonarQube (go to My Account > Security > Generate Tokens)",
+                "description": "Authentication Token generated through SonarQube Server (go to My Account > Security > Generate Tokens)",
                 "inputMode": "passwordbox",
                 "isConfidential": true,
                 "validation": {

@@ -1,10 +1,10 @@
 {
   "id": "sonarcloud_other_template",
-  "name": "Generic analysis with SonarCloud - using an existing properties file",
+  "name": "Generic analysis with SonarQube Cloud - using an existing properties file",
   "category": "Build",
   "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
   "defaultHostedQueue": null,
-  "description": "Analyze your project with SonarCloud using the Scanner CLI when you’re not relying on Maven, Gradle or MSBuild. Use this task if you already have an existing sonar-project.properties file in your repository.", 
+  "description": "Analyze your project with SonarQube Cloud using the Scanner CLI when you’re not relying on Maven, Gradle or MSBuild. Use this task if you already have an existing sonar-project.properties file in your repository.",
   "template": {
     "build": [
       {

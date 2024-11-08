@@ -1,11 +1,11 @@
 {
   "id": "sonarcloud_vsBuild_template",
-  "name": ".NET Desktop with SonarCloud",
+  "name": ".NET Desktop with SonarQube Cloud",
   "canDelete": false,
   "category": "Build",
   "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
   "defaultHostedQueue": null,
-  "description": "Build and run tests for .NET Desktop or Windows Classic Desktop solutions, and analyze with SonarCloud. This template requires that Visual Studio be installed on the build agent.",
+  "description": "Build and run tests for .NET Desktop or Windows Classic Desktop solutions, and analyze with SonarQube Cloud. This template requires that Visual Studio be installed on the build agent.",
   "template": {
     "build": [
       {

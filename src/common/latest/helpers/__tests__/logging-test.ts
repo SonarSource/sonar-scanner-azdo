@@ -15,34 +15,34 @@ beforeEach(() => {
 describe("logging", () => {
   it("should log DEBUG messages", () => {
     log(LogLevel.DEBUG, "This is a debug message");
-    expect(tl.debug).toHaveBeenCalledWith("[DEBUG] SonarQube: This is a debug message");
+    expect(tl.debug).toHaveBeenCalledWith("[DEBUG] SonarQube Server: This is a debug message");
   });
 
   it("should log INFO messages", () => {
     jest.spyOn(console, "log");
     log(LogLevel.INFO, "This is an info message");
-    expect(console.log).toHaveBeenCalledWith("[INFO]  SonarQube: This is an info message");
+    expect(console.log).toHaveBeenCalledWith("[INFO]  SonarQube Server: This is an info message");
   });
 
   it("should log ERROR messages", () => {
     log(LogLevel.ERROR, "This is an error message");
-    expect(tl.error).toHaveBeenCalledWith("[ERROR] SonarQube: This is an error message");
+    expect(tl.error).toHaveBeenCalledWith("[ERROR] SonarQube Server: This is an error message");
   });
 
   it("should log WARN messages", () => {
     log(LogLevel.WARN, "This is a warning message");
-    expect(tl.warning).toHaveBeenCalledWith("[WARN]  SonarQube: This is a warning message");
+    expect(tl.warning).toHaveBeenCalledWith("[WARN]  SonarQube Server: This is a warning message");
   });
 
   it("should prefix with endpoint type", () => {
     jest.spyOn(console, "log");
 
-    setEndpointType(EndpointType.SonarQube);
+    setEndpointType(EndpointType.Server);
     log(LogLevel.INFO, "This is an info message");
-    expect(console.log).toHaveBeenLastCalledWith("[INFO]  SonarQube: This is an info message");
+    expect(console.log).toHaveBeenLastCalledWith("[INFO]  SonarQube Server: This is an info message");
 
-    setEndpointType(EndpointType.SonarCloud);
+    setEndpointType(EndpointType.Cloud);
     log(LogLevel.INFO, "This is an info message");
-    expect(console.log).toHaveBeenLastCalledWith("[INFO]  SonarCloud: This is an info message");
+    expect(console.log).toHaveBeenLastCalledWith("[INFO]  SonarQube Cloud: This is an info message");
   });
 });
