@@ -23,7 +23,7 @@ export async function waitForTaskCompletion(
 ): Promise<Task> {
   log(LogLevel.DEBUG, `Waiting for task '${taskId}' to complete.`);
   let query = {};
-  if (endpoint.type === EndpointType.SonarQube) {
+  if (endpoint.type === EndpointType.Server) {
     query = { id: taskId };
   } else {
     query = { id: taskId, additionalFields: "warnings" };

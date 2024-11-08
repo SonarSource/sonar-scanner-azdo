@@ -42,7 +42,7 @@ jest.mock("azure-pipelines-task-lib/task", () => ({
 
 it("should generate an analysis status with error", () => {
   const analysis = new HtmlAnalysisReport(
-    EndpointType.SonarQube,
+    EndpointType.Server,
     MOCKED_PROJECT_STATUS_ERROR,
     [],
     MOCKED_ANALYSIS_RESULT,
@@ -53,7 +53,7 @@ it("should generate an analysis status with error", () => {
 });
 
 it("should not fail when metrics are missing", () => {
-  const analysis = new HtmlAnalysisReport(EndpointType.SonarQube, MOCKED_PROJECT_STATUS_ERROR, [], {
+  const analysis = new HtmlAnalysisReport(EndpointType.Server, MOCKED_PROJECT_STATUS_ERROR, [], {
     ...MOCKED_ANALYSIS_RESULT,
     dashboardUrl: undefined,
     metrics: undefined,
@@ -63,7 +63,7 @@ it("should not fail when metrics are missing", () => {
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
-it.each([[EndpointType.SonarQube], [EndpointType.SonarCloud]])(
+it.each([[EndpointType.Server], [EndpointType.Cloud]])(
   "should render passing quality gate measures correctly",
   (endpointType) => {
     const analysis = new HtmlAnalysisReport(
@@ -95,7 +95,7 @@ it.each([[EndpointType.SonarQube], [EndpointType.SonarCloud]])(
 );
 
 it("should display the project name", () => {
-  const analysis = new HtmlAnalysisReport(EndpointType.SonarQube, MOCKED_PROJECT_STATUS_ERROR, [], {
+  const analysis = new HtmlAnalysisReport(EndpointType.Server, MOCKED_PROJECT_STATUS_ERROR, [], {
     ...MOCKED_ANALYSIS_RESULT,
     projectName: "project_name",
   });

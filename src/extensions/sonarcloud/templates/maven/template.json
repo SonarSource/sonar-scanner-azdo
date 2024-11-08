@@ -1,10 +1,10 @@
 {
   "id": "sonarcloud_maven_template",
-  "name": "Maven with SonarCloud",
+  "name": "Maven with SonarQube Cloud",
   "category": "Build",
   "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
   "defaultHostedQueue": null,
-  "description": "Build your Java projects and run tests with Apache Maven, and analyze with SonarCloud. This template requires Maven to be installed on the build agent.",
+  "description": "Build your Java projects and run tests with Apache Maven, and analyze with SonarQube Cloud. This template requires Maven to be installed on the build agent.",
   "template": {
     "build": [
       {

@@ -7,7 +7,7 @@ export function mockTask(overrides: Partial<Task> = {}): Task {
     analysisId: "123",
     componentKey: "key",
     status: "OK",
-    type: EndpointType.SonarCloud,
+    type: EndpointType.Cloud,
     componentName: "componentName",
     warnings: [],
     ...overrides,

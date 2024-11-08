@@ -26,7 +26,7 @@ it("should not have SONAR_SCANNER_MODE property filled", async () => {
     jdkversion: JdkVersionSource.JavaHome,
   });
 
-  await analyzeTask(EndpointType.SonarQube);
+  await analyzeTask(EndpointType.Server);
 
   expect(azureTaskLibMock.getResult()).toEqual({
     result: tl.TaskResult.Failed,
@@ -54,7 +54,7 @@ it("should run scanner", async () => {
 
   jest.spyOn(scanner, "runAnalysis").mockResolvedValue();
 
-  await analyzeTask(EndpointType.SonarCloud);
+  await analyzeTask(EndpointType.Cloud);
 
   expect(Scanner.getAnalyzeScanner).toHaveBeenCalled();
 

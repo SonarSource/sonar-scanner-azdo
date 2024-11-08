@@ -35,13 +35,13 @@ beforeEach(() => {
 describe("branch and pull request", () => {
   describe("detect branch feature", () => {
     it.each([
-      [new Endpoint(EndpointType.SonarCloud, { url: "https://sonarcloud.io" }), "1.2.3", true],
-      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "7.1.0", false],
-      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "9.9.0", true],
-      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "10.0.0", true],
-      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "10.1.0", true],
-      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "11.0.0", true],
-      [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "12.0.0", true],
+      [new Endpoint(EndpointType.Cloud, { url: "https://sonarcloud.io" }), "1.2.3", true],
+      [new Endpoint(EndpointType.Server, { url: "https://localhost" }), "7.1.0", false],
+      [new Endpoint(EndpointType.Server, { url: "https://localhost" }), "9.9.0", true],
+      [new Endpoint(EndpointType.Server, { url: "https://localhost" }), "10.0.0", true],
+      [new Endpoint(EndpointType.Server, { url: "https://localhost" }), "10.1.0", true],
+      [new Endpoint(EndpointType.Server, { url: "https://localhost" }), "11.0.0", true],
+      [new Endpoint(EndpointType.Server, { url: "https://localhost" }), "12.0.0", true],
     ])(
       "branch feature is supported for %p %p %p",
       (endpoint: Endpoint, version: string, expectedBranchSupported: Boolean) => {
@@ -209,7 +209,7 @@ describe("downloading the scanner", () => {
           : new ScannerDotnet(__dirname, {});
       jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => mockedScanner);
 
-      await runTask(prept.prepareTask, "Prepare", EndpointType.SonarQube);
+      await runTask(prept.prepareTask, "Prepare", EndpointType.Server);
 
       expect(Scanner.getPrepareScanner).toHaveBeenCalled();
       if (url) {
@@ -237,7 +237,7 @@ describe("downloading the scanner", () => {
     jest.spyOn(toolLib, "downloadTool").mockRejectedValue(new Error(errorResponse));
     jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
-    await runTask(prept.prepareTask, "Prepare", EndpointType.SonarQube);
+    await runTask(prept.prepareTask, "Prepare", EndpointType.Server);
 
     expect(tl.setResult).toHaveBeenCalledWith(
       tl.TaskResult.Failed,
@@ -256,7 +256,7 @@ describe("downloading the scanner", () => {
 
     jest.spyOn(Scanner, "getPrepareScanner").mockImplementation(() => scanner);
 
-    await runTask(prept.prepareTask, "Prepare", EndpointType.SonarQube);
+    await runTask(prept.prepareTask, "Prepare", EndpointType.Server);
 
     expect(Scanner.getPrepareScanner).toHaveBeenCalled();
     expect(toolLib.downloadTool).not.toHaveBeenCalled();
