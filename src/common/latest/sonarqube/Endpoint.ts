@@ -7,8 +7,8 @@ import { log, LogLevel } from "../helpers/logging";
 import { getProxyFromURI } from "../helpers/proxyFromEnv";
 
 export enum EndpointType {
-  SonarCloud = "SonarCloud",
-  SonarQube = "SonarQube",
+  Cloud = "SonarQube Cloud",
+  Server = "SonarQube Server",
 }
 
 export interface EndpointData {
@@ -20,6 +20,8 @@ export interface EndpointData {
 }
 
 export default class Endpoint {
+  static readonly ENDPOINT_INPUT_NAME = "SonarQube";
+
   static readonly REQUEST_TIMEOUT: number = 60e3;
 
   public type: EndpointType;
@@ -107,14 +109,10 @@ export default class Endpoint {
 
   public static getEndpoint(id: string, type: EndpointType): Endpoint {
     const url = tl.getEndpointUrl(id, false) as string;
-    const token = tl.getEndpointAuthorizationParameter(
-      id,
-      "apitoken",
-      type !== EndpointType.SonarCloud,
-    );
+    const token = tl.getEndpointAuthorizationParameter(id, "apitoken", type !== EndpointType.Cloud);
     const username = tl.getEndpointAuthorizationParameter(id, "username", true);
     const password = tl.getEndpointAuthorizationParameter(id, "password", true);
-    const organization = tl.getInput("organization", type === EndpointType.SonarCloud);
+    const organization = tl.getInput("organization", type === EndpointType.Cloud);
     return new Endpoint(type, { url, token, username, password, organization });
   }
 }

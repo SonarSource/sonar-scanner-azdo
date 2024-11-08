@@ -2,7 +2,7 @@
   "id": "15B84CA1-B62F-4A2A-A403-89B77A063157",
   "name": "SonarQubePrepare",
   "friendlyName": "Prepare Analysis Configuration",
-  "description": "Prepare SonarQube analysis configuration",
+  "description": "Prepare SonarQube Server analysis configuration",
   "helpMarkDown": "[More Information](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/)",
   "category": "Build",
   "visibility": ["Build"],
@@ -14,7 +14,7 @@
   },
   "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
   "minimumAgentVersion": "3.218.0",
-  "instanceNameFormat": "Prepare analysis on SonarQube",
+  "instanceNameFormat": "Prepare analysis on SonarQube Server",
   "groups": [
     {
       "name": "advanced",
@@ -28,7 +28,7 @@
       "type": "connectedService:sonarqube",
       "label": "SonarQube Server Endpoint",
       "required": true,
-      "helpMarkDown": "Select the SonarQube server endpoint for your project. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token."
+      "helpMarkDown": "Select the SonarQube Server endpoint for your project. To create one, click the Manage link and create a new SonarQube Server Endpoint, enter your server url and token."
     },
     {
       "name": "scannerMode",
@@ -36,7 +36,7 @@
       "label": "Choose the way to run the analysis",
       "defaultValue": "dotnet",
       "required": true,
-      "helpMarkDown": "####dotnet\n* Put this task before your build task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
+      "helpMarkDown": "####dotnet\n* Put this task before your build task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube (Server, Cloud) Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
       "options": {
         "dotnet": "Integrate with .NET",
         "cli": "Use standalone SonarScanner CLI",
@@ -88,7 +88,7 @@
       "type": "string",
       "label": "Project Key",
       "required": true,
-      "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
+      "helpMarkDown": "The SonarQube Server project unique key, i.e. `sonar.projectKey`",
       "visibleRule": "scannerMode = cli && configMode = manual"
     },
     {
@@ -96,7 +96,7 @@
       "type": "string",
       "label": "Project Key",
       "required": true,
-      "helpMarkDown": "The SonarQube project unique key, i.e. `sonar.projectKey`",
+      "helpMarkDown": "The SonarQube Server project unique key, i.e. `sonar.projectKey`",
       "visibleRule": "scannerMode = dotnet"
     },
     {
@@ -104,7 +104,7 @@
       "type": "string",
       "label": "Project Name",
       "required": false,
-      "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
+      "helpMarkDown": "The SonarQube Server project name, i.e. `sonar.projectName`",
       "visibleRule": "scannerMode = cli && configMode = manual"
     },
     {
@@ -112,7 +112,7 @@
       "type": "string",
       "label": "Project Name",
       "required": false,
-      "helpMarkDown": "The SonarQube project name, i.e. `sonar.projectName`",
+      "helpMarkDown": "The SonarQube Server project name, i.e. `sonar.projectName`",
       "visibleRule": "scannerMode = dotnet"
     },
     {
@@ -121,7 +121,7 @@
       "label": "Project Version",
       "defaultValue": "1.0",
       "required": false,
-      "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
+      "helpMarkDown": "The SonarQube Server project version, i.e. `sonar.projectVersion`",
       "visibleRule": "scannerMode = cli && configMode = manual"
     },
     {
@@ -130,7 +130,7 @@
       "label": "Project Version",
       "defaultValue": "1.0",
       "required": false,
-      "helpMarkDown": "The SonarQube project version, i.e. `sonar.projectVersion`",
+      "helpMarkDown": "The SonarQube Server project version, i.e. `sonar.projectVersion`",
       "visibleRule": "scannerMode = dotnet"
     },
     {
@@ -139,7 +139,7 @@
       "label": "Sources directory root",
       "defaultValue": ".",
       "required": true,
-      "helpMarkDown": "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarQube property",
+      "helpMarkDown": "Path to the root directory containing source files. This value is set to the `sonar.sources` property",
       "visibleRule": "scannerMode = cli && configMode = manual"
     },
     {

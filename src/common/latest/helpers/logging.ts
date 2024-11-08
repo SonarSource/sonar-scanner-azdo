@@ -34,7 +34,7 @@ let endpointType: EndpointType | undefined;
 
 export function log(level: LogLevel, message: string) {
   const levelStr = `[${level}]`.padEnd(LOG_MESSAGE_PADDING);
-  const msgStr = [levelStr, `${endpointType ?? EndpointType.SonarQube}:`, message].join(" ");
+  const msgStr = [levelStr, `${endpointType ?? EndpointType.Server}:`, message].join(" ");
   switch (level) {
     case LogLevel.ERROR:
       tl.error(msgStr);

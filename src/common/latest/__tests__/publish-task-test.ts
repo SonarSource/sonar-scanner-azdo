@@ -49,7 +49,7 @@ const PROJECT_STATUS_OK: ProjectStatus = {
   ],
   status: "OK",
 };
-const ANALYSIS_OK = new HtmlAnalysisReport(EndpointType.SonarQube, PROJECT_STATUS_OK, [], {
+const ANALYSIS_OK = new HtmlAnalysisReport(EndpointType.Server, PROJECT_STATUS_OK, [], {
   warnings: [],
   dashboardUrl: "",
   metrics: undefined,
@@ -60,15 +60,15 @@ const PROJECT_STATUS_ERROR: ProjectStatus = {
   conditions: [],
   status: "ERROR",
 };
-const ANALYSIS_ERROR = new HtmlAnalysisReport(EndpointType.SonarQube, PROJECT_STATUS_ERROR, [], {
+const ANALYSIS_ERROR = new HtmlAnalysisReport(EndpointType.Server, PROJECT_STATUS_ERROR, [], {
   warnings: [],
   dashboardUrl: "",
   metrics: undefined,
   projectName: undefined,
 });
 
-const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
-const SQ_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
+const SC_ENDPOINT = new Endpoint(EndpointType.Cloud, { url: "https://endpoint.url" });
+const SQ_ENDPOINT = new Endpoint(EndpointType.Server, { url: "https://endpoint.url" });
 const METRICS: Metric[] = [
   {
     key: "new_violations",
@@ -91,7 +91,7 @@ it("should fail unless SONAR_SCANNER_PARAMS are supplied", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
   jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
-  await publish.publishTask(EndpointType.SonarCloud);
+  await publish.publishTask(EndpointType.Cloud);
 
   expect(tl.getVariable).toHaveBeenCalledWith(TaskVariables.SonarScannerParams);
   expect(tl.setResult).toHaveBeenCalledWith(
@@ -146,14 +146,14 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(serverUtils, "fillBuildProperty");
 
-  await publish.publishTask(EndpointType.SonarCloud);
+  await publish.publishTask(EndpointType.Cloud);
 
   expect(log).toHaveBeenCalledWith(LogLevel.INFO, `Overall Quality Gate status: ok`);
   expect(log).toHaveBeenCalledWith(LogLevel.DEBUG, `Number of analyses in this build: 2`);
   expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "ok");
   expect(tl.command).toHaveBeenCalledWith(
     "task.addattachment",
-    { type: "Distributedtask.Core.Summary", name: "SonarCloud Analysis Report" },
+    { type: "Distributedtask.Core.Summary", name: "SonarQube Cloud Analysis Report" },
     expect.any(String),
   );
 });
@@ -166,7 +166,7 @@ it("check multiple report status and set global quality gate for build propertie
     analysisId: "123",
     componentKey: "key",
     status: "OK",
-    type: EndpointType.SonarCloud,
+    type: EndpointType.Cloud,
     componentName: "componentName",
     warnings: [],
   });
@@ -214,7 +214,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
 
-  await runTask(publish.publishTask, "Publish", EndpointType.SonarCloud);
+  await runTask(publish.publishTask, "Publish", EndpointType.Cloud);
 
   expect(log).toHaveBeenCalledWith(LogLevel.INFO, `Overall Quality Gate status: failed`);
   expect(log).toHaveBeenCalledWith(LogLevel.DEBUG, `Number of analyses in this build: 3`);
@@ -334,13 +334,13 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
       }),
   );
 
-  await runTask(publish.publishTask, "Publish", EndpointType.SonarCloud);
+  await runTask(publish.publishTask, "Publish", EndpointType.Cloud);
 
   expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
-  expect(publishSummaryMock.mock.calls[0][1]).toBe(EndpointType.SonarCloud);
+  expect(publishSummaryMock.mock.calls[0][1]).toBe(EndpointType.Cloud);
   expect(tl.setResult).not.toHaveBeenCalledWith(tl.TaskResult.Failed);
 
-  expect(serverUtils.publishBuildSummary).toHaveBeenCalledWith("\r\n", EndpointType.SonarCloud);
+  expect(serverUtils.publishBuildSummary).toHaveBeenCalledWith("\r\n", EndpointType.Cloud);
 
   expect(log).toHaveBeenCalledWith(
     LogLevel.WARN,
@@ -388,7 +388,7 @@ describe("it should generate passing report correctly", () => {
     tl.setVariable(TaskVariables.SonarEndpoint, SQ_ENDPOINT.toJson());
     jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
 
-    await runTask(publish.publishTask, "Publish", EndpointType.SonarCloud);
+    await runTask(publish.publishTask, "Publish", EndpointType.Cloud);
 
     expect(log).toHaveBeenCalledWith(
       LogLevel.DEBUG,
@@ -406,7 +406,7 @@ describe("it should generate passing report correctly", () => {
       },
     ]);
 
-    await runTask(publish.publishTask, "Publish", EndpointType.SonarQube);
+    await runTask(publish.publishTask, "Publish", EndpointType.Server);
 
     // spy on publishBuildSummary
     expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
@@ -423,7 +423,7 @@ describe("it should generate passing report correctly", () => {
       .mockResolvedValueOnce({ ...PROJECT_STATUS_OK, conditions: [] });
     jest.spyOn(api, "fetchComponentMeasures").mockResolvedValueOnce([]);
 
-    await runTask(publish.publishTask, "Publish", EndpointType.SonarQube);
+    await runTask(publish.publishTask, "Publish", EndpointType.Server);
 
     // spy on publishBuildSummary
     expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
@@ -432,12 +432,12 @@ describe("it should generate passing report correctly", () => {
   });
 
   it.each([
-    [EndpointType.SonarQube, SQ_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
-    [EndpointType.SonarQube, SQ_ENDPOINT, {}, false],
-    [EndpointType.SonarQube, SQ_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
-    [EndpointType.SonarCloud, SC_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
-    [EndpointType.SonarCloud, SC_ENDPOINT, {}, false],
-    [EndpointType.SonarCloud, SC_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
+    [EndpointType.Server, SQ_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
+    [EndpointType.Server, SQ_ENDPOINT, {}, false],
+    [EndpointType.Server, SQ_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
+    [EndpointType.Cloud, SC_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
+    [EndpointType.Cloud, SC_ENDPOINT, {}, false],
+    [EndpointType.Cloud, SC_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
   ])(
     "should show issues fixed in pull request",
     async (endpointType, endpoint, scannerParams, shouldShow) => {

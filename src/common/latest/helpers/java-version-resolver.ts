@@ -36,7 +36,7 @@ export default class JavaVersionResolver {
       serverVersion &&
       serverVersionSemver &&
       semver.gte(serverVersionSemver, SQ_VERSION_DROPPING_JAVA_11) &&
-      endpointType === EndpointType.SonarQube;
+      endpointType === EndpointType.Server;
     if (ignoreJava11 && jdkVersion === JdkVersionSource.JavaHome11) {
       log(
         LogLevel.WARN,

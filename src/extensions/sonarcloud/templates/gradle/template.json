@@ -1,10 +1,10 @@
 {
   "id": "sonarcloud_gradle_template",
-  "name": "Gradle with SonarCloud",
+  "name": "Gradle with SonarQube Cloud",
   "category": "Build",
   "iconTaskId": "ce096e50-6155-4de8-8800-4221aaeed4a1",
   "defaultHostedQueue": null,
-  "description": "Build your Java projects and run tests with Gradle using a Gradle wrapper script, and analyze with SonarCloud.",
+  "description": "Build your Java projects and run tests with Gradle using a Gradle wrapper script, and analyze with SonarQube Cloud.",
   "template": {
     "build": [
       {

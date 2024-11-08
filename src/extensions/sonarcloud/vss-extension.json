@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "sonarcloud",
-  "name": "SonarCloud",
+  "name": "SonarQube Cloud",
   "version": "3.0.4",
   "branding": {
     "color": "rgb(243, 243, 243)",
@@ -112,7 +112,7 @@
       "targets": ["ms.vss-dashboards-web.widget-catalog", ".e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"],
       "properties": {
         "name": "Code Quality",
-        "description": "Shows the current quality status of your project based on SonarCloud.",
+        "description": "Shows the current quality status of your project based on SonarQube Cloud.",
         "catalogIconUrl:": "/integration/vsts/images/sonarcloud-icon.png",
         "previewImageUrl": "/integration/vsts/images/sonarcloud-icon.png",
         "uri": "/integration/vsts/index.html?type=widget&contribution=3c598f25-01c1-4c09-97c6-926476882688",
@@ -137,12 +137,12 @@
     },
     {
       "id": "343c5f6a-e4d5-4480-a764-506e1daa05df",
-      "description": "Service endpoint type for SonarCloud Connections",
+      "description": "Service endpoint type for SonarQube Cloud Connections",
       "type": "ms.vss-endpoint.service-endpoint-type",
       "targets": ["ms.vss-endpoint.endpoint-types"],
       "properties": {
         "name": "sonarcloud",
-        "displayName": "SonarCloud",
+        "displayName": "SonarQube Cloud",
         "icon": "icons/SonarCloud_endpoint.png",
         "url": {
           "displayName": "Server Url",
@@ -168,8 +168,8 @@
             "inputDescriptors": [
               {
                 "id": "apitoken",
-                "name": "SonarCloud Token",
-                "description": "Authentication Token generated through SonarCloud (go to My Account > Security > Generate Tokens)",
+                "name": "SonarQube Cloud Token",
+                "description": "Authentication Token generated through SonarQube Cloud (go to My Account > Security > Generate Tokens)",
                 "inputMode": "passwordbox",
                 "isConfidential": true,
                 "validation": {
@@ -180,7 +180,7 @@
             ]
           }
         ],
-        "helpMarkDown": "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarCloud account security page</a> to generate a token."
+        "helpMarkDown": "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarQube Cloud account security page</a> to generate a token."
       }
     },
     {

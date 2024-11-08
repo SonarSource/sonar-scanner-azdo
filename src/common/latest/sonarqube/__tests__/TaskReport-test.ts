@@ -28,7 +28,7 @@ serverUrl=http://sonar`,
     },
   );
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, { url: "http://sc.io" });
+  const endpoint = new Endpoint(EndpointType.Cloud, { url: "http://sc.io" });
 
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
@@ -70,7 +70,7 @@ serverUrl=http://sonar`,
     },
   );
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, { url: "http://sc.io" });
+  const endpoint = new Endpoint(EndpointType.Cloud, { url: "http://sc.io" });
 
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
@@ -87,12 +87,12 @@ serverUrl=http://sonar`,
 });
 
 it.each([
-  [EndpointType.SonarQube, "7.2.0"],
-  [EndpointType.SonarQube, "10.0.0"],
-  [EndpointType.SonarQube, "20.0.0"],
-  [EndpointType.SonarCloud, "7.2.0"],
-  [EndpointType.SonarCloud, "10.0.0"],
-  [EndpointType.SonarCloud, "20.0.0"],
+  [EndpointType.Server, "7.2.0"],
+  [EndpointType.Server, "10.0.0"],
+  [EndpointType.Server, "20.0.0"],
+  [EndpointType.Cloud, "7.2.0"],
+  [EndpointType.Cloud, "10.0.0"],
+  [EndpointType.Cloud, "20.0.0"],
 ])("should find report files for %p", (endpointType, version) => {
   // using spyOn so we can reset the original behaviour
   jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);
@@ -122,7 +122,7 @@ it("should find report files for SonarQube below 7.2.0", () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
   jest.spyOn(tl, "findMatch").mockImplementation(() => ["path1", "path2"]);
 
-  const endpoint = new Endpoint(EndpointType.SonarQube, { url: "http://sc.io" });
+  const endpoint = new Endpoint(EndpointType.Server, { url: "http://sc.io" });
 
   const reportFiles = TaskReport.findTaskFileReport(endpoint, new semver.SemVer("7.0.0"));
 
