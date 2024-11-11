@@ -10,7 +10,7 @@
   "version": {
     "Major": 3,
     "Minor": 0,
-    "Patch": 3
+    "Patch": 4
   },
   "minimumAgentVersion": "3.218.0",
   "demands": ["java"],
