@@ -10,7 +10,7 @@
   "version": {
     "Major": 7,
     "Minor": 0,
-    "Patch": 3
+    "Patch": 4
   },
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
   "minimumAgentVersion": "3.218.0",
