@@ -439,7 +439,7 @@ gulp.task("ci:azure:hotfix-extensions-version", () => {
         .pipe(
           gulpJsonEditor((json) => ({
             ...json,
-            version: `${json.version}.${buildNumber}`,
+            version: `10.0.0.${buildNumber}`,
           })),
         )
         .pipe(gulp.dest(path.dirname(vssExtension))),
