@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "axios": "1.7.7",
-    "azure-devops-node-api": "14.0.2",
-    "azure-pipelines-task-lib": "4.17.2",
-    "azure-pipelines-tool-lib": "2.0.7",
+    "azure-devops-node-api": "14.1.0",
+    "azure-pipelines-task-lib": "4.17.3",
+    "azure-pipelines-tool-lib": "2.0.8",
     "fs-extra": "11.2.0",
     "guid-typescript": "1.0.9",
     "hpagent": "1.2.0",
@@ -29,12 +29,12 @@
     "node": ">=6"
   },
   "devDependencies": {
-    "@babel/preset-env": "7.25.4",
+    "@babel/preset-env": "7.26.0",
     "@types/node-fetch": "2.6.11",
     "@types/q": "1.5.8",
     "@types/semver": "7.5.8",
     "@types/tmp": "0.2.6",
-    "axios-mock-adapter": "2.0.0",
+    "axios-mock-adapter": "2.1.0",
     "esbuild-plugin-shelljs": "1.1.2",
     "tmp": "0.2.3"
   }
