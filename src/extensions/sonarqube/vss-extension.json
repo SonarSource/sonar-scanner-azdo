@@ -110,7 +110,7 @@
       "properties": {
         "name": "sonarqube",
         "displayName": "SonarQube Server",
-        "icon": "icons/SonarQube_endpoint.png",
+        "icon": "icons/SonarQubeServer.png",
         "url": {
           "displayName": "Server Url",
           "helpText": "Url for the SonarQube Server to connect to."
