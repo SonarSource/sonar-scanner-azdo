@@ -61,6 +61,25 @@ stages:
               script: |
                 npx gulp ci:azure:hotfix-extensions-version
                 npx gulp ci:azure:hotfix-tasks-version
+
+          - task: Npm@1
+            displayName: "Create dogfood extension"
+            inputs:
+              command: "custom"
+              customCommand: "run test-build -- --publisher $(publisher)"
+
+          - task: CopyFiles@2
+            displayName: "Copy dogfood extensions to build directory"
+            inputs:
+              SourceFolder: "$(Build.SourcesDirectory)/dist"
+              Contents: "*.vsix"
+              TargetFolder: "$(Agent.BuildDirectory)/extensions/dogfood"
+
+          - task: Bash@3
+            displayName: "Suffix taks names with *Test for the test extension"
+            inputs:
+              targetType: "inline"
+              script: |
                 npx gulp ci:azure:hotfix-tasks-names
 
           - task: Npm@1
@@ -70,11 +89,11 @@ stages:
               customCommand: "run test-build -- --publisher $(publisher)"
 
           - task: CopyFiles@2
-            displayName: "Copy artifacts to build directory"
+            displayName: "Copy test extensions to build directory"
             inputs:
               SourceFolder: "$(Build.SourcesDirectory)/dist"
               Contents: "*.vsix"
-              TargetFolder: "$(Agent.BuildDirectory)/a"
+              TargetFolder: "$(Agent.BuildDirectory)/extensions/test"
 
           - task: Bash@3
             displayName: "Fetch extensions versions and rename vsix"
@@ -87,7 +106,7 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: "Publish artifacts on the build"
             inputs:
-              PathtoPublish: "$(Agent.BuildDirectory)/a"
+              PathtoPublish: "$(Agent.BuildDirectory)/extensions"
               ArtifactName: "extensions"
   - stage: run_qa
     condition: succeeded()
@@ -127,7 +146,7 @@ stages:
               connectTo: "VsTeam"
               connectedServiceName: "AzDo Extension - Marketplace - IntegrationTests"
               fileType: "vsix"
-              vsixFile: "$(System.ArtifactsDirectory)/extensions/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
+              vsixFile: "$(System.ArtifactsDirectory)/extensions/test/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
               extensionName: "[Test] SonarCloud ITs"
               updateTasksVersion: false
               updateTasksId: false
@@ -200,7 +219,7 @@ stages:
               connectTo: "VsTeam"
               connectedServiceName: "AzDO Extension - Marketplace - Dogfood"
               fileType: "vsix"
-              vsixFile: "$(System.ArtifactsDirectory)/extensions/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
+              vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
               extensionName: "[Dogfood] SonarCloud"
               extensionId: "sonarcloud-dogfood"
               updateTasksVersion: false
