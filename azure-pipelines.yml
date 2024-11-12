@@ -106,7 +106,7 @@ stages:
             name: versions
 
           # Install TFX
-          - task: TfxInstaller@3
+          - task: TfxInstaller@4
             displayName: "Install TFX CLI"
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
@@ -114,12 +114,6 @@ stages:
               version: "v0.10.x"
 
           # Publish Extension
-          - task: TfxInstaller@3
-            displayName: "Install TFX CLI"
-            env:
-              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
-            inputs:
-              version: "v0.10.x"
           - task: DownloadBuildArtifacts@1
             displayName: "Download artifacts"
             inputs:
@@ -127,7 +121,7 @@ stages:
               downloadType: "single"
               artifactName: "extensions"
               downloadPath: "$(System.ArtifactsDirectory)"
-          - task: PublishAzureDevOpsExtension@3
+          - task: PublishAzureDevOpsExtension@4
             displayName: "Publish SonarCloud test extension"
             inputs:
               connectTo: "VsTeam"
@@ -142,7 +136,7 @@ stages:
               cwd: "$(System.ArtifactsDirectory)"
 
           # Install extension
-          - task: InstallAzureDevOpsExtension@3
+          - task: InstallAzureDevOpsExtension@4
             displayName: "Install extension in IT org"
             inputs:
               connectTo: "VsTeam"
@@ -151,24 +145,6 @@ stages:
               publisherId: "$(publisher)"
               extensionId: "sonarcloud-test"
               accounts: "https://devops.azure.com/$(itOrg)"
-          - task: Bash@3
-            displayName: "Wait for tasks to be available in CI"
-            env:
-              SERVICE_URL: "https://devops.azure.com/$(SonarSourceITOrganization)"
-              AZURE_TOKEN: $(SonarSourceITOrganizationPAT)
-            inputs:
-              targetType: "inline"
-              script: |
-                extension_installed=""
-                while [ -z "$extension_installed" ]; do
-                  echo "Waiting for SonarCloudPublishTest task to be registered..."
-                  tasks=$(tfx build tasks list --authType pat --service-url "$SERVICE_URL" -t "$AZURE_TOKEN" --no-color --json)
-                  extension_installed=$(echo $tasks | jq -r ".[] | select(.name == \"SonarCloudPublishTest\") | .id")
-                  if [ -z "$extension_installed" ]; then
-                    sleep 5
-                  fi
-                done
-                echo "SonarCloudPublishTest task is registered with ID: $extension_installed"
 
           # Run ITs
           - task: Bash@3
@@ -203,7 +179,7 @@ stages:
           publisher: $(SonarSourceITPublisher)
           scExtensionVersion: $[stageDependencies.run_qa.run_qa.outputs['versions.SC_VERSION']]
         steps:
-          - task: TfxInstaller@3
+          - task: TfxInstaller@4
             displayName: "Install TFX CLI"
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
