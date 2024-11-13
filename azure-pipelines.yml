@@ -196,7 +196,7 @@ stages:
 
   - stage: publish_dogfood
     displayName: "Publish dogfood extension"
-    condition: and(succeeded(), eq(variables['isMain'], true))
+    condition: and(succeeded(), eq(variables['isMain'], false))
     jobs:
       - job: "publish_dogfood"
         variables:
