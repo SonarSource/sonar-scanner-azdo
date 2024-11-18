@@ -45,7 +45,7 @@ stages:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
               command: "custom"
-              customCommand: "i -g npm@latest"
+              customCommand: "i -g npm@10.7.0"
 
           - task: Bash@3
             displayName: "Install all extension dependencies"
