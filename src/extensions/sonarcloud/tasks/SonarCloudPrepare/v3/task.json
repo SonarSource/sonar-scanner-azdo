@@ -145,7 +145,7 @@
     },
     {
       "name": "cliSources",
-      "type": "filePath",
+      "type": "string",
       "label": "Sources directory root",
       "defaultValue": ".",
       "required": true,
