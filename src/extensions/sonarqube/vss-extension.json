@@ -4,8 +4,8 @@
   "name": "SonarQube Server",
   "version": "7.1.1",
   "branding": {
-    "color": "rgb(67, 157, 210)",
-    "theme": "dark"
+    "color": "rgb(244, 247, 251)",
+    "theme": "light"
   },
   "publisher": "sonarsource",
   "homepage": "https://www.sonarsource.com",
