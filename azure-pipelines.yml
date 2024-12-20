@@ -30,6 +30,7 @@ variables:
   - name: azureBranch
     value: $[coalesce(variables['System.PullRequest.SourceBranch'], 'master')]
 
+
 stages:
   - stage: build
     displayName: "Build:"
@@ -46,7 +47,7 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                sudo npm i -g npm@latest
+                sudo npm i -g npm@10
 
           - task: Bash@3
             displayName: "Install all extension dependencies"
