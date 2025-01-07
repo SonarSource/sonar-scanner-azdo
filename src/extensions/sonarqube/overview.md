@@ -6,7 +6,7 @@ _(Formerly SonarQube)_
 
 This extension provides tasks that you incorporate into your build definition(s) to enable additional SonarQube Server functionality in Azure DevOps environments. When paired with SonarQube [Community Build][CB], you can analyze and see the results for scanning your master codebase. SonarQube [Commercial Editions][CE] offer additional functionality with Branch and Pull Request analysis so your team spots and resolves code issues before merging to master. Analysis results are published right in your Pull Requests!
 
-## Benefits of the SonarQube Server Azure DevOps Marketplace Extension
+## Benefits of the Azure DevOps extension for SonarQube Server
 
 ### Quality Gate™ Status Publishing
 
@@ -46,7 +46,7 @@ C# and VB.NET analysis is simple and straightforward and only requires adding th
 
 For Java, analyzing your source code is also very easy. It only requires adding the **Prepare Analysis Configuration** task and checking the **Run SonarQube (Server, Cloud) Analysis** option in the 'Code Analysis' panel in your Maven or Gradle task.
 
-## SonarQube Server Azure DevOps Marketplace Extension Details
+## Azure DevOps extension for SonarQube Server Details
 
 This extension provides Branch and Pull Request analysis along with:
 

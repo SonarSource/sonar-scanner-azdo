@@ -18,7 +18,7 @@ To get started in a few minutes, you can:
 - Get a free analysis for open-source projects
 - **Start a no-commitment, free 14-day trial for the Team tier**
 
-## About the SonarQube Cloud Azure DevOps Marketplace Extension
+## About the Azure DevOps extension for SonarQube Cloud
 
 This extension provides the following features:
 
