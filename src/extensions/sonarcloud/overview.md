@@ -2,7 +2,7 @@
 
 _(Formerly SonarCloud)_
 
-You can start a no-commitment, 14-day trial of SonarQube Cloud for your private repositories completely free. No need to speak with a sales rep or request a license key - get automatic code analysis results on your private projects in minutes! SonarQube Cloud analysis is always free for open-source projects. You can create your free SonarQube Cloud account [here][signup].
+You can start a no-commitment, 14-day trial of SonarQube Cloud Team tier, completely free. No need to speak with a sales rep or request a license key - get automatic code analysis results on your private projects in minutes! SonarQube Cloud analysis is always free up to 50k lines of code. You can create your free SonarQube Cloud account [here][signup].
 
 This Azure DevOps extension provides build tasks that you can add in your build definition. You'll benefit from automated detection of bugs and vulnerabilities across all branches and Pull Requests. SonarQube Cloud explains all coding issues in details, giving you chance to fix your code before even merging and deploying, all the while learning best practices along the way. At project level, you'll also get a dedicated widget that tracks the overall health of your application.
 
@@ -12,17 +12,11 @@ To get started in a few minutes, you can:
 - Follow the SonarQube Cloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn].
 - Benefit from embedded templates for common analyses:
   - **Classic** build pipelines templates integrated while creating a new pipeline
-  - **YAML** build pipeline templates available in our Sourcecode: https://github.com/SonarSource/sonar-scanner-azdo/tree/master/yaml-pipeline-templates
-- Benefit from a bunch of sample projects (using different build technologies), analyzed on SonarQube Cloud, with their **YAML** pipelines files (See the SonarQube Cloud badge on the README.md file for a link to SonarQube Cloud project)
-  - [.NET Framework](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-framework-project)
-  - [.NET Core](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-core-project)
-  - [C++](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-cpp-project)
-  - [Gradle](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-gradle-project)
-  - [Maven](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-maven-project)
-  - [Node.js](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-nodejs-project)
+  - **YAML** build pipeline templates available in our Sourcecode: https://github.com/SonarSource/sonar-scanner-azdo/tree/master/its/fixtures
+- Benefit from a bunch of sample projects and pipelines (used in our automated tests). See the projects (.NET Framework, .NET Core, Gradle, Maven, Scanner CLI) [on GitHub](./its/fixtures) and the corresponding analyzed projects in [the SonarQube Cloud organization](https://sonarcloud.io/organizations/sonarsource-sonar-scanner-azdo-it/projects?sort=analysis_date).
 - Get IDE Support with SonarLint integration to find code issues on the fly. SonarQube Cloud rules and analysis settings synchronize to SonarLint, aligning teams around a single standard of Clean Code
 - Get a free analysis for open-source projects
-- **Start a no-commitment, free 14-day trial for your private repositories**
+- **Start a no-commitment, free 14-day trial for the Team tier**
 
 ## About the SonarQube Cloud Azure DevOps Marketplace Extension
 
