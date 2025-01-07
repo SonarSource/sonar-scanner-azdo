@@ -1,4 +1,4 @@
-# SonarQube (Server, Cloud) Azure DevOps Extension
+# Azure DevOps extension for SonarQube (Server, Cloud)
 
 [![Build Status](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_apis/build/status%2FSonarSource.sonar-scanner-azdo?branchName=master)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/latest?definitionId=126&branchName=master)
 
