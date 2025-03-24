@@ -9,7 +9,7 @@ export function generateCombinations(): PipelineCombination[] {
   ];
   const scannerCombinations: PipelineCombination["scanner"][] = [
     { type: "cli" },
-    { type: "cli", version: "6.2.1.4610" },
+    { type: "cli", version: "7.1.0.4889" },
     { type: "dotnet" },
     { type: "dotnet", version: "8.0.3.99785" },
     { type: "other", subtype: "gradle" },

@@ -1,5 +1,5 @@
 # This pipeline was automatically generated
-# Config: {"os":"windows","version":{"extension":"sonarcloud","version":1},"scanner":{"type":"cli","version":"6.2.1.4610"}}
+# Config: {"os":"windows","version":{"extension":"sonarcloud","version":1},"scanner":{"type":"cli","version":"7.1.0.4889"}}
 
 trigger: none
 pr: none
@@ -17,7 +17,7 @@ steps:
       cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
       cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
       cliSources: its/fixtures/dummy-project-cli
-      cliScannerVersion: 6.2.1.4610
+      cliScannerVersion: 7.1.0.4889
   - task: SonarCloudAnalyzeTest@1
     inputs: {}
   - task: SonarCloudPublishTest@1
