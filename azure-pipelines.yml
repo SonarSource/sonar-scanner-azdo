@@ -87,7 +87,7 @@ stages:
               TargetFolder: "$(Agent.BuildDirectory)/extensions/dogfood"
 
           - task: Bash@3
-            displayName: "Suffix taks names with *Test for the test extension"
+            displayName: "Suffix task names with *Test for the test extension"
             inputs:
               targetType: "inline"
               script: |
