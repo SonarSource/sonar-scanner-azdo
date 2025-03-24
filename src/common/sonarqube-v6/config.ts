@@ -1,4 +1,4 @@
-// When the user does not specify a specific version, these willl be the default versions used.
+// When the user does not specify a specific version, these will be the default versions used.
 const msBuildVersion = "6.2.0.85879";
 const cliVersion = "6.2.1.4610";
 
