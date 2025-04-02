@@ -146,9 +146,43 @@
         "icon": "icons/SonarQubeCloud.png",
         "url": {
           "displayName": "Server Url",
-          "value": "https://sonarcloud.io",
-          "isVisible": false
+          "defaultValue": "https://sonarcloud.io",
+          "isVisible": false,
+          "dependsOn": {
+            "input": "region",
+            "map": [{
+              "key": "global",
+              "value": "https://sonarcloud.io"
+            }, {
+              "key": "us",
+              "value": "https://sonarqube.us"
+            }]
+          }
         },
+        "inputDescriptors": [
+          {
+            "id": "region",
+            "name": "Region",
+            "description": "The SonarQube Cloud region (currently only the default global, and US regions are supported",
+            "inputMode": "combo",
+            "validation": {
+              "isRequired": false
+            },
+            "values": {
+              "inputId": "regionValues",
+              "defaultValue": "global",
+              "possibleValues": [
+                {
+                  "value": "global",
+                  "displayValue": "Global (https://sonarcloud.io)"
+                }, {
+                  "value": "us",
+                  "displayValue": "US (https://sonarqube.us)"
+                }
+              ]
+            }
+          }
+        ],
         "dataSources": [
           {
             "name": "TestConnection",
@@ -180,7 +214,7 @@
             ]
           }
         ],
-        "helpMarkDown": "Go to <a href=\"https://sonarcloud.io/account/security/\" target=\"_blank\">your SonarQube Cloud account security page</a> to generate a token."
+        "helpMarkDown": "Go to your SonarQube Cloud account security page to generate a token."
       }
     },
     {
