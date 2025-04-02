@@ -162,7 +162,7 @@
             "headers": [
               {
                 "name": "Authorization",
-                "value": "Basic {{ #base64 endpoint.apitoken \":\" }}"
+                "value": "Bearer {{ endpoint.apitoken }}"
               }
             ],
             "inputDescriptors": [
