@@ -90,42 +90,52 @@ async function run(
   testCase: TestCase,
   log: (...args: any[]) => void = console.log,
 ) {
-  // Run the pipeline
-  log("Running pipeline");
-  let provisionSuccess = await provisionProject(
-    testCase.sonarHostUrl,
-    testCase.projectKey,
-    log,
-  );
-  if (!provisionSuccess) {
-    log(`Unable to provision project ${testCase.projectKey}`);
+  await provision(testCase, log);
+
+  try {
+    const previousLastAnalysisDate = await getLastAnalysisDate(
+      testCase.sonarHostUrl,
+      testCase.projectKey,
+      log,
+    );
+    // Run the pipeline
+    log("Running pipeline");
+    await runPipeline(azdoApi, testCase.pipelineName, log);
+
+    // Verify that there was a new analysis after the pipeline run
+    const lastAnalysisDate = await getLastAnalysisDate(
+      testCase.sonarHostUrl,
+      testCase.projectKey,
+      log,
+    );
+
+    if (!lastAnalysisDate || lastAnalysisDate === previousLastAnalysisDate) {
+      throw new Error("Analysis date did not change");
+    }
+  } finally {
+    await cleanup(testCase, log);
   }
+}
 
-  const previousLastAnalysisDate = await getLastAnalysisDate(
-    testCase.sonarHostUrl,
-    testCase.projectKey,
-    log,
-  );
-  await runPipeline(azdoApi, testCase.pipelineName, log);
-
-  // Verify that there was a new analysis after the pipeline run
-  const lastAnalysisDate = await getLastAnalysisDate(
-    testCase.sonarHostUrl,
-    testCase.projectKey,
-    log,
-  );
-
+async function cleanup(testCase: TestCase, log: (...args: any[]) => void) {
   let deleteSuccess = await deleteProject(
     testCase.sonarHostUrl,
     testCase.projectKey,
-    log,
+    log
   );
   if (!deleteSuccess) {
     log(`Unable to delete project ${testCase.projectKey}`);
   }
+}
 
-  if (!lastAnalysisDate || lastAnalysisDate === previousLastAnalysisDate) {
-    throw new Error("Analysis date did not change");
+async function provision(testCase: TestCase, log: (...args: any[]) => void) {
+  let provisionSuccess = await provisionProject(
+    testCase.sonarHostUrl,
+    testCase.projectKey,
+    log
+  );
+  if (!provisionSuccess) {
+    log(`Unable to provision project ${testCase.projectKey}`);
   }
 }
 
