@@ -145,7 +145,7 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
       task: "Cache@2",
       inputs: {
         key: 'gradle | "$(Agent.OS)" | **/build.gradle',
-        restoreKeys: ['gradle | "$(Agent.OS)"', 'gradle'],
+        restoreKeys: 'gradle | "$(Agent.OS)"\ngradle',
         path: '$(GRADLE_USER_HOME)',
       },
     });
@@ -179,7 +179,7 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
       task: "Cache@2",
       inputs: {
         key: 'maven | "$(Agent.OS)" | **/pom.xml',
-        restoreKeys: ['maven | "$(Agent.OS)"', 'maven'],
+        restoreKeys: 'maven | "$(Agent.OS)"\nmaven',
         path: '$(MAVEN_CACHE_FOLDER)',
       },
     });

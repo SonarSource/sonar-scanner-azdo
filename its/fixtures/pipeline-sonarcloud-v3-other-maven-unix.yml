@@ -14,9 +14,9 @@ steps:
   - task: Cache@2
     inputs:
       key: maven | "$(Agent.OS)" | **/pom.xml
-      restoreKeys:
-        - maven | "$(Agent.OS)"
-        - maven
+      restoreKeys: |-
+        maven | "$(Agent.OS)"
+        maven
       path: $(MAVEN_CACHE_FOLDER)
   - task: JavaToolInstaller@1
     inputs:

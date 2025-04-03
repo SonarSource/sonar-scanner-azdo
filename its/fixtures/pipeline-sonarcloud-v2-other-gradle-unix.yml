@@ -14,9 +14,9 @@ steps:
   - task: Cache@2
     inputs:
       key: gradle | "$(Agent.OS)" | **/build.gradle
-      restoreKeys:
-        - gradle | "$(Agent.OS)"
-        - gradle
+      restoreKeys: |-
+        gradle | "$(Agent.OS)"
+        gradle
       path: $(GRADLE_USER_HOME)
   - task: SonarCloudPrepareTest@2
     inputs:
