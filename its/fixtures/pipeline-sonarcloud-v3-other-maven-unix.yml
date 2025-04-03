@@ -7,7 +7,17 @@ pool:
   vmImage: ubuntu-latest
 variables:
   system.debug: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
 steps:
+  - task: Cache@2
+    inputs:
+      key: maven | "$(Agent.OS)" | **/pom.xml
+      restoreKeys:
+        - maven | "$(Agent.OS)"
+        - maven
+      path: $(MAVEN_CACHE_FOLDER)
   - task: JavaToolInstaller@1
     inputs:
       versionSpec: "17"

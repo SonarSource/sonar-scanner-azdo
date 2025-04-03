@@ -28,6 +28,9 @@ function generatePipelineHeader(config: PipelineCombination): YamlContent {
     },
     variables: {
       "system.debug": true,
+      "MAVEN_CACHE_FOLDER": '$(Pipeline.Workspace)/.m2/repository',
+      "MAVEN_OPTS": '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)',
+      "GRADLE_USER_HOME": '$(Pipeline.Workspace)/.gradle',
     },
   };
 }
@@ -138,12 +141,21 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
 
   // Gradle
   if (config.scanner.type === "other" && config.scanner.subtype === "gradle") {
+    tasks.unshift({
+      task: "Cache@2",
+      inputs: {
+        key: 'gradle | "$(Agent.OS)" | **/build.gradle',
+        restoreKeys: ['gradle | "$(Agent.OS)"', 'gradle'],
+        path: '$(GRADLE_USER_HOME)',
+      },
+    });
     tasks.push({
       task: "Gradle@3",
       inputs: {
         gradleWrapperFile: DUMMY_PROJECT_GRADLE_PATH + "/gradlew",
         workingDirectory: DUMMY_PROJECT_GRADLE_PATH,
         tasks: "build",
+        options: "--build-cache",
         javaHomeOption: "JDKVersion",
         jdkVersionOption: "1.17",
         sonarQubeRunAnalysis: true,
@@ -161,6 +173,14 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
         versionSpec: "17",
         jdkArchitectureOption: "x64",
         jdkSourceOption: "PreInstalled",
+      },
+    });
+    tasks.unshift({
+      task: "Cache@2",
+      inputs: {
+        key: 'maven | "$(Agent.OS)" | **/pom.xml',
+        restoreKeys: ['maven | "$(Agent.OS)"', 'maven'],
+        path: '$(MAVEN_CACHE_FOLDER)',
       },
     });
     tasks.push({
@@ -216,5 +236,5 @@ export function generatePipelineFile(config: PipelineCombination): string {
 }
 
 export function generateUniqueProjectKey(projectKey: string, config: PipelineCombination) {
-  return `${projectKey}_${config.os}_${config.version.version}` + (config.scanner.type != "other" ? (config.scanner.version ?? "embedded") : "")
+  return `${projectKey}_${config.os}_${config.version.version}` + (config.scanner.type != "other" ? ('_' + (config.scanner.version ?? "embedded")) : "")
 }

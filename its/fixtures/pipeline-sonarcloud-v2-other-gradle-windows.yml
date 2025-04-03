@@ -7,7 +7,17 @@ pool:
   vmImage: windows-latest
 variables:
   system.debug: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
 steps:
+  - task: Cache@2
+    inputs:
+      key: gradle | "$(Agent.OS)" | **/build.gradle
+      restoreKeys:
+        - gradle | "$(Agent.OS)"
+        - gradle
+      path: $(GRADLE_USER_HOME)
   - task: SonarCloudPrepareTest@2
     inputs:
       SonarCloud: SonarCloud
@@ -19,6 +29,7 @@ steps:
       gradleWrapperFile: its/fixtures/dummy-project-gradle/gradlew
       workingDirectory: its/fixtures/dummy-project-gradle
       tasks: build
+      options: --build-cache
       javaHomeOption: JDKVersion
       jdkVersionOption: "1.17"
       sonarQubeRunAnalysis: true
