@@ -35,6 +35,7 @@ steps:
       sonarQubeRunAnalysis: true
       sqGradlePluginVersionChoice: build
       spotBugsAnalysis: false
+  - script: ./gradlew --stop
   - task: SonarCloudPublishTest@2
     inputs:
       pollingTimeoutSec: "300"

@@ -163,6 +163,9 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
         spotBugsAnalysis: false,
       },
     });
+    tasks.push({
+      script: './gradlew --stop'
+    });
   }
 
   // Maven
@@ -189,6 +192,7 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
         mavenPomFile: DUMMY_PROJECT_MAVEN_PATH + "/pom.xml",
         goals: "package",
         options: "-X",
+        mavenOptions: '$(MAVEN_OPTS)',
         sonarQubeRunAnalysis: true,
       },
     });
