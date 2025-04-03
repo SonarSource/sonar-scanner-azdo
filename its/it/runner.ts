@@ -10,7 +10,7 @@ import {
 } from "../constant";
 import { PipelineCombination } from "../types";
 import { getAzdoApi, runPipeline } from "./azdo";
-import { getLastAnalysisDate } from "./sonar";
+import { deleteProject, getLastAnalysisDate, provisionProject } from "./sonar";
 import { generateUniqueProjectKey } from "../pipeline";
 
 type TestCase = {
@@ -92,6 +92,15 @@ async function run(
 ) {
   // Run the pipeline
   log("Running pipeline");
+  let provisionSuccess = await provisionProject(
+    testCase.sonarHostUrl,
+    testCase.projectKey,
+    log,
+  );
+  if (!provisionSuccess) {
+    log(`Unable to provision project ${testCase.projectKey}`);
+  }
+
   const previousLastAnalysisDate = await getLastAnalysisDate(
     testCase.sonarHostUrl,
     testCase.projectKey,
@@ -105,6 +114,16 @@ async function run(
     testCase.projectKey,
     log,
   );
+
+  let deleteSuccess = await deleteProject(
+    testCase.sonarHostUrl,
+    testCase.projectKey,
+    log,
+  );
+  if (!deleteSuccess) {
+    log(`Unable to delete project ${testCase.projectKey}`);
+  }
+
   if (!lastAnalysisDate || lastAnalysisDate === previousLastAnalysisDate) {
     throw new Error("Analysis date did not change");
   }
