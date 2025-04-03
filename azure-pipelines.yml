@@ -39,7 +39,15 @@ stages:
         displayName: "NPM Install, CI and Build"
         variables:
           publisher: $(SonarSourceITPublisher)
+          npm_config_cache: $(Pipeline.Workspace)/.npm
         steps:
+          - task: Cache@2
+            inputs:
+              key: 'npm | "$(Agent.OS)" | **/package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(npm_config_cache)
+            displayName: Cache npm
           - task: Bash@3
             displayName: "Update NPM"
             env:
@@ -167,6 +175,8 @@ stages:
               extensionId: "sonarcloud-test"
               accounts: "https://devops.azure.com/$(itOrg)"
       - job: "run_its"
+        variables:
+          npm_config_cache: $(Pipeline.Workspace)/.npm
         strategy:
           matrix:
             v1_on_Unix:
@@ -188,7 +198,13 @@ stages:
               RUN_ON_OS: 'windows'
               TASK_VERSION: '3'
         steps:
-          # Run ITs
+          - task: Cache@2
+            inputs:
+              key: 'npm | "$(Agent.OS)" | **/package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(npm_config_cache)
+            displayName: Cache npm
           - task: Bash@3
             displayName: "Install all dependencies"
             env:
