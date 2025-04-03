@@ -145,7 +145,7 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
       task: "Cache@2",
       inputs: {
         key: 'gradle | "$(Agent.OS)" | **/build.gradle',
-        restoreKeys: 'gradle | "$(Agent.OS)"\ngradle',
+        restoreKeys: 'gradle | "$(Agent.OS)"\ngradle\n',
         path: '$(GRADLE_USER_HOME)',
       },
     });
@@ -164,7 +164,7 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
       },
     });
     tasks.push({
-      script: './gradlew --stop'
+      script: "cd " + DUMMY_PROJECT_GRADLE_PATH + "\n./gradlew --stop\n"
     });
   }
 
@@ -182,7 +182,7 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
       task: "Cache@2",
       inputs: {
         key: 'maven | "$(Agent.OS)" | **/pom.xml',
-        restoreKeys: 'maven | "$(Agent.OS)"\nmaven',
+        restoreKeys: 'maven | "$(Agent.OS)"\nmaven\n',
         path: '$(MAVEN_CACHE_FOLDER)',
       },
     });

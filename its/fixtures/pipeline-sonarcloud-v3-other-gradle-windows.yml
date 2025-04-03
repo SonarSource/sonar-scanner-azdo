@@ -14,7 +14,7 @@ steps:
   - task: Cache@2
     inputs:
       key: gradle | "$(Agent.OS)" | **/build.gradle
-      restoreKeys: |-
+      restoreKeys: |
         gradle | "$(Agent.OS)"
         gradle
       path: $(GRADLE_USER_HOME)
@@ -35,7 +35,9 @@ steps:
       sonarQubeRunAnalysis: true
       sqGradlePluginVersionChoice: build
       spotBugsAnalysis: false
-  - script: ./gradlew --stop
+  - script: |
+      cd its/fixtures/dummy-project-gradle
+      ./gradlew --stop
   - task: SonarCloudPublishTest@3
     inputs:
       pollingTimeoutSec: "300"
