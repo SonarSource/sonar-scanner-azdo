@@ -180,26 +180,6 @@ stages:
         displayName: "Run ITs"
         variables:
           npm_config_cache: $(Pipeline.Workspace)/.npm
-        strategy:
-          matrix:
-            v1_on_Unix:
-              RUN_ON_OS: 'unix'
-              TASK_VERSION: '1'
-            v2_on_Unix:
-              RUN_ON_OS: 'unix'
-              TASK_VERSION: '2'
-            v3_on_Unix:
-              RUN_ON_OS: 'unix'
-              TASK_VERSION: '3'
-            v1_on_Windows:
-              RUN_ON_OS: 'windows'
-              TASK_VERSION: '1'
-            v2_on_Windows:
-              RUN_ON_OS: 'windows'
-              TASK_VERSION: '2'
-            v3_on_Windows:
-              RUN_ON_OS: 'windows'
-              TASK_VERSION: '3'
         steps:
           - task: Cache@2
             inputs:

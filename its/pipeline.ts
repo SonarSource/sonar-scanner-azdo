@@ -216,5 +216,5 @@ export function generatePipelineFile(config: PipelineCombination): string {
 }
 
 export function generateUniqueProjectKey(projectKey: string, config: PipelineCombination) {
-  return `${projectKey}_${config.os}_${config.version.version}`
+  return `${projectKey}_${config.os}_${config.version.version}` + (config.scanner.type != "other" ? (config.scanner.version ?? "embedded") : "")
 }
