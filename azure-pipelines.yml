@@ -115,7 +115,7 @@ stages:
     dependsOn: build
     displayName: "Re-publish test extension & Run QA"
     jobs:
-      - job: "run_qa"
+      - job: "install_test_extension"
         variables:
           publisher: $(SonarSourceITPublisher)
           sqExtensionVersion: $[stageDependencies.build.npminstall.outputs['versions.SQ_VERSION']]
@@ -166,7 +166,28 @@ stages:
               publisherId: "$(publisher)"
               extensionId: "sonarcloud-test"
               accounts: "https://devops.azure.com/$(itOrg)"
-
+      - job: "run_its"
+        strategy:
+          matrix:
+            v1_on_Unix:
+              RUN_ON_OS: 'unix'
+              TASK_VERSION: '1'
+            v2_on_Unix:
+              RUN_ON_OS: 'unix'
+              TASK_VERSION: '2'
+            v3_on_Unix:
+              RUN_ON_OS: 'unix'
+              TASK_VERSION: '3'
+            v1_on_Windows:
+              RUN_ON_OS: 'windows'
+              TASK_VERSION: '1'
+            v2_on_Windows:
+              RUN_ON_OS: 'windows'
+              TASK_VERSION: '2'
+            v3_on_Windows:
+              RUN_ON_OS: 'windows'
+              TASK_VERSION: '3'
+        steps:
           # Run ITs
           - task: Bash@3
             displayName: "Install all dependencies"

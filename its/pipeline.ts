@@ -73,7 +73,7 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
   // Setup scanner inputs
   if (config.scanner.type === "other") {
     const projectKey =
-      config.scanner.subtype === "gradle" ? DUMMY_PROJECT_GRADLE_KEY : DUMMY_PROJECT_MAVEN_KEY;
+      config.scanner.subtype === "gradle" ? generateUniqueProjectKey(DUMMY_PROJECT_GRADLE_KEY, config) : generateUniqueProjectKey(DUMMY_PROJECT_MAVEN_KEY, config);
 
     prepareTask.inputs = {
       ...prepareTask.inputs,
@@ -83,14 +83,14 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
     prepareTask.inputs = {
       ...prepareTask.inputs,
       configMode: "manual",
-      cliProjectKey: DUMMY_PROJECT_CLI_KEY,
-      cliProjectName: DUMMY_PROJECT_CLI_KEY,
+      cliProjectKey: generateUniqueProjectKey(DUMMY_PROJECT_CLI_KEY, config),
+      cliProjectName: generateUniqueProjectKey(DUMMY_PROJECT_CLI_KEY, config),
       cliSources: DUMMY_PROJECT_CLI_PATH,
       [CLI_VERSION_INPUT_NAME]: config.scanner.version,
     };
   } else if (config.scanner.type === "dotnet") {
     const projectKey =
-      config.os === "unix" ? DUMMY_PROJECT_DOTNET_CORE_KEY : DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY;
+      config.os === "unix" ? generateUniqueProjectKey(DUMMY_PROJECT_DOTNET_CORE_KEY, config) : generateUniqueProjectKey(DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY, config);
     const projectPath =
       config.os === "unix" ? DUMMY_PROJECT_DOTNET_CORE_PATH : DUMMY_PROJECT_DOTNET_FRAMEWORK_PATH;
 
@@ -213,4 +213,8 @@ export function generatePipelineFile(config: PipelineCombination): string {
     "",
     stringify(generatePipeline(config)),
   ].join("\n");
+}
+
+export function generateUniqueProjectKey(projectKey: string, config: PipelineCombination) {
+  return `${projectKey}_${config.os}_${config.version.version}`
 }

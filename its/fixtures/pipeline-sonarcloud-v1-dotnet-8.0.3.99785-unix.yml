@@ -13,8 +13,8 @@ steps:
       SonarCloud: SonarCloud
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: MSBuild
-      projectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-core
-      projectName: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-core
+      projectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-core_unix_1
+      projectName: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-core_unix_1
       extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/its/fixtures/dummy-project-dotnet-core
       msBuildVersion: 8.0.3.99785
   - script: dotnet build --configuration Release

@@ -18,7 +18,7 @@ steps:
       SonarCloud: SonarCloud
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: other
-      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-maven
+      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-maven_windows_3
   - task: Maven@4
     inputs:
       mavenPomFile: its/fixtures/dummy-project-maven/pom.xml

@@ -18,8 +18,8 @@ steps:
       SonarCloud: SonarCloud
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: MSBuild
-      projectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-framework
-      projectName: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-framework
+      projectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-framework_windows_2
+      projectName: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-framework_windows_2
       extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/its/fixtures/dummy-project-dotnet-framework
       msBuildVersion: 8.0.3.99785
   - task: DotNetCoreCLI@2

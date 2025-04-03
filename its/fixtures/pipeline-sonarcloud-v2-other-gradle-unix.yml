@@ -13,7 +13,7 @@ steps:
       SonarCloud: SonarCloud
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: Other
-      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-gradle
+      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-gradle_unix_2
   - task: Gradle@3
     inputs:
       gradleWrapperFile: its/fixtures/dummy-project-gradle/gradlew

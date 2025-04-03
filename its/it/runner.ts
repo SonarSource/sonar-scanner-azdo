@@ -11,6 +11,7 @@ import {
 import { PipelineCombination } from "../types";
 import { getAzdoApi, runPipeline } from "./azdo";
 import { getLastAnalysisDate } from "./sonar";
+import { generateUniqueProjectKey } from "../pipeline";
 
 type TestCase = {
   sonarHostUrl: string;
@@ -25,15 +26,15 @@ export function getTestCase(combination: PipelineCombination): TestCase {
   let projectKey;
   switch (combination.scanner.type) {
     case "cli":
-      projectKey = DUMMY_PROJECT_CLI_KEY;
+      projectKey = generateUniqueProjectKey(DUMMY_PROJECT_CLI_KEY, combination);
       break;
     case "dotnet":
       switch (combination.os) {
         case "unix":
-          projectKey = DUMMY_PROJECT_DOTNET_CORE_KEY;
+          projectKey = generateUniqueProjectKey(DUMMY_PROJECT_DOTNET_CORE_KEY, combination);
           break;
         case "windows":
-          projectKey = DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY;
+          projectKey = generateUniqueProjectKey(DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY, combination);
           break;
         default:
           throw new Error(`Unsupported os: ${combination.os}`);
@@ -42,10 +43,10 @@ export function getTestCase(combination: PipelineCombination): TestCase {
     case "other":
       switch (combination.scanner.subtype) {
         case "gradle":
-          projectKey = DUMMY_PROJECT_GRADLE_KEY;
+          projectKey = generateUniqueProjectKey(DUMMY_PROJECT_GRADLE_KEY, combination);
           break;
         case "maven":
-          projectKey = DUMMY_PROJECT_MAVEN_KEY;
+          projectKey = generateUniqueProjectKey(DUMMY_PROJECT_MAVEN_KEY, combination);
           break;
         default:
           throw new Error(`Unsupported scanner subtype: ${combination.scanner.subtype}`);

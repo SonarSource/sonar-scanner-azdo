@@ -14,8 +14,8 @@ steps:
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: CLI
       configMode: manual
-      cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
-      cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
+      cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli_windows_2
+      cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli_windows_2
       cliSources: its/fixtures/dummy-project-cli
   - task: SonarCloudAnalyzeTest@2
     inputs: {}
