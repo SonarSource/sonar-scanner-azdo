@@ -42,6 +42,7 @@ export async function provisionProject(
     }, {
       headers: {
         Authorization: `Bearer ${env.SONARCLOUD_TOKEN}`,
+        'Content-Type': 'multipart/form-data',
       },
     }).catch(function (error) {
       if (error.response) {
@@ -81,6 +82,7 @@ export async function deleteProject(
     }, {
       headers: {
         Authorization: `Bearer ${env.SONARCLOUD_TOKEN}`,
+        'Content-Type': 'multipart/form-data',
       },
     });
     return true;

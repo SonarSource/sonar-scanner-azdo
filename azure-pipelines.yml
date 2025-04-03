@@ -177,7 +177,7 @@ stages:
               accounts: "https://devops.azure.com/$(itOrg)"
       - job: run_its
         dependsOn: install_test_extension
-        displayName: "Run integration tests for tasks v${{ variables.TASK_VERSION }} on ${{ variables.RUN_ON_OS }}"
+        displayName: "Run ITs"
         variables:
           npm_config_cache: $(Pipeline.Workspace)/.npm
         strategy:
