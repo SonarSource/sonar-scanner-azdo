@@ -27,7 +27,7 @@
     "cyclonedx": "gulp cyclonedx"
   },
   "devDependencies": {
-    "@cyclonedx/bom": "4.1.0",
+    "@cyclonedx/cyclonedx-npm": "^2.1.0",
     "@types/fs-extra": "11.0.4",
     "@types/jest": "29.5.14",
     "@types/jest-when": "3.5.5",
@@ -60,7 +60,7 @@
     "prettier": "3.3.3",
     "rimraf": "6.0.1",
     "semver": "7.6.3",
-    "sonarqube-scanner": "4.2.5",
+    "sonarqube-scanner": "4.3.0",
     "tfx-cli": "0.17.0",
     "through2": "4.0.2",
     "ts-jest": "29.2.5",
@@ -69,6 +69,12 @@
     "vinyl": "3.0.0",
     "yaml": "2.6.0",
     "yargs": "17.7.2"
+  },
+  "overrides": {
+    "libxmljs2": "https://registry.npmjs.org/@ttskp/libxmljs2-noop/-/libxmljs2-noop-1.0.0.tgz"
+  },
+  "overridesComment": {
+    "libxmljs2": "Workaround for https://github.com/CycloneDX/cyclonedx-javascript-library/issues/1061 to silent Mend"
   },
   "engines": {
     "node": ">=6",
