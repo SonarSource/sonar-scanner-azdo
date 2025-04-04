@@ -10,7 +10,8 @@ import {
 } from "../constant";
 import { PipelineCombination } from "../types";
 import { getAzdoApi, runPipeline } from "./azdo";
-import { getLastAnalysisDate } from "./sonar";
+import { deleteProject, getLastAnalysisDate, provisionProject } from "./sonar";
+import { generateUniqueProjectKey } from "../pipeline";
 
 type TestCase = {
   sonarHostUrl: string;
@@ -25,15 +26,15 @@ export function getTestCase(combination: PipelineCombination): TestCase {
   let projectKey;
   switch (combination.scanner.type) {
     case "cli":
-      projectKey = DUMMY_PROJECT_CLI_KEY;
+      projectKey = generateUniqueProjectKey(DUMMY_PROJECT_CLI_KEY, combination);
       break;
     case "dotnet":
       switch (combination.os) {
         case "unix":
-          projectKey = DUMMY_PROJECT_DOTNET_CORE_KEY;
+          projectKey = generateUniqueProjectKey(DUMMY_PROJECT_DOTNET_CORE_KEY, combination);
           break;
         case "windows":
-          projectKey = DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY;
+          projectKey = generateUniqueProjectKey(DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY, combination);
           break;
         default:
           throw new Error(`Unsupported os: ${combination.os}`);
@@ -42,10 +43,10 @@ export function getTestCase(combination: PipelineCombination): TestCase {
     case "other":
       switch (combination.scanner.subtype) {
         case "gradle":
-          projectKey = DUMMY_PROJECT_GRADLE_KEY;
+          projectKey = generateUniqueProjectKey(DUMMY_PROJECT_GRADLE_KEY, combination);
           break;
         case "maven":
-          projectKey = DUMMY_PROJECT_MAVEN_KEY;
+          projectKey = generateUniqueProjectKey(DUMMY_PROJECT_MAVEN_KEY, combination);
           break;
         default:
           throw new Error(`Unsupported scanner subtype: ${combination.scanner.subtype}`);
@@ -89,23 +90,52 @@ async function run(
   testCase: TestCase,
   log: (...args: any[]) => void = console.log,
 ) {
-  // Run the pipeline
-  log("Running pipeline");
-  const previousLastAnalysisDate = await getLastAnalysisDate(
-    testCase.sonarHostUrl,
-    testCase.projectKey,
-    log,
-  );
-  await runPipeline(azdoApi, testCase.pipelineName, log);
+  await provision(testCase, log);
 
-  // Verify that there was a new analysis after the pipeline run
-  const lastAnalysisDate = await getLastAnalysisDate(
+  try {
+    const previousLastAnalysisDate = await getLastAnalysisDate(
+      testCase.sonarHostUrl,
+      testCase.projectKey,
+      log,
+    );
+    // Run the pipeline
+    log("Running pipeline");
+    await runPipeline(azdoApi, testCase.pipelineName, log);
+
+    // Verify that there was a new analysis after the pipeline run
+    const lastAnalysisDate = await getLastAnalysisDate(
+      testCase.sonarHostUrl,
+      testCase.projectKey,
+      log,
+    );
+
+    if (!lastAnalysisDate || lastAnalysisDate === previousLastAnalysisDate) {
+      throw new Error("Analysis date did not change");
+    }
+  } finally {
+    await cleanup(testCase, log);
+  }
+}
+
+async function cleanup(testCase: TestCase, log: (...args: any[]) => void) {
+  let deleteSuccess = await deleteProject(
     testCase.sonarHostUrl,
     testCase.projectKey,
-    log,
+    log
   );
-  if (!lastAnalysisDate || lastAnalysisDate === previousLastAnalysisDate) {
-    throw new Error("Analysis date did not change");
+  if (!deleteSuccess) {
+    log(`Unable to delete project ${testCase.projectKey}`);
+  }
+}
+
+async function provision(testCase: TestCase, log: (...args: any[]) => void) {
+  let provisionSuccess = await provisionProject(
+    testCase.sonarHostUrl,
+    testCase.projectKey,
+    log
+  );
+  if (!provisionSuccess) {
+    log(`Unable to provision project ${testCase.projectKey}`);
   }
 }
 

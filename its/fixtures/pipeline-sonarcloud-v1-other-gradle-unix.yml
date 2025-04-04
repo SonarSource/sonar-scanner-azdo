@@ -7,23 +7,37 @@ pool:
   vmImage: ubuntu-latest
 variables:
   system.debug: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
 steps:
+  - task: Cache@2
+    inputs:
+      key: gradle | "$(Agent.OS)" | **/build.gradle
+      restoreKeys: |
+        gradle | "$(Agent.OS)"
+        gradle
+      path: $(GRADLE_USER_HOME)
   - task: SonarCloudPrepareTest@1
     inputs:
       SonarCloud: SonarCloud
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: Other
-      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-gradle
+      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-gradle_unix_1
   - task: Gradle@3
     inputs:
       gradleWrapperFile: its/fixtures/dummy-project-gradle/gradlew
       workingDirectory: its/fixtures/dummy-project-gradle
       tasks: build
+      options: --build-cache
       javaHomeOption: JDKVersion
       jdkVersionOption: "1.17"
       sonarQubeRunAnalysis: true
       sqGradlePluginVersionChoice: build
       spotBugsAnalysis: false
+  - script: |
+      cd its/fixtures/dummy-project-gradle
+      ./gradlew --stop
   - task: SonarCloudPublishTest@1
     inputs:
       pollingTimeoutSec: "300"

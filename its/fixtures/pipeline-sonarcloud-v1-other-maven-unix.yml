@@ -7,7 +7,17 @@ pool:
   vmImage: ubuntu-latest
 variables:
   system.debug: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
 steps:
+  - task: Cache@2
+    inputs:
+      key: maven | "$(Agent.OS)" | **/pom.xml
+      restoreKeys: |
+        maven | "$(Agent.OS)"
+        maven
+      path: $(MAVEN_CACHE_FOLDER)
   - task: JavaToolInstaller@1
     inputs:
       versionSpec: "17"
@@ -18,12 +28,13 @@ steps:
       SonarCloud: SonarCloud
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: Other
-      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-maven
+      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-maven_unix_1
   - task: Maven@4
     inputs:
       mavenPomFile: its/fixtures/dummy-project-maven/pom.xml
       goals: package
       options: -X
+      mavenOptions: $(MAVEN_OPTS)
       sonarQubeRunAnalysis: true
   - task: SonarCloudPublishTest@1
     inputs:

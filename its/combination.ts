@@ -1,12 +1,25 @@
 import { PipelineCombination } from "./types";
 
 export function generateCombinations(): PipelineCombination[] {
-  const osCombinations: PipelineCombination["os"][] = ["unix", "windows"];
-  const versionCombinations: PipelineCombination["version"][] = [
-    { extension: "sonarcloud", version: 1 },
-    { extension: "sonarcloud", version: 2 },
-    { extension: "sonarcloud", version: 3 },
-  ];
+  let osCombinations: PipelineCombination["os"][];
+  switch(process.env.RUN_ON_OS) {
+      case "unix": osCombinations = ["unix"]; break;
+      case "windows": osCombinations = ["windows"]; break;
+      case undefined: osCombinations = ["unix", "windows"]; break;
+      default: throw new Error(`Invalid OS combination: ${process.env.RUN_ON_OS}`);
+  };
+  let versionCombinations: PipelineCombination["version"][];
+  switch(process.env.TASK_VERSION) {
+      case "1": versionCombinations = [{ extension: "sonarcloud", version: 1 }]; break;
+      case "2": versionCombinations = [{ extension: "sonarcloud", version: 2 }]; break;
+      case "3": versionCombinations = [{ extension: "sonarcloud", version: 3 }]; break;
+      case undefined: versionCombinations = [
+        { extension: "sonarcloud", version: 1 },
+        { extension: "sonarcloud", version: 2 },
+        { extension: "sonarcloud", version: 3 },
+      ]; break;
+      default: throw new Error(`Invalid task version combination: ${process.env.TASK_VERSION}`);
+  };
   const scannerCombinations: PipelineCombination["scanner"][] = [
     { type: "cli" },
     { type: "cli", version: "6.2.1.4610" },

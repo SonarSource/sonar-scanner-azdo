@@ -28,6 +28,9 @@ function generatePipelineHeader(config: PipelineCombination): YamlContent {
     },
     variables: {
       "system.debug": true,
+      "MAVEN_CACHE_FOLDER": '$(Pipeline.Workspace)/.m2/repository',
+      "MAVEN_OPTS": '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)',
+      "GRADLE_USER_HOME": '$(Pipeline.Workspace)/.gradle',
     },
   };
 }
@@ -73,7 +76,7 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
   // Setup scanner inputs
   if (config.scanner.type === "other") {
     const projectKey =
-      config.scanner.subtype === "gradle" ? DUMMY_PROJECT_GRADLE_KEY : DUMMY_PROJECT_MAVEN_KEY;
+      config.scanner.subtype === "gradle" ? generateUniqueProjectKey(DUMMY_PROJECT_GRADLE_KEY, config) : generateUniqueProjectKey(DUMMY_PROJECT_MAVEN_KEY, config);
 
     prepareTask.inputs = {
       ...prepareTask.inputs,
@@ -83,14 +86,14 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
     prepareTask.inputs = {
       ...prepareTask.inputs,
       configMode: "manual",
-      cliProjectKey: DUMMY_PROJECT_CLI_KEY,
-      cliProjectName: DUMMY_PROJECT_CLI_KEY,
+      cliProjectKey: generateUniqueProjectKey(DUMMY_PROJECT_CLI_KEY, config),
+      cliProjectName: generateUniqueProjectKey(DUMMY_PROJECT_CLI_KEY, config),
       cliSources: DUMMY_PROJECT_CLI_PATH,
       [CLI_VERSION_INPUT_NAME]: config.scanner.version,
     };
   } else if (config.scanner.type === "dotnet") {
     const projectKey =
-      config.os === "unix" ? DUMMY_PROJECT_DOTNET_CORE_KEY : DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY;
+      config.os === "unix" ? generateUniqueProjectKey(DUMMY_PROJECT_DOTNET_CORE_KEY, config) : generateUniqueProjectKey(DUMMY_PROJECT_DOTNET_FRAMEWORK_KEY, config);
     const projectPath =
       config.os === "unix" ? DUMMY_PROJECT_DOTNET_CORE_PATH : DUMMY_PROJECT_DOTNET_FRAMEWORK_PATH;
 
@@ -138,18 +141,30 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
 
   // Gradle
   if (config.scanner.type === "other" && config.scanner.subtype === "gradle") {
+    tasks.unshift({
+      task: "Cache@2",
+      inputs: {
+        key: 'gradle | "$(Agent.OS)" | **/build.gradle',
+        restoreKeys: 'gradle | "$(Agent.OS)"\ngradle\n',
+        path: '$(GRADLE_USER_HOME)',
+      },
+    });
     tasks.push({
       task: "Gradle@3",
       inputs: {
         gradleWrapperFile: DUMMY_PROJECT_GRADLE_PATH + "/gradlew",
         workingDirectory: DUMMY_PROJECT_GRADLE_PATH,
         tasks: "build",
+        options: "--build-cache",
         javaHomeOption: "JDKVersion",
         jdkVersionOption: "1.17",
         sonarQubeRunAnalysis: true,
         sqGradlePluginVersionChoice: "build",
         spotBugsAnalysis: false,
       },
+    });
+    tasks.push({
+      script: "cd " + DUMMY_PROJECT_GRADLE_PATH + "\n./gradlew --stop\n"
     });
   }
 
@@ -163,12 +178,21 @@ function generatePrepareTasks(config: PipelineCombination): TaskDefinition[] {
         jdkSourceOption: "PreInstalled",
       },
     });
+    tasks.unshift({
+      task: "Cache@2",
+      inputs: {
+        key: 'maven | "$(Agent.OS)" | **/pom.xml',
+        restoreKeys: 'maven | "$(Agent.OS)"\nmaven\n',
+        path: '$(MAVEN_CACHE_FOLDER)',
+      },
+    });
     tasks.push({
       task: "Maven@4",
       inputs: {
         mavenPomFile: DUMMY_PROJECT_MAVEN_PATH + "/pom.xml",
         goals: "package",
         options: "-X",
+        mavenOptions: '$(MAVEN_OPTS)',
         sonarQubeRunAnalysis: true,
       },
     });
@@ -213,4 +237,8 @@ export function generatePipelineFile(config: PipelineCombination): string {
     "",
     stringify(generatePipeline(config)),
   ].join("\n");
+}
+
+export function generateUniqueProjectKey(projectKey: string, config: PipelineCombination) {
+  return `${projectKey}_${config.os}_${config.version.version}` + (config.scanner.type != "other" ? ('_' + (config.scanner.version ?? "embedded")) : "")
 }

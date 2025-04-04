@@ -7,6 +7,9 @@ pool:
   vmImage: windows-latest
 variables:
   system.debug: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
 steps:
   - task: SonarCloudPrepareTest@2
     inputs:
@@ -14,8 +17,8 @@ steps:
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: CLI
       configMode: manual
-      cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
-      cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli
+      cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli_windows_2_6.2.1.4610
+      cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli_windows_2_6.2.1.4610
       cliSources: its/fixtures/dummy-project-cli
       cliScannerVersion: 6.2.1.4610
   - task: SonarCloudAnalyzeTest@2
