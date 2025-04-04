@@ -9,11 +9,13 @@ COMMON_DIR="$GIT_ROOT/src/common"
 cd "$GIT_ROOT" || exit
 
 # Install dependencies at the root level
+echo "Running npm install at the root level"
 npm install
 
 # Iterate through each folder in the common directory
 for folder in "$COMMON_DIR"/*; do
     if [ -d "$folder" ]; then
-        cd "$folder" && npm install || exit
+      echo "Running npm install for folder: $folder"
+      cd "$folder" && npm install || exit
     fi
 done
