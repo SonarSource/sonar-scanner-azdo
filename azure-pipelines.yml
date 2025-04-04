@@ -30,6 +30,7 @@ variables:
   - name: azureBranch
     value: $[coalesce(variables['System.PullRequest.SourceBranch'], 'master')]
 
+lockBehavior: sequential
 
 stages:
   - stage: build
