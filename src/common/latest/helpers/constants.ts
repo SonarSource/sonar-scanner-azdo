@@ -4,7 +4,7 @@ export const PROP_NAMES = {
   HOST_URL: "sonar.host.url",
   TOKEN: "sonar.token",
   LOGIN: "sonar.login",
-  PASSSWORD: "sonar.password",
+  PASSWORD: "sonar.password",
   ORG: "sonar.organization",
   PROJECTKEY: "sonar.projectKey",
   PROJECTNAME: "sonar.projectName",

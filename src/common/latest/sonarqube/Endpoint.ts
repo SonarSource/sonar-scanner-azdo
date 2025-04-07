@@ -42,7 +42,6 @@ export default class Endpoint {
   }
 
   public get auth(): { username: string; password: string } {
-    // If using user/password
     if (
       !this.data.token &&
       this.data.username &&
@@ -57,11 +56,19 @@ export default class Endpoint {
   toAxiosOptions(): AxiosRequestConfig {
     const options: AxiosRequestConfig = {
       timeout: Endpoint.REQUEST_TIMEOUT,
-      auth: {
+    };
+
+    const isSonarCloud = Boolean(this.data.token);
+    if (isSonarCloud) {
+      options.headers = {
+        Authorization: `Bearer ${this.data.token}`,
+      };
+    } else {
+      options.auth = {
         username: this.auth.username,
         password: this.auth.password,
-      },
-    };
+      };
+    }
 
     // Fetch proxy from environment
     // We ignore proxy set by agent proxy configuration, we need to discuss whether we want to itroduce it
@@ -101,7 +108,7 @@ export default class Endpoint {
     return {
       [PROP_NAMES.HOST_URL]: this.data.url,
       [authKey]: this.data.token || this.data.username,
-      [PROP_NAMES.PASSSWORD]:
+      [PROP_NAMES.PASSWORD]:
         this.data.password && this.data.password.length > 0 ? this.data.password : null,
       [PROP_NAMES.ORG]: this.data.organization,
     };

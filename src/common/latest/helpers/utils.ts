@@ -16,7 +16,7 @@ export function stringifyScannerParams(scannerParams: ScannerParams) {
 
 export function sanitizeScannerParams(scannerParams: ScannerParams) {
   delete scannerParams[PROP_NAMES.LOGIN];
-  delete scannerParams[PROP_NAMES.PASSSWORD];
+  delete scannerParams[PROP_NAMES.PASSWORD];
   return scannerParams;
 }
 
