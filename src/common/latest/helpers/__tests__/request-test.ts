@@ -24,7 +24,7 @@ jest.mock("azure-pipelines-task-lib/task");
 
 describe("request", () => {
   describe("get", () => {
-    it("should get a JSON response with auth", async () => {
+    it("should get a JSON response with token auth", async () => {
       axiosMock
         .onGet(`${ENDPOINT.url}/api/server/version`, {
           params: {
@@ -40,9 +40,8 @@ describe("request", () => {
 
       const args = axiosMock.history.get[0];
       expect(args).toMatchObject({
-        auth: {
-          username: "the-token",
-          password: "",
+        headers: {
+          Authorization: `Bearer the-token`,
         },
         timeout: Endpoint.REQUEST_TIMEOUT,
       });

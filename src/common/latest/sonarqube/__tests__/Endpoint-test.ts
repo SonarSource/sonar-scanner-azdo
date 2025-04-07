@@ -31,7 +31,7 @@ it("On SonarQube Cloud, password is always null", () => {
 
   const result = Endpoint.getEndpoint("sonarcloud", EndpointType.Cloud);
 
-  expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSSWORD]).toBeNull();
+  expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSWORD]).toBeNull();
   expect(result.auth.password).toBe("");
 });
 
@@ -45,7 +45,7 @@ it("On SonarQube Server, password is empty should not be intepreted", () => {
 
   const result = Endpoint.getEndpoint("sonarqube", EndpointType.Server);
 
-  expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSSWORD]).toBeNull();
+  expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSWORD]).toBeNull();
   expect(result.auth.password).toBe("");
 });
 
@@ -58,7 +58,7 @@ it("On SonarQube Server password is not empty should be intepreted", () => {
 
   const result = Endpoint.getEndpoint("sonarqube", EndpointType.Server);
 
-  expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSSWORD]).toEqual("P@ssword");
+  expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSWORD]).toEqual("P@ssword");
   expect(result.auth.password).toEqual("P@ssword");
 });
 
