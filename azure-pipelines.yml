@@ -220,6 +220,7 @@ stages:
         variables:
           publisher: $(SonarSourceITPublisher)
           scExtensionVersion: $[stageDependencies.run_qa.install_test_extension.outputs['versions.SC_VERSION']]
+          sqExtensionVersion: $[stageDependencies.run_qa.install_test_extension.outputs['versions.SQ_VERSION']]
         steps:
           - task: TfxInstaller@4
             displayName: "Install TFX CLI"
@@ -245,6 +246,21 @@ stages:
               vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
               extensionName: "[Dogfood] SonarCloud"
               extensionId: "sonarcloud-dogfood"
+              updateTasksVersion: false
+              updateTasksId: false
+              extensionVisibility: "private"
+              shareWith: "sonarsource"
+              cwd: "$(System.ArtifactsDirectory)"
+
+          - task: PublishAzureDevOpsExtension@4
+            displayName: "Publish SonarQube Server dogfood extension"
+            inputs:
+              connectTo: "VsTeam"
+              connectedServiceName: "AzDO Extension - Marketplace - Dogfood"
+              fileType: "vsix"
+              vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(sqExtensionVersion)-sonarqube.vsix"
+              extensionName: "[Dogfood] SonarQube Server"
+              extensionId: "sonarqube-dogfood"
               updateTasksVersion: false
               updateTasksId: false
               extensionVisibility: "private"
