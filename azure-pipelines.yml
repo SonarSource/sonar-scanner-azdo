@@ -219,7 +219,7 @@ stages:
       - job: "publish_dogfood"
         variables:
           publisher: $(SonarSourceITPublisher)
-          scExtensionVersion: $[stageDependencies.run_qa.run_qa.outputs['versions.SC_VERSION']]
+          scExtensionVersion: $[stageDependencies.run_qa.install_test_extension.outputs['versions.SC_VERSION']]
         steps:
           - task: TfxInstaller@4
             displayName: "Install TFX CLI"
