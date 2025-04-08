@@ -133,6 +133,7 @@ stages:
           itOrg: $(SonarSourceITOrganization)
         steps:
           - bash: |
+              echo "##vso[task.setvariable variable=SQ_VERSION;isoutput=true]$(sqExtensionVersion)"
               echo "##vso[task.setvariable variable=SC_VERSION;isoutput=true]$(scExtensionVersion)"
             name: versions
 
