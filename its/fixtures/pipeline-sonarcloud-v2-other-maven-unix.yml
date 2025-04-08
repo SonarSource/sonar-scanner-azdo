@@ -25,7 +25,7 @@ steps:
       jdkSourceOption: PreInstalled
   - task: SonarCloudPrepareTest@2
     inputs:
-      SonarCloud: SonarCloud
+      SonarCloud: SonarQube Cloud US - QA
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: Other
       extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-maven_unix_2

@@ -20,7 +20,7 @@ steps:
       path: $(GRADLE_USER_HOME)
   - task: SonarCloudPrepareTest@3
     inputs:
-      SonarCloud: SonarCloud
+      SonarCloud: SonarQube Cloud US - QA
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: other
       extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-gradle_windows_3

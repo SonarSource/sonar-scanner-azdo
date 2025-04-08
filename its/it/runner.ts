@@ -56,7 +56,7 @@ export function getTestCase(combination: PipelineCombination): TestCase {
 
   const sonarHostUrl =
     combination.version.extension === "sonarcloud"
-      ? "https://sonarcloud.io"
+      ? "https://sonarqube.us"
       : "http://localhost:9000"; // SONARAZDO-425 We do not support SonarQube in the E2E tests
 
   return {

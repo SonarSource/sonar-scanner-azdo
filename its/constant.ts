@@ -7,7 +7,7 @@ export const AZDO_MAIN_PIPELINE_NAME = "SonarSource.sonar-scanner-azdo";
 
 // Information to bind to the SonarCloud used in the E2E tests
 export const SONARCLOUD_ORGANIZATION_KEY = "sonarsource-sonar-scanner-azdo-it";
-export const SONARCLOUD_SERVICE_CONNECTION = "SonarCloud";
+export const SONARCLOUD_SERVICE_CONNECTION = "SonarQube Cloud US - QA";
 export const SONARQUBE_SERVICE_CONNECTION = "SonarQube";
 
 // Input names for the prepare task

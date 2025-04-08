@@ -13,7 +13,7 @@ variables:
 steps:
   - task: SonarCloudPrepareTest@3
     inputs:
-      SonarCloud: SonarCloud
+      SonarCloud: SonarQube Cloud US - QA
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: cli
       configMode: manual

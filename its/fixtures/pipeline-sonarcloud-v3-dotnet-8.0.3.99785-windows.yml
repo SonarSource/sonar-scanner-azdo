@@ -18,7 +18,7 @@ steps:
       restoreSolution: its/fixtures/dummy-project-dotnet-framework/*.sln
   - task: SonarCloudPrepareTest@3
     inputs:
-      SonarCloud: SonarCloud
+      SonarCloud: SonarQube Cloud US - QA
       organization: sonarsource-sonar-scanner-azdo-it
       scannerMode: dotnet
       projectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-framework_windows_3_8.0.3.99785

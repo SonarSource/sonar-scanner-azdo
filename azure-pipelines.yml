@@ -205,7 +205,7 @@ stages:
           - task: Bash@3
             displayName: "Run the ITs"
             env:
-              SONARCLOUD_TOKEN: $(SonarCloudToken)
+              SONARCLOUD_TOKEN: $(SonarQubeCloudToken-US)
               AZURE_TOKEN: $(SonarSourceITOrganizationPAT)
               AZURE_BRANCH: $(azureBranch)
             inputs:
