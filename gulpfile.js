@@ -390,7 +390,7 @@ gulp.task("default", gulp.series("clean", "build", "extension"));
 gulp.task("sonarqube:scan", async () => {
   function run(extension) {
     return new Promise((resolve) => {
-      if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
+      if (process.env.CIRRUS_BRANCH === process.env.CIRRUS_DEFAULT_BRANCH && !process.env.CIRRUS_PR) {
         runSonarQubeScanner(
           extension,
           {
