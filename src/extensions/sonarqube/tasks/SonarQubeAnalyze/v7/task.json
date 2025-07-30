@@ -10,7 +10,7 @@
   "version": {
     "Major": 7,
     "Minor": 3,
-    "Patch": 0
+    "Patch": 1
   },
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
   "minimumAgentVersion": "3.218.0",
@@ -32,6 +32,9 @@
   ],
   "execution": {
     "Node16": {
+      "target": "SonarQubeAnalyze.js"
+    },
+    "Node20_1": {
       "target": "SonarQubeAnalyze.js"
     }
   }

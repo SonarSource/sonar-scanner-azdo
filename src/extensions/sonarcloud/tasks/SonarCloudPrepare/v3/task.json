@@ -10,7 +10,7 @@
   "version": {
     "Major": 3,
     "Minor": 3,
-    "Patch": 0
+    "Patch": 1
   },
   "minimumAgentVersion": "3.218.0",
   "instanceNameFormat": "Prepare analysis on SonarQube Cloud",
@@ -177,6 +177,9 @@
   ],
   "execution": {
     "Node16": {
+      "target": "SonarCloudPrepare.js"
+    },
+    "Node20_1": {
       "target": "SonarCloudPrepare.js"
     }
   }
