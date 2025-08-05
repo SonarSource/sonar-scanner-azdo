@@ -103,9 +103,9 @@ exports.getBuildInfo = function (type, vssData) {
   const name = `sonar-scanner-azdo-${productAccronym}`;
 
   const packageVersion = getVersionWithCirrusBuildNumber(vssData.version);
-  const vsixPaths = glob(path.join(DIST_DIR, `*-${type}.vsix`));
+  const vsixPaths = glob(path.join(DIST_DIR, `*-${type}.vsix`).replace(/\\/g, "/"));
   const additionalPaths = glob(
-    path.join(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`),
+    path.join(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`).replace(/\\/g, "/"),
   );
   const qualifierMatch = new RegExp(`${packageVersion}-(.+).vsix$`);
 
@@ -197,7 +197,7 @@ exports.runSonarQubeScanner = function (extension, customOptions, callback) {
     "sonar.analysis.repository": process.env.CIRRUS_REPO_FULL_NAME,
     "sonar.eslint.reportPaths": "eslint-report.json",
     "sonar.javascript.lcov.reportPaths": glob([
-      path.join("src", "common", "*", "coverage", "lcov.info"),
+      path.join("src", "common", "*", "coverage", "lcov.info").replace(/\\/g, "/"),
     ]).join(","),
     ...customOptions,
   };

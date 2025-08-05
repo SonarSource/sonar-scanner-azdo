@@ -109,7 +109,7 @@ gulp.task("build:typescript", () => {
  * Bundle tasks
  */
 gulp.task("build:bundle", async () => {
-  const tasks = glob(path.join(SOURCE_DIR, "extensions", "*", "tasks", "*", "v*", "*.ts"));
+  const tasks = glob(path.join(SOURCE_DIR, "extensions", "*", "tasks", "*", "v*", "*.ts").replace(/\\/g, "/"));
   for (const task of tasks) {
     const [extension, , taskName, version] = task.split(path.sep).slice(-5);
     const commonFolder = getTaskCommonFolder(taskName, version);
@@ -133,7 +133,7 @@ gulp.task("build:bundle", async () => {
  * Build all scanners needed by tasks
  */
 gulp.task("build:download-scanners", () => {
-  const configJss = glob([path.join(BUILD_TS_DIR, "common", "*", "config.js")]);
+  const configJss = glob([path.join(BUILD_TS_DIR, "common", "*", "config.js").replace(/\\/g, "/")]);
   const streams = [];
   for (const configJs of configJss) {
     // eslint-disable-next-line import/no-dynamic-require
@@ -362,7 +362,7 @@ gulp.task(
 gulp.task("extension:build", (done) => {
   const publisher = isProd ? "sonarsource" : (yargs.argv.publisher ?? "foo");
 
-  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json")]);
+  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json").replace(/\\/g, "/")]);
 
   for (const vssExtension of vssExtensions) {
     // eslint-disable-next-line import/no-dynamic-require
@@ -430,7 +430,7 @@ gulp.task("ci:azure:hotfix-extensions-version", () => {
     throw new Error("Missing build number");
   }
 
-  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json")]);
+  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json").replace(/\\/g, "/")]);
 
   return mergeStream(
     vssExtensions.map((vssExtension) =>
@@ -476,7 +476,7 @@ gulp.task("ci:azure:hotfix-tasks-version", () => {
 
 gulp.task("ci:azure:hotfix-tasks-names", () => {
   const tasks = glob(["src/extensions/*/tasks/*/v*/*.json"]);
-  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json")]);
+  const vssExtensions = glob([path.join(SOURCE_DIR, "extensions", "*", "vss-extension.json").replace(/\\/g, "/")]);
 
   function obfuscateTaskGuid(guid) {
     return "00000001" + guid.slice(8);
@@ -564,7 +564,7 @@ gulp.task("upload:sign", () => {
 });
 
 gulp.task("upload:cyclonedx", () => {
-  const commonPaths = glob([path.join(SOURCE_DIR, "common", "*", "package.json")]);
+  const commonPaths = glob([path.join(SOURCE_DIR, "common", "*", "package.json").replace(/\\/g, "/")]);
 
   return cycloneDxPipe(...commonPaths.map((commonPath) => path.dirname(commonPath)));
 });
@@ -585,7 +585,7 @@ gulp.task("upload:vsix:sonarqube", () => {
       path.join(
         DIST_DIR,
         "*{-sonarqube.vsix,cyclonedx-sonarqube-*.json,cyclonedx-latest.json,-sonarqube*.asc}",
-      ),
+      ).replace(/\\/g, "/"),
     ).map((filePath) => {
       const [sha1, md5] = fileHashsum(filePath);
       const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarqube");
@@ -642,7 +642,7 @@ gulp.task("upload:vsix:sonarcloud", () => {
       path.join(
         DIST_DIR,
         "*{-sonarcloud.vsix,cyclonedx-sonarcloud-*.json,cyclonedx-latest.json,-sonarcloud*.asc}",
-      ),
+      ).replace(/\\/g, "/"),
     ).map((filePath) => {
       const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarcloud");
       const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
