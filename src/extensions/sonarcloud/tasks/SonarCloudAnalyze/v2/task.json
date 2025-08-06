@@ -10,7 +10,7 @@
   "version": {
     "Major": 2,
     "Minor": 3,
-    "Patch": 4
+    "Patch": 5
   },
   "deprecated": true,
   "deprecationMessage": "This task is deprecated. Please upgrade to the latest version. For more information, refer to https://docs.sonarsource.com/sonarcloud/advanced-setup/ci-based-analysis/sonarcloud-extension-for-azure-devops/",
@@ -33,6 +33,9 @@
   ],
   "execution": {
     "Node16": {
+      "target": "SonarCloudAnalyze.js"
+    },
+    "Node20_1": {
       "target": "SonarCloudAnalyze.js"
     }
   }

@@ -10,7 +10,7 @@
   "version": {
     "Major": 7,
     "Minor": 3,
-    "Patch": 0
+    "Patch": 1
   },
   "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
   "minimumAgentVersion": "3.218.0",
@@ -158,6 +158,9 @@
   ],
   "execution": {
     "Node16": {
+      "target": "SonarQubePrepare.js"
+    },
+    "Node20_1": {
       "target": "SonarQubePrepare.js"
     }
   }
