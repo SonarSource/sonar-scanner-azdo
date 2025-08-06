@@ -103,9 +103,9 @@ exports.getBuildInfo = function (type, vssData) {
   const name = `sonar-scanner-azdo-${productAccronym}`;
 
   const packageVersion = getVersionWithCirrusBuildNumber(vssData.version);
-  const vsixPaths = glob(path.join(DIST_DIR, `*-${type}.vsix`).replace(/\\/g, "/"));
+  const vsixPaths = glob(globPath(DIST_DIR, `*-${type}.vsix`));
   const additionalPaths = glob(
-    path.join(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`).replace(/\\/g, "/"),
+    globPath(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`),
   );
   const qualifierMatch = new RegExp(`${packageVersion}-(.+).vsix$`);
 
@@ -197,7 +197,7 @@ exports.runSonarQubeScanner = function (extension, customOptions, callback) {
     "sonar.analysis.repository": process.env.CIRRUS_REPO_FULL_NAME,
     "sonar.eslint.reportPaths": "eslint-report.json",
     "sonar.javascript.lcov.reportPaths": glob([
-      path.join("src", "common", "*", "coverage", "lcov.info").replace(/\\/g, "/"),
+      globPath("src", "common", "*", "coverage", "lcov.info"),
     ]).join(","),
     ...customOptions,
   };
@@ -229,3 +229,9 @@ function cycloneDxPipe(...commonPaths) {
     .pipe(exec.reporter());
 }
 exports.cycloneDxPipe = cycloneDxPipe;
+
+function globPath(...segments) {
+    return path.join(...segments).replace(/\\/g, "/");
+}
+exports.globPath = globPath;
+
