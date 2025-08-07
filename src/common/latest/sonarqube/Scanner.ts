@@ -137,7 +137,10 @@ export default class Scanner {
         return;
       }
       data = data.toString().trim();
-      if (data.indexOf("WARNING: An illegal reflective access operation has occurred") !== -1) {
+      if (
+        data.indexOf("WARNING: An illegal reflective access operation has occurred") !== -1 ||
+        data.indexOf("Picked up JAVA_TOOL_OPTIONS") !== -1
+      ) {
         //bypass those warning showing as error because they can't be catched for now by Scanner.
         log(LogLevel.DEBUG, data);
         return;
