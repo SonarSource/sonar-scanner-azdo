@@ -8,14 +8,14 @@ This Azure DevOps extension provides build tasks that you can add in your build 
 
 To get started in a few minutes, you can:
 
-- Follow this dedicated [Microsoft Lab][getstarted]
-- Follow the SonarQube Cloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn].
+- Check out the official [SonarQube Cloud documentation][documentation].
+- Follow this dedicated [Azure DevOps Labs][getstarted].
 - Benefit from embedded templates for common analyses:
   - **Classic** build pipelines templates integrated while creating a new pipeline
   - **YAML** build pipeline templates available in our Sourcecode: https://github.com/SonarSource/sonar-scanner-azdo/tree/master/its/fixtures
-- Benefit from a bunch of sample projects and pipelines (used in our automated tests). See the projects (.NET Framework, .NET Core, Gradle, Maven, Scanner CLI) [on GitHub](./its/fixtures) and the corresponding analyzed projects in [the SonarQube Cloud organization](https://sonarcloud.io/organizations/sonarsource-sonar-scanner-azdo-it/projects?sort=analysis_date).
-- Get IDE Support with SonarLint integration to find code issues on the fly. SonarQube Cloud rules and analysis settings synchronize to SonarLint, aligning teams around a single standard of Clean Code
-- Get a free analysis for open-source projects
+- Benefit from a bunch of sample projects and pipelines (used in our automated tests). See the projects (.NET Framework, .NET Core, Gradle, Maven, Scanner CLI) [on GitHub][sampleprojects].
+- Get IDE Support with [SonarQube for IDE](https://www.sonarsource.com/products/sonarlint/) integration to find code issues on the fly. SonarQube Cloud rules and analysis settings synchronize to SonarQube for IDE, aligning teams around maintainable, reliable, and secure code.
+- Get free analysis for open-source projects.
 - **Start a no-commitment, free 14-day trial for the Team tier**
 
 ## About the Azure DevOps extension for SonarQube Cloud
@@ -86,5 +86,7 @@ Learn More - [SonarQube Cloud | Azure integration][learnmore]
 [sc]: https://www.sonarsource.com/products/sonarcloud/?utm_medium=referral&utm_source=azure&utm_campaign=sc-product&utm_content=signup-sonarcloud-listing-x-x&utm_term=ww-psp-x
 [signup]: https://www.sonarsource.com/products/sonarcloud/signup/?utm_medium=referral&utm_source=azure&utm_campaign=sc-signup&utm_content=signup-sonarcloud-listing-x-x&utm_term=ww-psp-x
 [opensource]: https://sonarcloud.io/explore/projects?sort=-analysis_date?utm_medium=referral&utm_source=azure&utm_campaign=sc-signup&utm_content=signup-sonarcloud-listing-x-x&utm_term=ww-psp-x
-[getstarted]: https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud/
+[getstarted]: https://github.com/microsoft/azuredevopslabs/blob/master/labs/vstsextend/sonarcloud/readme.md
 [learnmore]: https://www.sonarsource.com/products/sonarcloud/features/integrations/azure-integration-2/?utm_medium=referral&utm_source=azure&utm_campaign=sc-signup&utm_content=signup-sonarcloud-listing-x-x&utm_term=ww-psp-x
+[sampleprojects]: https://github.com/SonarSource/sonar-scanner-azdo/tree/master/its/fixtures
+[documentation]: https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/ci-based-analysis/sonarcloud-extension-for-azure-devops/
