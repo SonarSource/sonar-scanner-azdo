@@ -74,7 +74,7 @@
     "libxmljs2": "https://registry.npmjs.org/@ttskp/libxmljs2-noop/-/libxmljs2-noop-1.0.0.tgz"
   },
   "overridesComment": {
-    "libxmljs2": "Workaround for https://github.com/CycloneDX/cyclonedx-javascript-library/issues/1061 to silent Mend"
+    "libxmljs2": "Workaround for https://github.com/CycloneDX/cyclonedx-javascript-library/issues/1061 to silent vulnerability findings"
   },
   "engines": {
     "node": ">=6",
