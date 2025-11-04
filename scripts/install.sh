@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Get the root directory of the Git repository
 GIT_ROOT=$(git rev-parse --show-toplevel)
 
