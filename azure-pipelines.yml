@@ -227,33 +227,3 @@ stages:
               downloadType: "single"
               artifactName: "extensions"
               downloadPath: "$(System.ArtifactsDirectory)"
-
-          - task: PublishAzureDevOpsExtension@4
-            displayName: "Publish SonarCloud dogfood extension"
-            inputs:
-              connectTo: "VsTeam"
-              connectedServiceName: "AzDO Extension - Marketplace - Dogfood"
-              fileType: "vsix"
-              vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
-              extensionName: "[Dogfood] SonarCloud"
-              extensionId: "sonarcloud-dogfood"
-              updateTasksVersion: false
-              updateTasksId: false
-              extensionVisibility: "private"
-              shareWith: "sonarsource"
-              cwd: "$(System.ArtifactsDirectory)"
-
-          - task: PublishAzureDevOpsExtension@4
-            displayName: "Publish SonarQube Server dogfood extension"
-            inputs:
-              connectTo: "VsTeam"
-              connectedServiceName: "AzDO Extension - Marketplace - Dogfood"
-              fileType: "vsix"
-              vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(sqExtensionVersion)-sonarqube.vsix"
-              extensionName: "[Dogfood] SonarQube Server"
-              extensionId: "sonarqube-dogfood"
-              updateTasksVersion: false
-              updateTasksId: false
-              extensionVisibility: "private"
-              shareWith: "sonarsource"
-              cwd: "$(System.ArtifactsDirectory)"
