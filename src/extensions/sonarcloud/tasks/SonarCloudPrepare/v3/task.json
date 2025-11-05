@@ -10,7 +10,7 @@
   "version": {
     "Major": 3,
     "Minor": 4,
-    "Patch": 2
+    "Patch": 3
   },
   "minimumAgentVersion": "3.218.0",
   "instanceNameFormat": "Prepare analysis on SonarQube Cloud",
