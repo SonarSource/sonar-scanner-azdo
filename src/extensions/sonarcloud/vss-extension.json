@@ -38,7 +38,7 @@
       "uri": "https://sonarcloud.io/"
     },
     "getstarted": {
-      "uri": "https://www.azuredevopslabs.com/labs/vstsextend/sonarcloud"
+      "uri": "https://github.com/microsoft/azuredevopslabs/blob/master/labs/vstsextend/sonarcloud/readme.md"
     },
     "support": {
       "uri": "https://community.sonarsource.com/c/sc/9"
