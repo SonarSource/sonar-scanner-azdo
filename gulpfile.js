@@ -33,7 +33,7 @@ const {
   npmInstallTask,
   cycloneDxPipe,
   downloadOrCopy,
-  getVersionWithCirrusBuildNumber,
+  getVersionWithBuildNumber,
   run,
   runSonarQubeScanner,
   globPath,
@@ -369,7 +369,7 @@ gulp.task("extension:build", (done) => {
     // eslint-disable-next-line import/no-dynamic-require
     const { version } = require(vssExtension);
     const extension = path.basename(path.dirname(vssExtension));
-    const fullVersion = getVersionWithCirrusBuildNumber(version);
+    const fullVersion = getVersionWithBuildNumber(version);
     const vsixFileName = `sonar-scanner-azdo-${fullVersion}-${extension}.vsix`;
     const outPath = path.join(DIST_DIR, vsixFileName);
     const cwd = path.join(BUILD_EXTENSION_DIR, extension);
@@ -391,23 +391,23 @@ gulp.task("default", gulp.series("clean", "build", "extension"));
 gulp.task("sonarqube:scan", async () => {
   function run(extension) {
     return new Promise((resolve) => {
-      if (process.env.CIRRUS_BRANCH === process.env.CIRRUS_DEFAULT_BRANCH && !process.env.CIRRUS_PR) {
+      if (process.env.GITHUB_REF_NAME === process.env.ENV_DEFAULT_BRANCH && !process.env.ENV_PR) {
         runSonarQubeScanner(
           extension,
           {
-            "sonar.analysis.sha1": process.env.CIRRUS_CHANGE_IN_REPO,
+            "sonar.analysis.sha1": process.env.GITHUB_SHA,
           },
           resolve,
         );
-      } else if (process.env.CIRRUS_PR) {
+      } else if (process.env.ENV_PR) {
         runSonarQubeScanner(
           extension,
           {
-            "sonar.analysis.prNumber": process.env.CIRRUS_PR,
-            "sonar.pullrequest.key": process.env.CIRRUS_PR,
-            "sonar.pullrequest.branch": process.env.CIRRUS_BRANCH,
-            "sonar.pullrequest.base": process.env.CIRRUS_BASE,
-            "sonar.analysis.sha1": process.env.CIRRUS_BASE_SHA,
+            "sonar.analysis.prNumber": process.env.ENV_PR,
+            "sonar.pullrequest.key": process.env.ENV_PR,
+            "sonar.pullrequest.branch": process.env.GITHUB_HEAD_REF,
+            "sonar.pullrequest.base": process.env.GITHUB_BASE_REF,
+            "sonar.analysis.sha1": process.env.GITHUB_SHA,
           },
           resolve,
         );
@@ -571,11 +571,11 @@ gulp.task("upload:cyclonedx", () => {
 });
 
 gulp.task("upload:vsix:sonarqube", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
+  if (process.env.GITHUB_REF_NAME !== process.env.ENV_DEFAULT_BRANCH && !process.env.ENV_PR) {
     log("Not on master nor PR, skip upload:vsix");
     return Promise.resolve();
   }
-  if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
+  if (process.env.ENV_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
     log("On PR, but artifacts should not be deployed, skip upload:vsix");
     return Promise.resolve();
   }
@@ -591,7 +591,7 @@ gulp.task("upload:vsix:sonarqube", () => {
       const [sha1, md5] = fileHashsum(filePath);
       const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarqube");
       const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-      const packageVersion = getVersionWithCirrusBuildNumber(vssExtension.version);
+      const packageVersion = getVersionWithBuildNumber(vssExtension.version);
       return gulp
         .src(filePath)
         .pipe(
@@ -609,8 +609,8 @@ gulp.task("upload:vsix:sonarqube", () => {
             username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
             password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
             properties: {
-              "vcs.revision": process.env.CIRRUS_CHANGE_IN_REPO,
-              "vcs.branch": process.env.CIRRUS_BRANCH,
+              "vcs.revision": process.env.GITHUB_SHA,
+              "vcs.branch": process.env.ENV_PR ? process.env.GITHUB_HEAD_REF : process.env.GITHUB_REF_NAME,
               "build.name": name,
               "build.number": process.env.BUILD_NUMBER,
             },
@@ -628,11 +628,11 @@ gulp.task("upload:vsix:sonarqube", () => {
 });
 
 gulp.task("upload:vsix:sonarcloud", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
+  if (process.env.GITHUB_REF_NAME !== process.env.ENV_DEFAULT_BRANCH && !process.env.ENV_PR) {
     log("Not on master nor PR, skip upload:vsix");
     return Promise.resolve();
   }
-  if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
+  if (process.env.ENV_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
     log("On PR, but artifacts should not be deployed, skip upload:vsix");
     return Promise.resolve();
   }
@@ -647,7 +647,7 @@ gulp.task("upload:vsix:sonarcloud", () => {
     ).map((filePath) => {
       const extensionPath = path.join(BUILD_EXTENSION_DIR, "sonarcloud");
       const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-      const packageVersion = getVersionWithCirrusBuildNumber(vssExtension.version);
+      const packageVersion = getVersionWithBuildNumber(vssExtension.version);
       const [sha1, md5] = fileHashsum(filePath);
       return gulp
         .src(filePath)
@@ -666,8 +666,8 @@ gulp.task("upload:vsix:sonarcloud", () => {
             username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
             password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
             properties: {
-              "vcs.revision": process.env.CIRRUS_CHANGE_IN_REPO,
-              "vcs.branch": process.env.CIRRUS_BRANCH,
+              "vcs.revision": process.env.GITHUB_SHA,
+              "vcs.branch": process.env.ENV_PR ? process.env.GITHUB_HEAD_REF : process.env.GITHUB_REF_NAME,
               "build.name": name,
               "build.number": process.env.BUILD_NUMBER,
             },
@@ -685,11 +685,11 @@ gulp.task("upload:vsix:sonarcloud", () => {
 });
 
 gulp.task("upload:buildinfo", async () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
+  if (process.env.GITHUB_REF_NAME !== process.env.ENV_DEFAULT_BRANCH && !process.env.ENV_PR) {
     log("Not on master nor PR, skip upload:buildinfo");
     return;
   }
-  if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
+  if (process.env.ENV_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
     log("On PR, but artifacts should not be deployed, skip upload:buildinfo");
     return;
   }
@@ -727,7 +727,7 @@ gulp.task(
 );
 
 gulp.task("promote", async () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
+  if (process.env.GITHUB_REF_NAME !== process.env.ENV_DEFAULT_BRANCH && !process.env.ENV_PR) {
     log("Not on master nor PR, skip promote");
     return;
   }
@@ -741,11 +741,11 @@ gulp.task("promote", async () => {
         "post",
         `${process.env.ARTIFACTORY_URL}/api/build/promote/${name}/${process.env.BUILD_NUMBER}`,
         {
-          status: `it-passed${process.env.CIRRUS_PR ? "-pr" : ""}`,
+          status: `it-passed${process.env.ENV_PR ? "-pr" : ""}`,
           sourceRepo: process.env.ARTIFACTORY_DEPLOY_REPO,
           targetRepo: process.env.ARTIFACTORY_DEPLOY_REPO.replace(
             "qa",
-            process.env.CIRRUS_PR ? "dev" : "builds",
+            process.env.ENV_PR ? "dev" : "builds",
           ),
         },
         {
@@ -756,6 +756,7 @@ gulp.task("promote", async () => {
         },
       ).then((response) => {
         if (response.statusCode !== 200) {
+          log(`Promote failed: status=${response.statusCode}, body=${JSON.stringify(response.body)}`);
           throw new Error(`Failed to promote ${name} to ${process.env.BUILD_NUMBER}`);
         }
       }),
