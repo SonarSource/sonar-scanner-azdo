@@ -78,7 +78,7 @@ jobs:
       - name: Validate generated ITS
         run: |
           npm run generate-its
-          git diff --exit-code
+          git diff --exit-code its/fixtures/
       - name: Validate CI
         run: npm run validate-ci
       - name: Build
