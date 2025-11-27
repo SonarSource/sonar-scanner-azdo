@@ -25,7 +25,17 @@ permissions:
   contents: write  # Required for repository access and tagging
 
 jobs:
+  get-build-number:
+    name: Preload build number
+    runs-on: github-ubuntu-latest-s
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: SonarSource/ci-github-actions/get-build-number@v1
   build:
+    needs:
+      - get-build-number
     runs-on: github-ubuntu-latest-s  # Using custom GitHub-hosted runner for public repo
     name: Build and Test
     steps:
@@ -88,6 +98,8 @@ jobs:
         run: npm run upload
 
   check_size:
+    needs:
+      - get-build-number
     runs-on: github-ubuntu-latest-s  # Using custom GitHub-hosted runner for public repo
     name: Check Extension Size
     env:
