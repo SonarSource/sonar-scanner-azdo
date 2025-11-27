@@ -1,0 +1,13 @@
+name: Cleanup PR Resources
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: github-ubuntu-latest-s
+    name: Cleanup
+    permissions:
+      actions: write  # Required to delete caches and artifacts
+    steps:
+      - uses: SonarSource/ci-github-actions/pr_cleanup@v1

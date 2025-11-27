@@ -68,7 +68,7 @@ exports.tfxCommand = function (extensionPath, packageJSON, params = "") {
   run(
     `"${resolveRelativePath(
       path.join("node_modules", ".bin", "tfx"),
-    )}" extension create --output-path "../../${packageJSON.name}-${getVersionWithCirrusBuildNumber(
+    )}" extension create --output-path "../../${packageJSON.name}-${getVersionBuildNumber(
       vssExtension.version,
     )}-${vssExtension.id}.vsix" ${params}`,
     {
@@ -77,8 +77,8 @@ exports.tfxCommand = function (extensionPath, packageJSON, params = "") {
   );
 };
 
-function getVersionWithCirrusBuildNumber(version) {
-  const buildNumber = process.env.BUILD_NUMBER; // Cirrus CI build number
+function getVersionBuildNumber(version) {
+  const buildNumber = process.env.BUILD_NUMBER;
   console.log(`Incoming version: ${version} with build number ${buildNumber}`);
   if (buildNumber) {
     return `${version}.${buildNumber}`;
@@ -86,7 +86,7 @@ function getVersionWithCirrusBuildNumber(version) {
     return version;
   }
 }
-exports.getVersionWithCirrusBuildNumber = getVersionWithCirrusBuildNumber;
+exports.getVersionWithBuildNumber = getVersionBuildNumber;
 
 function fileHashsum(filePath) {
   const fileContent = fs.readFileSync(filePath);
@@ -102,7 +102,7 @@ exports.getBuildInfo = function (type, vssData) {
   const productAccronym = type === "sonarqube" ? "sq" : "sc";
   const name = `sonar-scanner-azdo-${productAccronym}`;
 
-  const packageVersion = getVersionWithCirrusBuildNumber(vssData.version);
+  const packageVersion = getVersionBuildNumber(vssData.version);
   const vsixPaths = glob(globPath(DIST_DIR, `*-${type}.vsix`));
   const additionalPaths = glob(
     globPath(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`),
@@ -115,8 +115,8 @@ exports.getBuildInfo = function (type, vssData) {
     number: process.env.BUILD_NUMBER,
     started: dateformat(new Date(), "yyyy-mm-dd'T'HH:MM:ss.lo"),
     url: process.env.CI_BUILD_URL,
-    vcsRevision: process.env.CIRRUS_CHANGE_IN_REPO,
-    vcsUrl: `https://github.com/${process.env.CIRRUS_REPO_FULL_NAME}.git`,
+    vcsRevision: process.env.GITHUB_SHA,
+    vcsUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}.git`,
     modules: [
       {
         id: `org.sonarsource.scanner.azdo:${name}:${packageVersion}`,
@@ -143,7 +143,7 @@ exports.getBuildInfo = function (type, vssData) {
       "java.specification.version": "1.8", // Workaround for https://jira.sonarsource.com/browse/RA-115
       [`buildInfo.env.${productAccronym.toUpperCase()}_PROJECT_VERSION`]: packageVersion,
       "buildInfo.env.ARTIFACTORY_DEPLOY_REPO": process.env.ARTIFACTORY_DEPLOY_REPO,
-      "buildInfo.env.TRAVIS_COMMIT": process.env.CIRRUS_CHANGE_IN_REPO,
+      "buildInfo.env.TRAVIS_COMMIT": process.env.GITHUB_SHA,
     },
   };
 };
@@ -192,9 +192,9 @@ exports.runSonarQubeScanner = function (extension, customOptions, callback) {
     "sonar.cpd.exclusions": "src/common/sonarqube-v*/**, src/common/sonarcloud-v*/**",
     "sonar.tests": ".",
     "sonar.test.inclusions": "**/__tests__/**",
-    "sonar.analysis.buildNumber": process.env.CIRRUS_BUILD_ID,
-    "sonar.analysis.pipeline": process.env.CIRRUS_BUILD_ID,
-    "sonar.analysis.repository": process.env.CIRRUS_REPO_FULL_NAME,
+    "sonar.analysis.buildNumber": process.env.BUILD_NUMBER,
+    "sonar.analysis.pipeline": process.env.BUILD_NUMBER,
+    "sonar.analysis.repository": process.env.GITHUB_REPOSITORY,
     "sonar.eslint.reportPaths": "eslint-report.json",
     "sonar.javascript.lcov.reportPaths": glob([
       globPath("src", "common", "*", "coverage", "lcov.info"),

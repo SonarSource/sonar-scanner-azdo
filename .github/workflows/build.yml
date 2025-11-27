@@ -1,0 +1,195 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+      - 'branch-*'
+      - 'dogfood-on-*'
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+env:
+  ENV_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+  ENV_PR: ${{ github.event.pull_request.number }}
+  DEPLOY_PULL_REQUEST: true
+  ARTIFACTORY_DEPLOY_REPO: sonarsource-public-qa
+  ARTIFACTORY_DEPLOY_USERNAME: vault-${{ github.repository_owner }}-${{ github.event.repository.name }}-qa-deployer
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write  # Required for Vault OIDC authentication
+  contents: write  # Required for repository access and tagging
+
+jobs:
+  get-build-number:
+    name: Preload build number
+    runs-on: github-ubuntu-latest-s
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: SonarSource/ci-github-actions/get-build-number@v1
+  build:
+    needs:
+      - get-build-number
+    runs-on: github-ubuntu-latest-s  # Using custom GitHub-hosted runner for public repo
+    name: Build and Test
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0  # Fetch all history for git operations
+
+      - uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+        with:
+          version: 2025.7.12
+      - uses: SonarSource/ci-github-actions/config-npm@v1
+        id: config
+        with:
+          artifactory-reader-role: private-reader
+      # Fetch vault secrets for build
+      - name: Vault
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3 # v3.1.0
+        with:
+          secrets: |
+            development/kv/data/next url | SONAR_HOST_URL;
+            development/kv/data/next token | SONAR_TOKEN;
+            development/kv/data/sign key | GPG_SIGNING_KEY;
+            development/kv/data/sign passphrase | GPG_SIGNING_PASSPHRASE;
+            development/kv/data/repox url | ARTIFACTORY_URL;
+            development/artifactory/token/${{ github.repository_owner }}-${{ github.event.repository.name }}-qa-deployer access_token | ARTIFACTORY_DEPLOY_PASSWORD;
+            development/artifactory/token/${{ github.repository_owner }}-${{ github.event.repository.name }}-private-reader access_token | ARTIFACTORY_ACCESS_TOKEN;
+      - name: Cache dependencies
+        uses: SonarSource/ci-github-actions/cache@v1
+        with:
+          path: |
+            node_modules
+          key: cache-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: cache-${{ runner.os }}-
+      # Install dependencies
+      - name: Install dependencies
+        run: bash scripts/install.sh
+
+      # Validate generated ITS are up-to-date
+      - name: Validate generated ITS
+        run: |
+          npm run generate-its
+          git diff --exit-code
+      - name: Validate CI
+        run: npm run validate-ci
+      - name: Build
+        run: npm run build
+      - name: Run SonarQube Analysis
+        env:
+          SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_HOST_URL }}
+        run: npm run sonarqube
+      - name: Upload Artifacts
+        env:
+          GPG_SIGNING_KEY: ${{ fromJSON(steps.secrets.outputs.vault).GPG_SIGNING_KEY }}
+          GPG_SIGNING_PASSPHRASE: ${{ fromJSON(steps.secrets.outputs.vault).GPG_SIGNING_PASSPHRASE }}
+          ARTIFACTORY_URL: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_URL }}
+          ARTIFACTORY_DEPLOY_PASSWORD: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_DEPLOY_PASSWORD }}
+          ARTIFACTORY_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_ACCESS_TOKEN }}
+        run: npm run upload
+
+  check_size:
+    needs:
+      - get-build-number
+    runs-on: github-ubuntu-latest-s  # Using custom GitHub-hosted runner for public repo
+    name: Check Extension Size
+    env:
+      MAX_FILE_SIZE_MB: 40
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+        with:
+          version: 2025.7.12
+      - uses: SonarSource/ci-github-actions/config-npm@v1
+        id: config
+        with:
+         artifactory-reader-role: private-reader
+
+      # Fetch vault secrets for build
+      - name: Vault
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3 # v3.1.0
+        with:
+          secrets: |
+            development/kv/data/next url | SONAR_HOST_URL;
+            development/kv/data/next token | SONAR_TOKEN;
+            development/kv/data/sign key | GPG_SIGNING_KEY;
+            development/kv/data/sign passphrase | GPG_SIGNING_PASSPHRASE;
+      - name: Cache dependencies
+        uses: SonarSource/ci-github-actions/cache@v1
+        with:
+          path: |
+            node_modules
+          key: cache-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: cache-${{ runner.os }}-
+      # Install dependencies
+      - name: Install dependencies
+        run: bash scripts/install.sh
+
+      # Build extensions
+      - name: Build extensions
+        env:
+          SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_HOST_URL }}
+          GPG_SIGNING_KEY: ${{ fromJSON(steps.secrets.outputs.vault).GPG_SIGNING_KEY }}
+          GPG_SIGNING_PASSPHRASE: ${{ fromJSON(steps.secrets.outputs.vault).GPG_SIGNING_PASSPHRASE }}
+        run: npm run build
+
+      # Check file size
+      - name: Check extension file size
+        run: |
+          du -a -m dist/*.vsix | awk '{print $1}' | xargs -I % bash -c '
+            echo "File size: % MB"
+            if [ % -ge ${{ env.MAX_FILE_SIZE_MB }} ]; then
+              echo "Error: File size exceeds limit of ${{ env.MAX_FILE_SIZE_MB }} MB."
+              exit 1
+            fi
+          '
+
+  promote:
+    needs:
+      - build
+    runs-on: github-ubuntu-latest-s  # Using custom GitHub-hosted runner for public repo
+    name: Promote
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+        with:
+          cache_save: false
+          version: 2025.7.12
+      - uses: SonarSource/ci-github-actions/config-npm@v1
+        id: config
+        with:
+          artifactory-reader-role: private-reader
+      - name: Vault
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3 # v3.1.0
+        with:
+          secrets: |
+            development/kv/data/repox url | ARTIFACTORY_URL;
+            development/artifactory/token/${{ github.repository_owner }}-${{ github.event.repository.name }}-promoter access_token | ARTIFACTORY_PROMOTE_ACCESS_TOKEN;
+      - name: Cache dependencies
+        uses: SonarSource/ci-github-actions/cache@v1
+        with:
+          path: |
+            node_modules
+          key: cache-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: cache-${{ runner.os }}-
+      - name: Install dependencies
+        run: bash scripts/install.sh
+      - name: promote
+        env:
+          ARTIFACTORY_URL: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_URL }}
+          ARTIFACTORY_PROMOTE_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_PROMOTE_ACCESS_TOKEN }}
+        run: |
+          npm run promote
