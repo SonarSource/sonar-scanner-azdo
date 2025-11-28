@@ -1,0 +1,186 @@
+{
+  "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
+  "name": "SonarCloudPrepare",
+  "friendlyName": "Prepare Analysis Configuration",
+  "description": "Prepare SonarQube Cloud analysis configuration",
+  "helpMarkDown": "[More Information](https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarcloud-extension-for-azure-devops/)",
+  "category": "Build",
+  "visibility": ["Build"],
+  "author": "sonarsource",
+  "version": {
+    "Major": 4,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "3.218.0",
+  "instanceNameFormat": "Prepare analysis on SonarQube Cloud",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "inputs": [
+    {
+      "name": "SonarQube",
+      "aliases": ["SonarQube", "SonarCloud"],
+      "type": "connectedService:sonarcloud",
+      "label": "SonarQube Cloud Service Endpoint",
+      "required": true,
+      "helpMarkDown": "Select the SonarQube Cloud endpoint for your project. To create one, go to your **Project Settings**, then **Service Connections** and create a new SonarQube Cloud Service Endpoint, you will have to enter your SonarQube Cloud account token.\n If you are on the build pipeline classic editor, click on the Manage link to be redirected to that page."
+    },
+    {
+      "name": "organization",
+      "type": "pickList",
+      "label": "Organization",
+      "required": true,
+      "helpMarkDown": "Select the name of your Organization",
+      "properties": {
+        "EditableOptions": "True"
+      }
+    },
+    {
+      "name": "scannerMode",
+      "type": "radio",
+      "label": "Choose the way to run the analysis",
+      "defaultValue": "dotnet",
+      "required": true,
+      "helpMarkDown": "####dotnet\n* Put this task before your build task\n* Add the 'Run Code Analysis' task after the MSBuild/VSTest tasks\n####Maven/Gradle\n* Put this task before the Maven/Gradle task\n* Tick the 'Run SonarQube (Server, Cloud) Analysis' checkbox in the Maven/Gradle task configuration.\n####Others\nFor other cases you can use the standalone scanner (sonar-scanner) and set all configuration with this task, and then add the 'Run Code Analysis' task",
+      "options": {
+        "dotnet": "Integrate with .NET",
+        "cli": "Use standalone SonarScanner CLI",
+        "other": "Integrate with Maven or Gradle"
+      }
+    },
+    {
+      "name": "dotnetScannerVersion",
+      "aliases": ["dotnetScannerVersion", "msBuildVersion"],
+      "type": "string",
+      "label": ".NET Scanner Version",
+      "required": false,
+      "visibleRule": "scannerMode = dotnet",
+      "helpMarkDown": "Specify the version of the .NET Scanner to use. Versions can be located [here](https://github.com/SonarSource/sonar-scanner-msbuild/tags)."
+    },
+    {
+      "name": "cliScannerVersion",
+      "aliases": ["cliScannerVersion", "cliVersion"],
+      "type": "string",
+      "label": "Scanner CLI Version",
+      "required": false,
+      "visibleRule": "scannerMode = cli",
+      "helpMarkDown": "Specify the version of the CLI scanner to use.  Versions can be located [here](https://github.com/SonarSource/sonar-scanner-cli/tags)."
+    },
+    {
+      "name": "configMode",
+      "type": "radio",
+      "label": "Mode",
+      "defaultValue": "file",
+      "required": true,
+      "helpMarkDown": "Choose your preferred configuration method",
+      "options": {
+        "file": "Store configuration with my source code (sonar-project.properties)",
+        "manual": "Manually provide configuration"
+      },
+      "visibleRule": "scannerMode = cli"
+    },
+    {
+      "name": "configFile",
+      "type": "filePath",
+      "defaultValue": "sonar-project.properties",
+      "label": "Settings File",
+      "required": false,
+      "helpMarkDown": "More information is available [here](https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarcloud-extension-for-azure-devops/)",
+      "visibleRule": "scannerMode = cli && configMode = file"
+    },
+    {
+      "name": "cliProjectKey",
+      "type": "string",
+      "label": "Project Key",
+      "required": true,
+      "helpMarkDown": "The SonarQube Cloud project unique key, i.e. `sonar.projectKey`",
+      "visibleRule": "scannerMode = cli && configMode = manual"
+    },
+    {
+      "name": "projectKey",
+      "type": "string",
+      "label": "Project Key",
+      "required": true,
+      "helpMarkDown": "The SonarQube Cloud project unique key, i.e. `sonar.projectKey`",
+      "visibleRule": "scannerMode = dotnet"
+    },
+    {
+      "name": "cliProjectName",
+      "type": "string",
+      "label": "Project Name",
+      "required": false,
+      "helpMarkDown": "The SonarQube Cloud project name, i.e. `sonar.projectName`",
+      "visibleRule": "scannerMode = cli && configMode = manual"
+    },
+    {
+      "name": "projectName",
+      "type": "string",
+      "label": "Project Name",
+      "required": false,
+      "helpMarkDown": "The SonarQube Cloud project name, i.e. `sonar.projectName`",
+      "visibleRule": "scannerMode = dotnet"
+    },
+    {
+      "name": "cliProjectVersion",
+      "type": "string",
+      "label": "Project Version",
+      "defaultValue": "1.0",
+      "required": false,
+      "helpMarkDown": "The SonarQube Cloud project version, i.e. `sonar.projectVersion`",
+      "visibleRule": "scannerMode = cli && configMode = manual"
+    },
+    {
+      "name": "projectVersion",
+      "type": "string",
+      "label": "Project Version",
+      "defaultValue": "1.0",
+      "required": false,
+      "helpMarkDown": "The SonarQube Cloud project version, i.e. `sonar.projectVersion`",
+      "visibleRule": "scannerMode = dotnet"
+    },
+    {
+      "name": "cliSources",
+      "type": "string",
+      "label": "Sources directory root",
+      "defaultValue": ".",
+      "required": true,
+      "helpMarkDown": "Path to the root directory containing source files. This value is set to the `sonar.sources` SonarQube Cloud property",
+      "visibleRule": "scannerMode = cli && configMode = manual"
+    },
+    {
+      "name": "extraProperties",
+      "type": "multiLine",
+      "label": "Additional Properties",
+      "defaultValue": "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin",
+      "required": false,
+      "properties": {
+        "resizable": "true",
+        "rows": "5"
+      },
+      "helpMarkDown": "[Additional properties](https://docs.sonarcloud.io/advanced-setup/analysis-parameters/) to be passed to the scanner. Specify each key=value pair on a new line.",
+      "groupName": "advanced"
+    }
+  ],
+  "dataSourceBindings": [
+    {
+      "target": "organization",
+      "endpointId": "$(SonarQube)",
+      "endpointUrl": "{{endpoint.url}}/api/organizations/search?member=true",
+      "resultSelector": "jsonpath:$.organizations[*]",
+      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{name}}} ({{{key}}})\" }"
+    }
+  ],
+  "execution": {
+    "Node16": {
+      "target": "SonarCloudPrepare.js"
+    },
+    "Node20_1": {
+      "target": "SonarCloudPrepare.js"
+    }
+  }
+}
