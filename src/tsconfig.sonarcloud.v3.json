@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "commonjs",
+    "lib": ["es2017", "DOM"],
+    "strict": true,
+    "moduleResolution": "node",
+    "rootDir": "./",
+    "baseUrl": ".",
+    "outDir": "../build/ts"
+  },
+  "include": [
+    "common/sonarcloud-v3/**/*.ts",
+    "extensions/sonarcloud/tasks/*/v3/**/*.ts"
+  ]
+}
