@@ -11,7 +11,7 @@
   },
   "include": [
     "common/latest/**/*.ts",
-    "extensions/sonarcloud/tasks/*/v3/**/*.ts",
-    "extensions/sonarqube/tasks/*/v7/**/*.ts"
+    "extensions/sonarcloud/tasks/*/v4/**/*.ts",
+    "extensions/sonarqube/tasks/*/v8/**/*.ts"
   ]
 }
