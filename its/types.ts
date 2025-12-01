@@ -15,11 +15,11 @@ export type PipelineCombination = {
   version:
     | {
         extension: "sonarcloud";
-        version: 1 | 2 | 3;
+        version: 3;
       }
     | {
         extension: "sonarqube" | "sonarqube:lts";
-        version: 5 | 6 | 7;
+        version: 7;
       };
 
   // Scanner to use
