@@ -1,1 +1,0 @@
-export { EndpointType } from "./Endpoint";
