@@ -355,9 +355,11 @@ export class ScannerDotnet extends Scanner {
     const scannerCliShellScripts = tl.findMatch(
       scannerExecutablePath,
       path.join(path.dirname(scannerExecutablePath), "sonar-scanner-*", "bin", SCANNER_CLI_NAME),
-    )[0];
+    );
 
-    await fs.chmod(scannerCliShellScripts, "500");
+    if (scannerCliShellScripts.length > 0) {
+      await fs.chmod(scannerCliShellScripts[0], "500");
+    }
   }
 
   private getScannerRunner(scannerPath: string, isExeScanner: boolean) {
