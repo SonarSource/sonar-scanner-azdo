@@ -1,0 +1,28 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarcloud","version":4},"scanner":{"type":"dotnet"}}
+
+trigger: none
+pr: none
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
+steps:
+  - task: SonarCloudPrepareTest@4
+    inputs:
+      SonarCloud: SonarCloud
+      organization: sonarsource-sonar-scanner-azdo-it
+      scannerMode: dotnet
+      projectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-core_unix_4_embedded
+      projectName: sonarsource-sonar-scanner-azdo-it_dummy-project-dotnet-core_unix_4_embedded
+      extraProperties: sonar.projectBaseDir=$(Build.SourcesDirectory)/its/fixtures/dummy-project-dotnet-core
+  - script: dotnet build --configuration Release
+    workingDirectory: its/fixtures/dummy-project-dotnet-core
+  - task: SonarCloudAnalyzeTest@4
+    inputs: {}
+  - task: SonarCloudPublishTest@4
+    inputs:
+      pollingTimeoutSec: "300"
