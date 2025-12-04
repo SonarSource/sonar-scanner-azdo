@@ -1,0 +1,41 @@
+# This pipeline was automatically generated
+# Config: {"os":"windows","version":{"extension":"sonarcloud","version":4},"scanner":{"type":"other","subtype":"maven"}}
+
+trigger: none
+pr: none
+pool:
+  vmImage: windows-latest
+variables:
+  system.debug: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
+steps:
+  - task: Cache@2
+    inputs:
+      key: maven | "$(Agent.OS)" | **/pom.xml
+      restoreKeys: |
+        maven | "$(Agent.OS)"
+        maven
+      path: $(MAVEN_CACHE_FOLDER)
+  - task: JavaToolInstaller@1
+    inputs:
+      versionSpec: "17"
+      jdkArchitectureOption: x64
+      jdkSourceOption: PreInstalled
+  - task: SonarCloudPrepareTest@4
+    inputs:
+      SonarCloud: SonarCloud
+      organization: sonarsource-sonar-scanner-azdo-it
+      scannerMode: other
+      extraProperties: sonar.projectKey=sonarsource-sonar-scanner-azdo-it_dummy-project-maven_windows_4
+  - task: Maven@4
+    inputs:
+      mavenPomFile: its/fixtures/dummy-project-maven/pom.xml
+      goals: package
+      options: -X
+      mavenOptions: $(MAVEN_OPTS)
+      sonarQubeRunAnalysis: true
+  - task: SonarCloudPublishTest@4
+    inputs:
+      pollingTimeoutSec: "300"

@@ -1,0 +1,27 @@
+# This pipeline was automatically generated
+# Config: {"os":"unix","version":{"extension":"sonarcloud","version":4},"scanner":{"type":"cli"}}
+
+trigger: none
+pr: none
+pool:
+  vmImage: ubuntu-latest
+variables:
+  system.debug: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
+steps:
+  - task: SonarCloudPrepareTest@4
+    inputs:
+      SonarCloud: SonarCloud
+      organization: sonarsource-sonar-scanner-azdo-it
+      scannerMode: cli
+      configMode: manual
+      cliProjectKey: sonarsource-sonar-scanner-azdo-it_dummy-project-cli_unix_4_embedded
+      cliProjectName: sonarsource-sonar-scanner-azdo-it_dummy-project-cli_unix_4_embedded
+      cliSources: its/fixtures/dummy-project-cli
+  - task: SonarCloudAnalyzeTest@4
+    inputs: {}
+  - task: SonarCloudPublishTest@4
+    inputs:
+      pollingTimeoutSec: "300"
