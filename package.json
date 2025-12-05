@@ -41,7 +41,7 @@
     "eslint-plugin-promise": "7.1.0",
     "fancy-log": "2.0.0",
     "fs-extra": "11.2.0",
-    "glob": "11.0.0",
+    "glob": "13.0.0",
     "gulp": "4.0.2",
     "gulp-artifactory-upload": "1.4.0",
     "gulp-decompress": "3.0.0",
