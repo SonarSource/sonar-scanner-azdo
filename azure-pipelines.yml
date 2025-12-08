@@ -56,7 +56,7 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                sudo npm i -g npm@10
+                sudo -E npm i -g npm@10
 
           - task: Bash@3
             displayName: "Install all extension dependencies"
