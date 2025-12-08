@@ -57,7 +57,13 @@ stages:
               targetType: "inline"
               script: |
                 sudo -E npm i -g npm@10
-
+          - task: Bash@3
+            displayName: "Clean npm cache"
+            inputs:
+              targetType: "inline"
+              script: |
+                sudo chown -R 1001:1001 "/home/vsts/work/1/.npm"
+                npm cache clean --force
           - task: Bash@3
             displayName: "Install all extension dependencies"
             env:
