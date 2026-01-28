@@ -40,7 +40,7 @@ stages:
         displayName: "NPM Install, CI and Build"
         variables:
           publisher: $(SonarSourceITPublisher)
-          npm_config_cache: $(Pipeline.Workspace)/.npm
+          npm_config_cache: $(Pipeline.Workspace)/.npm-v3
         steps:
           - task: Cache@2
             inputs:
@@ -168,7 +168,7 @@ stages:
         dependsOn: install_test_extension
         displayName: "Run ITs"
         variables:
-          npm_config_cache: $(Pipeline.Workspace)/.npm
+          npm_config_cache: $(Pipeline.Workspace)/.npm-v3
         steps:
           - task: Cache@2
             inputs:
