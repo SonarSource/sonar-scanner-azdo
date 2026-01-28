@@ -152,11 +152,11 @@ stages:
               downloadType: "single"
               artifactName: "extensions"
               downloadPath: "$(System.ArtifactsDirectory)"
-          - task: PublishAzureDevOpsExtension@4
+          - task: PublishAzureDevOpsExtension@5
             displayName: "Publish SonarCloud test extension"
             inputs:
-              connectTo: "VsTeam"
-              connectedServiceName: "AzDo Extension - Marketplace - IntegrationTests"
+              connectTo: "AzureRM"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
               fileType: "vsix"
               vsixFile: "$(System.ArtifactsDirectory)/extensions/test/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
               extensionName: "[Test] SonarCloud ITs"
@@ -227,11 +227,11 @@ stages:
               artifactName: "extensions"
               downloadPath: "$(System.ArtifactsDirectory)"
 
-          - task: PublishAzureDevOpsExtension@4
+          - task: PublishAzureDevOpsExtension@5
             displayName: "Publish SonarCloud dogfood extension"
             inputs:
-              connectTo: "VsTeam"
-              connectedServiceName: "AzDO Extension - Marketplace - Dogfood"
+              connectTo: "AzureRM"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
               fileType: "vsix"
               vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
               extensionName: "[Dogfood] SonarCloud"
@@ -242,11 +242,11 @@ stages:
               shareWith: "sonarsource"
               cwd: "$(System.ArtifactsDirectory)"
 
-          - task: PublishAzureDevOpsExtension@4
+          - task: PublishAzureDevOpsExtension@5
             displayName: "Publish SonarQube Server dogfood extension"
             inputs:
-              connectTo: "VsTeam"
-              connectedServiceName: "AzDO Extension - Marketplace - Dogfood"
+              connectTo: "AzureRM"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
               fileType: "vsix"
               vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(sqExtensionVersion)-sonarqube.vsix"
               extensionName: "[Dogfood] SonarQube Server"
