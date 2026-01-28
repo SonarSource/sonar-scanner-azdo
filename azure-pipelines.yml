@@ -29,8 +29,6 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: azureBranch
     value: $[coalesce(variables['System.PullRequest.SourceBranch'], 'master')]
-  - name: armServiceConnectionName
-    value: azure-devops-marketplace
 
 lockBehavior: sequential
 
@@ -158,7 +156,7 @@ stages:
             displayName: "Publish SonarCloud test extension"
             inputs:
               connectTo: "AzureRM"
-              connectedServiceNameAzureRM: "$(armServiceConnectionName)"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
               fileType: "vsix"
               vsixFile: "$(System.ArtifactsDirectory)/extensions/test/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
               extensionName: "[Test] SonarCloud ITs"
@@ -233,7 +231,7 @@ stages:
             displayName: "Publish SonarCloud dogfood extension"
             inputs:
               connectTo: "AzureRM"
-              connectedServiceNameAzureRM: "$(armServiceConnectionName)"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
               fileType: "vsix"
               vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
               extensionName: "[Dogfood] SonarCloud"
@@ -248,7 +246,7 @@ stages:
             displayName: "Publish SonarQube Server dogfood extension"
             inputs:
               connectTo: "AzureRM"
-              connectedServiceNameAzureRM: "$(armServiceConnectionName)"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
               fileType: "vsix"
               vsixFile: "$(System.ArtifactsDirectory)/extensions/dogfood/sonar-scanner-azdo-$(sqExtensionVersion)-sonarqube.vsix"
               extensionName: "[Dogfood] SonarQube Server"
