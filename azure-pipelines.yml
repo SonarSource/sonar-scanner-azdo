@@ -44,7 +44,7 @@ stages:
         steps:
           - task: Cache@2
             inputs:
-              key: 'version2 | npm | "$(Agent.OS)" | **/package-lock.json'
+              key: 'version3 | npm | "$(Agent.OS)" | **/package-lock.json'
               restoreKeys: |
                 npm | "$(Agent.OS)"
               path: $(npm_config_cache)
@@ -174,7 +174,7 @@ stages:
         steps:
           - task: Cache@2
             inputs:
-              key: 'version2 | npm | "$(Agent.OS)" | **/package-lock.json'
+              key: 'version3 | npm | "$(Agent.OS)" | **/package-lock.json'
               restoreKeys: |
                 npm | "$(Agent.OS)"
               path: $(npm_config_cache)
