@@ -165,7 +165,16 @@ stages:
               extensionVisibility: "private"
               shareWith: "$(itOrg)"
               cwd: "$(System.ArtifactsDirectory)"
-
+          # Install extension
+          - task: InstallAzureDevOpsExtension@5
+            displayName: "Install Test extension in IT org"
+            inputs:
+              connectTo: "AzureRM"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
+              method: "id"
+              publisherId: "$(publisher)"
+              extensionId: "sonarcloud-test"
+              accounts: "https://devops.azure.com/$(itOrg)"
       - job: run_its
         dependsOn: install_test_extension
         displayName: "Run ITs"
