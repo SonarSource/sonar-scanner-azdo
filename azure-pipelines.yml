@@ -53,6 +53,7 @@ stages:
             displayName: "Update NPM"
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
+              npm_config_cache: $(npm_config_cache)
             inputs:
               targetType: "inline"
               script: |
