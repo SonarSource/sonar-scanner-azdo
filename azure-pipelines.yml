@@ -58,7 +58,7 @@ stages:
               targetType: "inline"
               script: |
                 sudo -E npm i -g npm@11
-                chown -R $(whoami):$(whoami) "$npm_config_cache" 2>/dev/null || true
+                sudo chown -R $(whoami):$(whoami) "$npm_config_cache" 2>/dev/null || true
           - task: Bash@3
             displayName: "Install all extension dependencies"
             env:
