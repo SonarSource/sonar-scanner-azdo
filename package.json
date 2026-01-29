@@ -9,7 +9,7 @@
     "generate-its": "ts-node its/generate.ts",
     "test-its": "ts-node its/test.ts",
     "install-its": "ts-node its/install.ts",
-    "postinstall": "npm install --prefix src/common/latest --userconfig .npmrc && npm install --prefix src/common/sonarcloud-v3 --userconfig .npmrc && npm install --prefix src/common/sonarqube-v7 --userconfig .npmrc",
+    "postinstall": "./scripts/find-common-dirs.sh | xargs -0 -I {} npm install --prefix {} --userconfig .npmrc",
     "clean": "gulp clean",
     "upload": "gulp upload",
     "promote": "gulp promote",
