@@ -59,14 +59,12 @@ stages:
               script: |
                 sudo -E npm i -g npm@11
                 sudo chown -R $(whoami):$(whoami) "$npm_config_cache" 2>/dev/null || true
-          - task: Bash@3
+          - task: Npm@1
             displayName: "Install all extension dependencies"
             env:
               ARTIFACTORY_TOKEN: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
-              targetType: "inline"
-              script: |
-                npm install
+              command: "install"
           - task: Bash@3
             displayName: "Append build id in version in manifests"
             inputs:
@@ -191,14 +189,12 @@ stages:
                 npm | "$(Agent.OS)"
               path: $(npm_config_cache)
             displayName: Cache npm
-          - task: Bash@3
+          - task: Npm@1
             displayName: "Install all dependencies"
             env:
               ARTIFACTORY_TOKEN: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
-              targetType: "inline"
-              script: |
-                npm install
+              command: "install"
           - task: AzureCLI@2
             displayName: "Acquire token for integration testing"
             inputs:
