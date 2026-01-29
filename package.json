@@ -9,6 +9,7 @@
     "generate-its": "ts-node its/generate.ts",
     "test-its": "ts-node its/test.ts",
     "install-its": "ts-node its/install.ts",
+    "postinstall": "./scripts/find-common-dirs.sh | xargs -0 -I {} npm install --prefix {} ${ARTIFACTORY_TOKEN:+--//repox.jfrog.io/artifactory/api/npm/:_authToken=$ARTIFACTORY_TOKEN}",
     "clean": "gulp clean",
     "upload": "gulp upload",
     "promote": "gulp promote",
