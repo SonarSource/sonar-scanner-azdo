@@ -76,7 +76,7 @@ jobs:
           restore-keys: cache-${{ runner.os }}-
       # Install dependencies
       - name: Install dependencies
-        run: bash scripts/install.sh
+        run: npm install
 
       # Validate generated ITS are up-to-date
       - name: Validate generated ITS
@@ -138,7 +138,7 @@ jobs:
           restore-keys: cache-${{ runner.os }}-
       # Install dependencies
       - name: Install dependencies
-        run: bash scripts/install.sh
+        run: npm install
 
       # Build extensions
       - name: Build extensions
@@ -191,7 +191,7 @@ jobs:
           key: cache-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: cache-${{ runner.os }}-
       - name: Install dependencies
-        run: bash scripts/install.sh
+        run: npm install
       - name: promote
         env:
           ARTIFACTORY_URL: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_URL }}
