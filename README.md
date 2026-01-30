@@ -32,7 +32,7 @@ Make sure that you follow our [code style](https://github.com/SonarSource/sonar-
 - Install NPM (v8 or higher) / Node.js (v14 or higher)
 - ```bash
   npm install -g tfx-cli
-  bash scripts/install.sh
+  ARTIFACTORY_TOKEN={YOUR_ARTIFACTORY_TOKEN} npm install
   ```
 
 ### Formatting and Linting
