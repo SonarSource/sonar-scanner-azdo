@@ -64,7 +64,7 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                ls -la
+                npm config list
           - task: Bash@3
             displayName: "Install all extension dependencies"
             env:
