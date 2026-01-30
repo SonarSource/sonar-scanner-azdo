@@ -63,7 +63,7 @@ stages:
             displayName: "Install all extension dependencies"
             env:
               ARTIFACTORY_TOKEN: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
-              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_TOKEN)
+              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
               command: "install"
           - task: Bash@3
@@ -194,7 +194,7 @@ stages:
             displayName: "Install all dependencies"
             env:
               ARTIFACTORY_TOKEN: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
-              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_TOKEN)
+              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
               command: "install"
           - task: AzureCLI@2
