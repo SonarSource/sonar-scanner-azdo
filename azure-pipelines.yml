@@ -60,6 +60,12 @@ stages:
                 sudo -E npm i -g npm@11
                 sudo chown -R $(whoami):$(whoami) "$npm_config_cache" 2>/dev/null || true
           - task: Bash@3
+            displayName: "Playground"
+            inputs:
+              targetType: "inline"
+              script: |
+                ls -la
+          - task: Bash@3
             displayName: "Install all extension dependencies"
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
