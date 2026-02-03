@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import * as semver from "semver";
 import Endpoint from "../sonarqube/Endpoint";
 import { log, LogLevel } from "./logging";
@@ -22,10 +22,18 @@ export async function get<T>(endpoint: Endpoint, path: string, query?: RequestDa
     return response.data;
   } catch (error: unknown) {
     let msg = `API GET '${path}' failed.`;
-    if (error instanceof Error) {
-      msg += ` Error message: ${error.message}.`;
+
+    if (error instanceof AxiosError) {
+      msg += ` Error message: ${error.cause?.message}.`;
+      log(
+        LogLevel.DEBUG,
+        error.response ? `Response data: ${JSON.stringify(error.response)}` : "No response data",
+      );
+    } else if (error instanceof Error) {
+      msg += ` Non Axios Error message: ${error.message}.`;
     }
     log(LogLevel.DEBUG, msg);
+
     throw new Error(msg);
   }
 }
