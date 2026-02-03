@@ -113,6 +113,22 @@ describe("request", () => {
         `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded.`,
       );
     });
+
+    it("get with non-Axios error", async () => {
+      const genericError = new Error("Some non-Axios error occurred");
+
+      axiosMock.onGet(`${ENDPOINT.url}/api/server/version`, { params: { a: "b" } }).reply(() => {
+        throw genericError;
+      });
+
+      await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
+        "API GET '/api/server/version' failed. Non Axios Error message: Some non-Axios error occurred.",
+      );
+
+      expect(tl.debug).toHaveBeenCalledWith(
+        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Non Axios Error message: Some non-Axios error occurred.`,
+      );
+    });
   });
 
   describe("proxy", () => {
