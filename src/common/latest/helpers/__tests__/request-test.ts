@@ -80,11 +80,11 @@ describe("request", () => {
       axiosMock.onGet(`${ENDPOINT.url}/api/server/version`, { params: { a: "b" } }).networkError();
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "API GET '/api/server/version' failed. Error message: Network Error.",
+        "API GET '/api/server/version' failed. Axios Error message: Network Error.",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: Network Error.`,
+        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Axios Error message: Network Error.`,
       );
     });
 
@@ -94,11 +94,11 @@ describe("request", () => {
         .reply(500, "some error");
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "API GET '/api/server/version' failed. Error message: Request failed with status code 500.",
+        "API GET '/api/server/version' failed. Axios Error message: Request failed with status code 500.",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: Request failed with status code 500.`,
+        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Axios Error message: Request failed with status code 500.`,
       );
     });
 
@@ -106,11 +106,11 @@ describe("request", () => {
       axiosMock.onGet(`${ENDPOINT.url}/api/server/version`, { params: { a: "b" } }).timeout();
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded.",
+        "API GET '/api/server/version' failed. Axios Error message: timeout of 60000ms exceeded.",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: timeout of 60000ms exceeded.`,
+        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Axios Error message: timeout of 60000ms exceeded.`,
       );
     });
 
@@ -122,11 +122,11 @@ describe("request", () => {
       });
 
       await expect(() => get(ENDPOINT, "/api/server/version", { a: "b" })).rejects.toThrow(
-        "API GET '/api/server/version' failed. Non Axios Error message: Some non-Axios error occurred.",
+        "API GET '/api/server/version' failed. Error message: Some non-Axios error occurred.",
       );
 
       expect(tl.debug).toHaveBeenCalledWith(
-        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Non Axios Error message: Some non-Axios error occurred.`,
+        `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: Some non-Axios error occurred.`,
       );
     });
   });
@@ -186,6 +186,123 @@ describe("request", () => {
       expect(console.log).toHaveBeenCalledWith(
         `[INFO]  SonarQube Server: Server version: 7.9.1.48248`,
       );
+    });
+  });
+
+  describe("detailed logging", () => {
+    describe("logAxiosResponseDetails", () => {
+      it("should log response details when debug is enabled", async () => {
+        azureTaskLibMock.setVariables({ "system.debug": "true" });
+        axiosMock
+          .onGet(`${ENDPOINT.url}/api/test`, { params: { query: "param" } })
+          .reply(200, { result: "success" });
+
+        await get(ENDPOINT, "/api/test", { query: "param" });
+
+        expect(tl.debug).toHaveBeenCalledWith(
+          expect.stringContaining("API GET '/api/test' succeeded with status 200"),
+        );
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Response request:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Response headers:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Response data:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Response config:"));
+      });
+
+      it("should not log response details when debug is disabled", async () => {
+        azureTaskLibMock.setVariables({ "system.debug": "false" });
+        axiosMock
+          .onGet(`${ENDPOINT.url}/api/test`, { params: { query: "param" } })
+          .reply(200, { result: "success" });
+
+        await get(ENDPOINT, "/api/test", { query: "param" });
+
+        expect(tl.debug).not.toHaveBeenCalledWith(
+          expect.stringContaining("API GET '/api/test' succeeded with status 200"),
+        );
+        expect(tl.debug).not.toHaveBeenCalledWith(expect.stringContaining("Response request:"));
+      });
+
+      it("should safely stringify circular references in response", async () => {
+        azureTaskLibMock.setVariables({ "system.debug": "true" });
+        axiosMock.onGet(`${ENDPOINT.url}/api/test`).reply(200, { result: "success" });
+
+        await get(ENDPOINT, "/api/test");
+
+        expect(tl.debug).toHaveBeenCalledWith(
+          expect.stringContaining("API GET '/api/test' succeeded with status 200"),
+        );
+      });
+    });
+
+    describe("logAxiosErrorDetails", () => {
+      it("should log error details with response when debug is enabled", async () => {
+        azureTaskLibMock.setVariables({ "system.debug": "true" });
+        axiosMock.onGet(`${ENDPOINT.url}/api/test`).reply(500, { error: "Internal Server Error" });
+
+        await expect(() => get(ENDPOINT, "/api/test")).rejects.toThrow();
+
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Response data:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Response status: 500"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Response headers:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Error config:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Error JSON:"));
+      });
+
+      it("should log error details for network error when debug is enabled", async () => {
+        azureTaskLibMock.setVariables({ "system.debug": "true" });
+        axiosMock.onGet(`${ENDPOINT.url}/api/test`).networkError();
+
+        await expect(() => get(ENDPOINT, "/api/test")).rejects.toThrow();
+
+        expect(tl.debug).toHaveBeenCalledWith(
+          expect.stringContaining("Error setting up the request: Network Error"),
+        );
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Error config:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Error JSON:"));
+      });
+
+      it("should log error details for timeout when debug is enabled", async () => {
+        azureTaskLibMock.setVariables({ "system.debug": "true" });
+        axiosMock.onGet(`${ENDPOINT.url}/api/test`).timeout();
+
+        await expect(() => get(ENDPOINT, "/api/test")).rejects.toThrow();
+
+        expect(tl.debug).toHaveBeenCalledWith(
+          expect.stringContaining("Error setting up the request: timeout of 60000ms exceeded"),
+        );
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Error config:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Error JSON:"));
+      });
+
+      it("should not log error details when debug is disabled", async () => {
+        azureTaskLibMock.setVariables({ "system.debug": "false" });
+        axiosMock.onGet(`${ENDPOINT.url}/api/test`).reply(500, { error: "Internal Server Error" });
+
+        await expect(() => get(ENDPOINT, "/api/test")).rejects.toThrow();
+
+        expect(tl.debug).not.toHaveBeenCalledWith(expect.stringContaining("Response data:"));
+        expect(tl.debug).not.toHaveBeenCalledWith(expect.stringContaining("Error config:"));
+        expect(tl.debug).not.toHaveBeenCalledWith(expect.stringContaining("Error JSON:"));
+      });
+
+      it("should handle error without request or response when debug is enabled", async () => {
+        azureTaskLibMock.setVariables({ "system.debug": "true" });
+        axiosMock.onGet(`${ENDPOINT.url}/api/test`).reply(() => {
+          const error = new Error("Request setup error") as any;
+          error.isAxiosError = true;
+          error.toJSON = () => ({ message: "Request setup error" });
+          error.config = { url: `${ENDPOINT.url}/api/test` };
+          throw error;
+        });
+
+        await expect(() => get(ENDPOINT, "/api/test")).rejects.toThrow();
+
+        expect(tl.debug).toHaveBeenCalledWith(
+          expect.stringContaining("Error setting up the request:"),
+        );
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Error config:"));
+        expect(tl.debug).toHaveBeenCalledWith(expect.stringContaining("Error JSON:"));
+      });
     });
   });
 });
