@@ -23,3 +23,25 @@ export function sanitizeScannerParams(scannerParams: ScannerParams) {
 export function isWindows() {
   return tl.getPlatform() === tl.Platform.Windows;
 }
+
+export function isDebug() {
+  return tl.getVariable("system.debug") === "true";
+}
+
+export function safeStringify(obj: unknown, space?: number): string {
+  const seen = new WeakSet();
+
+  return JSON.stringify(
+    obj,
+    (key, value) => {
+      if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) {
+          return "[Circular]";
+        }
+        seen.add(value);
+      }
+      return value;
+    },
+    space,
+  );
+}
