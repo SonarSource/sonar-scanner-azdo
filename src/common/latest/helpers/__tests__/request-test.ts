@@ -129,6 +129,38 @@ describe("request", () => {
         `[DEBUG] SonarQube Server: API GET '/api/server/version' failed. Error message: Some non-Axios error occurred.`,
       );
     });
+
+    it("should retry with IPv4", async () => {
+      const sonarcloudEndpoint = new Endpoint(EndpointType.Cloud, {
+        url: "https://sonarcloud.io",
+        token: "the-token",
+        organization: "test-org",
+      });
+
+      axiosMock
+        .onGet(`${sonarcloudEndpoint.url}/api/server/version`)
+        .replyOnce(() => {
+          const error: any = new Error("timeout of 60000ms exceeded");
+          error.code = "ETIMEDOUT";
+          error.isAxiosError = true;
+          error.toJSON = () => ({ code: "ETIMEDOUT" });
+          error.config = {};
+          throw error;
+        })
+        .onGet(`${sonarcloudEndpoint.url}/api/server/version`)
+        .replyOnce(200, "9.9");
+
+      const response = await get(sonarcloudEndpoint, "/api/server/version");
+      expect(response).toEqual(9.9);
+      expect(axiosMock.history.get).toHaveLength(2);
+      expect(axiosMock.history.get[1].family).toBe(4);
+
+      expect(tl.debug).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "[Second attempt] Retrying API GET with forced IPv4 due to timeout",
+        ),
+      );
+    });
   });
 
   describe("proxy", () => {

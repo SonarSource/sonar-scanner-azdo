@@ -8,6 +8,13 @@ export interface RequestData {
   [x: string]: string;
 }
 
+interface RetryContext {
+  endpoint: Endpoint;
+  path: string;
+  fullUrl: string;
+  query: RequestData | undefined;
+}
+
 export async function get<T>(endpoint: Endpoint, path: string, query?: RequestData): Promise<T> {
   const fullUrl = endpoint.url + path;
   log(
@@ -24,18 +31,15 @@ export async function get<T>(endpoint: Endpoint, path: string, query?: RequestDa
     logAxiosResponseDetails(path, response);
     return response.data;
   } catch (error: unknown) {
-    let msg = `API GET '${path}' failed.`;
+    const retryResult = axios.isAxiosError(error)
+      ? await handleAxiosError<T>(error, { endpoint, path, fullUrl, query })
+      : undefined;
 
-    if (axios.isAxiosError(error)) {
-      msg += ` Axios Error message: ${error.message}.`;
-      logAxiosErrorDetails(error);
-    } else if (error instanceof Error) {
-      msg += ` Error message: ${error.message}.`;
-      log(LogLevel.DEBUG, msg);
-    } else {
-      msg += ` An unknown error occurred.`;
+    if (retryResult !== undefined) {
+      return retryResult;
     }
 
+    const msg = buildErrorMessage(path, error);
     log(LogLevel.DEBUG, msg);
     throw new Error(msg);
   }
@@ -51,6 +55,20 @@ function logAxiosResponseDetails(path: string, response: AxiosResponse) {
   log(LogLevel.DEBUG, `Response headers: ${safeStringify(response.headers)}`);
   log(LogLevel.DEBUG, `Response data: ${safeStringify(response.data)}`);
   log(LogLevel.DEBUG, `Response config: ${safeStringify(response.config)}`);
+}
+
+function handleAxiosError<T>(error: AxiosError, context: RetryContext): Promise<T | undefined> {
+  logAxiosErrorDetails(error);
+
+  // The call may fail due to Node's Happy eyeballs implementation bug: see https://github.com/nodejs/node/issues/54359
+  // In such case, we decided to retry the call with a forced IPv4 resolution, as a workaround.
+  // This is not ideal but allows to mitigate the issue for now without requiring users to change their environment configuration.
+  const shouldRetry = error.code === AxiosError.ETIMEDOUT || error.code === AxiosError.ECONNABORTED;
+  if (!shouldRetry) {
+    return Promise.resolve(undefined);
+  }
+
+  return retryGetUsingIpv4Only<T>(context.endpoint, context.path, context.fullUrl, context.query);
 }
 
 function logAxiosErrorDetails(error: AxiosError) {
@@ -73,6 +91,50 @@ function logAxiosErrorDetails(error: AxiosError) {
 
   log(LogLevel.DEBUG, `Error config: ${safeStringify(error.config)}`);
   log(LogLevel.DEBUG, `Error JSON: ${JSON.stringify(error.toJSON())}`);
+}
+
+async function retryGetUsingIpv4Only<T>(
+  endpoint: Endpoint,
+  path: string,
+  fullUrl: string,
+  query: RequestData | undefined,
+): Promise<T | undefined> {
+  try {
+    log(LogLevel.DEBUG, `[Second attempt] Retrying API GET with forced IPv4 due to timeout...`);
+    const response = await axios.get<T>(fullUrl, {
+      params: query,
+      ...endpoint.toAxiosOptions(),
+      family: 4,
+    });
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.request) {
+      log(LogLevel.DEBUG, `[Second attempt] Error request: ${safeStringify(error.request)}`);
+    }
+
+    log(
+      LogLevel.DEBUG,
+      `[Second attempt] Retrying API GET with forced IPv4 failed. See the first failure for more information.`,
+    );
+    log(LogLevel.DEBUG, `[Second attempt] error JSON: ${safeStringify(error)}`);
+  }
+
+  return undefined;
+}
+
+function buildErrorMessage(path: string, error: unknown): string {
+  let msg = `API GET '${path}' failed.`;
+
+  if (axios.isAxiosError(error)) {
+    msg += ` Axios Error message: ${error.message}.`;
+  } else if (error instanceof Error) {
+    msg += ` Error message: ${error.message}.`;
+    log(LogLevel.DEBUG, msg);
+  } else {
+    msg += ` An unknown error occurred.`;
+  }
+
+  return msg;
 }
 
 export async function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
