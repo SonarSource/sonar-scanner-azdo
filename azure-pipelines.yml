@@ -246,6 +246,7 @@ stages:
 
           - task: PublishAzureDevOpsExtension@5
             displayName: "Publish SonarCloud dogfood extension"
+            retryCountOnTaskFailure: 3
             inputs:
               connectTo: "AzureRM"
               connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
@@ -261,6 +262,7 @@ stages:
 
           - task: PublishAzureDevOpsExtension@5
             displayName: "Publish SonarQube Server dogfood extension"
+            retryCountOnTaskFailure: 3
             inputs:
               connectTo: "AzureRM"
               connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
