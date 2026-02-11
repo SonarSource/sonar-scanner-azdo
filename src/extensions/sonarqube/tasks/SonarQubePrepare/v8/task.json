@@ -10,7 +10,7 @@
   "version": {
     "Major": 8,
     "Minor": 0,
-    "Patch": 2
+    "Patch": 3
   },
   "releaseNotes": "* __Support non MSBuild projects:__ This task can be used to configure analysis also for non MSBuild projects.",
   "minimumAgentVersion": "3.218.0",
