@@ -221,7 +221,8 @@ stages:
 
   - stage: publish_dogfood
     displayName: "Publish dogfood extension"
-    condition: and(succeeded(), eq(variables['isMain'], true))
+    # Temporarily deactivate Dogfood extension publishing because of sudden timeout issues. We will re-activate it once the issue is resolved.
+    condition: and(succeeded(), eq(variables['isMain'], true), false)
     jobs:
       - job: "publish_dogfood"
         variables:
@@ -246,7 +247,6 @@ stages:
 
           - task: PublishAzureDevOpsExtension@5
             displayName: "Publish SonarCloud dogfood extension"
-            retryCountOnTaskFailure: 3
             inputs:
               connectTo: "AzureRM"
               connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
@@ -262,7 +262,6 @@ stages:
 
           - task: PublishAzureDevOpsExtension@5
             displayName: "Publish SonarQube Server dogfood extension"
-            retryCountOnTaskFailure: 3
             inputs:
               connectTo: "AzureRM"
               connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
