@@ -221,8 +221,7 @@ stages:
 
   - stage: publish_dogfood
     displayName: "Publish dogfood extension"
-    # Temporarily deactivate Dogfood extension publishing because of sudden timeout issues. We will re-activate it once the issue is resolved.
-    condition: and(succeeded(), eq(variables['isMain'], true), false)
+    condition: and(succeeded(), eq(variables['isMain'], true))
     jobs:
       - job: "publish_dogfood"
         variables:
