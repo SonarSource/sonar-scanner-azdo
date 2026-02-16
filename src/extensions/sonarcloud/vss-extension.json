@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "sonarcloud",
   "name": "SonarQube Cloud",
-  "version": "4.0.5",
+  "version": "4.1.0",
   "branding": {
     "color": "rgb(244, 247, 251)",
     "theme": "light"
