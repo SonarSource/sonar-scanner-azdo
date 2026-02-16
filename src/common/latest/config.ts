@@ -1,5 +1,5 @@
 // When the user does not specify a specific version, these will be the default versions used.
-const dotnetScannerVersion = "11.0.0.126294";
+const dotnetScannerVersion = "11.1.0.132901";
 const cliScannerVersion = "8.0.1.6346";
 
 // MSBUILD scanner location
