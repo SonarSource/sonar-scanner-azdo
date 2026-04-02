@@ -127,11 +127,7 @@ export async function getReportForTask(
       warnings: task.warnings,
     });
 
-    if (
-      projectStatus.status === "ERROR" ||
-      projectStatus.status === "WARN" ||
-      projectStatus.status === "NONE"
-    ) {
+    if (projectStatus.status === "ERROR" || projectStatus.status === "WARN") {
       globalQualityGateStatus = "failed";
     }
 
