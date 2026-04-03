@@ -67,6 +67,17 @@ const ANALYSIS_ERROR = new HtmlAnalysisReport(EndpointType.Server, PROJECT_STATU
   projectName: undefined,
 });
 
+const PROJECT_STATUS_NONE: ProjectStatus = {
+  conditions: [],
+  status: "NONE",
+};
+const ANALYSIS_NONE = new HtmlAnalysisReport(EndpointType.Server, PROJECT_STATUS_NONE, [], {
+  warnings: [],
+  dashboardUrl: "",
+  metrics: undefined,
+  projectName: undefined,
+});
+
 const SC_ENDPOINT = new Endpoint(EndpointType.Cloud, { url: "https://endpoint.url" });
 const SQ_ENDPOINT = new Endpoint(EndpointType.Server, { url: "https://endpoint.url" });
 const METRICS: Metric[] = [
@@ -123,10 +134,10 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(request, "getServerVersion").mockResolvedValue(new SemVer("7.2.0"));
 
-  jest.spyOn(api, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
+  jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_OK);
   jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_OK);
-  jest.spyOn(api, "fetchProjectStatus").mockResolvedValue(PROJECT_STATUS_OK);
-  jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_OK);
+  jest.spyOn(api, "fetchProjectStatus").mockResolvedValueOnce(PROJECT_STATUS_NONE);
+  jest.spyOn(HtmlAnalysisReport, "getInstance").mockReturnValueOnce(ANALYSIS_NONE);
 
   jest.spyOn(api, "fetchMetrics").mockResolvedValue(METRICS);
 
