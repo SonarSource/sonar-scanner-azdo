@@ -74,7 +74,6 @@ export function branchFeatureSupported(endpoint: Endpoint, serverVersion: string
 }
 
 export async function populateBranchAndPrProps(props: { [key: string]: string }) {
-  const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri") as string;
   const provider = tl.getVariable("Build.Repository.Provider") as AzureProvider;
   const pullRequestId = tl.getVariable("System.PullRequest.PullRequestId");
 
@@ -89,11 +88,6 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     );
     // Set provider-specific properties
     if (provider === AzureProvider.TfsGit) {
-      // sonar.pullrequest.provider is deprecated in 8.1 and dropped between 8.1-8.9
-      // We keep this to support legacy versions of SQ and due to the fact that scanner
-      // is not rejecting this property. However we should drop it later on
-      props["sonar.pullrequest.provider"] = "vsts";
-      props["sonar.pullrequest.vsts.instanceUrl"] = collectionUrl;
       props["sonar.pullrequest.vsts.project"] = tl.getVariable("System.TeamProject") as string;
       props["sonar.pullrequest.vsts.repository"] = tl.getVariable(
         AzureBuildVariables.BuildRepositoryName,
