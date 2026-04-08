@@ -76,6 +76,28 @@ describe("branch and pull request", () => {
         "sonar.scanner.skip": "true",
       });
     });
+
+    it("should set TfsGit pull request properties including vsts.instanceUrl", () => {
+      azureTaskLibMock.setVariables({
+        "System.TeamFoundationCollectionUri": "https://dev.azure.com/myorg",
+        "Build.Repository.Provider": AzureProvider.TfsGit,
+        "System.PullRequest.PullRequestId": "123",
+        "System.PullRequest.TargetBranch": "refs/heads/main",
+        "System.PullRequest.SourceBranch": "refs/heads/feature/my-feature",
+        "System.TeamProject": "MyProject",
+        "Build.Repository.Name": "MyRepo",
+      });
+      const props = {};
+      prept.populateBranchAndPrProps(props);
+      expect(props).toEqual({
+        "sonar.pullrequest.key": "123",
+        "sonar.pullrequest.base": "main",
+        "sonar.pullrequest.branch": "feature/my-feature",
+        "sonar.pullrequest.vsts.instanceUrl": "https://dev.azure.com/myorg",
+        "sonar.pullrequest.vsts.project": "MyProject",
+        "sonar.pullrequest.vsts.repository": "MyRepo",
+      });
+    });
   });
 
   describe("default branch detection", () => {
