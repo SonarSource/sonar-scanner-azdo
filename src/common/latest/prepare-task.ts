@@ -74,6 +74,7 @@ export function branchFeatureSupported(endpoint: Endpoint, serverVersion: string
 }
 
 export async function populateBranchAndPrProps(props: { [key: string]: string }) {
+  const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri") as string;
   const provider = tl.getVariable("Build.Repository.Provider") as AzureProvider;
   const pullRequestId = tl.getVariable("System.PullRequest.PullRequestId");
 
@@ -88,6 +89,7 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     );
     // Set provider-specific properties
     if (provider === AzureProvider.TfsGit) {
+      props["sonar.pullrequest.vsts.instanceUrl"] = collectionUrl;
       props["sonar.pullrequest.vsts.project"] = tl.getVariable("System.TeamProject") as string;
       props["sonar.pullrequest.vsts.repository"] = tl.getVariable(
         AzureBuildVariables.BuildRepositoryName,
