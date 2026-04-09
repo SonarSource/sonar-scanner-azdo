@@ -31,8 +31,8 @@ export const prepareTask: TaskJob = async (endpointType: EndpointType) => {
   let props: { [key: string]: string } = {};
 
   if (branchFeatureSupported(endpoint, serverVersion)) {
-    await populateBranchAndPrProps(props);
-    /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
+    await populateBranchAndPrProps(props, endpoint);
+    /* branchFeatureSupported method magically checks everything we need for the support of the below property,
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
     log(
       LogLevel.DEBUG,
@@ -73,7 +73,10 @@ export function branchFeatureSupported(endpoint: Endpoint, serverVersion: string
   return semver.satisfies(serverVersion, ">=7.2.0");
 }
 
-export async function populateBranchAndPrProps(props: { [key: string]: string }) {
+export async function populateBranchAndPrProps(
+  props: { [key: string]: string },
+  endpoint: Endpoint,
+) {
   const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri") as string;
   const provider = tl.getVariable("Build.Repository.Provider") as AzureProvider;
   const pullRequestId = tl.getVariable("System.PullRequest.PullRequestId");
@@ -89,6 +92,9 @@ export async function populateBranchAndPrProps(props: { [key: string]: string })
     );
     // Set provider-specific properties
     if (provider === AzureProvider.TfsGit) {
+      if (endpoint.type === EndpointType.Cloud) {
+        props["sonar.pullrequest.provider"] = "vsts";
+      }
       props["sonar.pullrequest.vsts.instanceUrl"] = collectionUrl;
       props["sonar.pullrequest.vsts.project"] = tl.getVariable("System.TeamProject") as string;
       props["sonar.pullrequest.vsts.repository"] = tl.getVariable(
