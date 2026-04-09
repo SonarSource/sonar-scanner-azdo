@@ -55,7 +55,8 @@ describe("branch and pull request", () => {
   describe("should populate branch and pull request properties", () => {
     it("should not do anything for non-pull request", () => {
       const props = {};
-      prept.populateBranchAndPrProps(props);
+      const endpoint = new Endpoint(EndpointType.Cloud, { url: "https://sonarcloud.io" });
+      prept.populateBranchAndPrProps(props, endpoint);
       expect(props).toEqual({});
     });
 
@@ -68,7 +69,8 @@ describe("branch and pull request", () => {
         "System.PullRequest.SourceBranch": "refs/heads/dev/br/feature",
       });
       const props = {};
-      prept.populateBranchAndPrProps(props);
+      const endpoint = new Endpoint(EndpointType.Cloud, { url: "https://sonarcloud.io" });
+      prept.populateBranchAndPrProps(props, endpoint);
       expect(props).toEqual({
         "sonar.pullrequest.key": "123",
         "sonar.pullrequest.base": "main",
@@ -77,7 +79,7 @@ describe("branch and pull request", () => {
       });
     });
 
-    it("should set TfsGit pull request properties including vsts.instanceUrl", () => {
+    it("should set TfsGit pull request properties including provider for SonarCloud", () => {
       azureTaskLibMock.setVariables({
         "System.TeamFoundationCollectionUri": "https://dev.azure.com/myorg",
         "Build.Repository.Provider": AzureProvider.TfsGit,
@@ -88,7 +90,32 @@ describe("branch and pull request", () => {
         "Build.Repository.Name": "MyRepo",
       });
       const props = {};
-      prept.populateBranchAndPrProps(props);
+      const endpoint = new Endpoint(EndpointType.Cloud, { url: "https://sonarcloud.io" });
+      prept.populateBranchAndPrProps(props, endpoint);
+      expect(props).toEqual({
+        "sonar.pullrequest.key": "123",
+        "sonar.pullrequest.base": "main",
+        "sonar.pullrequest.branch": "feature/my-feature",
+        "sonar.pullrequest.provider": "vsts",
+        "sonar.pullrequest.vsts.instanceUrl": "https://dev.azure.com/myorg",
+        "sonar.pullrequest.vsts.project": "MyProject",
+        "sonar.pullrequest.vsts.repository": "MyRepo",
+      });
+    });
+
+    it("should set TfsGit pull request properties without provider for SonarQube Server", () => {
+      azureTaskLibMock.setVariables({
+        "System.TeamFoundationCollectionUri": "https://dev.azure.com/myorg",
+        "Build.Repository.Provider": AzureProvider.TfsGit,
+        "System.PullRequest.PullRequestId": "123",
+        "System.PullRequest.TargetBranch": "refs/heads/main",
+        "System.PullRequest.SourceBranch": "refs/heads/feature/my-feature",
+        "System.TeamProject": "MyProject",
+        "Build.Repository.Name": "MyRepo",
+      });
+      const props = {};
+      const endpoint = new Endpoint(EndpointType.Server, { url: "https://localhost:9000" });
+      prept.populateBranchAndPrProps(props, endpoint);
       expect(props).toEqual({
         "sonar.pullrequest.key": "123",
         "sonar.pullrequest.base": "main",
@@ -113,7 +140,8 @@ describe("branch and pull request", () => {
         }),
       } as unknown as GitApi);
       const props = {};
-      await prept.populateBranchAndPrProps(props);
+      const endpoint = new Endpoint(EndpointType.Cloud, { url: "https://sonarcloud.io" });
+      await prept.populateBranchAndPrProps(props, endpoint);
       expect(props).toEqual({});
     });
 
@@ -129,7 +157,8 @@ describe("branch and pull request", () => {
         }),
       } as unknown as GitApi);
       const props = {};
-      await prept.populateBranchAndPrProps(props);
+      const endpoint = new Endpoint(EndpointType.Cloud, { url: "https://sonarcloud.io" });
+      await prept.populateBranchAndPrProps(props, endpoint);
       expect(props).toEqual({
         "sonar.branch.name": "dev",
       });
@@ -151,7 +180,8 @@ describe("branch and pull request", () => {
         "Build.SourceBranch": branchName,
       });
       const props = {};
-      await prept.populateBranchAndPrProps(props);
+      const endpoint = new Endpoint(EndpointType.Cloud, { url: "https://sonarcloud.io" });
+      await prept.populateBranchAndPrProps(props, endpoint);
       expect(props).toEqual(
         isDefault
           ? {}
