@@ -93,6 +93,6 @@ npm run test-build -- --publisher <your-publisher>
 
 ## License
 
-Copyright 2017-2024 SonarSource.
+Copyright (C) SonarSource Sàrl
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt))
