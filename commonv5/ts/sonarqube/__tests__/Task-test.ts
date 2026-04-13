@@ -45,7 +45,7 @@ it("should fail if polling fails", async () => {
   try {
     await Task.waitForTaskCompletion(MOCKED_ENDPOINT, "taskId", 5, 1);
   } catch (error) {
-    expect(error.message).toMatch("[SQ] Could not fetch task for ID 'taskId'");
+    expect(error.message).toMatch("[SQ] Could not fetch task status");
   }
 });
 

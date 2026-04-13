@@ -83,7 +83,7 @@ export default class TaskReport {
       taskReportGlobResult = tl.findMatch(tl.getVariable("Agent.TempDirectory"), taskReportGlob);
     }
 
-    tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
+    tl.debug(`[SQ] Searching for report-task.txt - found ${taskReportGlobResult.length} file(s)`);
     return taskReportGlobResult;
   }
 
@@ -102,11 +102,12 @@ export default class TaskReport {
             ),
           );
         }
-        tl.debug(`[SQ] Read Task report file: ${filePath}`);
+        tl.debug(`[SQ] Reading task report file.`);
         return fs.access(filePath, fs.constants.R_OK).then(
           () => this.parseReportFile(filePath),
           () => {
-            throw TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`);
+            // SEC-FIX: Do not log full file path in error message
+            throw TaskReport.throwInvalidReport(`[SQ] Task report file not found or not readable`);
           },
         );
       }),
@@ -116,7 +117,8 @@ export default class TaskReport {
   private static parseReportFile(filePath: string): Promise<TaskReport> {
     return fs.readFile(filePath, "utf-8").then(
       (fileContent) => {
-        tl.debug(`[SQ] Parse Task report file: ${fileContent}`);
+        tl.debug(`[SQ] Parsing task report file.`);
+        // SEC-FIX: Do not log raw file content — it contains projectKey, serverUrl, ceTaskId
         if (!fileContent || fileContent.length <= 0) {
           throw TaskReport.throwInvalidReport(`[SQ] Error reading file: ${fileContent}`);
         }

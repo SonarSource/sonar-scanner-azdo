@@ -34,6 +34,8 @@ function run(cl, options = {}) {
   } catch (err) {
     if (opts.stdio === 'inherit') {
       console.error(err.output ? err.output.toString() : err.message);
+    } else {
+      console.error(err.message);
     }
     process.exit(1);
   }
@@ -45,7 +47,25 @@ exports.run = run;
 // Return a stream that downloads the file if urlOrPath is a link, or copies it otherwise (if it is a relaitve path)
 function downloadOrCopy(urlOrPath) {
   if (urlOrPath.startsWith('http')) {
-    return gulpDownload(urlOrPath);
+    return gulpDownload(urlOrPath).pipe(map((file, cb) => {
+      // Ensure the file is a Vinyl object for compatibility with other gulp plugins
+      // Check if it looks like a Vinyl object but missing isNull
+      if (file && typeof file.isNull !== 'function') {
+        try {
+          const vinylFile = new Vinyl({
+            cwd: file.cwd,
+            base: file.base,
+            path: file.path,
+            contents: file.contents
+          });
+          cb(null, vinylFile);
+        } catch (e) {
+          cb(null, file); // fallback to original file if Vinyl creation fails
+        }
+      } else {
+        cb(null, file);
+      }
+    }));
   } else {
     return gulp.src(urlOrPath);
   }
@@ -71,17 +91,35 @@ exports.npmInstallTask = function (packagePath) {
 };
 
 exports.tfxCommand = function (extensionPath, packageJSON, params = '') {
-  const vssExtension = fs.readJsonSync(path.join(extensionPath, 'vss-extension.json'));
+  const vssExtJsonPath = path.join(extensionPath, 'vss-extension.json');
+  if (!fs.existsSync(vssExtJsonPath)) {
+    console.warn(`Skipping extension ${extensionPath}: vss-extension.json not found`);
+    return;
+  }
+  const vssExtension = fs.readJsonSync(vssExtJsonPath);
+  const vsixName = `${packageJSON.name}-${fullVersion(vssExtension.version)}-${vssExtension.id}.vsix`;
+  const vsixPath = path.resolve(paths.root, vsixName);
+
   run(
     `"${resolveRelativePath(
       path.join('node_modules', '.bin', 'tfx')
-    )}" extension create --output-path "../../${packageJSON.name}-${fullVersion(
-      vssExtension.version
-    )}-${vssExtension.id}.vsix" ${params}`,
+    )}" extension create --output-path "${vsixPath}" ${params}`,
     {
       cwd: resolveRelativePath(extensionPath)
     }
   );
+
+  // Apply arm64 encoding fix
+  if (fs.existsSync(vsixPath)) {
+    console.log(`Applying arm64 fix to ${vsixName}`);
+    try {
+      run(`unzip -p "${vsixPath}" "\\[Content_Types\\].xml" | sed "s/arm64):&#x9;//" > "[Content_Types].xml"`, { cwd: paths.root });
+      run(`zip "${vsixPath}" "[Content_Types].xml"`, { cwd: paths.root });
+      fs.removeSync(path.join(paths.root, "[Content_Types].xml"));
+    } catch (e) {
+      console.error(`Failed to apply arm64 fix: ${e.message}`);
+    }
+  }
 };
 
 function fullVersion(version) {
@@ -241,7 +279,7 @@ function cycloneDxPipe(flavour, packageJSON, ...ps) {
       ignore: path.join(p, '**', 'node_modules', '**')
     })
   ))
-    .pipe(exec(file => `npm run cyclonedx-run -- --output ${file.dirname}/cyclonedx.json ${file.dirname}`))
+    .pipe(exec(file => `npm run cyclonedx-run -- ${file.dirname}/cyclonedx.json --ignore-npm-errors ${paths.extensions.root}/..`))
     .pipe(exec.reporter())
     .pipe(map((file, done) => {
       file.contents = fs.readFileSync(`${file.dirname}/cyclonedx.json`)
@@ -270,21 +308,36 @@ function cycloneDxPipe(flavour, packageJSON, ...ps) {
 exports.cycloneDxPipe = cycloneDxPipe;
 
 function copyIconsTask(icon = 'task_icon.png') {
-  return () =>
-    mergeStream(
-      globby.sync(path.join(paths.extensions.root, '*'), { nodir: false }).map(extension => {
-        let iconPipe = gulp
-          .src(path.join(extension, 'tasks_icons', icon))
-          .pipe(gulpRename('icon.png'));
-        globby.sync(path.join(extension, 'tasks', '*', '*'), { nodir: false }).forEach(dir => {
-          iconPipe = iconPipe.pipe(
-            gulp.dest(
-              path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir))
-            )
-          );
-        });
-        return iconPipe;
-      })
-    );
+  return (done) => {
+    const streams = globby.sync(path.join(paths.extensions.root, '*'), { nodir: false }).map(extension => {
+      let iconPipe = gulp
+        .src(path.join(extension, 'tasks_icons', icon), { allowEmpty: true })
+        .pipe(gulpRename('icon.png'));
+      globby.sync(path.join(extension, 'tasks', '*', '*'), { nodir: false }).forEach(dir => {
+        iconPipe = iconPipe.pipe(
+          gulp.dest(
+            path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir))
+          )
+        );
+      });
+      return iconPipe;
+    });
+
+    if (streams.length === 0) {
+      done();
+      return;
+    }
+
+    let completed = 0;
+    streams.forEach(stream => {
+      stream.on('finish', () => {
+        completed++;
+        if (completed === streams.length) {
+          done();
+        }
+      });
+      stream.on('error', done);
+    });
+  }
 }
 exports.copyIconsTask = copyIconsTask;

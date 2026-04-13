@@ -32,7 +32,8 @@ export class HttpProxyAgent extends http.Agent {
     this.proxyRequestOptions = options.proxyRequestOptions || {};
   }
 
-  createConnection(options: http.RequestOptions, callback) {
+  //@ts-ignore
+  createConnection(options: http.RequestOptions, callback): any {
     const requestOptions: https.RequestOptions = Object.assign({}, this.proxyRequestOptions, {
       method: "CONNECT",
       host: this.proxy.hostname,
@@ -96,7 +97,8 @@ export class HttpsProxyAgent extends https.Agent {
     this.proxyRequestOptions = options.proxyRequestOptions || {};
   }
 
-  createConnection(options: https.RequestOptions, callback) {
+  //@ts-ignore
+  createConnection(options: https.RequestOptions, callback): any {
     const requestOptions: https.RequestOptions = Object.assign({}, this.proxyRequestOptions, {
       method: "CONNECT",
       host: this.proxy.hostname,

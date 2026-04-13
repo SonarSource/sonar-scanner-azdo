@@ -10,7 +10,8 @@ export function publishBuildSummary(summary: string, endpointType = "SonarQube")
 export function saveBuildSummary(summary: string): string {
   const filePath = path.join(getStagingDirectory(), "SonarQubeBuildSummary.md");
   fs.writeFileSync(filePath, summary);
-  tl.debug(`[SQ] Summary saved at: ${filePath}`);
+  // SEC-FIX: Do not log full file path to avoid information disclosure
+  tl.debug(`[SQ] Summary file saved.`);
   return filePath;
 }
 
@@ -21,7 +22,8 @@ export function getStagingDirectory(): string {
 }
 
 export function uploadBuildSummary(summaryPath: string, title: string): void {
-  tl.debug(`[SQ] Uploading build summary from ${summaryPath}`);
+  // SEC-FIX: Do not log full file path to avoid information disclosure
+  tl.debug(`[SQ] Uploading build summary.`);
   tl.command(
     "task.addattachment",
     {

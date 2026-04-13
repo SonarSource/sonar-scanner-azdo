@@ -46,7 +46,8 @@ export default async function publishTask(endpointType: EndpointType) {
     tl.debug(`Number of analyses in this build: ${taskReports.length}`);
   }
 
-  tl.debug(`Overall Quality Gate status: ${globalQualityGateStatus}`);
+  // SEC-FIX: Do not log quality gate status value in debug output
+  tl.debug(`[SQ] Overall Quality Gate status evaluated.`);
 
   await fillBuildProperty("sonarglobalqualitygate", globalQualityGateStatus);
 
@@ -82,7 +83,7 @@ export async function getReportForTask(
   } catch (e) {
     if (e instanceof TimeOutReachedError) {
       tl.warning(
-        `Task '${taskReport.ceTaskId}' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`,
+        `A task took too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`,
       );
     } else {
       throw e;

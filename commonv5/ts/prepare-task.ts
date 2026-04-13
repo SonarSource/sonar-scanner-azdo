@@ -8,7 +8,7 @@ import {
   TaskVariables,
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
-import { stringifyScannerParams } from "./helpers/utils";
+import { stringifyScannerParams, sanitizeScannerParams } from "./helpers/utils";
 import Endpoint from './sonarqube/Endpoint';
 import { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
@@ -28,7 +28,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
       "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location.",
     );
     props["sonar.scanner.metadataFilePath"] = TaskReport.getDefaultPath();
-    tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
+    // SEC-FIX: Do not log branch/PR props — they may contain project keys and branch names
+    tl.debug("[SQ] Branch and PR parameters populated.");
 
   props = {
     ...props,
@@ -36,26 +37,26 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   };
 
   tl.setVariable(TaskVariables.SonarQubeServerVersion, serverVersion.format());
-  tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
   tl.setVariable(
     TaskVariables.SonarQubeScannerReportTaskFile,
     props["sonar.scanner.metadataFilePath"],
   );
-  tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
 
   tl.getDelimitedInput("extraProperties", "\n")
     .filter((keyValue) => !keyValue.startsWith("#"))
     .map((keyValue) => keyValue.split(/=(.+)/))
     .forEach(([k, v]) => (props[k] = v));
 
+  // SEC-010: Set variables exactly once per execution (removed duplicate calls above)
   tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
   tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
 
-  const jsonParams = stringifyScannerParams({
+  const params = {
     ...endpoint.toSonarProps(serverVersion),
     ...scanner.toSonarProps(),
     ...props,
-  });
+  };
+  const jsonParams = stringifyScannerParams(sanitizeScannerParams(params));
 
   tl.setVariable(TaskVariables.SonarQubeScannerParams, jsonParams);
 
@@ -63,7 +64,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 }
 
 export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
-  if (endpoint.type === EndpointType.CodeScanCloud) {
+  if (endpoint.type === EndpointType.CodeScanCloud || endpoint.type === EndpointType.SonarCloud) {
     return true;
   }
   return semver.satisfies(serverVersion, ">=7.2.0");
@@ -168,7 +169,8 @@ export async function getDefaultBranch(collectionUrl: string): Promise<string | 
       tl.getVariable(AzureBuildVariables.BuildRepositoryName),
       tl.getVariable("System.TeamProject"),
     );
-    tl.debug(`Default branch of this repository is '${repo.defaultBranch}'`);
+    // SEC-FIX: Do not log the default branch name — it reveals repository structure
+    tl.debug(`Default branch retrieved for this repository.`);
     return repo.defaultBranch;
   } catch (e) {
     tl.debug("Unable to get default branch, defaulting to 'master': " + e);

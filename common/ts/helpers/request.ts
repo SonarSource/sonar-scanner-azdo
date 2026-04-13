@@ -1,5 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import fetch from "node-fetch";
+import axios from "axios";
 import * as semver from "semver";
 import Endpoint from "../sonarqube/Endpoint";
 
@@ -13,23 +13,23 @@ export async function get(
   isJson: boolean,
   query: RequestData = {},
 ): Promise<any> {
-  tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
+  // SEC-009: Log only the path, not the full URL with query params
+  tl.debug(`[SQ] API GET: '${path}'`);
 
   try {
-    let url = endpoint.url + path;
-
-    Object.keys(query).forEach((key, i) => {
-      url += i === 0 ? "?" : "&";
-      url += `${key}=${query[key]}`;
+    const url = endpoint.url + path;
+    const auth = Buffer.from(`${endpoint.auth.user}:${endpoint.auth.pass ?? ""}`).toString("base64");
+    
+    const response = await axios.get(url, {
+      params: query,
+      headers: {
+        Authorization: `Basic ${auth}`
+      },
+      timeout: 60000,
+      responseType: isJson ? 'json' : 'text'
     });
 
-    const response = await fetch(url, endpoint.toFetchOptions(url));
-
-    if (isJson) {
-      return await response.json();
-    } else {
-      return await response.text();
-    }
+    return response.data;
   } catch (error) {
     if (error.response) {
       tl.debug(`[SQ] API GET '${path}' failed, status code was: ${error.response.status}`);
@@ -41,5 +41,13 @@ export async function get(
 }
 
 export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
-  return get(endpoint, "/api/server/version", false).then(semver.coerce);
+  return get(endpoint, "/api/server/version", false).then((version) => {
+    // SEC-FIX: Validate version string; do not log raw API response
+    const coerced = semver.coerce(version);
+    if (!coerced) {
+      throw new Error(`[SQ] Invalid server version response from /api/server/version`);
+    }
+    tl.debug(`[SQ] Server version retrieved successfully.`);
+    return coerced;
+  });
 }

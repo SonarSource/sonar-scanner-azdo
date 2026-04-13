@@ -100,7 +100,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   await publishTask.default(EndpointType.SonarCloud);
 
-  expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: ok`);
+  expect(tl.debug).toHaveBeenCalledWith(`[SQ] Overall Quality Gate status evaluated.`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 2`);
   expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "ok");
 });
@@ -176,7 +176,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   await publishTask.default(EndpointType.SonarCloud);
 
-  expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: failed`);
+  expect(tl.debug).toHaveBeenCalledWith(`[SQ] Overall Quality Gate status evaluated.`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 3`);
   expect(serverUtils.fillBuildProperty).toHaveBeenCalledWith("sonarglobalqualitygate", "failed");
 });
@@ -194,7 +194,7 @@ it("get report string should return undefined if ceTask times out", async () => 
   expect(result).toBeUndefined();
   expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
   expect(tl.warning).toBeCalledWith(
-    "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result.",
+    "A task took too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result.",
   );
   expect(Analysis.getAnalysis).not.toBeCalled();
 });
@@ -318,9 +318,6 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
   expect(serverUtils.publishBuildSummary).toBeCalledWith("\r\n", EndpointType.SonarCloud);
 
   expect(tl.warning).toBeCalledWith(
-    "Task '111' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
-  );
-  expect(tl.warning).toBeCalledWith(
-    "Task '222' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
+    "A task took too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
   );
 });

@@ -162,7 +162,7 @@ export default class Analysis {
     metrics?: Metrics;
     warnings: string[];
   }): Promise<Analysis> {
-    tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
+      tl.debug(`[SQ] Retrieving project status for analysis.`);
     return get(endpoint, "/api/qualitygates/project_status", true, { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
         new Analysis(projectStatus, endpoint.type, warnings, dashboardUrl, metrics, projectName),
@@ -172,7 +172,7 @@ export default class Analysis {
         } else if (err) {
           tl.error(`[SQ] Error retrieving analysis: ${JSON.stringify(err)}`);
         }
-        throw new Error(`[SQ] Could not fetch analysis for ID '${analysisId}'`);
+        throw new Error(`[SQ] Could not fetch analysis`);
       },
     );
   }

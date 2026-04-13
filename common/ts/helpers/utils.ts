@@ -27,8 +27,13 @@ export function setIfNotEmpty(props: { [key: string]: string }, key: string, val
 
 export function sanitizeVariable(jsonPayload: string) {
   const jsonObj = JSON.parse(jsonPayload);
+  // SEC-002: Strip all credential properties from scanner params
   delete jsonObj[PROP_NAMES.LOGIN];
   delete jsonObj[PROP_NAMES.PASSSWORD];
+  delete jsonObj["sonar.token"];
+  delete jsonObj["sonar.scanner.metadataFilePath"];
+  delete jsonObj["sonar.organization"];
+  delete jsonObj["sonar.projectKey"];
   jsonPayload = toCleanJSON(jsonObj);
   return jsonPayload;
 }

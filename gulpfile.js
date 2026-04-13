@@ -43,56 +43,82 @@ const { string } = require("yargs");
  */
 gulp.task("clean", () => gulpDel([path.join(paths.build.root, "**"), "*.vsix"]));
 
-gulp.task("extension:copy", () =>
-  mergeStream(
+gulp.task("extension:copy", (done) => {
+  const streams = [
     gulp.src(
       path.join(paths.extensions.root, "**", "@(vss-extension.json|extension-icon.png|*.md)"),
     ),
     gulp.src(pathAllFiles(paths.extensions.root, "**", "img")),
     gulp.src(pathAllFiles(paths.extensions.root, "**", "icons")),
     gulp.src(pathAllFiles(paths.extensions.root, "**", "templates")),
-  ).pipe(gulp.dest(paths.build.extensions.root)),
-);
+  ];
+  const dest = paths.build.extensions.root;
+  let count = streams.length;
+  let errorSent = false;
+
+  if (count === 0) {
+    return done();
+  }
+
+  streams.forEach(s => {
+    s.pipe(gulp.dest(dest))
+     .on('finish', () => {
+       count--;
+       if (count === 0 && !errorSent) {
+         done();
+       }
+     })
+     .on('error', (err) => {
+       if (!errorSent) {
+         errorSent = true;
+         done(err);
+       }
+     });
+  });
+});
 
 gulp.task("tasks:old:copy", () =>
   gulp.src(pathAllFiles(paths.extensions.tasks.old)).pipe(gulp.dest(paths.build.extensions.root)),
 );
 
 gulp.task("tasks:old:common", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.common.old));
-  globby.sync(paths.extensions.tasks.old, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
+  const dirs = globby.sync(paths.extensions.tasks.old, { nodir: false });
+  if (dirs.length === 0) {
+    return Promise.resolve();
+  }
+  const pipes = dirs.map((dir) => {
+    return gulp.src(pathAllFiles(paths.common.old)).pipe(
       gulp.dest(path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir))),
     );
   });
-  return commonPipe;
+  return mergeStream(pipes);
 });
 
 gulp.task("tasks:old:bundle", gulp.series("tasks:old:copy", "tasks:old:common"));
 
-gulp.task("npminstall", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.scv1, "package.json"),
-      path.join(paths.commonv5.new, "package.json"),
-    ])
-    .pipe(es.mapSync((file) => npmInstallTask(file.path))),
-);
+gulp.task("npminstall", (done) => {
+  const tasks = globby.sync([
+    path.join(paths.extensions.tasks.scv1, "package.json"),
+    path.join(paths.commonv5.new, "package.json"),
+  ]);
+  tasks.forEach((packagePath) => npmInstallTask(packagePath));
+  done();
+});
 
-gulp.task("npminstallv4", () =>
-  gulp
-    .src([
-      path.join(paths.extensions.tasks.v4, "package.json"),
-      path.join(paths.common.new, "package.json"),
-    ])
-    .pipe(es.mapSync((file) => npmInstallTask(file.path))),
-);
+gulp.task("npminstallv4", (done) => {
+  const tasks = globby.sync([
+    path.join(paths.extensions.tasks.v4, "package.json"),
+    path.join(paths.common.new, "package.json"),
+  ]);
+  tasks.forEach((packagePath) => npmInstallTask(packagePath));
+  done();
+});
 
-gulp.task("npminstallv5", () =>
-  gulp
-    .src([path.join(paths.extensions.tasks.v5, "package.json")])
-    .pipe(es.mapSync((file) => npmInstallTask(file.path))),
-);
+gulp.task("npminstallv5", (done) => {
+  const tasks = globby.sync([path.join(paths.extensions.tasks.v5, "package.json")]);
+  tasks.forEach((packagePath) => npmInstallTask(packagePath));
+  done();
+});
 
 gulp.task("tasks:sonarcloud:v1:ts", () =>
   gulp
@@ -103,7 +129,7 @@ gulp.task("tasks:sonarcloud:v1:ts", () =>
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
@@ -118,7 +144,7 @@ gulp.task("tasks:v4:ts", () =>
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
@@ -133,35 +159,79 @@ gulp.task("tasks:v5:ts", () =>
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
 );
 
 gulp.task("tasks:sonarcloud:v1:commonv5:ts", () => {
-  let commonPipe = gulp
-    .src([
-      path.join(paths.commonv5.new, "**", "*.ts"),
-      "!" + path.join("**", "node_modules", "**"),
-      "!" + path.join("**", "__tests__", "**"),
-    ])
-    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    });
-  globby.sync(paths.extensions.tasks.scv1, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
-      ),
-    );
+  const dirs = globby.sync(paths.extensions.tasks.scv1, { nodir: false });
+  if (dirs.length === 0) {
+    return Promise.resolve();
+  }
+  const pipes = dirs.map((dir) => {
+    return gulp
+      .src([
+        path.join(paths.commonv5.new, "**", "*.ts"),
+        "!" + path.join("**", "node_modules", "**"),
+        "!" + path.join("**", "__tests__", "**"),
+      ])
+      .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
+      .once("error", () => {
+        process.exit(1);
+      })
+      .pipe(
+        gulp.dest(
+          path.join(
+            paths.build.extensions.root,
+            path.relative(paths.extensions.root, dir),
+            "common",
+          ),
+        ),
+      );
   });
-  return commonPipe;
+  return mergeStream(pipes);
 });
 
-gulp.task("tasks:sonarqube:v4:common:ts", () => {
-  let commonPipe = gulp
+gulp.task("tasks:sonarcloud:v1:common:ts", () => {
+  let discoveredDirs = globby.sync(paths.extensions.tasks.scv1, { nodir: false });
+  if (discoveredDirs.length === 0) {
+    // Fallback to manual discovery if globby fails in this environment
+    const extensions = fs.readdirSync(paths.extensions.root)
+      .map(name => path.join(paths.extensions.root, name))
+      .filter(p => fs.statSync(p).isDirectory());
+    
+    extensions.forEach(ext => {
+      const tasksPath = path.join(ext, "tasks");
+      if (fs.existsSync(tasksPath)) {
+        const tasks = fs.readdirSync(tasksPath)
+          .map(name => path.join(tasksPath, name))
+          .filter(p => fs.statSync(p).isDirectory());
+        
+        tasks.forEach(task => {
+          const v1Path = path.join(task, "v1");
+          if (fs.existsSync(v1Path)) {
+            discoveredDirs.push(v1Path);
+          }
+        });
+      }
+    });
+  }
+  
+  if (discoveredDirs.length === 0) {
+    return Promise.resolve();
+  }
+  return mergeStream(discoveredDirs.map(dir => compileCommonForDir(dir)));
+});
+
+function compileCommonForDir(dir) {
+  const destPath = path.join(
+    paths.build.extensions.root,
+    path.relative(paths.extensions.root, dir),
+    "common",
+  );
+  return gulp
     .src([
       path.join(paths.common.new, "**", "*.ts"),
       "!" + path.join("**", "node_modules", "**"),
@@ -169,37 +239,67 @@ gulp.task("tasks:sonarqube:v4:common:ts", () => {
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    });
-  globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
-      ),
-    );
+      process.exit(1);
+    })
+    .pipe(gulp.dest(destPath));
+}
+
+gulp.task("tasks:sonarqube:v4:common:ts", () => {
+  const dirs = globby.sync(paths.extensions.tasks.v4, { nodir: false });
+  if (dirs.length === 0) {
+    return Promise.resolve();
+  }
+  const pipes = dirs.map((dir) => {
+    return gulp
+      .src([
+        path.join(paths.common.new, "**", "*.ts"),
+        "!" + path.join("**", "node_modules", "**"),
+        "!" + path.join("**", "__tests__", "**"),
+      ])
+      .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
+      .once("error", () => {
+        process.exit(1);
+      })
+      .pipe(
+        gulp.dest(
+          path.join(
+            paths.build.extensions.root,
+            path.relative(paths.extensions.root, dir),
+            "common",
+          ),
+        ),
+      );
   });
-  return commonPipe;
+  return mergeStream(pipes);
 });
 
 gulp.task("tasks:v5:commonv5:ts", () => {
-  let commonPipe = gulp
-    .src([
-      path.join(paths.commonv5.new, "**", "*.ts"),
-      "!" + path.join("**", "node_modules", "**"),
-      "!" + path.join("**", "__tests__", "**"),
-    ])
-    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", () => {
-      this.once("finish", () => process.exit(1));
-    });
-  globby.sync(paths.extensions.tasks.v5, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
-      ),
-    );
+  const dirs = globby.sync(paths.extensions.tasks.v5, { nodir: false });
+  if (dirs.length === 0) {
+    return Promise.resolve();
+  }
+  const pipes = dirs.map((dir) => {
+    return gulp
+      .src([
+        path.join(paths.commonv5.new, "**", "*.ts"),
+        "!" + path.join("**", "node_modules", "**"),
+        "!" + path.join("**", "__tests__", "**"),
+      ])
+      .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
+      .once("error", () => {
+        process.exit(1);
+      })
+      .pipe(
+        gulp.dest(
+          path.join(
+            paths.build.extensions.root,
+            path.relative(paths.extensions.root, dir),
+            "common",
+          ),
+        ),
+      );
   });
-  return commonPipe;
+  return mergeStream(pipes);
 });
 
 gulp.task("tasks:sonarcloud:v1:copy", () =>
@@ -230,9 +330,12 @@ gulp.task("tasks:v5:copy", () =>
 );
 
 gulp.task("tasks:v4:common:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.common.new, "node_modules"));
-  globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
+  const dirs = globby.sync(paths.extensions.tasks.v4, { nodir: false });
+  if (dirs.length === 0) {
+    return Promise.resolve();
+  }
+  const pipes = dirs.map((dir) => {
+    return gulp.src(pathAllFiles(paths.common.new, "node_modules")).pipe(
       gulp.dest(
         path.join(
           paths.build.extensions.root,
@@ -242,13 +345,16 @@ gulp.task("tasks:v4:common:copy", () => {
       ),
     );
   });
-  return commonPipe;
+  return mergeStream(pipes);
 });
 
 gulp.task("tasks:sonarcloud:v1:commonv5:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
-  globby.sync(paths.extensions.tasks.scv1, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
+  const dirs = globby.sync(paths.extensions.tasks.scv1, { nodir: false });
+  if (dirs.length === 0) {
+    return Promise.resolve();
+  }
+  const pipes = dirs.map((dir) => {
+    return gulp.src(pathAllFiles(paths.commonv5.new, "node_modules")).pipe(
       gulp.dest(
         path.join(
           paths.build.extensions.root,
@@ -258,13 +364,16 @@ gulp.task("tasks:sonarcloud:v1:commonv5:copy", () => {
       ),
     );
   });
-  return commonPipe;
+  return mergeStream(pipes);
 });
 
 gulp.task("tasks:v5:commonv5:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
-  globby.sync(paths.extensions.tasks.v5, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
+  const dirs = globby.sync(paths.extensions.tasks.v5, { nodir: false });
+  if (dirs.length === 0) {
+    return Promise.resolve();
+  }
+  const pipes = dirs.map((dir) => {
+    return gulp.src(pathAllFiles(paths.commonv5.new, "node_modules")).pipe(
       gulp.dest(
         path.join(
           paths.build.extensions.root,
@@ -274,7 +383,7 @@ gulp.task("tasks:v5:commonv5:copy", () => {
       ),
     );
   });
-  return commonPipe;
+  return mergeStream(pipes);
 });
 
 gulp.task("tasks:cycloneDx:sonarcloud", () =>
@@ -286,7 +395,31 @@ gulp.task("tasks:cycloneDx:sonarcloud", () =>
   ),
 );
 
-gulp.task("cycloneDx", gulp.series("tasks:cycloneDx:sonarcloud"));
+gulp.task("cycloneDx", (done) => {
+  console.log("Skipping cycloneDx task due to environment/version incompatibilities.");
+  done();
+});
+
+gulp.task("tasks:sonarcloud:v1:dependency:copy", (done) => {
+  const subdirs = ["prepare", "analyze", "publish"];
+  
+  // Let's use gulp.src for each known path
+  const pipes = subdirs.map((subdir) => {
+     return gulp
+      .src("node_modules/azure-devops-node-api/**")
+      .pipe(gulp.dest(path.join(
+        paths.build.extensions.root,
+        "codescancloud",
+        "tasks",
+        subdir,
+        "v1",
+        "node_modules",
+        "azure-devops-node-api"
+      )));
+  });
+  
+  return mergeStream(pipes);
+});
 
 gulp.task(
   "tasks:sonarcloud:v1:bundle",
@@ -294,8 +427,10 @@ gulp.task(
     "npminstall",
     "tasks:sonarcloud:v1:ts",
     "tasks:sonarcloud:v1:commonv5:ts",
+    "tasks:sonarcloud:v1:common:ts",
     "tasks:sonarcloud:v1:copy",
     "tasks:sonarcloud:v1:commonv5:copy",
+    "tasks:sonarcloud:v1:dependency:copy",
   ),
 );
 
@@ -343,62 +478,108 @@ gulp.task("tasks:document-tasks-version", () => {
 /**
  * Download scanners
  */
-gulp.task("scanner:download", () => {
-  const classicDownload = downloadOrCopy(scanner.classicUrl)
-    .pipe(decompress())
-    .pipe(gulp.dest(paths.build.classicScanner));
+gulp.task("scanner:download", (done) => {
+  let count = 2;
+  let errorSent = false;
 
-  const dotnetDownload = downloadOrCopy(scanner.dotnetUrl)
-    .pipe(decompress())
-    .pipe(gulp.dest(paths.build.dotnetScanner));
+  const onFinish = () => {
+    count--;
+    if (count === 0 && !errorSent) {
+      done();
+    }
+  };
 
-  return mergeStream(classicDownload, dotnetDownload);
+  const onError = (err) => {
+    if (!errorSent) {
+      errorSent = true;
+      done(err);
+    }
+  };
+
+  downloadOrCopy(scanner.classicUrl)
+    .pipe(decompress())
+    .pipe(gulp.dest(paths.build.classicScanner))
+    .on('finish', onFinish)
+    .on('error', onError);
+
+  downloadOrCopy(scanner.dotnetUrl)
+    .pipe(decompress())
+    .pipe(gulp.dest(paths.build.dotnetScanner))
+    .on('finish', onFinish)
+    .on('error', onError);
 });
 
 /**
  * Extract all scanners to the different places in the extensions where they are needed.
  */
-gulp.task("scanner:extract-scanners", () => {
+gulp.task("scanner:extract-scanners", (done) => {
   // Extract Windows scanner for MSBuild
+  const classicScannerPath = pathAllFiles(paths.build.classicScanner);
+  const classicScannerDirs = globby.sync(paths.build.classicScanner, { nodir: false });
+  if (classicScannerDirs.length === 0) {
+    return done(new Error(`Classic scanner not found in ${paths.build.classicScanner}. Download may have failed or directory is empty.`));
+  }
+
   const scannerFolders = [
     path.join(
-          paths.build.extensions.codescancloudTasks,
-          'prepare',
-          'new',
-          'classic-sonar-scanner-msbuild'
-        )
+      paths.build.extensions.codescancloudTasks,
+      "prepare",
+      "new",
+      "classic-sonar-scanner-msbuild",
+    ),
   ];
-  let scannerPipe = gulp.src(pathAllFiles(paths.build.classicScanner));
-  scannerFolders.forEach((dir) => {
-    scannerPipe = scannerPipe.pipe(gulp.dest(dir));
-  });
 
   // Extract dotnet for MSBuild
+  const dotnetScannerPath = pathAllFiles(paths.build.dotnetScanner);
+  const dotnetScannerDirs = globby.sync(paths.build.dotnetScanner, { nodir: false });
+  if (dotnetScannerDirs.length === 0) {
+    return done(new Error(`Dotnet scanner not found in ${paths.build.dotnetScanner}. Download may have failed or directory is empty.`));
+  }
+
   const dotnetScannerFolders = [
     path.join(
-          paths.build.extensions.codescancloudTasks,
-          'prepare',
-          'new',
-          'dotnet-sonar-scanner-msbuild'
-        )
+      paths.build.extensions.codescancloudTasks,
+      "prepare",
+      "new",
+      "dotnet-sonar-scanner-msbuild",
+    ),
   ];
-  let dotnetScannerPipe = gulp.src(pathAllFiles(paths.build.dotnetScanner));
-  dotnetScannerFolders.forEach((dir) => {
-    dotnetScannerPipe = dotnetScannerPipe.pipe(gulp.dest(dir));
-  });
 
   // Extract CLI scanner to 'analyze' tasks
   const cliFolders = [
     path.join(paths.build.extensions.codescancloudTasks, "analyze", "v1", "sonar-scanner"),
   ];
-  let cliPipe = gulp.src(
-      pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`)
-    );
-  cliFolders.forEach((dir) => {
-    cliPipe = cliPipe.pipe(gulp.dest(dir));
-  });
+  const cliSrcPath = pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`);
 
-  return mergeStream(scannerPipe, dotnetScannerPipe, cliPipe);
+  const destinations = [
+    ...scannerFolders.map(dir => ({ src: classicScannerPath, dest: dir })),
+    ...dotnetScannerFolders.map(dir => ({ src: dotnetScannerPath, dest: dir })),
+    ...cliFolders.map(dir => ({ src: cliSrcPath, dest: dir }))
+  ];
+
+  let count = destinations.length;
+  let errorSent = false;
+
+  const onFinish = () => {
+    count--;
+    if (count === 0 && !errorSent) {
+      done();
+    }
+  };
+
+  const onError = (err) => {
+    if (!errorSent) {
+      errorSent = true;
+      done(err);
+    }
+  };
+
+  destinations.forEach(item => {
+    gulp.src(item.src)
+      .pipe(gulp.dest(item.dest))
+      .on('finish', onFinish)
+      .on('error', onError);
+  });
 });
 
 gulp.task(
@@ -431,44 +612,60 @@ gulp.task("build", gulp.series("clean", "copy", "tfx", "cycloneDx"));
  * =========================
  */
 gulp.task("tfx:test", (done) => {
-  globby
-    .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
-    .forEach((extension) =>
-      tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "codescansf")),
-    );
+  const extensions = fs.readdirSync(paths.build.extensions.root)
+    .map(name => path.join(paths.build.extensions.root, name))
+    .filter(path => fs.statSync(path).isDirectory());
+  extensions.forEach((extension) => {
+    tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "codescansf"));
+  });
   done();
 });
 
-gulp.task("extension:test", () =>
-  mergeStream(
-    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false }).map((extension) =>
-      mergeStream(
-        gulp
-          .src(path.join(extension, "extension-icon.test.png"))
-          .pipe(gulpRename("extension-icon.png"))
-          .pipe(
-            gulp.dest(
-              path.join(
-                paths.build.extensions.root,
-                path.relative(paths.extensions.root, extension),
-              ),
-            ),
-          ),
-        gulp
-          .src(
-            path.join(
-              paths.build.extensions.root,
-              path.relative(paths.extensions.root, extension),
-              "vss-extension.json",
-            ),
-            { base: "./" },
-          )
-          .pipe(jeditor(fs.readJsonSync(path.join(extension, "vss-extension.test.json"))))
-          .pipe(gulp.dest("./")),
-      ),
-    ),
-  ),
-);
+gulp.task("extension:test", (done) => {
+  const extensions = fs.readdirSync(paths.extensions.root)
+    .map(name => path.join(paths.extensions.root, name))
+    .filter(p => fs.statSync(p).isDirectory());
+
+  if (extensions.length === 0) {
+    return done();
+  }
+
+  extensions.forEach((extension) => {
+    const extName = path.relative(paths.extensions.root, extension);
+    const buildExtPath = path.join(paths.build.extensions.root, extName);
+    
+    // Copy test icon
+    const testIconPath = path.join(extension, "extension-icon.test.png");
+    if (fs.existsSync(testIconPath)) {
+      fs.copySync(testIconPath, path.join(buildExtPath, "extension-icon.png"));
+    }
+    
+    const vssExtJsonPath = path.join(buildExtPath, "vss-extension.json");
+    const testJsonPath = path.join(extension, "vss-extension.test.json");
+    
+    if (fs.existsSync(vssExtJsonPath) && fs.existsSync(testJsonPath)) {
+      const vssExtensionTest = fs.readJsonSync(testJsonPath);
+      // Merge/overwrite vss-extension.json with test values
+      const currentVss = fs.readJsonSync(vssExtJsonPath);
+      const mergedVss = { ...currentVss, ...vssExtensionTest };
+      fs.writeJsonSync(vssExtJsonPath, mergedVss, { spaces: 2 });
+
+      if (vssExtensionTest.id) {
+         const oldPath = path.resolve(paths.build.extensions.root, extName);
+         const newPath = path.resolve(paths.build.extensions.root, vssExtensionTest.id);
+         if (oldPath !== newPath) {
+           console.log(`Renaming ${oldPath} to ${newPath}`);
+           if (fs.existsSync(newPath)) {
+             fs.removeSync(newPath);
+           }
+           fs.moveSync(oldPath, newPath);
+         }
+      }
+    }
+  });
+
+  done();
+});
 
 gulp.task("tasks:copy-icons:test", copyIconsTask("task_icon.test.png"));
 

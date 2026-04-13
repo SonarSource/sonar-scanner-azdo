@@ -26,11 +26,12 @@ export async function addBuildProperty(properties: IPropertyBag[]) {
     });
   });
 
-  tl.debug(JSON.stringify(patchBody));
+  // SEC-FIX: Do not log patchBody — it may contain quality gate status or other metadata
+  // SEC-FIX: Retrieve auth token once and reuse to avoid duplicate credential reads
+  const accessToken = getAuthToken();
+  const customHeader = { Authorization: `Bearer ${accessToken}` };
 
-  const customHeader = { Authorization: `Bearer ${getAuthToken()}` };
-
-  const azdoWebApi = getWebApi(collectionUri);
+  const azdoWebApi = new vm.WebApi(collectionUri, vm.getBearerHandler(accessToken));
   const jsonPatchBody: JsonPatchDocument[] = patchBody;
 
   try {

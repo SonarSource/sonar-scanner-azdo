@@ -4,6 +4,7 @@ import { RequestInit } from "node-fetch";
 import * as semver from "semver";
 import { URL } from "url";
 import { PROP_NAMES } from "../helpers/constants";
+import { maskUrlCredentials } from "../helpers/log-masker";
 import { getProxyFromURI } from "../helpers/proxyFromEnv";
 
 const REQUEST_TIMEOUT = 60000;
@@ -11,6 +12,7 @@ const REQUEST_TIMEOUT = 60000;
 export enum EndpointType {
   CodeScanCloud = "CodeScanCloud",
   SonarQube = "SonarQube",
+  SonarCloud = "SonarCloud",
 }
 
 export interface EndpointData {
@@ -32,6 +34,16 @@ export default class Endpoint {
     // Remove trailing slash at the end of the base url, if any
     if (this.data) {
       this.data.url = this.data?.url.replace(/\/$/, "");
+    }
+    // SEC-007: Enforce HTTPS for server communication
+    if (this.data?.url && !this.data.url.startsWith("https://")) {
+      const allowInsecure = tl.getBoolInput("allowInsecureConnection", false) || false;
+      if (!allowInsecure) {
+        throw new Error(
+          `[SQ] HTTPS is required for server URL. Got: ${maskUrlCredentials(this.data.url)}. ` +
+          `Set 'allowInsecureConnection' to true to allow HTTP for local development.`
+        );
+      }
     }
   }
 
@@ -86,6 +98,15 @@ export default class Endpoint {
     return JSON.stringify({ type: this.type, data: this.data });
   }
 
+  // SEC-009: Redacted version for debug logging
+  public toRedactedJson() {
+    const redacted = { ...this.data };
+    if (redacted.token) redacted.token = "[REDACTED]";
+    if (redacted.username) redacted.username = "[REDACTED]";
+    if (redacted.password) redacted.password = "[REDACTED]";
+    return JSON.stringify({ type: this.type, data: redacted });
+  }
+
   public toSonarProps(serverVersion: semver.SemVer | string) {
     const isSonarCloud = Boolean(this.data.token);
     const authKey =
@@ -110,8 +131,16 @@ export default class Endpoint {
       "apitoken",
       type !== EndpointType.CodeScanCloud,
     );
-    const username = tl.getEndpointAuthorizationParameter(id, "username", true);
-    const password = tl.getEndpointAuthorizationParameter(id, "password", true);
+
+    // SEC-009: Request only minimum authorization parameters per endpoint type
+    // CodeScanCloud only needs apitoken; SonarQube/SonarCloud may also use username/password
+    let username: string | undefined;
+    let password: string | undefined;
+    if (type !== EndpointType.CodeScanCloud) {
+      username = tl.getEndpointAuthorizationParameter(id, "username", true);
+      password = tl.getEndpointAuthorizationParameter(id, "password", true);
+    }
+
     const organization = tl.getInput("organization", type === EndpointType.CodeScanCloud);
     return new Endpoint(type, { url, token, username, password, organization });
   }

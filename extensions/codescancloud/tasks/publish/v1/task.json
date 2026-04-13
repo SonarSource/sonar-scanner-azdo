@@ -11,16 +11,16 @@
   "author": "codescansf",
   "version": {
     "Major": 1,
-    "Minor": 16,
+    "Minor": 19,
     "Patch": 0
   },
-  "minimumAgentVersion": "2.144.0",
+  "minimumAgentVersion": "3.246.0",
   "inputs": [
     {
       "name": "pollingTimeoutSec",
       "type": "string",
       "label": "Timeout (s)",
-      "defaultValue": "300",
+      "defaultValue": "60",
       "required": true,
       "helpMarkDown":
         "This task will poll CodeScanCloud until the analysis is completed, or until the timeout is reached"
@@ -28,7 +28,13 @@
   ],
   "dataSourceBindings": [],
   "execution": {
-    "Node10": {
+    "Node22_1": {
+      "target": "publish.js"
+    },
+    "Node20_1": {
+      "target": "publish.js"
+    },
+    "Node16": {
       "target": "publish.js"
     }
   }

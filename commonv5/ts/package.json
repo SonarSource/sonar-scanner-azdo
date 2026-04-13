@@ -6,15 +6,15 @@
   "license": "LGPL-3.0",
   "dependencies": {
     "azure-devops-node-api": "12.1.0",
-    "azure-pipelines-task-lib": "4.7.0",
-    "fs-extra": "11.1.1",
+    "azure-pipelines-task-lib": "4.13.0",
+    "axios": "^1.6.0",
+    "fs-extra": "^11.2.0",
     "guid-typescript": "1.0.9",
     "hpagent": "1.2.0",
-    "node-fetch": "2.7.0",
-    "semver": "5.7.2"
+    "semver": "^7.6.0"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=22"
   },
   "overrides": {
     "azure-pipelines-task-lib": {

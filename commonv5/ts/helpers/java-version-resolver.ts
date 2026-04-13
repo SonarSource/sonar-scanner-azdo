@@ -46,9 +46,8 @@ export default class JavaVersionResolver {
     const newJavaPath = tl.getVariable(jdkVersion);
 
     if (newJavaPath) {
-      tl.debug(
-        `${jdkVersion} was found with value ${newJavaPath}, will switch to it for Sonar scanner...`,
-      );
+      // SEC-FIX: Do not log the Java path value — it reveals filesystem layout
+      tl.debug(`${jdkVersion} was found, switching to it for Sonar scanner...`);
       this.javaHomeOriginalPath = tl.getVariable(TaskVariables.JavaHome);
       // Replace the JAVA_HOME variable with the new path
       tl.setVariable(TaskVariables.JavaHome, newJavaPath);

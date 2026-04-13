@@ -19,10 +19,15 @@ function EscapeArg
 function SetTaskContextVariable
 {
     param([string][ValidateNotNullOrEmpty()]$varName, 
-          [string]$varValue)
+          [string]$varValue,
+          [bool]$isSecret=$false)
         
     [Environment]::SetEnvironmentVariable($varName, $varValue)
-    Write-Host "##vso[task.setvariable variable=$varName;]$varValue"
+    if ($isSecret) {
+        Write-Host "##vso[task.setvariable variable=$varName;isSecret=true;]$varValue"
+    } else {
+        Write-Host "##vso[task.setvariable variable=$varName;]$varValue"
+    }
 }
 
 function GetTaskContextVariable()
@@ -36,7 +41,11 @@ function GetTaskContextVariable()
 	    $value = Get-TaskVariable -Context $distributedTaskContext -Name $varName
     }    
 
-    Write-Verbose "Variable read: $varName = $value"
+    if ($varName -like "*Password*" -or $varName -like "*Token*") {
+        Write-Verbose "Variable read: $varName = ********"
+    } else {
+        Write-Verbose "Variable read: $varName = $value"
+    }
 	return $value
 }
 

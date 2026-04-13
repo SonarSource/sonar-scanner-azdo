@@ -43,7 +43,8 @@ export default class Task {
     tries: number,
     delay: number,
   ): Promise<Task> {
-    tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
+    // SEC-FIX: Do not log taskId — it is a sensitive internal identifier
+    tl.debug(`[SQ] Waiting for task to complete.`);
     let query = {};
     if (endpoint.type === EndpointType.SonarQube) {
       query = { id: taskId };
@@ -52,6 +53,10 @@ export default class Task {
     }
 
     let attempts = 0;
+    // SEC-FIX: Exponential backoff — doubles delay each attempt, capped at 30s
+    let currentDelay = delay;
+    const MAX_DELAY = 30000;
+
     while (attempts < tries) {
       // Fetch task status
       let task: ITask;
@@ -62,22 +67,25 @@ export default class Task {
         });
       } catch (error) {
         tl.error(JSON.stringify(error?.message ?? error ?? "Unknown error"));
-        throw new Error(`[SQ] Could not fetch task for ID '${taskId}'`);
+        // SEC-FIX: Do not include taskId in error message
+        throw new Error(`[SQ] Could not fetch task status`);
       }
 
       const status = task.status.toUpperCase();
 
-      tl.debug(`[SQ] Task status:` + status);
+      tl.debug(`[SQ] Task status: ` + status);
       if (status === "CANCELED" || status === "FAILED") {
         const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : "";
         throw new Error(`[SQ] Task failed with status ${task.status}${errorInfo}`);
       }
       if (status === "SUCCESS") {
-        tl.debug(`[SQ] Task complete: ${JSON.stringify(task)}`);
+        // SEC-FIX: Do not log full task JSON — it contains componentKey, analysisId, organization
+        tl.debug(`[SQ] Task complete.`);
         return new Task(task);
       }
-      // Task did not complete yet, we wait and retry
-      await waitFor(delay);
+      // Task did not complete yet — wait with exponential backoff
+      await waitFor(currentDelay);
+      currentDelay = Math.min(currentDelay * 2, MAX_DELAY);
       attempts++;
     }
 

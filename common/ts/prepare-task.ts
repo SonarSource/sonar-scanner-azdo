@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as azdoApiUtils from "./helpers/azdo-api-utils";
 import { DEPRECATION_MESSAGE } from "./helpers/constants";
-import { toCleanJSON } from "./helpers/utils";
+import { toCleanJSON, sanitizeVariable } from "./helpers/utils";
 import Endpoint from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 
@@ -23,7 +23,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     tl.debug(
       "SonarCloud or SonarQube version >= 7.2.0 detected, setting report-task.txt file to its newest location.",
     );
-    tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
+    // SEC-FIX: Do not log branch/PR props — they may contain project keys and branch names
+    tl.debug("[SQ] Branch and PR parameters populated.");
 
 
   tl.getDelimitedInput("extraProperties", "\n")
@@ -40,7 +41,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     ...props,
   });
 
-  tl.setVariable("SONARQUBE_SCANNER_PARAMS", jsonParams);
+  tl.setVariable("SONARQUBE_SCANNER_PARAMS", sanitizeVariable(jsonParams));
 
   await scanner.runPrepare();
 }
@@ -116,7 +117,8 @@ export async function getDefaultBranch(collectionUrl: string) {
       tl.getVariable(REPO_NAME_VAR),
       tl.getVariable("System.TeamProject"),
     );
-    tl.debug(`Default branch of this repository is '${repo.defaultBranch}'`);
+    // SEC-FIX: Do not log the default branch name — it reveals repository structure
+    tl.debug(`Default branch retrieved for this repository.`);
     return repo.defaultBranch;
   } catch (e) {
     tl.warning("Unable to get default branch, defaulting to 'master': " + e);

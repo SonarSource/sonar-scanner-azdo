@@ -2,6 +2,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { PROP_NAMES, isWindows } from "../helpers/utils";
+import { validateProjectKey, validateProjectName, validateOrganization } from "../helpers/input-sanitizer";
 
 export enum ScannerMode {
   MSBuild = "MSBuild",
@@ -146,19 +147,39 @@ export class ScannerCLI extends Scanner {
     if (this.isDebug()) {
       scannerRunner.arg("-X");
     }
-    await scannerRunner.execAsync();
+    // SEC-003: Pass credentials via SONAR_TOKEN env var scoped to child process
+    const execEnv: { [key: string]: string } = { ...process.env };
+    const endpoint = tl.getVariable("SONARQUBE_ENDPOINT");
+    if (endpoint) {
+      const parsedEndpoint = JSON.parse(endpoint);
+      if (parsedEndpoint.data?.token) {
+        execEnv.SONAR_TOKEN = parsedEndpoint.data.token;
+      } else if (parsedEndpoint.data?.username) {
+        execEnv.SONAR_TOKEN = parsedEndpoint.data.username;
+      }
+    }
+    await (scannerRunner as any).execAsync({ env: execEnv });
   }
 
   public static getScanner(rootPath: string) {
     const mode = tl.getInput("configMode");
     if (mode === "file") {
-      return new ScannerCLI(rootPath, { projectSettings: tl.getInput("configFile", true) }, mode);
+      const configFile = tl.getInput("configFile", true);
+      if (configFile && (configFile.includes("..") || configFile.startsWith("/") || configFile.includes(":"))) {
+         throw new Error("[SQ] Invalid configFile path. Only relative paths within the workspace are allowed.");
+      }
+      return new ScannerCLI(rootPath, { projectSettings: configFile }, mode);
     }
+    const cliProjectKey = tl.getInput("cliProjectKey", true);
+    const cliProjectName = tl.getInput("cliProjectName");
+    // SEC-008: Validate inputs before use
+    if (cliProjectKey) validateProjectKey(cliProjectKey);
+    if (cliProjectName) validateProjectName(cliProjectName);
     return new ScannerCLI(
       rootPath,
       {
-        projectKey: tl.getInput("cliProjectKey", true),
-        projectName: tl.getInput("cliProjectName"),
+        projectKey: cliProjectKey,
+        projectName: cliProjectName,
         projectVersion: tl.getInput("cliProjectVersion"),
         projectSources: tl.getInput("cliSources"),
       },
@@ -195,12 +216,14 @@ export class ScannerMSBuild extends Scanner {
 
     if (isWindows()) {
       const scannerExePath = this.findFrameworkScannerPath();
-      tl.debug(`Using classic scanner at ${scannerExePath}`);
+      // SEC-FIX: Do not log scanner path — reveals filesystem layout
+      tl.debug(`Using classic scanner (exe).`);
       tl.setVariable("SONARQUBE_SCANNER_MSBUILD_EXE", scannerExePath);
       scannerRunner = this.getScannerRunner(scannerExePath, true);
     } else {
       const scannerDllPath = this.findDotnetScannerPath();
-      tl.debug(`Using dotnet scanner at ${scannerDllPath}`);
+      // SEC-FIX: Do not log scanner path — reveals filesystem layout
+      tl.debug(`Using dotnet scanner (dll).`);
       tl.setVariable("SONARQUBE_SCANNER_MSBUILD_DLL", scannerDllPath);
       scannerRunner = this.getScannerRunner(scannerDllPath, false);
 
@@ -212,12 +235,28 @@ export class ScannerMSBuild extends Scanner {
     if (this.data.organization) {
       scannerRunner.arg("/o:" + this.data.organization);
     }
+    // SEC-003: Pass credentials via SONAR_TOKEN env var instead of CLI arguments
+    // This prevents passwords from appearing in process list (ps output)
+    const endpoint = tl.getVariable("SONARQUBE_ENDPOINT");
+    const execEnv: { [key: string]: string } = { ...process.env };
+    if (endpoint) {
+        const parsedEndpoint = JSON.parse(endpoint);
+        if (parsedEndpoint.data && parsedEndpoint.data.token) {
+            execEnv.SONAR_TOKEN = parsedEndpoint.data.token;
+        } else if (parsedEndpoint.data && parsedEndpoint.data.password) {
+            execEnv.SONAR_TOKEN = parsedEndpoint.data.username;
+            // For user/password auth, pass password via env var as well
+            scannerRunner.arg("/d:sonar.password.secured=true");
+            execEnv.SONAR_PASSWORD = parsedEndpoint.data.password;
+            execEnv.SONAR_LOGIN = parsedEndpoint.data.username;
+        }
+    }
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
     if (this.isDebug()) {
       scannerRunner.arg("/d:sonar.verbose=true");
     }
-    await scannerRunner.execAsync();
+    await (scannerRunner as any).execAsync({ env: execEnv });
   }
 
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
@@ -259,11 +298,18 @@ export class ScannerMSBuild extends Scanner {
   }
 
   public static getScanner(rootPath: string) {
+    const projectKey = tl.getInput("projectKey", true);
+    const projectName = tl.getInput("projectName");
+    const organization = tl.getInput("organization");
+    // SEC-008: Validate inputs before use
+    if (projectKey) validateProjectKey(projectKey);
+    if (projectName) validateProjectName(projectName);
+    if (organization) validateOrganization(organization);
     return new ScannerMSBuild(rootPath, {
-      projectKey: tl.getInput("projectKey", true),
-      projectName: tl.getInput("projectName"),
+      projectKey,
+      projectName,
       projectVersion: tl.getInput("projectVersion"),
-      organization: tl.getInput("organization"),
+      organization,
     });
   }
 }

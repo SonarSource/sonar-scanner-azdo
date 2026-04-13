@@ -38,16 +38,19 @@ export default class Task {
     tries: number,
     delay = 1000,
   ): Promise<Task> {
-    tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
+    // SEC-FIX: Do not log taskId — it is a sensitive internal identifier
+    tl.debug(`[SQ] Waiting for task to complete.`);
     let query = {};
     if (endpoint.type === EndpointType.SonarQube) {
       query = { id: taskId };
     } else {
       query = { id: taskId, additionalFields: "warnings" };
     }
+    // SEC-FIX: Exponential backoff — doubles delay each recursive call, capped at 30s
+    const nextDelay = Math.min(delay * 2, 30000);
     return get(endpoint, `/api/ce/task`, true, query).then(
       ({ task }: { task: ITask }) => {
-        tl.debug(`[SQ] Task status:` + task.status);
+        tl.debug(`[SQ] Task status: ` + task.status);
         if (tries <= 0) {
           throw new TimeOutReachedError();
         }
@@ -57,13 +60,13 @@ export default class Task {
           case "FAILED":
             throw new Error(`[SQ] Task failed with status ${task.status}${errorInfo}`);
           case "SUCCESS":
-            tl.debug(`[SQ] Task complete: ${JSON.stringify(task)}`);
+            // SEC-FIX: Do not log full task JSON — it contains componentKey, analysisId, organization
+            tl.debug(`[SQ] Task complete.`);
             return new Task(task);
           default:
             return new Promise<Task>((resolve, reject) =>
               setTimeout(() => {
-                Task.waitForTaskCompletion(endpoint, taskId, tries, delay).then(resolve, reject);
-                tries--;
+                Task.waitForTaskCompletion(endpoint, taskId, tries - 1, nextDelay).then(resolve, reject);
               }, delay),
             );
         }
@@ -74,7 +77,8 @@ export default class Task {
         } else if (err) {
           tl.error(JSON.stringify(err));
         }
-        throw new Error(`[SQ] Could not fetch task for ID '${taskId}'`);
+        // SEC-FIX: Do not include taskId in error message
+        throw new Error(`[SQ] Could not fetch task status`);
       },
     );
   }

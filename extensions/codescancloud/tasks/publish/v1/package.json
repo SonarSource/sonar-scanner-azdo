@@ -5,16 +5,17 @@
   "author": "VillageChief",
   "license": "LGPL-3.0",
   "dependencies": {
-    "azure-pipelines-task-lib": "4.7.0"
+    "azure-pipelines-task-lib": "5.2.8"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=22"
   },
   "overrides": {
     "azure-pipelines-task-lib": {
       "nodejs-file-downloader": {
         "follow-redirects": "1.15.6"
       }
-    }
+    },
+    "event-stream": "4.0.1"
   }
 }
