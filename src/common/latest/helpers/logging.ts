@@ -1,6 +1,6 @@
 /*
- * sonar-scanner-npm
- * Copyright (C) 2022-2024 SonarSource Sàrl
+ * Azure DevOps extension for SonarQube
+ * Copyright (C) SonarSource Sàrl
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
