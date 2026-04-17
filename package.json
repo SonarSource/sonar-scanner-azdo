@@ -65,7 +65,7 @@
     "prettier": "3.3.3",
     "rimraf": "6.0.1",
     "semver": "7.6.3",
-    "sonarqube-scanner": "4.3.0",
+    "sonarqube-scanner": "4.3.6",
     "tfx-cli": "0.17.0",
     "through2": "4.0.2",
     "ts-jest": "29.2.5",
