@@ -9,7 +9,7 @@
     "test-ci": "jest --coverage"
   },
   "dependencies": {
-    "axios": "1.14.0",
+    "axios": "1.15.0",
     "azure-devops-node-api": "15.1.1",
     "azure-pipelines-task-lib": "5.2.2",
     "azure-pipelines-tool-lib": "2.0.10",
