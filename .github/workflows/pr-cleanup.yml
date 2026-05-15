@@ -5,7 +5,7 @@ on:
 
 jobs:
   cleanup:
-    runs-on: github-ubuntu-latest-s
+    runs-on: warp-custom-ubuntu-24-04
     name: Cleanup
     permissions:
       actions: write  # Required to delete caches and artifacts
