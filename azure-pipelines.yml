@@ -144,7 +144,7 @@ stages:
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
-              version: "v0.10.x"
+              version: "v0.23.x"
 
           # Publish Extension
           - task: DownloadBuildArtifacts@1
@@ -234,7 +234,7 @@ stages:
             env:
               NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
-              version: "v0.10.x"
+              version: "v0.23.x"
 
           - task: DownloadBuildArtifacts@1
             displayName: "Download artifacts"
