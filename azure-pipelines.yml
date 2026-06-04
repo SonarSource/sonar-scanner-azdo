@@ -176,7 +176,7 @@ stages:
               method: "id"
               publisherId: "$(publisher)"
               extensionId: "sonarcloud-test"
-              accounts: "https://devops.azure.com/$(itOrg)"
+              accounts: "https://extmgmt.dev.azure.com/$(itOrg)"
       - job: run_its
         dependsOn: install_test_extension
         displayName: "Run ITs"
