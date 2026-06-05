@@ -29,7 +29,7 @@ import {
   htmlSeparator,
 } from "../helpers/html";
 import { log, LogLevel } from "../helpers/logging";
-import { formatMeasure } from "../helpers/measures";
+import { formatMeasure, getEffectiveMetricType } from "../helpers/measures";
 import { EndpointType } from "./Endpoint";
 import { AnalysisResult, Measure, ProjectStatus } from "./types";
 
@@ -88,16 +88,16 @@ export default class HtmlAnalysisReport {
         if (!metric) {
           return null;
         }
+        const effectiveType = getEffectiveMetricType(metric.key, metric.type);
         const threshold =
           condition.status === "WARN" ? condition.warningThreshold : condition.errorThreshold;
-        const requiredContent =
-          (metric.type !== "RATING"
-            ? formatMeasure(condition.comparator, "COMPARATOR") + " "
-            : "") + formatMeasure(threshold, metric.type);
+        const comparatorPrefix =
+          effectiveType === "RATING" ? "" : formatMeasure(condition.comparator, "COMPARATOR") + " ";
+        const requiredContent = comparatorPrefix + formatMeasure(threshold, effectiveType);
 
         return htmlMetricListItem(
           "❌",
-          `${formatMeasure(condition.actualValue, metric.type)} ${metric.name}`,
+          `${formatMeasure(condition.actualValue, effectiveType)} ${metric.name}`,
           requiredContent,
         );
       })
