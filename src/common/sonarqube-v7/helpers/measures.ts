@@ -20,6 +20,34 @@
 
 const HOURS_IN_DAY = 8;
 
+const STANDARD_SEVERITY_LABELS: { [value: number]: string } = {
+  5: "INFO",
+  10: "MINOR",
+  15: "MAJOR",
+  20: "CRITICAL",
+  25: "BLOCKER",
+};
+
+const MQR_SEVERITY_LABELS: { [value: number]: string } = {
+  5: "INFO",
+  10: "LOW",
+  15: "MEDIUM",
+  20: "HIGH",
+  25: "BLOCKER",
+};
+
+const STANDARD_SEVERITY_METRIC_KEYS = new Set([
+  "new_bugs_severity",
+  "new_vulnerabilities_severity",
+  "new_code_smells_severity",
+]);
+
+const MQR_SEVERITY_METRIC_KEYS = new Set([
+  "new_software_quality_reliability_severity",
+  "new_software_quality_security_severity",
+  "new_software_quality_maintainability_severity",
+]);
+
 const FORMATTERS: { [type: string]: Formatter } = {
   INT: intFormatter,
   SHORT_INT: shortIntFormatter,
@@ -32,6 +60,8 @@ const FORMATTERS: { [type: string]: Formatter } = {
   LEVEL_ICON: levelIconFormatter,
   MILLISEC: millisecondsFormatter,
   COMPARATOR: comparatorFormatter,
+  SEVERITY: severityFormatter,
+  SEVERITY_MQR: severityMqrFormatter,
 };
 
 type Formatter = (value: any, options?: any) => string;
@@ -140,6 +170,26 @@ function comparatorFormatter(value: string): string {
     NE: "&#8800;",
   };
   return l10nKeys[value.toUpperCase()] ?? value;
+}
+
+function severityFormatter(value: string | number): string {
+  const numVal = typeof value === "string" ? Number.parseInt(value, 10) : value;
+  return STANDARD_SEVERITY_LABELS[numVal] ?? value.toString();
+}
+
+function severityMqrFormatter(value: string | number): string {
+  const numVal = typeof value === "string" ? Number.parseInt(value, 10) : value;
+  return MQR_SEVERITY_LABELS[numVal] ?? value.toString();
+}
+
+export function getEffectiveMetricType(metricKey: string, metricType: string): string {
+  if (STANDARD_SEVERITY_METRIC_KEYS.has(metricKey)) {
+    return "SEVERITY";
+  }
+  if (MQR_SEVERITY_METRIC_KEYS.has(metricKey)) {
+    return "SEVERITY_MQR";
+  }
+  return metricType;
 }
 
 function millisecondsFormatter(value: number): string {

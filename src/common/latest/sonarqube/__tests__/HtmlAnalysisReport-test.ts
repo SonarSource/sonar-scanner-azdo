@@ -122,3 +122,111 @@ it("should display the project name", () => {
 
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
+
+it.each([
+  {
+    metricKey: "new_bugs_severity",
+    actualValue: "15",
+    threshold: "10",
+    expectedActual: "MAJOR",
+    expectedThreshold: "MINOR",
+  },
+  {
+    metricKey: "new_vulnerabilities_severity",
+    actualValue: "20",
+    threshold: "10",
+    expectedActual: "CRITICAL",
+    expectedThreshold: "MINOR",
+  },
+  {
+    metricKey: "new_code_smells_severity",
+    actualValue: "25",
+    threshold: "15",
+    expectedActual: "BLOCKER",
+    expectedThreshold: "MAJOR",
+  },
+])(
+  "should render standard severity labels for $metricKey",
+  ({ metricKey, actualValue, threshold, expectedActual, expectedThreshold }) => {
+    const analysis = new HtmlAnalysisReport(
+      EndpointType.Server,
+      {
+        status: "ERROR",
+        conditions: [
+          {
+            status: "ERROR",
+            metricKey,
+            comparator: "GT",
+            errorThreshold: threshold,
+            actualValue,
+          },
+        ],
+      },
+      [],
+      {
+        ...MOCKED_ANALYSIS_RESULT,
+        metrics: [{ key: metricKey, name: "Severity", type: "INT" }],
+      },
+    );
+
+    const html = analysis.getHtmlAnalysisReport();
+    expect(html).toContain(expectedActual);
+    expect(html).toContain(expectedThreshold);
+    expect(html).not.toContain(`>${actualValue}<`);
+    expect(html).not.toContain(`>${threshold}<`);
+  },
+);
+
+it.each([
+  {
+    metricKey: "new_software_quality_reliability_severity",
+    actualValue: "10",
+    threshold: "5",
+    expectedActual: "LOW",
+    expectedThreshold: "INFO",
+  },
+  {
+    metricKey: "new_software_quality_security_severity",
+    actualValue: "15",
+    threshold: "10",
+    expectedActual: "MEDIUM",
+    expectedThreshold: "LOW",
+  },
+  {
+    metricKey: "new_software_quality_maintainability_severity",
+    actualValue: "20",
+    threshold: "15",
+    expectedActual: "HIGH",
+    expectedThreshold: "MEDIUM",
+  },
+])(
+  "should render MQR severity labels for $metricKey",
+  ({ metricKey, actualValue, threshold, expectedActual, expectedThreshold }) => {
+    const analysis = new HtmlAnalysisReport(
+      EndpointType.Server,
+      {
+        status: "ERROR",
+        conditions: [
+          {
+            status: "ERROR",
+            metricKey,
+            comparator: "GT",
+            errorThreshold: threshold,
+            actualValue,
+          },
+        ],
+      },
+      [],
+      {
+        ...MOCKED_ANALYSIS_RESULT,
+        metrics: [{ key: metricKey, name: "Software Quality Severity", type: "INT" }],
+      },
+    );
+
+    const html = analysis.getHtmlAnalysisReport();
+    expect(html).toContain(expectedActual);
+    expect(html).toContain(expectedThreshold);
+    expect(html).not.toContain(`>${actualValue}<`);
+    expect(html).not.toContain(`>${threshold}<`);
+  },
+);
