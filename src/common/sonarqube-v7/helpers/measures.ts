@@ -173,13 +173,11 @@ function comparatorFormatter(value: string): string {
 }
 
 function severityFormatter(value: string | number): string {
-  const numVal = typeof value === "string" ? Number.parseInt(value, 10) : value;
-  return STANDARD_SEVERITY_LABELS[numVal] ?? value.toString();
+  return STANDARD_SEVERITY_LABELS[Number(value)] ?? value.toString();
 }
 
 function severityMqrFormatter(value: string | number): string {
-  const numVal = typeof value === "string" ? Number.parseInt(value, 10) : value;
-  return MQR_SEVERITY_LABELS[numVal] ?? value.toString();
+  return MQR_SEVERITY_LABELS[Number(value)] ?? value.toString();
 }
 
 export function getEffectiveMetricType(metricKey: string, metricType: string): string {
