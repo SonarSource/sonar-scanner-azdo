@@ -230,3 +230,59 @@ it.each([
     expect(html).not.toContain(`>${threshold}<`);
   },
 );
+
+it("should render full HTML for standard severity condition including comparator and metric name", () => {
+  const analysis = new HtmlAnalysisReport(
+    EndpointType.Server,
+    {
+      status: "ERROR",
+      conditions: [
+        {
+          status: "ERROR",
+          metricKey: "new_bugs_severity",
+          comparator: "GT",
+          errorThreshold: "10",
+          actualValue: "15",
+        },
+      ],
+    },
+    [],
+    {
+      ...MOCKED_ANALYSIS_RESULT,
+      metrics: [{ key: "new_bugs_severity", name: "Severity", type: "INT" }],
+    },
+  );
+
+  expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
+});
+
+it("should render full HTML for MQR severity condition including comparator and metric name", () => {
+  const analysis = new HtmlAnalysisReport(
+    EndpointType.Server,
+    {
+      status: "ERROR",
+      conditions: [
+        {
+          status: "ERROR",
+          metricKey: "new_software_quality_reliability_severity",
+          comparator: "GT",
+          errorThreshold: "5",
+          actualValue: "10",
+        },
+      ],
+    },
+    [],
+    {
+      ...MOCKED_ANALYSIS_RESULT,
+      metrics: [
+        {
+          key: "new_software_quality_reliability_severity",
+          name: "Software Quality Severity",
+          type: "INT",
+        },
+      ],
+    },
+  );
+
+  expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
+});
