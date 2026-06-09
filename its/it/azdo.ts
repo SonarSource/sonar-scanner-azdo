@@ -82,13 +82,32 @@ export async function createPipeline(
   );
 }
 
+const TRANSIENT_ERROR_CODES = new Set(["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "ENETUNREACH"]);
+
+async function withRetry<T>(fn: () => Promise<T>, maxAttempts = 5): Promise<T> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const isTransient = e instanceof Error && TRANSIENT_ERROR_CODES.has((e as NodeJS.ErrnoException).code ?? "");
+      if (!isTransient || attempt === maxAttempts) {
+        throw e;
+      }
+      const delayMs = attempt * 5000;
+      console.warn(`Network error (${(e as NodeJS.ErrnoException).code}), retrying in ${delayMs / 1000}s (attempt ${attempt}/${maxAttempts})`);
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  throw new Error("Unreachable");
+}
+
 export async function runPipeline(
   azdoApi: vm.WebApi,
   pipelineName: string,
   log: (...args: unknown[]) => void = console.log,
 ): Promise<Build> {
   const azdoBuildApi = await azdoApi.getBuildApi();
-  const definitions = await azdoBuildApi.getDefinitions(AZDO_PROJECT, pipelineName);
+  const definitions = await withRetry(() => azdoBuildApi.getDefinitions(AZDO_PROJECT, pipelineName));
   if (definitions.length === 0) {
     throw new Error(`No pipeline found with name ${pipelineName}`);
   }
@@ -96,22 +115,24 @@ export async function runPipeline(
   const branch = getBranch();
   const definition = definitions[0];
   log(`Running pipeline on branch "${branch}"`);
-  const build = await azdoBuildApi.queueBuild(
-    {
-      definition: { id: definition.id },
-      project: definition.project,
-      sourceBranch: branch,
-    },
-    AZDO_PROJECT,
+  const build = await withRetry(() =>
+    azdoBuildApi.queueBuild(
+      {
+        definition: { id: definition.id },
+        project: definition.project,
+        sourceBranch: branch,
+      },
+      AZDO_PROJECT,
+    ),
   );
   const buildId = build.id as number;
   const projectId = build.project?.id as string;
 
   log(`Build ${buildId} queued`);
-  let buildResult = await azdoBuildApi.getBuild(projectId, buildId);
+  let buildResult = await withRetry(() => azdoBuildApi.getBuild(projectId, buildId));
   while (buildResult.status !== BuildStatus.Completed) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    buildResult = await azdoBuildApi.getBuild(projectId, buildId);
+    buildResult = await withRetry(() => azdoBuildApi.getBuild(projectId, buildId));
   }
 
   if (buildResult.result !== BuildResult.Succeeded) {
