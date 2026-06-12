@@ -89,10 +89,19 @@ export default class HtmlAnalysisReport {
           return null;
         }
         const effectiveType = getEffectiveMetricType(metric.key, metric.type);
-        const threshold =
+        const rawThreshold =
           condition.status === "WARN" ? condition.warningThreshold : condition.errorThreshold;
-        const comparatorPrefix =
-          effectiveType === "RATING" ? "" : formatMeasure(condition.comparator, "COMPARATOR") + " ";
+        const isSeverity = effectiveType === "SEVERITY" || effectiveType === "SEVERITY_MQR";
+        const isGt = condition.comparator?.toUpperCase() === "GT";
+        // SonarQube stores severity thresholds as (level - 1) for GT comparator.
+        // Adjust to display "< INFO" instead of "≤ 4".
+        const threshold =
+          isSeverity && isGt && rawThreshold !== undefined
+            ? String(Number(rawThreshold) + 1)
+            : rawThreshold;
+        const comparatorSymbol =
+          isSeverity && isGt ? "&lt;" : formatMeasure(condition.comparator, "COMPARATOR");
+        const comparatorPrefix = effectiveType === "RATING" ? "" : comparatorSymbol + " ";
         const requiredContent = comparatorPrefix + formatMeasure(threshold, effectiveType);
 
         return htmlMetricListItem(
