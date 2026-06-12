@@ -120,7 +120,7 @@ exports[`should render full HTML for MQR severity condition including comparator
       "
     ><span style="width: 24px">❌</span>
 <span style="margin-left: 4px">LOW Software Quality Severity</span>
-<span class="margin-left: 12px">(required &le; INFO)</span></li></ul></div><div style="margin-top: 24px;
+<span class="margin-left: 12px">(required &lt; INFO)</span></li></ul></div><div style="margin-top: 24px;
       padding-left: 28px;"><a
     style="
       color: rgb(9, 105, 218);
@@ -159,7 +159,7 @@ exports[`should render full HTML for standard severity condition including compa
       "
     ><span style="width: 24px">❌</span>
 <span style="margin-left: 4px">MAJOR Severity</span>
-<span class="margin-left: 12px">(required &le; MINOR)</span></li></ul></div><div style="margin-top: 24px;
+<span class="margin-left: 12px">(required &lt; MINOR)</span></li></ul></div><div style="margin-top: 24px;
       padding-left: 28px;"><a
     style="
       color: rgb(9, 105, 218);
