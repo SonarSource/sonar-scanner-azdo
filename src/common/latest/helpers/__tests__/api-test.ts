@@ -122,18 +122,18 @@ describe("fetchProjectStatus", () => {
     expect(projectStatus.conditions).toEqual(MOCKED_CONDITIONS);
   });
 
-  it("should fail if the project status fails to load", () => {
+  it("should fail if the project status fails to load", async () => {
     jest.mocked(get).mockRejectedValueOnce(new Error("API Couldn't be reached"));
 
-    expect(() => fetchProjectStatus(MOCKED_ENDPOINT, "analysisId")).rejects.toThrow(
+    await expect(fetchProjectStatus(MOCKED_ENDPOINT, "analysisId")).rejects.toThrow(
       "Could not fetch analysis for ID 'analysisId'",
     );
   });
 
-  it("should fail if the project status fails to load with non-standard error", () => {
+  it("should fail if the project status fails to load with non-standard error", async () => {
     jest.mocked(get).mockRejectedValueOnce("API Couldn't be reached");
 
-    expect(() => fetchProjectStatus(MOCKED_ENDPOINT, "analysisId")).rejects.toThrow(
+    await expect(fetchProjectStatus(MOCKED_ENDPOINT, "analysisId")).rejects.toThrow(
       "Could not fetch analysis for ID 'analysisId'",
     );
   });
@@ -182,7 +182,7 @@ describe("fetchMetrics", () => {
     expect(metrics[1].key).toBe("code_smells");
   });
 
-  it("should fail if a metric page fails to load", () => {
+  it("should fail if a metric page fails to load", async () => {
     jest.mocked(get).mockResolvedValueOnce({
       metrics: MOCKED_METRICS.slice(0, 1),
       p: 1,
@@ -192,20 +192,20 @@ describe("fetchMetrics", () => {
     jest.mocked(get).mockRejectedValueOnce(new Error("API Couldn't be reached"));
     jest.spyOn(tl, "error");
 
-    expect(() => fetchMetrics(MOCKED_ENDPOINT)).rejects.toThrow("Could not fetch metrics");
+    await expect(fetchMetrics(MOCKED_ENDPOINT)).rejects.toThrow("Could not fetch metrics");
   });
 
-  it("should fail if the first metric page fails to load", () => {
+  it("should fail if the first metric page fails to load", async () => {
     jest.mocked(get).mockRejectedValueOnce(new Error("API Couldn't be reached"));
     jest.spyOn(tl, "error");
 
-    expect(() => fetchMetrics(MOCKED_ENDPOINT)).rejects.toThrow("Could not fetch metrics");
+    await expect(fetchMetrics(MOCKED_ENDPOINT)).rejects.toThrow("Could not fetch metrics");
   });
 
-  it("should fail if the first metric page fails to load with non-standard error", () => {
+  it("should fail if the first metric page fails to load with non-standard error", async () => {
     jest.mocked(get).mockRejectedValueOnce("API Couldn't be reached");
     jest.spyOn(tl, "error");
 
-    expect(() => fetchMetrics(MOCKED_ENDPOINT)).rejects.toThrow("Could not fetch metrics");
+    await expect(fetchMetrics(MOCKED_ENDPOINT)).rejects.toThrow("Could not fetch metrics");
   });
 });
