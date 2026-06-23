@@ -28,7 +28,7 @@
     "cyclonedx": "gulp cyclonedx"
   },
   "devDependencies": {
-    "@cyclonedx/cyclonedx-npm": "^2.1.0",
+    "@cyclonedx/cyclonedx-npm": "^5.0.0",
     "@eslint/compat": "^2.0.1",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
