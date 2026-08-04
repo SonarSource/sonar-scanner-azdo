@@ -166,7 +166,25 @@ stages:
               updateTasksId: false
               extensionVisibility: "private"
               shareWith: "$(itOrg)"
+              # Let tfx exit right after the upload. Waiting for Marketplace validation inside the
+              # publish command makes a transient timeout fail a step that cannot safely be retried.
+              noWaitValidation: true
               cwd: "$(System.ArtifactsDirectory)"
+
+          # Wait for validation in a dedicated, read-only step that is safe to retry
+          - task: IsAzureDevOpsExtensionValid@5
+            displayName: "Wait for Marketplace validation of the test extension"
+            retryCountOnTaskFailure: 3
+            inputs:
+              connectTo: "AzureRM"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
+              method: "id"
+              publisherId: "$(publisher)"
+              extensionId: "sonarcloud-test"
+              extensionVersion: "$(scExtensionVersion)"
+              maxRetries: "10"
+              minTimeout: "0.5"
+
           # Install extension
           - task: InstallAzureDevOpsExtension@5
             displayName: "Install Test extension in IT org"
@@ -257,7 +275,21 @@ stages:
               updateTasksId: false
               extensionVisibility: "private"
               shareWith: "sonarsource"
+              noWaitValidation: true
               cwd: "$(System.ArtifactsDirectory)"
+
+          - task: IsAzureDevOpsExtensionValid@5
+            displayName: "Wait for Marketplace validation of the SonarCloud dogfood extension"
+            retryCountOnTaskFailure: 3
+            inputs:
+              connectTo: "AzureRM"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
+              method: "id"
+              publisherId: "$(publisher)"
+              extensionId: "sonarcloud-dogfood"
+              extensionVersion: "$(scExtensionVersion)"
+              maxRetries: "10"
+              minTimeout: "0.5"
 
           - task: PublishAzureDevOpsExtension@5
             displayName: "Publish SonarQube Server dogfood extension"
@@ -272,4 +304,18 @@ stages:
               updateTasksId: false
               extensionVisibility: "private"
               shareWith: "sonarsource"
+              noWaitValidation: true
               cwd: "$(System.ArtifactsDirectory)"
+
+          - task: IsAzureDevOpsExtensionValid@5
+            displayName: "Wait for Marketplace validation of the SonarQube Server dogfood extension"
+            retryCountOnTaskFailure: 3
+            inputs:
+              connectTo: "AzureRM"
+              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
+              method: "id"
+              publisherId: "$(publisher)"
+              extensionId: "sonarqube-dogfood"
+              extensionVersion: "$(sqExtensionVersion)"
+              maxRetries: "10"
+              minTimeout: "0.5"
