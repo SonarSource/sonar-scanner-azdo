@@ -179,25 +179,46 @@ it.each([
 
 it.each([
   {
-    metricKey: "new_software_quality_reliability_severity",
+    metricKey: "new_reliability_issue_severity",
     actualValue: "10",
     threshold: "4",
     expectedActual: "LOW",
     expectedThreshold: "INFO",
   },
   {
-    metricKey: "new_software_quality_security_severity",
+    metricKey: "new_security_issue_severity",
     actualValue: "15",
     threshold: "9",
     expectedActual: "MEDIUM",
     expectedThreshold: "LOW",
   },
   {
-    metricKey: "new_software_quality_maintainability_severity",
+    metricKey: "new_maintainability_issue_severity",
     actualValue: "20",
     threshold: "14",
     expectedActual: "HIGH",
     expectedThreshold: "MEDIUM",
+  },
+  {
+    metricKey: "reliability_issue_severity",
+    actualValue: "25",
+    threshold: "19",
+    expectedActual: "BLOCKER",
+    expectedThreshold: "HIGH",
+  },
+  {
+    metricKey: "security_issue_severity",
+    actualValue: "5",
+    threshold: "4",
+    expectedActual: "INFO",
+    expectedThreshold: "INFO",
+  },
+  {
+    metricKey: "maintainability_issue_severity",
+    actualValue: "20",
+    threshold: "9",
+    expectedActual: "HIGH",
+    expectedThreshold: "LOW",
   },
 ])(
   "should render MQR severity labels for $metricKey",
@@ -264,7 +285,7 @@ it("should render full HTML for MQR severity condition including comparator and 
       conditions: [
         {
           status: "ERROR",
-          metricKey: "new_software_quality_reliability_severity",
+          metricKey: "new_reliability_issue_severity",
           comparator: "GT",
           errorThreshold: "4",
           actualValue: "10",
@@ -276,7 +297,7 @@ it("should render full HTML for MQR severity condition including comparator and 
       ...MOCKED_ANALYSIS_RESULT,
       metrics: [
         {
-          key: "new_software_quality_reliability_severity",
+          key: "new_reliability_issue_severity",
           name: "Software Quality Severity",
           type: "INT",
         },
