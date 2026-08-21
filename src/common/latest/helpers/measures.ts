@@ -43,9 +43,12 @@ const STANDARD_SEVERITY_METRIC_KEYS = new Set([
 ]);
 
 const MQR_SEVERITY_METRIC_KEYS = new Set([
-  "new_software_quality_reliability_severity",
-  "new_software_quality_security_severity",
-  "new_software_quality_maintainability_severity",
+  "new_reliability_issue_severity",
+  "new_security_issue_severity",
+  "new_maintainability_issue_severity",
+  "reliability_issue_severity",
+  "security_issue_severity",
+  "maintainability_issue_severity",
 ]);
 
 const FORMATTERS: { [type: string]: Formatter } = {
