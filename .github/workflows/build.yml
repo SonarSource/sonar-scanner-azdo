@@ -8,6 +8,8 @@ on:
   pull_request:
   merge_group:
   workflow_dispatch:
+  schedule:
+    - cron: '55 1 * * 1-5' # Run the build and SonarQube analysis Monday-Friday (UTC).
 
 env:
   ENV_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
