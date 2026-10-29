@@ -34,6 +34,9 @@
     },
     "Node20_1": {
       "target": "SonarCloudAnalyze.js"
+    },
+    "Node24": {
+      "target": "SonarCloudAnalyze.js"
     }
   }
 }

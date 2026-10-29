@@ -162,6 +162,9 @@
     },
     "Node20_1": {
       "target": "SonarQubePrepare.js"
+    },
+    "Node24": {
+      "target": "SonarQubePrepare.js"
     }
   }
 }

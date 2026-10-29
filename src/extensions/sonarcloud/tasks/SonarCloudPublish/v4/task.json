@@ -30,6 +30,9 @@
     },
     "Node20_1": {
       "target": "SonarCloudPublish.js"
+    },
+    "Node24": {
+      "target": "SonarCloudPublish.js"
     }
   }
 }

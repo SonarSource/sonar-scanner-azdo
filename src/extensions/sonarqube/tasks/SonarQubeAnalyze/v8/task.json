@@ -35,6 +35,9 @@
     },
     "Node20_1": {
       "target": "SonarQubeAnalyze.js"
+    },
+    "Node24": {
+      "target": "SonarQubeAnalyze.js"
     }
   }
 }
