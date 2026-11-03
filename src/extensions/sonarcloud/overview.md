@@ -1,4 +1,4 @@
-**[SonarQube Cloud][sc]** is a SaaS code analysis tool, designed to detect coding issues in 30+ languages, frameworks, and IaC platforms. The solution also provides fix recommendations leveraging AI with Sonar’s AI CodeFix capability. By integrating directly with your CI pipeline or one of the supported DevOps platforms, your code is checked against an extensive set of rules that cover many attributes of code, such as maintainability, reliability, and security issues, on each merge/pull request.
+**[SonarQube Cloud][sc]** is a fully managed, SaaS code analysis solution that scales instantly with your needs to deliver real-time code quality and security verification directly within your cloud-native workflow. It verifies AI-generated and developer-written code across 45+ languages, frameworks, and IaC platforms, and provides fix recommendations leveraging AI with Sonar’s AI CodeFix capability. By integrating directly with your CI pipeline or one of the supported DevOps platforms, your code is checked against an extensive set of rules covering maintainability, reliability, and security on each merge/pull request.
 
 _(Formerly SonarCloud)_
 
@@ -33,7 +33,7 @@ This extension provides the following features:
 
 Note that the above features are **available for all Git repository providers in Azure DevOps**: Azure Repos Git, Bitbucket Cloud or GitHub.
 
-Want to see more examples of SonarQube Cloud in action? You can [explore current Open Source projects in SonarQube Cloud][opensource] that are using the Clean as You Code methodology.
+Want to see more examples of SonarQube Cloud in action? You can [explore current open source projects in SonarQube Cloud][opensource].
 
 ## Highlighted Features
 
