@@ -118,16 +118,19 @@ function fileHashsum(filePath) {
 }
 exports.fileHashsum = fileHashsum;
 
-exports.getBuildInfo = function (type, vssData) {
+exports.getBuildInfo = function (type, vssData, distDir = DIST_DIR) {
   const productAccronym = type === "sonarqube" ? "sq" : "sc";
   const name = `sonar-scanner-azdo-${productAccronym}`;
 
   const packageVersion = getVersionBuildNumber(vssData.version);
-  const vsixPaths = glob(globPath(DIST_DIR, `*-${type}.vsix`));
+  const vsixPaths = glob(globPath(distDir, `*-${type}.vsix`));
   const additionalPaths = glob(
-    globPath(DIST_DIR, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`),
+    globPath(distDir, `*{cyclonedx-${type}-*.json,cyclonedx-latest.json,-${type}*.asc}`),
   );
   const qualifierMatch = new RegExp(`${packageVersion}-(.+).vsix$`);
+  const revision = process.env.GITHUB_SHA;
+  const vcsUrl = `https://github.com/${process.env.GITHUB_REPOSITORY}.git`;
+  const branch = process.env.ENV_PR ? process.env.GITHUB_HEAD_REF : process.env.GITHUB_REF_NAME;
 
   return {
     version: "1.0.1",
@@ -135,8 +138,15 @@ exports.getBuildInfo = function (type, vssData) {
     number: process.env.BUILD_NUMBER,
     started: dateformat(new Date(), "yyyy-mm-dd'T'HH:MM:ss.lo"),
     url: process.env.CI_BUILD_URL,
-    vcsRevision: process.env.GITHUB_SHA,
-    vcsUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}.git`,
+    vcsRevision: revision,
+    vcsUrl,
+    vcs: [
+      {
+        revision,
+        url: vcsUrl,
+        ...(branch ? { branch } : {}),
+      },
+    ],
     modules: [
       {
         id: `org.sonarsource.scanner.azdo:${name}:${packageVersion}`,
@@ -163,7 +173,8 @@ exports.getBuildInfo = function (type, vssData) {
       "java.specification.version": "1.8", // Workaround for https://jira.sonarsource.com/browse/RA-115
       [`buildInfo.env.${productAccronym.toUpperCase()}_PROJECT_VERSION`]: packageVersion,
       "buildInfo.env.ARTIFACTORY_DEPLOY_REPO": process.env.ARTIFACTORY_DEPLOY_REPO,
-      "buildInfo.env.TRAVIS_COMMIT": process.env.GITHUB_SHA,
+      "buildInfo.env.GITHUB_SHA": revision,
+      ...(branch ? { "buildInfo.env.GITHUB_REF_NAME": branch } : {}),
     },
   };
 };

@@ -20,10 +20,11 @@
     "lint-report": "eslint --ext js,ts -f json -o eslint-report.json \"src/**/*.{js,ts}\"",
     "test": "./scripts/find-common-dirs.sh | xargs -0L1 npm test --prefix",
     "test-ci": "./scripts/find-common-dirs.sh  | xargs -0L1 npm run test-ci --prefix",
+    "test-build-info": "node --test config/getBuildInfo.test.js",
     "find-dep": "f() { ./scripts/find-common-dirs.sh | xargs -I % -0 npm ls \"$1\" --prefix %; }; f",
     "ts-check": "gulp build:typescript",
-    "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test",
-    "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci",
+    "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test && npm run test-build-info",
+    "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci && npm run test-build-info",
     "cyclonedx-run": "cyclonedx-npm",
     "cyclonedx": "gulp cyclonedx"
   },
