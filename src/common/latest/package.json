@@ -21,7 +21,7 @@
   "overrides": {
     "azure-pipelines-task-lib": {
       "nodejs-file-downloader": {
-        "follow-redirects": "1.15.6"
+        "follow-redirects": "1.16.2"
       }
     }
   },
