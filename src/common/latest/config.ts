@@ -20,7 +20,7 @@
 
 // When the user does not specify a specific version, these will be the default versions used.
 const dotnetScannerVersion = "11.3.0.1175";
-const cliScannerVersion = "8.3.1.16491";
+const cliScannerVersion = "8.4.0.16527";
 
 // MSBUILD scanner location
 const dotnetScannersBaseUrl = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/`;
