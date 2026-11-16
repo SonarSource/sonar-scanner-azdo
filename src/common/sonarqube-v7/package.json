@@ -38,6 +38,6 @@
     "@types/tmp": "0.2.6",
     "axios-mock-adapter": "2.1.0",
     "esbuild-plugin-shelljs": "1.1.2",
-    "tmp": "0.2.3"
+    "tmp": "0.2.6"
   }
 }
