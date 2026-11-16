@@ -116,3 +116,47 @@ it("On SonarQube Cloud, token field is used instead of login", () => {
 
   expect(result.toSonarProps("8.2.4")).not.toContain(PROP_NAMES.LOGIN);
 });
+
+// SONARAZDO-630
+describe("SonarQube Cloud server URL properties", () => {
+  function cloudEndpointProps(url: string) {
+    return new Endpoint(EndpointType.Cloud, {
+      url,
+      token: "token",
+      organization: "org",
+    }).toSonarProps("8.0.0");
+  }
+
+  it.each(["https://sonarqube.au", "https://sonarqube.au/"])(
+    "sends %s as a custom SonarQube Cloud instance without sonar.host.url",
+    (url) => {
+      const props = cloudEndpointProps(url);
+
+      expect(props[PROP_NAMES.SONARCLOUD_URL]).toBe("https://sonarqube.au");
+      expect(props[PROP_NAMES.API_BASE_URL]).toBe("https://api.sonarqube.au");
+      expect(props).not.toHaveProperty(PROP_NAMES.HOST_URL);
+    },
+  );
+
+  it.each(["https://sonarcloud.io", "https://sonarqube.us"])(
+    "sends %s as sonar.host.url only",
+    (url) => {
+      const props = cloudEndpointProps(url);
+
+      expect(props[PROP_NAMES.HOST_URL]).toBe(url);
+      expect(props).not.toHaveProperty(PROP_NAMES.SONARCLOUD_URL);
+      expect(props).not.toHaveProperty(PROP_NAMES.API_BASE_URL);
+    },
+  );
+
+  it("sends a SonarQube Server URL as sonar.host.url even if it matches a custom cloud URL", () => {
+    const props = new Endpoint(EndpointType.Server, {
+      url: "https://sonarqube.au",
+      token: "token",
+    }).toSonarProps("10.0.0");
+
+    expect(props[PROP_NAMES.HOST_URL]).toBe("https://sonarqube.au");
+    expect(props).not.toHaveProperty(PROP_NAMES.SONARCLOUD_URL);
+    expect(props).not.toHaveProperty(PROP_NAMES.API_BASE_URL);
+  });
+});

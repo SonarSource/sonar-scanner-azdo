@@ -156,6 +156,9 @@
             }, {
               "key": "us",
               "value": "https://sonarqube.us"
+            }, {
+              "key": "au",
+              "value": "https://sonarqube.au"
             }]
           }
         },
@@ -163,7 +166,7 @@
           {
             "id": "region",
             "name": "Region",
-            "description": "The SonarQube Cloud region (currently only the default global, and US regions are supported",
+            "description": "The SonarQube Cloud region (global, US or AU)",
             "inputMode": "combo",
             "validation": {
               "isRequired": false
@@ -178,6 +181,9 @@
                 }, {
                   "value": "us",
                   "displayValue": "US (https://sonarqube.us)"
+                }, {
+                  "value": "au",
+                  "displayValue": "AU (https://sonarqube.au)"
                 }
               ]
             }

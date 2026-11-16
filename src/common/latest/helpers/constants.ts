@@ -31,6 +31,17 @@ export const PROP_NAMES = {
   PROJECTVERSION: "sonar.projectVersion",
   PROJECTSOURCES: "sonar.sources",
   PROJECTSETTINGS: "project.settings",
+  SONARCLOUD_URL: "sonar.scanner.sonarcloudUrl",
+  API_BASE_URL: "sonar.scanner.apiBaseUrl",
+};
+
+/**
+ * SonarQube Cloud regions unknown to the embedded Scanner for .NET and to older Java-based scanners.
+ * Sending their URL as `sonar.host.url` makes those scanners treat them as SonarQube Server, so the
+ * URL is sent as a custom SonarQube Cloud instance together with its API base URL instead.
+ */
+export const API_BASE_URL_BY_CUSTOM_CLOUD_URL: Record<string, string> = {
+  "https://sonarqube.au": "https://api.sonarqube.au",
 };
 
 export const SCANNER_CLI_NAME = "sonar-scanner";
