@@ -18,7 +18,24 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import { PipelineCombination } from "./types";
+import { ItScope, PipelineCombination } from "./types";
+
+const SMOKE_COMBINATION_NAME = "sonarcloud-v4-cli-embedded-unix";
+
+export function selectCombinations(scope: ItScope): PipelineCombination[] {
+  const allCombinations = generateCombinations();
+  if (scope === "full") {
+    return allCombinations;
+  }
+
+  const smokeCombinations = allCombinations.filter(
+    (combination) => serializeCombination(combination) === SMOKE_COMBINATION_NAME,
+  );
+  if (smokeCombinations.length === 0) {
+    throw new Error(`Smoke combination ${SMOKE_COMBINATION_NAME} is not part of the generated combinations`);
+  }
+  return smokeCombinations;
+}
 
 export function generateCombinations(): PipelineCombination[] {
   let osCombinations: PipelineCombination["os"][];
@@ -27,7 +44,7 @@ export function generateCombinations(): PipelineCombination[] {
       case "windows": osCombinations = ["windows"]; break;
       case undefined: osCombinations = ["unix", "windows"]; break;
       default: throw new Error(`Invalid OS combination: ${process.env.RUN_ON_OS}`);
-  };
+  }
   let versionCombinations: PipelineCombination["version"][];
   switch(process.env.TASK_VERSION) {
       case "3": versionCombinations = [{ extension: "sonarcloud", version: 3 }]; break;
@@ -37,7 +54,7 @@ export function generateCombinations(): PipelineCombination[] {
         { extension: "sonarcloud", version: 4 },
       ]; break;
       default: throw new Error(`Invalid task version combination: ${process.env.TASK_VERSION}`);
-  };
+  }
   const scannerCombinations: PipelineCombination["scanner"][] = [
     { type: "cli" },
     { type: "cli", version: "6.2.1.4610" },

@@ -18,6 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+import { ItScope } from "../types";
+
 export function loadEnvironmentVariables() {
   const { SONARCLOUD_TOKEN, AZURE_TOKEN } = process.env;
 
@@ -36,4 +38,12 @@ export function loadEnvironmentVariables() {
 
 export function getBranch() {
   return process.env.AZURE_BRANCH;
+}
+
+export function getItScope(): ItScope {
+  const scope = process.env.IT_SCOPE ?? "full";
+  if (scope !== "smoke" && scope !== "full") {
+    throw new Error(`Invalid IT_SCOPE: ${scope}. Expected "smoke" or "full"`);
+  }
+  return scope;
 }

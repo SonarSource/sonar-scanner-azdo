@@ -15,6 +15,12 @@ schedules:
 trigger:
   - master
 
+pr:
+  branches:
+    include:
+      - "*"
+  drafts: false
+
 pool:
   vmImage: ubuntu-latest
 
@@ -29,13 +35,41 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: azureBranch
     value: $[coalesce(variables['System.PullRequest.SourceBranch'], 'master')]
+  # Pull requests run a single smoke IT; master, nightly and manual runs run the full matrix
+  - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+      - name: itScope
+        value: smoke
+  - ${{ else }}:
+      - name: itScope
+        value: full
 
+# Works with the "Exclusive Lock" check of the sonar-scanner-azdo-its environment: QA runs share
+# the test extension and the SonarCloud projects, so they wait for each other in queue order
 lockBehavior: sequential
 
 stages:
   - stage: build
     displayName: "Build:"
     jobs:
+      - job: detect_its_changes
+        displayName: "Detect changes relevant to ITs"
+        steps:
+          - checkout: self
+            # PR builds check out the merge commit, whose first parent is the target branch
+            fetchDepth: 2
+          - bash: |
+              set -euo pipefail
+              if [ "$BUILD_REASON" = "PullRequest" ]; then
+                run_its=$(git diff --name-only HEAD^1 HEAD | bash scripts/requires-its.sh)
+              else
+                run_its=true
+              fi
+              echo "RUN_ITS=$run_its"
+              echo "##vso[task.setvariable variable=RUN_ITS;isoutput=true]$run_its"
+            name: decision
+            displayName: "Decide whether ITs must run"
+            env:
+              BUILD_REASON: $(Build.Reason)
       - job: npminstall
         displayName: "NPM Install, CI and Build"
         variables:
@@ -121,80 +155,87 @@ stages:
               PathtoPublish: "$(Agent.BuildDirectory)/extensions"
               ArtifactName: "extensions"
   - stage: run_qa
-    condition: succeeded()
+    condition: and(succeeded(), eq(dependencies.build.outputs['detect_its_changes.decision.RUN_ITS'], 'true'))
     dependsOn: build
     displayName: "Re-publish test extension & Run QA"
     jobs:
-      - job: install_test_extension
+      # A deployment job so that the stage acquires the environment's exclusive lock
+      - deployment: install_test_extension
         displayName: "Install the extension under test"
+        environment: sonar-scanner-azdo-its
         variables:
           publisher: $(SonarSourceITPublisher)
           sqExtensionVersion: $[stageDependencies.build.npminstall.outputs['versions.SQ_VERSION']]
           scExtensionVersion: $[stageDependencies.build.npminstall.outputs['versions.SC_VERSION']]
           itOrg: $(SonarSourceITOrganization)
-        steps:
-          - bash: |
-              echo "##vso[task.setvariable variable=SQ_VERSION;isoutput=true]$(sqExtensionVersion)"
-              echo "##vso[task.setvariable variable=SC_VERSION;isoutput=true]$(scExtensionVersion)"
-            name: versions
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                # Artifacts are downloaded explicitly by DownloadBuildArtifacts@1 below
+                - download: none
+                - bash: |
+                    echo "##vso[task.setvariable variable=SQ_VERSION;isoutput=true]$(sqExtensionVersion)"
+                    echo "##vso[task.setvariable variable=SC_VERSION;isoutput=true]$(scExtensionVersion)"
+                  name: versions
 
-          # Install TFX
-          - task: TfxInstaller@4
-            displayName: "Install TFX CLI"
-            env:
-              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
-            inputs:
-              version: "v0.23.x"
+                # Install TFX
+                - task: TfxInstaller@4
+                  displayName: "Install TFX CLI"
+                  env:
+                    NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
+                  inputs:
+                    version: "v0.23.x"
 
-          # Publish Extension
-          - task: DownloadBuildArtifacts@1
-            displayName: "Download artifacts"
-            inputs:
-              buildType: "current"
-              downloadType: "single"
-              artifactName: "extensions"
-              downloadPath: "$(System.ArtifactsDirectory)"
-          - task: PublishAzureDevOpsExtension@5
-            displayName: "Publish SonarCloud test extension"
-            inputs:
-              connectTo: "AzureRM"
-              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
-              fileType: "vsix"
-              vsixFile: "$(System.ArtifactsDirectory)/extensions/test/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
-              extensionName: "[Test] SonarCloud ITs"
-              updateTasksVersion: false
-              updateTasksId: false
-              extensionVisibility: "private"
-              shareWith: "$(itOrg)"
-              # Let tfx exit right after the upload. Waiting for Marketplace validation inside the
-              # publish command makes a transient timeout fail a step that cannot safely be retried.
-              noWaitValidation: true
-              cwd: "$(System.ArtifactsDirectory)"
+                # Publish Extension
+                - task: DownloadBuildArtifacts@1
+                  displayName: "Download artifacts"
+                  inputs:
+                    buildType: "current"
+                    downloadType: "single"
+                    artifactName: "extensions"
+                    downloadPath: "$(System.ArtifactsDirectory)"
+                - task: PublishAzureDevOpsExtension@5
+                  displayName: "Publish SonarCloud test extension"
+                  inputs:
+                    connectTo: "AzureRM"
+                    connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
+                    fileType: "vsix"
+                    vsixFile: "$(System.ArtifactsDirectory)/extensions/test/sonar-scanner-azdo-$(scExtensionVersion)-sonarcloud.vsix"
+                    extensionName: "[Test] SonarCloud ITs"
+                    updateTasksVersion: false
+                    updateTasksId: false
+                    extensionVisibility: "private"
+                    shareWith: "$(itOrg)"
+                    # Let tfx exit right after the upload. Waiting for Marketplace validation inside the
+                    # publish command makes a transient timeout fail a step that cannot safely be retried.
+                    noWaitValidation: true
+                    cwd: "$(System.ArtifactsDirectory)"
 
-          # Wait for validation in a dedicated, read-only step that is safe to retry
-          - task: IsAzureDevOpsExtensionValid@5
-            displayName: "Wait for Marketplace validation of the test extension"
-            retryCountOnTaskFailure: 3
-            inputs:
-              connectTo: "AzureRM"
-              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
-              method: "id"
-              publisherId: "$(publisher)"
-              extensionId: "sonarcloud-test"
-              extensionVersion: "$(scExtensionVersion)"
-              maxRetries: "10"
-              minTimeout: "0.5"
+                # Wait for validation in a dedicated, read-only step that is safe to retry
+                - task: IsAzureDevOpsExtensionValid@5
+                  displayName: "Wait for Marketplace validation of the test extension"
+                  retryCountOnTaskFailure: 3
+                  inputs:
+                    connectTo: "AzureRM"
+                    connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
+                    method: "id"
+                    publisherId: "$(publisher)"
+                    extensionId: "sonarcloud-test"
+                    extensionVersion: "$(scExtensionVersion)"
+                    maxRetries: "10"
+                    minTimeout: "0.5"
 
-          # Install extension
-          - task: InstallAzureDevOpsExtension@5
-            displayName: "Install Test extension in IT org"
-            inputs:
-              connectTo: "AzureRM"
-              connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
-              method: "id"
-              publisherId: "$(publisher)"
-              extensionId: "sonarcloud-test"
-              accounts: "https://extmgmt.dev.azure.com/$(itOrg)"
+                # Install extension
+                - task: InstallAzureDevOpsExtension@5
+                  displayName: "Install Test extension in IT org"
+                  inputs:
+                    connectTo: "AzureRM"
+                    connectedServiceNameAzureRM: "$(MarketplaceARMServiceConnection)"
+                    method: "id"
+                    publisherId: "$(publisher)"
+                    extensionId: "sonarcloud-test"
+                    accounts: "https://extmgmt.dev.azure.com/$(itOrg)"
       - job: run_its
         dependsOn: install_test_extension
         displayName: "Run ITs"
@@ -232,10 +273,22 @@ stages:
               SONARCLOUD_TOKEN: $(SonarCloudToken)
               AZURE_TOKEN: $(INTEGRATION_TESTING_TOKEN)
               AZURE_BRANCH: $(azureBranch)
+              IT_SCOPE: $(itScope)
             inputs:
               targetType: "inline"
               script: |
                 npm run test-its
+          # IT builds queued by a failed or cancelled run would otherwise keep running
+          - task: Bash@3
+            displayName: "Cancel IT builds left running"
+            condition: or(canceled(), failed())
+            env:
+              SONARCLOUD_TOKEN: $(SonarCloudToken)
+              AZURE_TOKEN: $(INTEGRATION_TESTING_TOKEN)
+            inputs:
+              targetType: "inline"
+              script: |
+                npm run cancel-its
 
   - stage: publish_dogfood
     displayName: "Publish dogfood extension"
@@ -244,8 +297,9 @@ stages:
       - job: "publish_dogfood"
         variables:
           publisher: $(SonarSourceITPublisher)
-          scExtensionVersion: $[stageDependencies.run_qa.install_test_extension.outputs['versions.SC_VERSION']]
-          sqExtensionVersion: $[stageDependencies.run_qa.install_test_extension.outputs['versions.SQ_VERSION']]
+          # Outputs of a runOnce deployment job are prefixed with the job name
+          scExtensionVersion: $[stageDependencies.run_qa.install_test_extension.outputs['install_test_extension.versions.SC_VERSION']]
+          sqExtensionVersion: $[stageDependencies.run_qa.install_test_extension.outputs['install_test_extension.versions.SQ_VERSION']]
         steps:
           - task: TfxInstaller@4
             displayName: "Install TFX CLI"

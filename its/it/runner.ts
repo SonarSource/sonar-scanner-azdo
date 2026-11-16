@@ -19,7 +19,7 @@
  */
 
 import * as vm from "azure-devops-node-api";
-import { generateCombinations, serializeCombination } from "../combination";
+import { selectCombinations, serializeCombination } from "../combination";
 import {
   AZDO_PIPELINE_NAME_PREFIX,
   DUMMY_PROJECT_CLI_KEY,
@@ -30,6 +30,7 @@ import {
 } from "../constant";
 import { PipelineCombination } from "../types";
 import { getAzdoApi, runPipeline } from "./azdo";
+import { getItScope } from "./env";
 import { deleteProject, getLastAnalysisDate, provisionProject } from "./sonar";
 import { generateUniqueProjectKey } from "../pipeline";
 
@@ -162,7 +163,9 @@ async function provision(testCase: TestCase, log: (...args: any[]) => void) {
 export async function main() {
   const azdoApi = getAzdoApi();
 
-  const testCases = generateCombinations().map(getTestCase);
+  const itScope = getItScope();
+  console.log(`IT scope: ${itScope}`);
+  const testCases = selectCombinations(itScope).map(getTestCase);
 
   const executionPlan = getExecutionPlan(testCases);
   console.log(

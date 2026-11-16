@@ -20,6 +20,9 @@
 
 export type YamlContent = { [key: string]: unknown };
 
+// "smoke" runs a single representative IT (pull requests), "full" runs every combination
+export type ItScope = "smoke" | "full";
+
 export type TaskDefinition = Partial<{
   task: string;
   script: string;

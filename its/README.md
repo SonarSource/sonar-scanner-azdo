@@ -2,10 +2,33 @@
 
 ## How are integration tests run
 
-On each pull request and main branch, the QA pipeline should:
+The QA stage of the [Azure pipeline](../azure-pipelines.yml):
 
-- Build a test extension and install it
-- Run each [test case](./it/cases.ts) and verify the result on SonarQube Cloud
+- Builds a test extension and installs it
+- Runs each [test case](./it/cases.ts) and verifies the result on SonarQube Cloud
+
+Which test cases run depends on the build:
+
+| Build                                  | ITs run                                                      |
+| -------------------------------------- | ------------------------------------------------------------ |
+| master push, nightly build, manual run | All combinations (`IT_SCOPE=full`)                           |
+| Pull request                           | Only `sonarcloud-v4-cli-embedded-unix` (`IT_SCOPE=smoke`)    |
+| Pull request changing only docs, `.github/`, `*.md`, ... | None (see [requires-its.sh](../scripts/requires-its.sh)) |
+| Draft pull request                     | Not built at all, the build starts when it is marked ready |
+
+To run the smoke test locally: `IT_SCOPE=smoke npm run test-its`.
+
+When the ITs job fails or is cancelled, the IT builds it queued are cancelled (`npm run cancel-its`).
+
+### QA runs are serialized
+
+All QA runs share the test extension and the SonarQube Cloud projects, so only one can run at a time.
+The `run_qa` stage targets the `sonar-scanner-azdo-its` environment, which holds an "Exclusive Lock" check:
+other runs wait in queue order (`lockBehavior: sequential`).
+
+One-time setup (requires admin rights on the Azure DevOps project): in `sonarsource/SonarScannerAzdo`, go to
+Pipelines > Environments > `sonar-scanner-azdo-its` (created on first use if missing) > Approvals and checks,
+and add an "Exclusive Lock" check.
 
 ## How to register a new pipeline to every PR analysis
 

@@ -23,8 +23,10 @@ import { IBuildApi } from "azure-devops-node-api/BuildApi";
 import {
   Build,
   BuildDefinition,
+  BuildDefinitionReference,
   BuildResult,
   BuildStatus,
+  DefinitionQueryOrder,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import path from "path";
 import {
@@ -36,6 +38,8 @@ import {
   FIXTURES_PATH,
 } from "../constant";
 import { getBranch, loadEnvironmentVariables } from "./env";
+
+const DEFINITIONS_PAGINATION_LIMIT = 500;
 
 export function getAzdoApi(): vm.WebApi {
   const env = loadEnvironmentVariables();
@@ -140,4 +144,63 @@ export async function runPipeline(
   }
 
   return buildResult;
+}
+
+export async function getItPipelineDefinitions(
+  buildApi: IBuildApi,
+): Promise<BuildDefinitionReference[]> {
+  const definitions = await withRetry(() =>
+    buildApi.getDefinitions(
+      AZDO_PROJECT,
+      undefined,
+      undefined,
+      undefined,
+      DefinitionQueryOrder.LastModifiedAscending,
+      DEFINITIONS_PAGINATION_LIMIT,
+    ),
+  );
+  return definitions.filter((definition) => definition.name?.startsWith(AZDO_PIPELINE_NAME_PREFIX));
+}
+
+/**
+ * Cancels every IT build that is queued or running. Only one QA run can be active at a time
+ * (exclusive lock on the run_qa stage), so all active IT builds belong to the current run.
+ */
+export async function cancelActiveItBuilds(
+  azdoApi: vm.WebApi,
+  log: (...args: unknown[]) => void = console.log,
+): Promise<void> {
+  const buildApi = await azdoApi.getBuildApi();
+  const definitionIds = (await getItPipelineDefinitions(buildApi)).map(
+    (definition) => definition.id as number,
+  );
+  if (definitionIds.length === 0) {
+    log("No IT pipeline found");
+    return;
+  }
+
+  const activeBuilds = await withRetry(() =>
+    buildApi.getBuilds(
+      AZDO_PROJECT,
+      definitionIds,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      BuildStatus.InProgress | BuildStatus.NotStarted,
+    ),
+  );
+  log(`Found ${activeBuilds.length} active IT build(s)`);
+
+  await Promise.all(
+    activeBuilds.map((build) => {
+      const buildId = build.id as number;
+      log(`Cancelling build ${buildId} of ${build.definition?.name}`);
+      return withRetry(() =>
+        buildApi.updateBuild({ status: BuildStatus.Cancelling }, AZDO_PROJECT, buildId),
+      );
+    }),
+  );
 }
