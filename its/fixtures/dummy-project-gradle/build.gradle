@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.sonarqube" version "7.3.1.8318"
+    id "org.sonarqube" version "7.5.0.8588"
 }
 
 group = 'com.example'
@@ -11,8 +11,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.14.4'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.14.4'
 }
 
 test {
