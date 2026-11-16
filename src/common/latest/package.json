@@ -19,11 +19,7 @@
     "semver": "7.7.3"
   },
   "overrides": {
-    "azure-pipelines-task-lib": {
-      "nodejs-file-downloader": {
-        "follow-redirects": "1.16.2"
-      }
-    }
+    "follow-redirects": "1.16.2"
   },
   "engines": {
     "node": ">=6"
