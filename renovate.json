@@ -11,6 +11,13 @@
         "src/common/sonarqube-v7/**"
       ],
       "enabled": false
+    },
+    {
+      "description": "Do not update dependencies used by integration test fixtures",
+      "matchFileNames": [
+        "its/**"
+      ],
+      "enabled": false
     }
   ],
   "vulnerabilityAlerts": {
