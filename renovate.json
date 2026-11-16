@@ -2,5 +2,18 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>SonarSource/renovate-config"
-  ]
+  ],
+  "packageRules": [
+    {
+      "description": "Keep deprecated task versions on their existing dependencies except for security updates",
+      "matchFileNames": [
+        "src/common/sonarcloud-v3/**",
+        "src/common/sonarqube-v7/**"
+      ],
+      "enabled": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true
+  }
 }
