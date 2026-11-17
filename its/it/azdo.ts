@@ -35,7 +35,7 @@ import {
   AZDO_PROJECT,
   FIXTURES_PATH,
 } from "../constant";
-import { getBranch, loadEnvironmentVariables } from "./env";
+import { getBranch, getCommit, loadEnvironmentVariables } from "./env";
 
 export function getAzdoApi(): vm.WebApi {
   const env = loadEnvironmentVariables();
@@ -113,14 +113,18 @@ export async function runPipeline(
   }
 
   const branch = getBranch();
+  const commit = getCommit();
   const definition = definitions[0];
-  log(`Running pipeline on branch "${branch}"`);
+  log(`Running pipeline on branch "${branch}" at commit "${commit ?? "latest"}"`);
   const build = await withRetry(() =>
     azdoBuildApi.queueBuild(
       {
         definition: { id: definition.id },
         project: definition.project,
         sourceBranch: branch,
+        // Pinned so that the IT pipelines build the same commit as the extension under test,
+        // even when newer commits landed on the branch in the meantime
+        sourceVersion: commit,
       },
       AZDO_PROJECT,
     ),

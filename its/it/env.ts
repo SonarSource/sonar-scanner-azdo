@@ -37,3 +37,10 @@ export function loadEnvironmentVariables() {
 export function getBranch() {
   return process.env.AZURE_BRANCH;
 }
+
+/**
+ * Commit under test. When unset (local runs), the IT pipelines build the latest commit of the branch.
+ */
+export function getCommit() {
+  return process.env.AZURE_COMMIT;
+}
