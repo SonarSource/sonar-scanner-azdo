@@ -44,6 +44,26 @@ describe("logging", () => {
     expect(console.log).toHaveBeenCalledWith("[INFO]  SonarQube Server: This is an info message");
   });
 
+  it.each([
+    ["LF", "Warning\n##vso[task.setvariable variable=foo]bar"],
+    ["CRLF", "Warning\r\n##vso[task.setvariable variable=foo]bar"],
+    ["CR", "Warning\r##vso[task.setvariable variable=foo]bar"],
+  ])("should prevent logging command injection in INFO messages (%s)", (_, message) => {
+    jest.spyOn(console, "log");
+    log(LogLevel.INFO, message);
+    expect(console.log).toHaveBeenCalledWith(
+      String.raw`[INFO]  SonarQube Server: Warning\n## vso[task.setvariable variable=foo]bar`,
+    );
+  });
+
+  it("should prevent inline logging command injection in INFO messages", () => {
+    jest.spyOn(console, "log");
+    log(LogLevel.INFO, "Warning ##VSO[task.complete result=Succeeded]done");
+    expect(console.log).toHaveBeenCalledWith(
+      "[INFO]  SonarQube Server: Warning ## vso[task.complete result=Succeeded]done",
+    );
+  });
+
   it("should log ERROR messages", () => {
     log(LogLevel.ERROR, "This is an error message");
     expect(tl.error).toHaveBeenCalledWith("[ERROR] SonarQube Server: This is an error message");
