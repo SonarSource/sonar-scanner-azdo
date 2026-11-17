@@ -30,7 +30,7 @@ jobs:
     runs-on: github-ubuntu-latest-s
     permissions:
       id-token: write
-      contents: read
+      contents: write  # get-build-number@v2 creates refs/build-number/*
     outputs:
       BUILD_NUMBER: ${{ steps.get_build_number.outputs.BUILD_NUMBER }}
     steps:
@@ -161,7 +161,7 @@ jobs:
           '
 
   promote:
-    needs: build
+    needs: [build, get-build-number]
     env:
       BUILD_NUMBER: ${{ needs.get-build-number.outputs.BUILD_NUMBER }}
     runs-on: github-ubuntu-latest-s  # Using custom GitHub-hosted runner for public repo
