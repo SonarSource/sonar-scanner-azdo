@@ -10,4 +10,4 @@ jobs:
     permissions:
       actions: write  # Required to delete caches and artifacts
     steps:
-      - uses: SonarSource/ci-github-actions/pr_cleanup@v1
+      - uses: SonarSource/ci-github-actions/pr_cleanup@v2

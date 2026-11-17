@@ -34,7 +34,7 @@ jobs:
     outputs:
       BUILD_NUMBER: ${{ steps.get_build_number.outputs.BUILD_NUMBER }}
     steps:
-      - uses: SonarSource/ci-github-actions/get-build-number@v1
+      - uses: SonarSource/ci-github-actions/get-build-number@v2
         id: get_build_number
   build:
     needs: get-build-number
@@ -43,14 +43,14 @@ jobs:
     runs-on: github-ubuntu-latest-s  # Using custom GitHub-hosted runner for public repo
     name: Build and Test
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0  # Fetch all history for git operations
 
-      - uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
         with:
           version: 2026.11.7
-      - uses: SonarSource/ci-github-actions/config-npm@v1
+      - uses: SonarSource/ci-github-actions/config-npm@v2
         id: config
         with:
           artifactory-reader-role: private-reader
@@ -68,7 +68,7 @@ jobs:
             development/artifactory/token/${{ github.repository_owner }}-${{ github.event.repository.name }}-qa-deployer access_token | ARTIFACTORY_DEPLOY_PASSWORD;
             development/artifactory/token/${{ github.repository_owner }}-${{ github.event.repository.name }}-private-reader access_token | ARTIFACTORY_ACCESS_TOKEN;
       - name: Cache dependencies
-        uses: SonarSource/ci-github-actions/cache@v1
+        uses: SonarSource/ci-github-actions/cache@v2
         with:
           path: |
             node_modules
@@ -109,12 +109,12 @@ jobs:
       MAX_FILE_SIZE_MB: 40
       BUILD_NUMBER: ${{ needs.get-build-number.outputs.BUILD_NUMBER }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
         with:
           version: 2026.11.7
-      - uses: SonarSource/ci-github-actions/config-npm@v1
+      - uses: SonarSource/ci-github-actions/config-npm@v2
         id: config
         with:
          artifactory-reader-role: private-reader
@@ -130,7 +130,7 @@ jobs:
             development/kv/data/sign key | GPG_SIGNING_KEY;
             development/kv/data/sign passphrase | GPG_SIGNING_PASSPHRASE;
       - name: Cache dependencies
-        uses: SonarSource/ci-github-actions/cache@v1
+        uses: SonarSource/ci-github-actions/cache@v2
         with:
           path: |
             node_modules
@@ -167,12 +167,12 @@ jobs:
     runs-on: github-ubuntu-latest-s  # Using custom GitHub-hosted runner for public repo
     name: Promote
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
         with:
           cache_save: false
           version: 2026.11.7
-      - uses: SonarSource/ci-github-actions/config-npm@v1
+      - uses: SonarSource/ci-github-actions/config-npm@v2
         id: config
         with:
           artifactory-reader-role: private-reader
@@ -184,7 +184,7 @@ jobs:
             development/kv/data/repox url | ARTIFACTORY_URL;
             development/artifactory/token/${{ github.repository_owner }}-${{ github.event.repository.name }}-promoter access_token | ARTIFACTORY_PROMOTE_ACCESS_TOKEN;
       - name: Cache dependencies
-        uses: SonarSource/ci-github-actions/cache@v1
+        uses: SonarSource/ci-github-actions/cache@v2
         with:
           path: |
             node_modules
