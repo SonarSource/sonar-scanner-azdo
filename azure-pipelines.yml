@@ -13,7 +13,12 @@ schedules:
     always: true
 
 trigger:
-  - master
+  batch: true
+  branches:
+    include:
+      - master
+
+pr: none
 
 pool:
   vmImage: ubuntu-latest
@@ -27,8 +32,10 @@ variables:
     value: $(ARTIFACTORY_URL)/api/npm/npm
   - name: isMain
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  # Short name of the branch under test (e.g. "master"). The ITs queue their pipelines on it, so they use
+  # the fixtures of that branch, and read the SonarQube Cloud analysis of that branch name.
   - name: azureBranch
-    value: $[coalesce(variables['System.PullRequest.SourceBranch'], 'master')]
+    value: $[replace(variables['Build.SourceBranch'], 'refs/heads/', '')]
 
 lockBehavior: sequential
 
