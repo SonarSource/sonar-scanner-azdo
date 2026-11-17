@@ -30,7 +30,14 @@ export enum LogLevel {
 
 const LOG_MESSAGE_PADDING = 7;
 
+const LINE_BREAKS = /\r\n|\r|\n/g;
+const LOGGING_COMMAND_PREFIX = /##vso\[/gi;
+
 let endpointType: EndpointType | undefined;
+
+function sanitizeLogs(message: string): string {
+  return message.replace(LINE_BREAKS, String.raw`\n`).replace(LOGGING_COMMAND_PREFIX, "## vso[");
+}
 
 export function log(level: LogLevel, message: string) {
   const levelStr = `[${level}]`.padEnd(LOG_MESSAGE_PADDING);
@@ -43,7 +50,7 @@ export function log(level: LogLevel, message: string) {
       tl.warning(msgStr);
       break;
     case LogLevel.INFO:
-      console.log(msgStr);
+      console.log(sanitizeLogs(msgStr));
       break;
     default:
       tl.debug(msgStr);
