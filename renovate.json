@@ -3,6 +3,7 @@
   "extends": [
     "local>SonarSource/renovate-config"
   ],
+  "rebaseWhen": "conflicted",
   "packageRules": [
     {
       "description": "Keep deprecated task versions on their existing dependencies except for security updates",
