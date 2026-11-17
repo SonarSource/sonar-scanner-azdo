@@ -2,12 +2,23 @@
 
 ## How are integration tests run
 
-On each pull request and main branch, the QA pipeline should:
+The QA stage of the [Azure pipeline](../azure-pipelines.yml):
 
-- Build a test extension and install it
-- Run each [test case](./it/cases.ts) and verify the result on SonarQube Cloud
+- Builds a test extension and installs it
+- Runs each [test case](./it/cases.ts) and verifies the result on SonarQube Cloud
 
-## How to register a new pipeline to every PR analysis
+The Azure pipeline runs on master pushes and on the nightly build, not on pull requests.
+Pushes landing on master while a run is in progress are batched into a single run of the latest commit.
+
+To run the ITs for a pull request, run the pipeline manually in Azure DevOps on the pull request branch
+(the branch must belong to this repository, not to a fork). The dogfood extension is only published from master.
+
+Runs share the test extension and the SonarQube Cloud projects, so an "Exclusive Lock" check on the
+`sonar-scanner-azdo-variables` variable group lets only one stage use it at a time, across all runs.
+Every stage uses this variable group, so stages of different runs can interleave, but never run at the same time.
+With `lockBehavior: sequential`, waiting stages proceed in queue order and are never cancelled.
+
+## How to register a new pipeline to the QA
 
 Modify the [test cases](./it/cases.ts) file
 
