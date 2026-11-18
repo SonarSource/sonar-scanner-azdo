@@ -47,9 +47,10 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for git operations
 
-      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      - uses: SonarSource/mise-action-wrapper@65aa289d3f408f4999d13a52a14cde4f54b48442 # 2.0.0
         with:
           version: 2026.11.7
+          persist_github_token: false
       - uses: SonarSource/ci-github-actions/config-npm@v2
         id: config
         with:
@@ -111,9 +112,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      - uses: SonarSource/mise-action-wrapper@65aa289d3f408f4999d13a52a14cde4f54b48442 # 2.0.0
         with:
           version: 2026.11.7
+          persist_github_token: false
       - uses: SonarSource/ci-github-actions/config-npm@v2
         id: config
         with:
@@ -168,7 +170,7 @@ jobs:
     name: Promote
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      - uses: step-security/mise-action@a225bbd7c202ddf57dd76dff22bb7992f6314173 # v5.1.2
         with:
           cache_save: false
           version: 2026.11.7
