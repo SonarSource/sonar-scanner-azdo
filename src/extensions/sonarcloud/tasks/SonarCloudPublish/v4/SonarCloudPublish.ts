@@ -18,6 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import { EndpointType, publishTask, runTask } from "../../../../../common/latest";
+import { EndpointType, publishTask, runTask } from "../../../../../common/sonarcloud-v4";
 
 runTask(publishTask, "Publish", EndpointType.Cloud);
