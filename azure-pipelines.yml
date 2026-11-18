@@ -239,6 +239,7 @@ stages:
               SONARCLOUD_TOKEN: $(SonarCloudToken)
               AZURE_TOKEN: $(INTEGRATION_TESTING_TOKEN)
               AZURE_BRANCH: $(azureBranch)
+              AZURE_COMMIT: $(Build.SourceVersion)
             inputs:
               targetType: "inline"
               script: |
