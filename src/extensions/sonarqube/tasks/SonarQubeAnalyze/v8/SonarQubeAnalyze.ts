@@ -18,6 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import { EndpointType, analyzeTask, runTask } from "../../../../../common/latest";
+import { EndpointType, analyzeTask, runTask } from "../../../../../common/sonarqube-v8";
 
 runTask(analyzeTask, "Analyze", EndpointType.Server);
