@@ -6,14 +6,6 @@
   "rebaseWhen": "never",
   "packageRules": [
     {
-      "description": "Keep deprecated task versions on their existing dependencies except for security updates",
-      "matchFileNames": [
-        "src/common/sonarcloud-v3/**",
-        "src/common/sonarqube-v7/**"
-      ],
-      "enabled": false
-    },
-    {
       "description": "Do not update dependencies used by integration test fixtures",
       "matchFileNames": [
         "its/**"
