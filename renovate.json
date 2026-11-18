@@ -6,6 +6,14 @@
   "rebaseWhen": "never",
   "packageRules": [
     {
+      "description": "Keep frozen task versions on their existing dependencies except for security updates",
+      "matchFileNames": [
+        "src/common/sonarcloud-v4/**",
+        "src/common/sonarqube-v8/**"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Do not update dependencies used by integration test fixtures",
       "matchFileNames": [
         "its/**"
