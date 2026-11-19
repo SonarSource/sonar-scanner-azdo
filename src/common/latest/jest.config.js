@@ -18,9 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-const path = require("path");
-
-const esModules = ["node-fetch", "data-uri-to-buffer", "fetch-blob", "formdata-polyfill"].join("|");
+const path = require("node:path");
 
 module.exports = {
   clearMocks: true,
@@ -31,14 +29,12 @@ module.exports = {
   ],
   moduleFileExtensions: ["ts", "js"],
   testPathIgnorePatterns: ["<rootDir>/node_modules", "<rootDir>/config", "<rootDir>/build"],
-  testRegex: "(/__tests__/.*-test)\\.ts$",
+  testRegex: String.raw`(/__tests__/.*-test)\.ts$`,
   testEnvironmentOptions: {
     url: "http://localhost/",
   },
-  transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
   transform: {
     ".(ts)$": ["ts-jest"],
-    ".(js)$": ["babel-jest"],
   },
   setupFilesAfterEnv: ["<rootDir>/__tests__/setup.ts"],
 };
