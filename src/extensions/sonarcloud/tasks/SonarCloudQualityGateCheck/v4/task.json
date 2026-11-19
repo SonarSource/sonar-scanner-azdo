@@ -13,6 +13,8 @@
     "Minor": 4,
     "Patch": 0
   },
+  "deprecated": true,
+  "deprecationMessage": "This task version is deprecated. Please upgrade to version 5 of this task. For more information, refer to https://docs.sonarsource.com/sonarcloud/advanced-setup/ci-based-analysis/sonarcloud-extension-for-azure-devops/",
   "preview": "true",
   "inputs": [],
   "instanceNameFormat": "Check SonarQube Cloud Quality Gate status",
