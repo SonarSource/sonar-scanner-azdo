@@ -31,8 +31,10 @@ export function generateCombinations(): PipelineCombination[] {
   let versionCombinations: PipelineCombination["version"][];
   switch(process.env.TASK_VERSION) {
       case "4": versionCombinations = [{ extension: "sonarcloud", version: 4 }]; break;
+      case "5": versionCombinations = [{ extension: "sonarcloud", version: 5 }]; break;
       case undefined: versionCombinations = [
         { extension: "sonarcloud", version: 4 },
+        { extension: "sonarcloud", version: 5 },
       ]; break;
       default: throw new Error(`Invalid task version combination: ${process.env.TASK_VERSION}`);
   };

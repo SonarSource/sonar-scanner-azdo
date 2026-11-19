@@ -82,6 +82,10 @@ export async function createPipeline(
   );
 }
 
+// All test cases poll their build in parallel: a short interval floods Azure DevOps with
+// requests and causes connection timeouts, while builds take minutes anyway.
+const BUILD_STATUS_POLLING_INTERVAL_MS = 5000;
+
 const TRANSIENT_ERROR_CODES = new Set(["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "ENETUNREACH"]);
 
 async function withRetry<T>(fn: () => Promise<T>, maxAttempts = 5): Promise<T> {
@@ -131,7 +135,7 @@ export async function runPipeline(
   log(`Build ${buildId} queued`);
   let buildResult = await withRetry(() => azdoBuildApi.getBuild(projectId, buildId));
   while (buildResult.status !== BuildStatus.Completed) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, BUILD_STATUS_POLLING_INTERVAL_MS));
     buildResult = await withRetry(() => azdoBuildApi.getBuild(projectId, buildId));
   }
 

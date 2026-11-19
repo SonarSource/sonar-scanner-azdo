@@ -5,7 +5,7 @@
 The QA stage of the [Azure pipeline](../azure-pipelines.yml):
 
 - Builds a test extension and installs it
-- Runs each [test case](./it/cases.ts) and verifies the result on SonarQube Cloud
+- Runs one test case per combination defined in [combination.ts](./combination.ts) and verifies the result on SonarQube Cloud
 
 The Azure pipeline runs on master pushes and on the nightly build, not on pull requests.
 Pushes landing on master while a run is in progress are batched into a single run of the latest commit.
@@ -18,21 +18,21 @@ Runs share the test extension and the SonarQube Cloud projects, so an "Exclusive
 Every stage uses this variable group, so stages of different runs can interleave, but never run at the same time.
 With `lockBehavior: sequential`, waiting stages proceed in queue order and are never cancelled.
 
-## How to register a new pipeline to the QA
-
-Modify the [test cases](./it/cases.ts) file
-
 ## How to add/remove test-cases
+
+Test cases are derived from the combinations: each combination produces one pipeline file and one test case,
+so there is no separate list of test cases to maintain.
 
 - Edit the combinations that are being tested in [the combination.ts file](./combination.ts), or modify the pipeline definition in [the pipeline.ts file](./pipeline.ts).
 - Re-generate the pipelines with `npm run generate-its`.
-- Create a pull request with your changes (your branch need to exist).
-- **If you added a pipeline** file which you want to run in the QA, you need to:
-  - Create a new pipeline on Azure DevOps from this GitHub repository and select the pipeline file.
-  - Add a test-case for your new pipeline file in [cases.ts](./it/cases.ts)
-- **If you removed a pipeline** which is currently run in the QA, you need to:
-  - Delete the pipeline on Azure DevOps
-  - Renmove the test-case on this pipeline from [cases.ts](./it/cases.ts)
+- Push your branch, so the pipeline files exist on GitHub.
+- Synchronize the pipelines on Azure DevOps with `npm run install-its` (requires the `AZURE_TOKEN` and `SONARCLOUD_TOKEN` environment variables),
+  or run the **Install QA pipelines** release in Azure DevOps. This creates the missing pipelines and deletes the ones that no longer have a pipeline file.
+- Create a pull request with your changes.
+
+The QA fails for new combinations until their pipelines exist on Azure DevOps.
+
+Only SonarQube Cloud combinations are tested for now. SonarQube Server is not supported in the E2E tests yet (SONARAZDO-425).
 
 ## Test vs Real extension differences
 
