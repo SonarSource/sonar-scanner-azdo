@@ -82,7 +82,7 @@
     "libxmljs2": "Workaround for https://github.com/CycloneDX/cyclonedx-javascript-library/issues/1061 to silent vulnerability findings"
   },
   "engines": {
-    "node": ">=6",
+    "node": ">=24",
     "npm": ">=8"
   }
 }
