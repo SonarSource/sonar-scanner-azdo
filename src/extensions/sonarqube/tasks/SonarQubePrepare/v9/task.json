@@ -13,7 +13,7 @@
     "Patch": 0
   },
   "releaseNotes": "* __SonarScanner for .NET 12:__ The embedded SonarScanner for .NET requires SonarQube Server 2025.1 or later, or SonarQube Community Build 25.1 or later.\n* __XAML builds are no longer supported:__ Use YAML or classic pipelines instead.\n* __SonarScanner CLI fallback removed:__ The scanner engine is always downloaded from the server, so build agents need access to `<server>/api/v2/analysis/*`. The `sonar.scanner.useSonarScannerCLI` property is ignored.\n* __Temporary workaround for older servers:__ Set the `.NET Scanner Version` input (`dotnetScannerVersion`) to a SonarScanner for .NET 11.x version. 11.x no longer receives fixes, including security fixes.",
-  "minimumAgentVersion": "3.218.0",
+  "minimumAgentVersion": "3.232.1",
   "instanceNameFormat": "Prepare analysis on SonarQube Server",
   "groups": [
     {
@@ -157,9 +157,6 @@
     }
   ],
   "execution": {
-    "Node16": {
-      "target": "SonarQubePrepare.js"
-    },
     "Node20_1": {
       "target": "SonarQubePrepare.js"
     },

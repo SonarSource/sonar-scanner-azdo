@@ -13,7 +13,7 @@
     "Patch": 0
   },
   "releaseNotes": "To be used with version 9 of the `Prepare Analysis Configuration` task, which embeds SonarScanner for .NET 12 and requires SonarQube Server 2025.1 or later, or SonarQube Community Build 25.1 or later, for .NET analysis.",
-  "minimumAgentVersion": "3.218.0",
+  "minimumAgentVersion": "3.232.1",
   "inputs": [
     {
       "name": "jdkversion",
@@ -30,9 +30,6 @@
     }
   ],
   "execution": {
-    "Node16": {
-      "target": "SonarQubeAnalyze.js"
-    },
     "Node20_1": {
       "target": "SonarQubeAnalyze.js"
     },

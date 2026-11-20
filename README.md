@@ -44,7 +44,7 @@ Make sure that you follow our [code style](https://github.com/SonarSource/sonar-
 
 ### How to set the environment
 
-- Install NPM (v8 or higher) / Node.js (v14 or higher)
+- Install NPM (v8 or higher) / Node.js (v24 or higher), e.g. via `mise install` (see `mise.toml`)
 - ```bash
   npm install -g tfx-cli
   npm install
