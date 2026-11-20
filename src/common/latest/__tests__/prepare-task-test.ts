@@ -22,7 +22,7 @@ import { WebApi } from "azure-devops-node-api";
 import { GitApi } from "azure-devops-node-api/GitApi";
 import * as tl from "azure-pipelines-task-lib/task";
 import * as toolLib from "azure-pipelines-tool-lib/tool";
-import { Guid } from "guid-typescript";
+import * as crypto from "crypto";
 import * as path from "path";
 import { SemVer } from "semver";
 import { AzureProvider, JdkVersionSource } from "../helpers/constants";
@@ -218,15 +218,15 @@ it("should build report task path from variables", () => {
   const sonarSubDirectory = "sonar";
   const buildId = "1";
 
-  const guid = Guid.create();
+  const guid = crypto.randomUUID();
 
-  jest.spyOn(Guid, "create").mockImplementation(() => guid);
+  jest.spyOn(crypto, "randomUUID").mockImplementation(() => guid);
 
   const reportFullPath = path.join(
     reportDirectory,
     sonarSubDirectory,
     buildId,
-    guid.toString(),
+    guid,
     "report-task.txt",
   );
 

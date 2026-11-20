@@ -19,9 +19,9 @@
  */
 
 import * as tl from "azure-pipelines-task-lib/task";
+import * as crypto from "node:crypto";
 import * as fs from "fs-extra";
-import { Guid } from "guid-typescript";
-import * as path from "path";
+import * as path from "node:path";
 import * as semver from "semver";
 import { TaskVariables } from "../helpers/constants";
 import { log, LogLevel } from "../helpers/logging";
@@ -78,7 +78,7 @@ export default class TaskReport {
   public static getDefaultPath() {
     return path.join(
       tl.getVariable("Agent.TempDirectory") as string,
-      TaskReport.getDefaultPathTemplate().replace("<GUID>", Guid.create().toString()),
+      TaskReport.getDefaultPathTemplate().replace("<GUID>", crypto.randomUUID()),
     );
   }
 
