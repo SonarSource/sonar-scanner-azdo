@@ -22,7 +22,7 @@ import { AxiosRequestConfig } from "axios";
 import * as tl from "azure-pipelines-task-lib/task";
 import { HttpProxyAgent, HttpsProxyAgent } from "hpagent";
 import * as semver from "semver";
-import { API_BASE_URL_BY_CUSTOM_CLOUD_URL, PROP_NAMES } from "../helpers/constants";
+import { PROP_NAMES } from "../helpers/constants";
 import { log, LogLevel } from "../helpers/logging";
 import { getProxyFromURI } from "../helpers/proxyFromEnv";
 
@@ -126,27 +126,12 @@ export default class Endpoint {
         : PROP_NAMES.TOKEN;
 
     return {
-      ...this.toServerUrlProps(),
+      [PROP_NAMES.HOST_URL]: this.data.url,
       [authKey]: this.data.token || this.data.username,
       [PROP_NAMES.PASSWORD]:
         this.data.password && this.data.password.length > 0 ? this.data.password : null,
       [PROP_NAMES.ORG]: this.data.organization,
     };
-  }
-
-  // Scanners ignore the custom SonarQube Cloud properties whenever sonar.host.url is set, so they are exclusive
-  private toServerUrlProps(): { [key: string]: string } {
-    const apiBaseUrl =
-      this.type === EndpointType.Cloud
-        ? API_BASE_URL_BY_CUSTOM_CLOUD_URL[this.data.url]
-        : undefined;
-    if (apiBaseUrl) {
-      return {
-        [PROP_NAMES.SONARCLOUD_URL]: this.data.url,
-        [PROP_NAMES.API_BASE_URL]: apiBaseUrl,
-      };
-    }
-    return { [PROP_NAMES.HOST_URL]: this.data.url };
   }
 
   public static getEndpoint(id: string, type: EndpointType): Endpoint {

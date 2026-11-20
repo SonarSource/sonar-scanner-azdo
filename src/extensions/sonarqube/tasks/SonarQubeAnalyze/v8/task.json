@@ -12,6 +12,8 @@
     "Minor": 4,
     "Patch": 0
   },
+  "deprecated": true,
+  "deprecationMessage": "This task version is deprecated. Please upgrade to version 9 of this task. For more information, refer to https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/",
   "releaseNotes": "To be used with the new version of the `Prepare Analysis Configuration` task.",
   "minimumAgentVersion": "3.218.0",
   "inputs": [

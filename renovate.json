@@ -8,8 +8,8 @@
     {
       "description": "Keep deprecated task versions on their existing dependencies except for security updates",
       "matchFileNames": [
-        "src/common/sonarcloud-v3/**",
-        "src/common/sonarqube-v7/**"
+        "src/common/sonarcloud-v4/**",
+        "src/common/sonarqube-v8/**"
       ],
       "enabled": false
     },
