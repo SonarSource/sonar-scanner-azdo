@@ -24,7 +24,7 @@ module.exports = {
   bundle: true,
   platform: "node",
   format: "cjs",
-  target: "node16",
+  target: "node20",
   minify: true,
   plugins: [shellJsPlugin],
 };
