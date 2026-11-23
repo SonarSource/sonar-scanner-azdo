@@ -36,7 +36,7 @@
     "@types/yargs": "17.0.35",
     "@typescript-eslint/parser": "8.73.0",
     "dateformat": "4.6.3",
-    "esbuild": "0.24.0",
+    "esbuild": "0.28.2",
     "eslint": "10.0.2",
     "eslint-plugin-promise": "7.3.0",
     "fancy-log": "2.0.0",
