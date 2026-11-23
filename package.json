@@ -24,17 +24,20 @@
     "ts-check": "gulp build:typescript",
     "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test",
     "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci",
-    "cyclonedx-run": "cyclonedx-npm",
+    "cyclonedx-run": "cyclonedx-npm --validate",
     "cyclonedx": "gulp cyclonedx"
   },
   "devDependencies": {
-    "@cyclonedx/cyclonedx-npm": "^6.0.0",
+    "@cyclonedx/cyclonedx-npm": "^7.0.1",
     "@eslint/js": "^10.0.1",
     "@types/fs-extra": "11.0.4",
     "@types/jest": "30.0.0",
     "@types/node": "22.20.5",
     "@types/yargs": "17.0.35",
     "@typescript-eslint/parser": "8.73.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "ajv-formats-draft2019": "1.6.1",
     "dateformat": "4.6.3",
     "esbuild": "0.28.2",
     "eslint": "10.0.2",
@@ -69,12 +72,6 @@
     "vinyl": "3.0.1",
     "yaml": "2.9.1",
     "yargs": "17.7.3"
-  },
-  "overrides": {
-    "libxmljs2": "https://registry.npmjs.org/@ttskp/libxmljs2-noop/-/libxmljs2-noop-1.0.0.tgz"
-  },
-  "overridesComment": {
-    "libxmljs2": "Workaround for https://github.com/CycloneDX/cyclonedx-javascript-library/issues/1061 to silent vulnerability findings"
   },
   "engines": {
     "node": ">=24",
