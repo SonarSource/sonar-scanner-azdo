@@ -20,6 +20,7 @@
 
 import { fetchWithRetry } from "../helpers/api";
 import { log, LogLevel } from "../helpers/logging";
+import { RequestData } from "../helpers/request";
 import { waitFor } from "../helpers/utils";
 import Endpoint, { EndpointType } from "./Endpoint";
 
@@ -42,12 +43,10 @@ export async function waitForTaskCompletion(
   delay: number,
 ): Promise<Task> {
   log(LogLevel.DEBUG, `Waiting for task '${taskId}' to complete.`);
-  let query = {};
-  if (endpoint.type === EndpointType.Server) {
-    query = { id: taskId };
-  } else {
-    query = { id: taskId, additionalFields: "warnings" };
-  }
+  const query: RequestData =
+    endpoint.type === EndpointType.Server
+      ? { id: taskId }
+      : { id: taskId, additionalFields: "warnings" };
 
   let attempts = 0;
   while (attempts < tries) {
@@ -60,7 +59,7 @@ export async function waitForTaskCompletion(
       if (error instanceof Error) {
         log(LogLevel.ERROR, JSON.stringify(error.message));
       }
-      throw new Error(`Could not fetch task for ID '${taskId}'`);
+      throw new Error(`Could not fetch task for ID '${taskId}'`, { cause: error });
     }
 
     const status = task.status.toUpperCase();
