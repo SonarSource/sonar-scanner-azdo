@@ -70,7 +70,7 @@ export async function fetchProjectStatus(
     if (error instanceof Error) {
       log(LogLevel.ERROR, `Error retrieving analysis: ${error.message}`);
     }
-    throw new Error(`Could not fetch analysis for ID '${analysisId}'`);
+    throw new Error(`Could not fetch analysis for ID '${analysisId}'`, { cause: error });
   }
 }
 
@@ -99,7 +99,7 @@ export async function fetchMetrics(
       log(LogLevel.ERROR, error.message);
     }
 
-    throw new Error(`Could not fetch metrics`);
+    throw new Error(`Could not fetch metrics`, { cause: error });
   }
 }
 
@@ -118,6 +118,6 @@ export async function fetchComponentMeasures(
       );
     }
 
-    throw new Error(`Could not fetch component measures`);
+    throw new Error(`Could not fetch component measures`, { cause: error });
   }
 }

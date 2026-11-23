@@ -61,7 +61,7 @@ export async function get<T>(endpoint: Endpoint, path: string, query?: RequestDa
 
     const msg = buildErrorMessage(path, error);
     log(LogLevel.DEBUG, msg);
-    throw new Error(msg);
+    throw new Error(msg, { cause: error });
   }
 }
 

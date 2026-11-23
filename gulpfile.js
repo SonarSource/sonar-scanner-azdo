@@ -136,7 +136,6 @@ gulp.task("build:bundle", async () => {
     const commonFolder = getTaskCommonFolder(taskName, version);
     const outFilePath = task.replace(SOURCE_DIR, BUILD_DIR).replace(/\.ts$/, ".js");
 
-    // eslint-disable-next-line import/no-dynamic-require
     const esbuildConfig = require(
       path.join(SOURCE_DIR, "common", commonFolder, "esbuild.config.js"),
     );
@@ -157,7 +156,6 @@ gulp.task("build:download-scanners", () => {
   const configJss = glob([globPath(BUILD_TS_DIR, "common", "*", "config.js")]);
   const streams = [];
   for (const configJs of configJss) {
-    // eslint-disable-next-line import/no-dynamic-require
     const { scanner } = require(configJs);
     streams.push(
       downloadOrCopy(process.env.SCANNER_NET_FRAMEWORK_LOCATION ?? scanner.classicUrl)
@@ -224,7 +222,6 @@ gulp.task("build:copy", () => {
      * Hotfix for shelljs dependency
      * @see https://github.com/microsoft/azure-pipelines-task-lib/issues/942#issuecomment-1904939900
      */
-    // eslint-disable-next-line import/no-dynamic-require
     const esbuildConfig = require(path.join(SOURCE_DIR, "common", commonPath, "esbuild.config.js"));
     if (esbuildConfig.external?.includes("shelljs")) {
       const createShellJsDummyFile = gulpFile("index.js", "", { src: true }).pipe(
@@ -243,7 +240,6 @@ gulp.task("build:copy", () => {
         path.join(SOURCE_DIR, "common", commonPath, "node_modules", libName, "lib.json"),
       )
       .filter((libJsonPath) => fs.existsSync(libJsonPath))
-      // eslint-disable-next-line import/no-dynamic-require
       .map((libJsonPath) => require(libJsonPath).messages)
       .reduce((acc, libJson) => ({ ...acc, ...libJson }), {});
     streams.push(
@@ -276,7 +272,6 @@ gulp.task("build:copy", () => {
 
     // Get the config.js file for the task to know what scanner to use
     const configJs = path.join(BUILD_TS_DIR, "common", commonPath, "config.js");
-    // eslint-disable-next-line import/no-dynamic-require
     const { scanner } = require(configJs);
 
     // Copy Scanner CLI
@@ -386,7 +381,6 @@ gulp.task("extension:build", (done) => {
   const vssExtensions = glob([globPath(SOURCE_DIR, "extensions", "*", "vss-extension.json")]);
 
   for (const vssExtension of vssExtensions) {
-    // eslint-disable-next-line import/no-dynamic-require
     const { version } = require(vssExtension);
     const extension = path.basename(path.dirname(vssExtension));
     const fullVersion = getVersionWithBuildNumber(version);

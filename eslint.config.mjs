@@ -1,21 +1,8 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import _import from "eslint-plugin-import";
 import promise from "eslint-plugin-promise";
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
 
 export default defineConfig([globalIgnores([
     "**/node_modules",
@@ -23,14 +10,7 @@ export default defineConfig([globalIgnores([
     "**/coverage",
     "common/ts/helpers/temp-find-method.ts",
 ]), {
-    extends: fixupConfigRules(
-        compat.extends("eslint:recommended", "plugin:import/errors", "plugin:promise/recommended"),
-    ),
-
-    plugins: {
-        import: fixupPluginRules(_import),
-        promise: fixupPluginRules(promise),
-    },
+    extends: [js.configs.recommended, promise.configs["flat/recommended"]],
 
     languageOptions: {
         globals: {
@@ -48,10 +28,6 @@ export default defineConfig([globalIgnores([
                 modules: true,
             },
         },
-    },
-
-    settings: {
-        "import/ignore": ["node_modules"],
     },
 
     rules: {
@@ -138,20 +114,6 @@ export default defineConfig([globalIgnores([
         "prefer-spread": "warn",
         "no-undef": "off",
         "no-unused-vars": "off",
-        "import/extensions": "error",
-        "import/first": "error",
-        "import/newline-after-import": "error",
-        "import/no-absolute-path": "error",
-        "import/no-amd": "error",
-        "import/no-deprecated": "error",
-        "import/no-duplicates": "error",
-        "import/no-dynamic-require": "error",
-        "import/no-mutable-exports": "error",
-        "import/no-named-as-default": "error",
-        "import/no-named-as-default-member": "error",
-        "import/no-named-default": "error",
-        "import/no-webpack-loader-syntax": "error",
-        "import/no-unresolved": "off",
 
         "promise/catch-or-return": ["warn", {
             allowThen: true,
@@ -159,5 +121,13 @@ export default defineConfig([globalIgnores([
 
         "promise/always-return": "off",
         "promise/avoid-new": "off",
+    },
+}, {
+    // Deprecated task versions are frozen until removal, so rules introduced by ESLint 10 are not enforced there.
+    files: ["src/common/sonarcloud-v4/**", "src/common/sonarqube-v8/**"],
+
+    rules: {
+        "no-useless-assignment": "off",
+        "preserve-caught-error": "off",
     },
 }]);
