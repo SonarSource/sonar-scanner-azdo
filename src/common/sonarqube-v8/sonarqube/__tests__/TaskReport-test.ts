@@ -151,7 +151,7 @@ it("should find report files for SonarQube below 7.2.0", () => {
   expect(reportFiles[1]).toBe("path2");
 
   expect(tl.getVariable).toHaveBeenCalledTimes(1);
-  expect(tl.getVariable).toBeCalledWith("Agent.BuildDirectory");
+  expect(tl.getVariable).toHaveBeenCalledWith("Agent.BuildDirectory");
 
   // Calculate the expected path to take account of different
   // path separators in Windows/non-Windows

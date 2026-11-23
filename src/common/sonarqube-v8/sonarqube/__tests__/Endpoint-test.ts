@@ -90,7 +90,7 @@ it("For SonarQube Server version >= 10.0.0 token field is used instead of login"
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
 
   const result = Endpoint.getEndpoint("sonarqube", EndpointType.Server);
-  expect(result.toSonarProps("10.0.0")).not.toContain(PROP_NAMES.LOGIN);
+  expect(result.toSonarProps("10.0.0")).not.toHaveProperty([PROP_NAMES.LOGIN]);
 });
 
 // SONARAZDO-302
@@ -114,7 +114,7 @@ it("On SonarQube Cloud, token field is used instead of login", () => {
 
   const result = Endpoint.getEndpoint("sonarcloud", EndpointType.Cloud);
 
-  expect(result.toSonarProps("8.2.4")).not.toContain(PROP_NAMES.LOGIN);
+  expect(result.toSonarProps("8.2.4")).not.toHaveProperty([PROP_NAMES.LOGIN]);
 });
 
 // SONARAZDO-630
