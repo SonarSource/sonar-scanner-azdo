@@ -13,6 +13,7 @@
     "Patch": 0
   },
   "minimumAgentVersion": "3.232.1",
+  "instanceNameFormat": "Publish Quality Gate Result",
   "inputs": [
     {
       "name": "pollingTimeoutSec",

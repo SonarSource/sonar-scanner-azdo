@@ -13,6 +13,7 @@
     "Patch": 0
   },
   "minimumAgentVersion": "3.232.1",
+  "instanceNameFormat": "Run Code Analysis",
   "inputs": [
     {
       "name": "jdkversion",

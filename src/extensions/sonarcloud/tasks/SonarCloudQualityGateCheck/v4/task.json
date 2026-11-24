@@ -1,7 +1,7 @@
 {
   "id": "6350bfb8-c310-4cdd-af68-722f33cf440a",
   "name": "SonarCloudQualityGateCheck",
-  "friendlyName": "SonarQube Cloud Quality Gate status check",
+  "friendlyName": "Check SonarQube Cloud Quality Gate",
   "description": "SonarQube Cloud Quality Gate status check for a build.",
   "helpMarkDown": "",
   "category": "Deploy",
